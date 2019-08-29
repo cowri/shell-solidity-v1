@@ -11,11 +11,12 @@ contract DappTest is DSTest {
         dapp = new Dapp();
     }
 
-    function testFail_basic_sanity() public {
-        assertTrue(false);
+    function testSet() public {
+        dapp.setNum(10);
+        assertTrue(dapp.getNum() == 10);
     }
 
-    function test_basic_sanity() public {
-        assertTrue(true);
+    function testConstructor() public {
+        assertTrue(dapp.getNum() == 5);
     }
 }
