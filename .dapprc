@@ -1,0 +1,4 @@
+DAPPTOOLS=~/.dapp/dapptools	
+DAPP_SRC=src	
+DAPP_LIb=lib	
+DAPP_OUT=out	

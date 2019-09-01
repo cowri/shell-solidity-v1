@@ -1,8 +1,9 @@
 pragma solidity ^0.5.0;
 
+import "ds-math/math.sol";
 import "./Shell.sol";
 
-contract PrototypeOne {
+contract PrototypeOne is DSMath {
     using SafeMath for uint256;
 
     address[] tokens;
