@@ -1,0 +1,5 @@
+DAPPTOOLS=~/.dapp/dapptools	Installed location of tools
+DAPPSYS_PATH=~/.dapp/daptools
+DAPP_SRC=src	
+DAPP_LIb=lib	
+DAPP_OUT=out	
