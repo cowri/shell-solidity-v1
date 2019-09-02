@@ -44,36 +44,31 @@ contract DappTest is DSTest {
         shell1Liquidity = pool.depositLiquidity(shell1, 1000);
         shell2Liquidity = pool.depositLiquidity(shell2, 3000);
 
-        uint256 swap1 = pool.swap(address(TEST1), address(TEST2), 100);
-        uint256 swap2 = pool.swap(address(TEST2), address(TEST1), 100);
-        uint256 swap3 = pool.swap(address(TEST1), address(TEST3), 100);
-        uint256 swap4 = pool.swap(address(TEST3), address(TEST2), 100);
+        pool.swap(address(TEST1), address(TEST2), 100);
+        pool.swap(address(TEST2), address(TEST1), 100);
+        pool.swap(address(TEST1), address(TEST3), 100);
+        pool.swap(address(TEST3), address(TEST2), 100);
 
     }
 
 
-    function testSwap () public {
-
-        uint256 shell1Token1 = pool.getShellBalanceOf(shell1, address(TEST1));
-        uint256 shell1Token2 = pool.getShellBalanceOf(shell1, address(TEST2));
-        assertEq(shell1Token1, 999);
-        assertEq(shell1Token2, 1000);
+    function testWithdrawPostSwaps () public {
 
         uint256[] memory shell1Withdrawal = pool.withdrawLiquidity(shell1, 500);
-        assertEq(shell1Withdrawal[0], 249);
-        assertEq(shell1Withdrawal[1], 249);
+        assertEq(shell1Withdrawal[0], 250);
+        assertEq(shell1Withdrawal[1], 250);
 
         uint256 shell2Token1 = pool.getShellBalanceOf(shell2, address(TEST1));
         uint256 shell2Token2 = pool.getShellBalanceOf(shell2, address(TEST2));
         uint256 shell2Token3 = pool.getShellBalanceOf(shell2, address(TEST3));
         assertEq(shell2Token1, 3093);
-        assertEq(shell2Token2, 2902);
+        assertEq(shell2Token2, 2899);
         assertEq(shell2Token3, 3000);
 
         uint256[] memory shell2Withdrawal = pool.withdrawLiquidity(shell2, 1500);
-        assertEq(shell2Withdrawal[0], 515);
+        assertEq(shell2Withdrawal[0], 516);
         assertEq(shell2Withdrawal[1], 483);
-        assertEq(shell2Withdrawal[2], 499);
+        assertEq(shell2Withdrawal[2], 500);
 
     }
 

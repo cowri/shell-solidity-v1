@@ -4,7 +4,6 @@ import "ds-math/math.sol";
 import "./Shell.sol";
 
 contract PrototypeOne is DSMath {
-    using SafeMath for uint256;
 
     address[] tokens;
     Shell[] public shellList;
@@ -13,7 +12,8 @@ contract PrototypeOne is DSMath {
     mapping(address => mapping(address => uint)) public shells;
 
     event balanceOf(bytes32, uint256);
-    event log_uint(bytes32, uint256);
+    event log_named_uint(bytes32, uint256);
+    event log_named_uint_arr(bytes32, uint256[]);
 
     function __init__ (address[] memory _tokens) public {
         tokens = _tokens;
@@ -46,17 +46,18 @@ contract PrototypeOne is DSMath {
         Shell shell = Shell(shellAddress);
         uint supportedTokensNumber = shell.getTokens().length;
         uint liqTokensMinted = 0;
+
         if(shell.totalSupply() > 0){
 
-            uint capitalDeposited = amount.mul(supportedTokensNumber);
-            liqTokensMinted = multiplyDivide(shell.totalSupply(), capitalDeposited, getTotalCapital(shell));
+            uint capitalDeposited = wmul(supportedTokensNumber, amount * WAD);
+            liqTokensMinted = wdiv(wmul(shell.totalSupply(), capitalDeposited), getTotalCapital(shell));
             depositTokens(shell, msg.sender, amount);
             depositShellBalance(shell, amount); //doesn't change the tokens, but changes the shells
             shell.mint(msg.sender, liqTokensMinted);
 
         } else {
 
-            liqTokensMinted = amount.mul(supportedTokensNumber);
+            liqTokensMinted = wmul(supportedTokensNumber, amount * WAD);
             depositTokens(shell, msg.sender, amount);
             depositShellBalance(shell, amount); //updates the shells, not the ERC20 balanceOf...
             shell.mint(msg.sender, liqTokensMinted);
@@ -69,7 +70,8 @@ contract PrototypeOne is DSMath {
         Shell shell = Shell(shellAddress);
         uint256 totalCapital = getTotalCapital(shell);
         uint256 totalShellSupply = shell.totalSupply();
-        uint256 capitalWithdrawn = multiplyDivide(totalCapital, liquidityTokensToBurn, totalShellSupply);
+        uint256 capitalWithdrawn = wdiv(wmul(totalCapital, liquidityTokensToBurn * WAD), totalShellSupply * WAD);
+        emit log_named_uint("capital withdrawn", capitalWithdrawn);
         // uint256 capitalWithdrawn = multiplyDivide(getTotalCapital(shell), liquidityTokensToBurn, shell.totalSupply());
         uint256[] memory tokenAmountWithdrawn = tokenAmountWithdrawnCalc(shell, capitalWithdrawn);
         Shell(shellAddress).testBurn(msg.sender, liquidityTokensToBurn);
@@ -87,29 +89,48 @@ contract PrototypeOne is DSMath {
         uint originLiquidity = 0; //total supply of originCurrency in shells that support the trading pair
         uint targetLiquidity = 0; //total supply of targetCurrency in shells that support the trading pair
         for (uint i = 0; i < _shells.length; i++) {
-            originLiquidity = originLiquidity.add(shells[_shells[i]][originCurrency]);
-            targetLiquidity = targetLiquidity.add(shells[_shells[i]][targetCurrency]);
+            originLiquidity = add(originLiquidity, shells[_shells[i]][originCurrency]);
+            targetLiquidity = add(targetLiquidity, shells[_shells[i]][targetCurrency]);
         }
 
+        emit log_named_uint("originLiquidity", originLiquidity);
+        emit log_named_uint("targetLiquidity", targetLiquidity);
+        emit log_named_uint("swap amount origin", swapAmountOrigin);
         //calculating the swap amount for the target currency
-        uint swapAmountTarget = multiplyDivide(swapAmountOrigin, targetLiquidity, swapAmountOrigin.add(originLiquidity));
+        uint numerator = wmul(swapAmountOrigin * WAD, targetLiquidity);
+        uint denominator = add(swapAmountOrigin, originLiquidity) * WAD;
+        uint swapAmountTarget = wdiv(numerator, denominator);
+        emit log_named_uint("numerator to swapAmountTarget", numerator);
+        emit log_named_uint("denominator to swapAmountTarget", numerator);
+        emit log_named_uint("swap amount target", swapAmountTarget);
 
         //calculating the % contribution and updating the shell balances
         for(uint i = 0; i < _shells.length; i++) {
 
             targetBalance = shells[_shells[i]][targetCurrency];
-            targetBalance = targetBalance.sub(multiplyDivide(swapAmountTarget, targetBalance, targetLiquidity));
+            numerator = wmul(swapAmountTarget * WAD, targetBalance);
+            targetBalance = sub(targetBalance, wdiv(numerator, targetLiquidity * WAD));
             shells[_shells[i]][targetCurrency] = targetBalance;
+            emit log_named_uint("target balance", targetBalance);
+            emit log_named_uint("numer to target balance ", numerator);
+            emit log_named_uint("denom to target balance ", targetLiquidity);
+            emit log_named_uint("target balance after alteration", targetBalance);
 
             originBalance = shells[_shells[i]][originCurrency];
-            originBalance = originBalance.add(multiplyDivide(swapAmountOrigin, targetBalance, targetLiquidity));
+            numerator = wmul(swapAmountOrigin * WAD, targetBalance);
+            originBalance = add(originBalance, wdiv(numerator, targetLiquidity * WAD));
             shells[_shells[i]][originCurrency] = originBalance;
+
+            emit log_named_uint("origin balance", originBalance);
+            emit log_named_uint("numer to origin balance ", numerator);
+            emit log_named_uint("denom to origin balance ", targetLiquidity);
+            emit log_named_uint("origin balance after alteration", originBalance);
 
         }
 
         //executing the swap (finally)
         ERC20(originCurrency).transferFrom(msg.sender, address(this), swapAmountOrigin);
-        ERC20(targetCurrency).transfer(msg.sender, swapAmountTarget);
+        ERC20(targetCurrency).transfer(msg.sender, swapAmountTarget / WAD);
 
         return swapAmountTarget;
 
@@ -124,7 +145,6 @@ contract PrototypeOne is DSMath {
     ////////////////////////////////////
 
     function depositTokens(Shell shell, address liquidityProvider, uint amount) private {
-        emit log_uint("amountn from deposit", amount);
         ERC20[] memory supportedTokens = shell.getTokens();
         for(uint i = 0; i < supportedTokens.length; i++) {
             supportedTokens[i].transferFrom(liquidityProvider, address(this), amount);
@@ -138,17 +158,19 @@ contract PrototypeOne is DSMath {
         }
     }
 
-  function tokenAmountWithdrawnCalc(Shell shell, uint capitalRemoved) private view returns(uint[] memory) {
+  function tokenAmountWithdrawnCalc(Shell shell, uint capitalRemoved) private returns(uint[] memory) {
         ERC20[] memory supportedTokens = shell.getTokens();
         uint[] memory tokenAmountWithdrawn = new uint[](supportedTokens.length);
         uint totalCapital = getTotalCapital(shell);
         for(uint i = 0; i < supportedTokens.length; i++) {
             //currently getting the stablecoins of the exchange contract
             //need to update and get the stablecoins of the shell
-            tokenAmountWithdrawn[i] = multiplyDivide(capitalRemoved,
-                                        shells[address(shell)][address(supportedTokens[i])],
-                                        totalCapital);
+            tokenAmountWithdrawn[i] = wdiv(
+                wmul(capitalRemoved * WAD, shells[address(shell)][address(supportedTokens[i])]),
+                totalCapital * WAD
+            );
         }
+        emit log_named_uint_arr("token amount withdrawn", tokenAmountWithdrawn);
         return(tokenAmountWithdrawn);
     }
 
@@ -161,7 +183,7 @@ contract PrototypeOne is DSMath {
     function getTotalCapital(Shell shell) public view returns (uint totalCapital) {
         address[] memory supportedTokens = shell.getTokenAddresses();
         for (uint i = 0; i < supportedTokens.length; i++) {
-            totalCapital = totalCapital.add(shells[address(shell)][supportedTokens[i]]);
+            totalCapital = add(totalCapital, shells[address(shell)][supportedTokens[i]]);
         }
         return(totalCapital);
     }
@@ -173,7 +195,7 @@ contract PrototypeOne is DSMath {
         uint currentBalance;
         for (uint i = 0; i < supportedTokens.length; i++) {
             currentBalance = shells[shellAddress][address(supportedTokens[i])];
-            shells[shellAddress][address(supportedTokens[i])] = currentBalance.add(amount);
+            shells[shellAddress][address(supportedTokens[i])] = add(currentBalance, amount);
         }
     }
 
@@ -184,7 +206,7 @@ contract PrototypeOne is DSMath {
         uint currentBalance;
         for(uint i = 0; i < supportedTokens.length; i++) {
             currentBalance = shells[shellAddress][address(supportedTokens[i])];
-            shells[shellAddress][address(supportedTokens[i])] = currentBalance.sub(tokenAmountWithdrawn[i]);
+            shells[shellAddress][address(supportedTokens[i])] = sub(currentBalance, tokenAmountWithdrawn[i]);
         }
     }
 
@@ -221,17 +243,6 @@ contract PrototypeOne is DSMath {
     ////////////////////////////////
     ///UTILITY FUNCTIONS FOR MATH///
     ////////////////////////////////
-
-    //multiplying two numbers and dividing by a third
-    function multiplyDivide(uint firstNum, uint secondNum, uint thirdNum) private pure returns (uint result) {
-        uint numerator = firstNum.mul(secondNum);
-        return(numerator.div(thirdNum));
-    }
-
-    function addThreeNumbers(uint firstNum, uint secondNum, uint thirdNum) private pure returns (uint result) {
-        uint intermediateNum = firstNum.add(secondNum);
-        return(intermediateNum.add(thirdNum));
-    }
 
 }
 

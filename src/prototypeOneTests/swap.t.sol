@@ -55,15 +55,15 @@ contract DappTest is DSTest {
         uint256 balanceTarget2;
 
         uint256 swap1 = pool.swap(address(TEST1), address(TEST2), 100);
-        assertEq(swap1, 97);
+        assertEq(swap1, 98);
         balanceOrigin1 = pool.getShellBalanceOf(shell1, address(TEST1));
         balanceOrigin2 = pool.getShellBalanceOf(shell2, address(TEST1));
         balanceTarget1 = pool.getShellBalanceOf(shell1, address(TEST2));
         balanceTarget2 = pool.getShellBalanceOf(shell2, address(TEST2));
         assertEq(balanceOrigin1, 1024);
         assertEq(balanceOrigin2, 3073);
-        assertEq(balanceTarget1, 976);
-        assertEq(balanceTarget2, 2928);
+        assertEq(balanceTarget1, 975);
+        assertEq(balanceTarget2, 2926);
 
         uint256 swap2 = pool.swap(address(TEST2), address(TEST1), 100);
         assertEq(swap2, 102);
@@ -71,24 +71,24 @@ contract DappTest is DSTest {
         balanceOrigin2 = pool.getShellBalanceOf(shell2, address(TEST2));
         balanceTarget1 = pool.getShellBalanceOf(shell1, address(TEST1));
         balanceTarget2 = pool.getShellBalanceOf(shell2, address(TEST1));
-        assertEq(balanceOrigin1, 1000);
-        assertEq(balanceOrigin2, 3001);
+        assertEq(balanceOrigin1, 999);
+        assertEq(balanceOrigin2, 2999);
         assertEq(balanceTarget1, 999);
-        assertEq(balanceTarget2, 2997);
+        assertEq(balanceTarget2, 2996);
 
         uint256 swap3 = pool.swap(address(TEST1), address(TEST3), 100);
-        assertEq(swap3, 96);
+        assertEq(swap3, 97);
         balanceOrigin1 = pool.getShellBalanceOf(shell2, address(TEST1));
         balanceTarget1 = pool.getShellBalanceOf(shell2, address(TEST3));
         assertEq(balanceOrigin1, 3093);
-        assertEq(balanceTarget1, 2904);
+        assertEq(balanceTarget1, 2903);
 
         uint256 swap4 = pool.swap(address(TEST3), address(TEST2), 100);
-        assertEq(swap4, 99);
+        assertEq(swap4, 100);
         balanceOrigin1 = pool.getShellBalanceOf(shell2, address(TEST3));
         balanceTarget1 = pool.getShellBalanceOf(shell2, address(TEST2));
         assertEq(balanceOrigin1, 3000);
-        assertEq(balanceTarget1, 2902);
+        assertEq(balanceTarget1, 2899);
 
     }
 

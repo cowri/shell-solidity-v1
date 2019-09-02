@@ -104,9 +104,9 @@ contract DappTest is DSTest {
 
         uint256[] memory shell2Withdraw1 = pool.withdrawLiquidity(address(shell2), 500);
 
-        assertEq(shell2Withdraw1[0], 166);
-        assertEq(shell2Withdraw1[1], 166);
-        assertEq(shell2Withdraw1[2], 166);
+        assertEq(shell2Withdraw1[0], 167);
+        assertEq(shell2Withdraw1[1], 167);
+        assertEq(shell2Withdraw1[2], 167);
 
         uint256[] memory shell2Withdraw2 = pool.withdrawLiquidity(address(shell2), 333);
 
