@@ -1,25 +1,28 @@
 pragma solidity ^0.5.0;
 
+import "ds-math/math.sol";
 import "./Shell.sol";
+import "./ERC20Token.sol";
 
-contract PrototypeOne {
-    using SafeMath for uint256;
+contract PrototypeOne is DSMath {
 
-    address[] tokens;
+    address[] supportedTokens;
     Shell[] public shellList;
     mapping(address => mapping(address => Shell[])) public pairsToShells;
     mapping(address => mapping(address => address[])) public pairsToShellAddresses;
     mapping(address => mapping(address => uint)) public shells;
 
     event balanceOf(bytes32, uint256);
-    event log_uint(bytes32, uint256);
+    event log_named_uint(bytes32, uint256);
+    event log_named_uint_arr(bytes32, uint256[]);
+    event log(bytes32, string);
 
     function __init__ (address[] memory _tokens) public {
-        tokens = _tokens;
+        supportedTokens = _tokens;
     }
 
     function getTokens () public view returns (address[] memory) {
-        return tokens;
+        return supportedTokens;
     }
 
     function createShell(address[] memory coins) public returns (address) {
@@ -28,6 +31,7 @@ contract PrototypeOne {
         shellList.push(shell);
 
         for (uint8 i = 0; i < coins.length; i++) {
+
             for (uint8 j = i + 1; j < coins.length; j++){
                 pairsToShells[coins[i]][coins[j]].push(shell);
                 pairsToShells[coins[j]][coins[i]].push(shell);
@@ -43,41 +47,97 @@ contract PrototypeOne {
 
     function depositLiquidity(address shellAddress, uint amount) public returns (uint256) {
         Shell shell = Shell(shellAddress);
-        uint supportedTokensNumber = shell.getTokens().length;
+        uint tokensNumber = shell.getTokens().length;
         uint liqTokensMinted = 0;
+
         if(shell.totalSupply() > 0){
-
-            uint capitalDeposited = amount.mul(supportedTokensNumber);
-            liqTokensMinted = multiplyDivide(shell.totalSupply(), capitalDeposited, getTotalCapital(shell));
-            depositTokens(shell, msg.sender, amount);
-            depositShellBalance(shell, amount); //doesn't change the tokens, but changes the shells
-            shell.mint(msg.sender, liqTokensMinted);
-
+            uint capitalDeposited = mul(tokensNumber, amount);
+            liqTokensMinted = wdiv(wmul(shell.totalSupply(), capitalDeposited), getTotalCapital(shell));
         } else {
+            liqTokensMinted = mul(tokensNumber, amount);
+        }
 
-            liqTokensMinted = amount.mul(supportedTokensNumber);
-            depositTokens(shell, msg.sender, amount);
-            depositShellBalance(shell, amount); //updates the shells, not the ERC20 balanceOf...
-            shell.mint(msg.sender, liqTokensMinted);
+        ERC20Token[] memory tokens = shell.getTokens();
+        for(uint i = 0; i < tokens.length; i++) {
+
+            uint8 decimals = tokens[i].decimals();
+            uint256 adjustedAmount = decimals <= 18
+                ? amount / pow(10, 18 - decimals)
+                : mul(amount, pow(10, decimals - 18));
+
+            tokens[i].transferFrom(
+                msg.sender,
+                address(this),
+                adjustedAmount
+            );
+
+            shells[shellAddress][address(tokens[i])] = add(
+                shells[shellAddress][address(tokens[i])],
+                amount
+            );
 
         }
+
+        shell.mint(msg.sender, liqTokensMinted);
+
         return liqTokensMinted;
+    }
+
+    function pow(uint x, uint n) internal pure returns (uint z) {
+        z = n % 2 != 0 ? x : 1;
+
+        for (n /= 2; n != 0; n /= 2) {
+            x = mul(x, x);
+
+            if (n % 2 != 0) {
+                z = mul(z, x);
+            }
+        }
     }
 
     function withdrawLiquidity(address shellAddress, uint liquidityTokensToBurn) public returns (uint256[] memory) {
         Shell shell = Shell(shellAddress);
         uint256 totalCapital = getTotalCapital(shell);
         uint256 totalShellSupply = shell.totalSupply();
-        uint256 capitalWithdrawn = multiplyDivide(totalCapital, liquidityTokensToBurn, totalShellSupply);
+        uint256 capitalWithdrawn = wdiv(wmul(totalCapital, liquidityTokensToBurn), totalShellSupply);
         // uint256 capitalWithdrawn = multiplyDivide(getTotalCapital(shell), liquidityTokensToBurn, shell.totalSupply());
-        uint256[] memory tokenAmountWithdrawn = tokenAmountWithdrawnCalc(shell, capitalWithdrawn);
+
+        ERC20Token[] memory tokens = Shell(shellAddress).getTokens();
+        uint256[] memory amountsWithdrawn = new uint256[](tokens.length);
+        for(uint i = 0; i < tokens.length; i++) {
+
+            // capital withdrawn * balance of coin for shell / amount of all coins in shell combined
+            amountsWithdrawn[i] = wdiv(
+                wmul(capitalWithdrawn, shells[address(shell)][address(tokens[i])]),
+                totalCapital
+            );
+
+            string memory tokenName = tokens[i].name();
+            uint8 decimals = tokens[i].decimals();
+            emit log("name", tokenName);
+            emit log_named_uint("decimals", decimals);
+            uint256 adjustedAmount = decimals <= 18
+                ? amountsWithdrawn[i] / pow(10, 18 - decimals)
+                : mul(amountsWithdrawn[i], pow(10, decimals - 18));
+            emit log_named_uint("adjusted Amount", adjustedAmount);
+
+            tokens[i].transfer(msg.sender, adjustedAmount);
+
+            shells[address(shell)][address(tokens[i])] = sub(
+                shells[address(shell)][address(tokens[i])],
+                amountsWithdrawn[i]
+            );
+
+            amountsWithdrawn[i] = adjustedAmount;
+
+        }
+
         Shell(shellAddress).testBurn(msg.sender, liquidityTokensToBurn);
-        withdrawTokens(shellAddress, msg.sender, tokenAmountWithdrawn);
-        withdrawShellBalance(shellAddress, tokenAmountWithdrawn);
-        return tokenAmountWithdrawn;
+
+        return amountsWithdrawn;
     }
 
-    function swap(address originCurrency, address targetCurrency, uint swapAmountOrigin) public returns (uint256) {
+    function swap(address originCurrency, address targetCurrency, uint originAmount) public returns (uint256) {
         address[] memory _shells = pairsToShellAddresses[originCurrency][targetCurrency];
 
         uint originBalance; //balance of originCurrency in a given shell
@@ -86,31 +146,57 @@ contract PrototypeOne {
         uint originLiquidity = 0; //total supply of originCurrency in shells that support the trading pair
         uint targetLiquidity = 0; //total supply of targetCurrency in shells that support the trading pair
         for (uint i = 0; i < _shells.length; i++) {
-            originLiquidity = originLiquidity.add(shells[_shells[i]][originCurrency]);
-            targetLiquidity = targetLiquidity.add(shells[_shells[i]][targetCurrency]);
+            originLiquidity = add(originLiquidity, shells[_shells[i]][originCurrency]);
+            targetLiquidity = add(targetLiquidity, shells[_shells[i]][targetCurrency]);
         }
 
         //calculating the swap amount for the target currency
-        uint swapAmountTarget = multiplyDivide(swapAmountOrigin, targetLiquidity, swapAmountOrigin.add(originLiquidity));
+        uint targetAmount = wdiv(
+            wmul(originAmount, targetLiquidity),
+            add(originAmount, originLiquidity)
+        );
 
         //calculating the % contribution and updating the shell balances
         for(uint i = 0; i < _shells.length; i++) {
 
             targetBalance = shells[_shells[i]][targetCurrency];
-            targetBalance = targetBalance.sub(multiplyDivide(swapAmountTarget, targetBalance, targetLiquidity));
-            shells[_shells[i]][targetCurrency] = targetBalance;
+            shells[_shells[i]][targetCurrency] = sub(
+                targetBalance,
+                wdiv( wmul(targetAmount, targetBalance), targetLiquidity )
+            );
 
             originBalance = shells[_shells[i]][originCurrency];
-            originBalance = originBalance.add(multiplyDivide(swapAmountOrigin, targetBalance, targetLiquidity));
-            shells[_shells[i]][originCurrency] = originBalance;
+            shells[_shells[i]][originCurrency] = add(
+                originBalance,
+                wdiv( wmul(originAmount, targetBalance), targetLiquidity )
+            );
 
         }
 
-        //executing the swap (finally)
-        ERC20(originCurrency).transferFrom(msg.sender, address(this), swapAmountOrigin);
-        ERC20(targetCurrency).transfer(msg.sender, swapAmountTarget);
+        ERC20Token origin = ERC20Token(originCurrency);
+        uint8 originDecimals = origin.decimals();
+        origin.transferFrom(
+            msg.sender,
+            address(this),
+            originDecimals == 18
+                ? originAmount
+                : originDecimals < 18
+                    ? originAmount / pow(18 - originDecimals, 10)
+                    : mul(originAmount, pow(originDecimals - 18, 10))
+        );
 
-        return swapAmountTarget;
+        ERC20Token target = ERC20Token(targetCurrency);
+        uint8 targetDecimals = target.decimals();
+        target.transfer(
+            msg.sender,
+            targetDecimals == 18
+                ? targetAmount
+                : targetDecimals < 18
+                    ? targetAmount / pow(18 - targetDecimals, 10)
+                    : mul(targetAmount, pow(targetDecimals - 18, 10))
+        );
+
+        return targetAmount;
 
     }
 
@@ -123,31 +209,32 @@ contract PrototypeOne {
     ////////////////////////////////////
 
     function depositTokens(Shell shell, address liquidityProvider, uint amount) private {
-        emit log_uint("amountn from deposit", amount);
-        ERC20[] memory supportedTokens = shell.getTokens();
-        for(uint i = 0; i < supportedTokens.length; i++) {
-            supportedTokens[i].transferFrom(liquidityProvider, address(this), amount);
+        ERC20Token[] memory tokens = shell.getTokens();
+        for(uint i = 0; i < tokens.length; i++) {
+            tokens[i].transferFrom(liquidityProvider, address(this), amount);
         }
     }
 
     function withdrawTokens(address shellAddress, address liquidityProvider, uint[] memory tokenAmountWithdrawn) private {
-        ERC20[] memory supportedTokens = Shell(shellAddress).getTokens();
-        for(uint i = 0; i < supportedTokens.length; i++) {
-            supportedTokens[i].transfer(liquidityProvider, tokenAmountWithdrawn[i]);
+        ERC20Token[] memory tokens = Shell(shellAddress).getTokens();
+        for(uint i = 0; i < tokens.length; i++) {
+            tokens[i].transfer(liquidityProvider, tokenAmountWithdrawn[i]);
         }
     }
 
-  function tokenAmountWithdrawnCalc(Shell shell, uint capitalRemoved) private view returns(uint[] memory) {
-        ERC20[] memory supportedTokens = shell.getTokens();
-        uint[] memory tokenAmountWithdrawn = new uint[](supportedTokens.length);
+  function tokenAmountWithdrawnCalc(Shell shell, uint capitalRemoved) private returns(uint[] memory) {
+        ERC20Token[] memory tokens = shell.getTokens();
+        uint[] memory tokenAmountWithdrawn = new uint[](tokens.length);
         uint totalCapital = getTotalCapital(shell);
-        for(uint i = 0; i < supportedTokens.length; i++) {
+        for(uint i = 0; i < tokens.length; i++) {
             //currently getting the stablecoins of the exchange contract
             //need to update and get the stablecoins of the shell
-            tokenAmountWithdrawn[i] = multiplyDivide(capitalRemoved,
-                                        shells[address(shell)][address(supportedTokens[i])],
-                                        totalCapital);
+            tokenAmountWithdrawn[i] = wdiv(
+                wmul(capitalRemoved, shells[address(shell)][address(tokens[i])]),
+                totalCapital
+            );
         }
+        emit log_named_uint_arr("token amount withdrawn", tokenAmountWithdrawn);
         return(tokenAmountWithdrawn);
     }
 
@@ -158,32 +245,32 @@ contract PrototypeOne {
     //current function gets balance of exchange contract, not the Shell
     //need to change!
     function getTotalCapital(Shell shell) public view returns (uint totalCapital) {
-        address[] memory supportedTokens = shell.getTokenAddresses();
-        for (uint i = 0; i < supportedTokens.length; i++) {
-            totalCapital = totalCapital.add(shells[address(shell)][supportedTokens[i]]);
+        address[] memory tokens = shell.getTokenAddresses();
+        for (uint i = 0; i < tokens.length; i++) {
+            totalCapital = add(totalCapital, shells[address(shell)][tokens[i]]);
         }
         return(totalCapital);
     }
 
     //updates the shell's balance as recorded on the exchange (called when depositing capital)
     function depositShellBalance(Shell shell, uint amount) private {
-        ERC20[] memory supportedTokens = shell.getTokens();
+        ERC20Token[] memory tokens = shell.getTokens();
         address shellAddress = address(shell);
         uint currentBalance;
-        for (uint i = 0; i < supportedTokens.length; i++) {
-            currentBalance = shells[shellAddress][address(supportedTokens[i])];
-            shells[shellAddress][address(supportedTokens[i])] = currentBalance.add(amount);
+        for (uint i = 0; i < tokens.length; i++) {
+            currentBalance = shells[shellAddress][address(tokens[i])];
+            shells[shellAddress][address(tokens[i])] = add(currentBalance, amount);
         }
     }
 
     //function is incorrect. We want to use tokenAmountWithdrawn[] so that each balance
     //is incremented differently, not by the same amount
     function withdrawShellBalance(address shellAddress, uint[] memory tokenAmountWithdrawn) private {
-        ERC20[] memory supportedTokens = Shell(shellAddress).getTokens();
+        ERC20Token[] memory tokens = Shell(shellAddress).getTokens();
         uint currentBalance;
-        for(uint i = 0; i < supportedTokens.length; i++) {
-            currentBalance = shells[shellAddress][address(supportedTokens[i])];
-            shells[shellAddress][address(supportedTokens[i])] = currentBalance.sub(tokenAmountWithdrawn[i]);
+        for(uint i = 0; i < tokens.length; i++) {
+            currentBalance = shells[shellAddress][address(tokens[i])];
+            shells[shellAddress][address(tokens[i])] = sub(currentBalance, tokenAmountWithdrawn[i]);
         }
     }
 
@@ -220,17 +307,6 @@ contract PrototypeOne {
     ////////////////////////////////
     ///UTILITY FUNCTIONS FOR MATH///
     ////////////////////////////////
-
-    //multiplying two numbers and dividing by a third
-    function multiplyDivide(uint firstNum, uint secondNum, uint thirdNum) private pure returns (uint result) {
-        uint numerator = firstNum.mul(secondNum);
-        return(numerator.div(thirdNum));
-    }
-
-    function addThreeNumbers(uint firstNum, uint secondNum, uint thirdNum) private pure returns (uint result) {
-        uint intermediateNum = firstNum.add(secondNum);
-        return(intermediateNum.add(thirdNum));
-    }
 
 }
 

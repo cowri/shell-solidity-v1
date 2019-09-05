@@ -10,16 +10,16 @@ contract DappTest is DSTest {
     PrototypeOne pool;
     address shell1;
     address shell2;
-    address shell3; 
-    address shell4; 
+    address shell3;
+    address shell4;
     address shell5;
     address shell6;
     uint256 shell1Liquidity;
     uint256 shell2Liquidity;
-    uint256 shell3Liquidity; 
-    uint256 shell4Liquidity; 
-    uint256 shell5Liquidity; 
-    uint256 shell6Liquidity; 
+    uint256 shell3Liquidity;
+    uint256 shell4Liquidity;
+    uint256 shell5Liquidity;
+    uint256 shell6Liquidity;
     TOKEN TEST1;
     TOKEN TEST2;
     TOKEN TEST3;
@@ -28,15 +28,13 @@ contract DappTest is DSTest {
     TOKEN TEST6;
 
     function setUp() public {
-        uint256 tokenAmount = 100000;
-        uint8 decimalAmount = 18;
-        TEST1 = new TOKEN("TEST ONE", "TEST1", decimalAmount, tokenAmount);
-        TEST2 = new TOKEN("TEST TWO", "TEST2", decimalAmount, tokenAmount);
-        TEST3 = new TOKEN("TEST THREE", "TEST3", decimalAmount, tokenAmount);
-
-        TEST4 = new TOKEN("TEST ONE", "TEST1", decimalAmount, tokenAmount);
-        TEST5 = new TOKEN("TEST TWO", "TEST2", decimalAmount, tokenAmount);
-        TEST6 = new TOKEN("TEST THREE", "TEST3", decimalAmount, tokenAmount);
+        uint256 tokenAmount = 1000000000 * (10 ** 18);
+        TEST1 = new TOKEN("TEST ONE", "TEST1", 18, tokenAmount);
+        TEST2 = new TOKEN("TEST TWO", "TEST2", 16, tokenAmount);
+        TEST3 = new TOKEN("TEST THREE", "TEST3", 14, tokenAmount);
+        TEST4 = new TOKEN("TEST FOUR", "TEST4", 12, tokenAmount);
+        TEST5 = new TOKEN("TEST FIVE", "TEST5", 10, tokenAmount);
+        TEST6 = new TOKEN("TEST SIX", "TEST6", 8, tokenAmount);
 
         pool = new PrototypeOne();
 
@@ -82,61 +80,63 @@ contract DappTest is DSTest {
         shell5Addrs[5] = address(TEST6);
         shell5 = pool.createShell(shell5Addrs);
 
-        shell1Liquidity = pool.depositLiquidity(shell1, 500);
-        shell2Liquidity = pool.depositLiquidity(shell2, 500);
-        shell3Liquidity = pool.depositLiquidity(shell3, 500);
-        shell4Liquidity = pool.depositLiquidity(shell4, 500);
-        shell5Liquidity = pool.depositLiquidity(shell5, 500);
+        uint256 amountToStake = 500 * (10 ** 18);
+        shell1Liquidity = pool.depositLiquidity(shell1, amountToStake);
+        shell2Liquidity = pool.depositLiquidity(shell2, amountToStake);
+        shell3Liquidity = pool.depositLiquidity(shell3, amountToStake);
+        shell4Liquidity = pool.depositLiquidity(shell4, amountToStake);
+        shell5Liquidity = pool.depositLiquidity(shell5, amountToStake);
 
     }
 
     function testWithdrawLiquidity () public {
 
-        uint256[] memory shell1Withdraw1 = pool.withdrawLiquidity(address(shell1), 500);
+        uint256 amount = 100 * (10 ** 18);
+        uint256[] memory shell1Withdraw1 = pool.withdrawLiquidity(address(shell1), amount);
 
-        assertEq(shell1Withdraw1[0], 250);
-        assertEq(shell1Withdraw1[1], 250);
+        assertEq(shell1Withdraw1[0], amount/2);
+        assertEq(shell1Withdraw1[1], (amount/2) / 100);
 
-        uint256[] memory shell1Withdraw2 = pool.withdrawLiquidity(address(shell1), 100);
+        uint256[] memory shell1Withdraw2 = pool.withdrawLiquidity(address(shell1), amount);
 
-        assertEq(shell1Withdraw2[0], 50);
-        assertEq(shell1Withdraw2[1], 50);
+        assertEq(shell1Withdraw2[0], amount/2);
+        assertEq(shell1Withdraw2[1], (amount/2) / 100);
 
-        uint256[] memory shell2Withdraw1 = pool.withdrawLiquidity(address(shell2), 500);
+        uint256[] memory shell2Withdraw1 = pool.withdrawLiquidity(address(shell2), amount);
 
-        assertEq(shell2Withdraw1[0], 166);
-        assertEq(shell2Withdraw1[1], 166);
-        assertEq(shell2Withdraw1[2], 166);
+        assertEq(shell2Withdraw1[0], amount/3);
+        assertEq(shell2Withdraw1[1], (amount/3) / 100);
+        assertEq(shell2Withdraw1[2], (amount/3) / 10000);
 
-        uint256[] memory shell2Withdraw2 = pool.withdrawLiquidity(address(shell2), 333);
+        uint256[] memory shell2Withdraw2 = pool.withdrawLiquidity(address(shell2), amount);
 
-        assertEq(shell2Withdraw2[0], 111);
-        assertEq(shell2Withdraw2[1], 111);
-        assertEq(shell2Withdraw2[2], 111);
+        assertEq(shell2Withdraw2[0], amount/3);
+        assertEq(shell2Withdraw2[1], (amount/3) / 100);
+        assertEq(shell2Withdraw2[2], (amount/3) / 10000);
 
-        uint256[] memory shell3Withdraw1 = pool.withdrawLiquidity(address(shell3), 500);
+        uint256[] memory shell3Withdraw1 = pool.withdrawLiquidity(address(shell3), amount);
 
-        assertEq(shell3Withdraw1[0], 125);
-        assertEq(shell3Withdraw1[1], 125);
-        assertEq(shell3Withdraw1[2], 125);
-        assertEq(shell3Withdraw1[3], 125);
+        assertEq(shell3Withdraw1[0], amount/4);
+        assertEq(shell3Withdraw1[1], (amount/4) / 100);
+        assertEq(shell3Withdraw1[2], (amount/4) / 10000);
+        assertEq(shell3Withdraw1[3], (amount/4) / 1000000);
 
-        uint256[] memory shell4Withdraw1 = pool.withdrawLiquidity(address(shell4), 500);
+        uint256[] memory shell4Withdraw1 = pool.withdrawLiquidity(address(shell4), amount);
 
-        assertEq(shell4Withdraw1[0], 100);
-        assertEq(shell4Withdraw1[1], 100);
-        assertEq(shell4Withdraw1[2], 100);
-        assertEq(shell4Withdraw1[3], 100);
-        assertEq(shell4Withdraw1[4], 100);
+        assertEq(shell4Withdraw1[0], amount/5);
+        assertEq(shell4Withdraw1[1], (amount/5) / 100);
+        assertEq(shell4Withdraw1[2], (amount/5) / 10000);
+        assertEq(shell4Withdraw1[3], (amount/5) / 1000000);
+        assertEq(shell4Withdraw1[4], (amount/5) / 100000000);
 
-        uint256[] memory shell5Withdraw1 = pool.withdrawLiquidity(address(shell5), 500);
+        uint256[] memory shell5Withdraw1 = pool.withdrawLiquidity(address(shell5), amount);
 
-        assertEq(shell5Withdraw1[0], 83);
-        assertEq(shell5Withdraw1[1], 83);
-        assertEq(shell5Withdraw1[2], 83);
-        assertEq(shell5Withdraw1[3], 83);
-        assertEq(shell5Withdraw1[4], 83);
-        assertEq(shell5Withdraw1[5], 83);
+        assertEq(shell5Withdraw1[0], wdiv(amount, 6));
+        assertEq(shell5Withdraw1[1], (amount/6) / 100);
+        assertEq(shell5Withdraw1[2], (amount/6) / 10000);
+        assertEq(shell5Withdraw1[3], (amount/6) / 1000000);
+        assertEq(shell5Withdraw1[4], (amount/6) / 100000000);
+        assertEq(shell5Withdraw1[5], (amount/6) / 10000000000);
 
     }
 
