@@ -200,30 +200,52 @@ contract PrototypeOne is DSMath {
 
         }
 
-        ERC20Token origin = ERC20Token(originCurrency);
-        uint8 originDecimals = origin.decimals();
-        uint256 adjustedOriginAmount = originDecimals <= 18
-            ? originAmount / pow(10, 18 - originDecimals)
-            : mul(originAmount, pow(10, originDecimals - 18));
-
-        origin.transferFrom(
+        adjustedTransferFrom(
+            ERC20Token(originCurrency),
             msg.sender,
+            originAmount
+        );
+
+        return adjustedTransfer(
+            ERC20Token(targetCurrency),
+            msg.sender,
+            targetAmount
+        );
+
+    }
+
+    function adjustedTransferFrom (ERC20Token token, address source, uint256 amount) private returns (uint256) {
+
+        uint256 decimals = token.decimals();
+        uint256 adjustedAmount = decimals <= 18
+            ? amount / pow(10, 18 - decimals)
+            : mul(amount, pow(10, decimals - 18));
+
+        token.transferFrom(
+            source,
             address(this),
-            adjustedOriginAmount
+            adjustedAmount
         );
 
-        ERC20Token target = ERC20Token(targetCurrency);
-        uint8 targetDecimals = target.decimals();
-        uint256 adjustedTargetAmount = targetDecimals <= 18
-            ? targetAmount / pow(10, 18 - targetDecimals)
-            : mul(targetAmount, pow(10, targetDecimals - 18));
+        return adjustedAmount;
 
-        target.transfer(
-            msg.sender,
-            adjustedTargetAmount
+    }
+
+    
+
+    function adjustedTransfer (ERC20Token token, address recipient, uint256 amount) private returns (uint256) {
+
+        uint256 decimals = token.decimals();
+        uint256 adjustedAmount = decimals <= 18
+            ? amount / pow(10, 18 - decimals)
+            : mul(amount, pow(10, decimals - 18));
+
+        token.transfer(
+            recipient,
+            adjustedAmount
         );
 
-        return adjustedTargetAmount;
+        return adjustedAmount;
 
     }
 
