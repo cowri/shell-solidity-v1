@@ -114,12 +114,9 @@ contract PrototypeOne is DSMath {
 
             string memory tokenName = tokens[i].name();
             uint8 decimals = tokens[i].decimals();
-            emit log("name", tokenName);
-            emit log_named_uint("decimals", decimals);
             uint256 adjustedAmount = decimals <= 18
                 ? amountsWithdrawn[i] / pow(10, 18 - decimals)
                 : mul(amountsWithdrawn[i], pow(10, decimals - 18));
-            emit log_named_uint("adjusted Amount", adjustedAmount);
 
             tokens[i].transfer(msg.sender, adjustedAmount);
 
@@ -162,41 +159,47 @@ contract PrototypeOne is DSMath {
             targetBalance = shells[_shells[i]][targetCurrency];
             shells[_shells[i]][targetCurrency] = sub(
                 targetBalance,
-                wdiv( wmul(targetAmount, targetBalance), targetLiquidity )
+                wdiv(
+                    wmul(targetAmount, targetBalance),
+                    targetLiquidity
+                )
             );
 
             originBalance = shells[_shells[i]][originCurrency];
             shells[_shells[i]][originCurrency] = add(
                 originBalance,
-                wdiv( wmul(originAmount, targetBalance), targetLiquidity )
+                wdiv(
+                    wmul(originAmount, targetBalance),
+                    targetLiquidity
+                )
             );
 
         }
 
         ERC20Token origin = ERC20Token(originCurrency);
         uint8 originDecimals = origin.decimals();
+        uint256 adjustedOriginAmount = originDecimals <= 18
+            ? originAmount / pow(10, 18 - originDecimals)
+            : mul(originAmount, pow(10, originDecimals - 18));
+
         origin.transferFrom(
             msg.sender,
             address(this),
-            originDecimals == 18
-                ? originAmount
-                : originDecimals < 18
-                    ? originAmount / pow(18 - originDecimals, 10)
-                    : mul(originAmount, pow(originDecimals - 18, 10))
+            adjustedOriginAmount
         );
 
         ERC20Token target = ERC20Token(targetCurrency);
         uint8 targetDecimals = target.decimals();
+        uint256 adjustedTargetAmount = targetDecimals <= 18
+            ? targetAmount / pow(10, 18 - targetDecimals)
+            : mul(targetAmount, pow(10, targetDecimals - 18));
+
         target.transfer(
             msg.sender,
-            targetDecimals == 18
-                ? targetAmount
-                : targetDecimals < 18
-                    ? targetAmount / pow(18 - targetDecimals, 10)
-                    : mul(targetAmount, pow(targetDecimals - 18, 10))
+            adjustedTargetAmount
         );
 
-        return targetAmount;
+        return adjustedTargetAmount;
 
     }
 

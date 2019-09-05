@@ -1,12 +1,13 @@
 pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
+import "ds-math/math.sol";
 
 import "../PrototypeOne.sol";
 import "../Shell.sol";
 import "../TOKEN.sol";
 
-contract DappTest is DSTest {
+contract DappTest is DSTest, DSMath{
     PrototypeOne pool;
     address shell1;
     address shell2;
@@ -131,7 +132,7 @@ contract DappTest is DSTest {
 
         uint256[] memory shell5Withdraw1 = pool.withdrawLiquidity(address(shell5), amount);
 
-        assertEq(shell5Withdraw1[0], wdiv(amount, 6));
+        assertEq(shell5Withdraw1[0], wdiv(amount, 6 * WAD));
         assertEq(shell5Withdraw1[1], (amount/6) / 100);
         assertEq(shell5Withdraw1[2], (amount/6) / 10000);
         assertEq(shell5Withdraw1[3], (amount/6) / 1000000);
