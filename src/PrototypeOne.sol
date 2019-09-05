@@ -134,6 +134,30 @@ contract PrototypeOne is DSMath {
         return amountsWithdrawn;
     }
 
+    function getInputPrice () public returns (uint256) {
+
+    }
+
+    function getOutputPrice () public returns (uint256) {
+
+    }
+
+    function swapByOutput () public returns (uint256) {
+
+    }
+
+    function transferByOutput () public returns (uint256) {
+
+    }
+
+    function transferByInput () public returns (uint256) {
+
+    }
+
+    function swapByInput () public returns (uint256) {
+
+    }
+
     function swap(address originCurrency, address targetCurrency, uint originAmount) public returns (uint256) {
         address[] memory _shells = pairsToShellAddresses[originCurrency][targetCurrency];
 
