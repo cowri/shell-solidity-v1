@@ -47,14 +47,14 @@ contract DappTest is DSTest {
     }
 
 
-    function testSwap () public {
+    function testSwapByOrigin () public {
 
         uint256 balanceOrigin1;
         uint256 balanceOrigin2;
         uint256 balanceTarget1;
         uint256 balanceTarget2;
 
-        uint256 swap1 = pool.swap(address(TEST1), address(TEST2), 100 * ( 10 ** 18 ));
+        uint256 swap1 = pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
         assertEq(swap1, 97560975609756097561);
         balanceOrigin1 = pool.getShellBalanceOf(shell1, address(TEST1));
         balanceOrigin2 = pool.getShellBalanceOf(shell2, address(TEST1));
@@ -65,7 +65,7 @@ contract DappTest is DSTest {
         assertEq(balanceTarget1, 975609756097560975610);
         assertEq(balanceTarget2, 2926829268292682926829);
 
-        uint256 swap2 = pool.swap(address(TEST2), address(TEST1), 100 * ( 10 ** 18 ));
+        uint256 swap2 = pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST2), address(TEST1));
         assertEq(swap2, 102437538086532602072);
         balanceOrigin1 = pool.getShellBalanceOf(shell1, address(TEST2));
         balanceOrigin2 = pool.getShellBalanceOf(shell2, address(TEST2));
@@ -76,14 +76,14 @@ contract DappTest is DSTest {
         assertEq(balanceTarget1, 999390615478366849482);
         assertEq(balanceTarget2, 2998171846435100548446);
 
-        uint256 swap3 = pool.swap(address(TEST1), address(TEST3), 100 * ( 10 ** 18 ));
+        uint256 swap3 = pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST1), address(TEST3));
         assertEq(swap3, 96831297574791998584);
         balanceOrigin1 = pool.getShellBalanceOf(shell2, address(TEST1));
         balanceTarget1 = pool.getShellBalanceOf(shell2, address(TEST3));
         assertEq(balanceOrigin1, 3098171846435100548446);
         assertEq(balanceTarget1, 2903168702425208001416);
 
-        uint256 swap4 = pool.swap(address(TEST3), address(TEST2), 100 * ( 10 ** 18 ));
+        uint256 swap4 = pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST3), address(TEST2));
         assertEq(swap4, 99955399304359977681);
         balanceOrigin1 = pool.getShellBalanceOf(shell2, address(TEST3));
         balanceTarget1 = pool.getShellBalanceOf(shell2, address(TEST2));
