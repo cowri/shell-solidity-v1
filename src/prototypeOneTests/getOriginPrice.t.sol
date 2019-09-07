@@ -49,20 +49,20 @@ contract DappTest is DSTest {
 
     function testGetSwapRate () public {
 
-        // uint256 price1 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
-        // assertEq(price1, 97560975609756097561);
-        // pool.swap(address(TEST1), address(TEST2), 100 * ( 10 ** 18 ));
+        uint256 price1 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
+        assertEq(price1, 97560975609756097561);
+        pool.swap(address(TEST1), address(TEST2), 100 * ( 10 ** 18 ));
 
-        // uint256 price2 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(TEST2), address(TEST1));
-        // assertEq(price2, 102437538086532602072);
-        // pool.swap(address(TEST2), address(TEST1), 100 * ( 10 ** 18 ));
+        uint256 price2 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(TEST2), address(TEST1));
+        assertEq(price2, 102437538086532602072);
+        pool.swap(address(TEST2), address(TEST1), 100 * ( 10 ** 18 ));
 
-        // uint256 price3 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST3));
-        // assertEq(price3, 96831297574791998584);
-        // pool.swap(address(TEST1), address(TEST3), 100 * ( 10 ** 18 ));
+        uint256 price3 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST3));
+        assertEq(price3, 96831297574791998584);
+        pool.swap(address(TEST1), address(TEST3), 100 * ( 10 ** 18 ));
 
-        // uint256 price4 = pool.getOriginPrice(100 * ( 10 ** 18), address(TEST3), address(TEST2));
-        // assertEq(price4, 99955399304359977681);
+        uint256 price4 = pool.getOriginPrice(100 * ( 10 ** 18), address(TEST3), address(TEST2));
+        assertEq(price4, 99955399304359977681);
 
     }
 

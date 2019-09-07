@@ -43,15 +43,15 @@ contract DappTest is DSTest {
         shell1Liquidity = pool.depositLiquidity(shell1, 1000 * (10 ** 18));
         shell2Liquidity = pool.depositLiquidity(shell2, 3000 * (10 ** 18));
 
-        pool.swap(address(TEST1), address(TEST2), 100 * (10 ** 18));
-        pool.swap(address(TEST2), address(TEST1), 100 * (10 ** 18));
-        pool.swap(address(TEST1), address(TEST3), 100 * (10 ** 18));
-        pool.swap(address(TEST3), address(TEST2), 100 * (10 ** 18));
+        pool.swapByOrigin(100 * (10 ** 18), address(TEST1), address(TEST2));
+        pool.swapByOrigin(100 * (10 ** 18), address(TEST2), address(TEST1));
+        pool.swapByOrigin(100 * (10 ** 18), address(TEST1), address(TEST3));
+        pool.swapByOrigin(100 * (10 ** 18), address(TEST3), address(TEST2));
 
     }
 
 
-    function testWithdrawPostSwap () public {
+    function testWithdrawAfterSwapByOrigin () public {
 
         uint256 shell1Token1 = pool.getShellBalanceOf(shell1, address(TEST1));
         uint256 shell1Token2 = pool.getShellBalanceOf(shell1, address(TEST2));

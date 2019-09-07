@@ -49,24 +49,19 @@ contract DappTest is DSTest {
 
     function testSwapByTarget () public {
 
-        uint256 balanceOrigin1;
-        uint256 balanceOrigin2;
-        uint256 balanceTarget1;
-        uint256 balanceTarget2;
-
         uint256 swapAmount = 100 * ( 10 ** 18 );
 
         uint256 swap1 = pool.swapByTarget(swapAmount, address(TEST1), address(TEST2));
-        assertEq(swap1, 2);
+        assertEq(swap1, 102564102564102564103);
 
         uint256 swap2 = pool.swapByTarget(swapAmount, address(TEST2), address(TEST1));
-        assertEq(swap2, 2);
+        assertEq(swap2, 97437540038436899423);
 
         uint256 swap3 = pool.swapByTarget(swapAmount, address(TEST1), address(TEST3));
-        assertEq(swap3, 96831297574791998584);
+        assertEq(swap3, 103514588859416445623);
 
         uint256 swap4 = pool.swapByTarget(swapAmount, address(TEST3), address(TEST2));
-        assertEq(swap4, 99955399304359977681);
+        assertEq(swap4, 100066314463184420522);
 
     }
 
