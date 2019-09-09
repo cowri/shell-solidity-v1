@@ -102,7 +102,7 @@ contract PrototypeOne is DSMath {
         for(uint i = 0; i < tokens.length; i++) {
 
             // capital withdrawn * balance of coin for shell / amount of all coins in shell combined
-            amountsWithdrawn[i] = wdiv(
+            uint amount = wdiv(
                 wmul(capitalWithdrawn, shells[address(shell)][address(tokens[i])]),
                 totalCapital
             );
@@ -110,12 +110,12 @@ contract PrototypeOne is DSMath {
             amountsWithdrawn[i] = adjustedTransfer(
                 tokens[i],
                 msg.sender,
-                amountsWithdrawn[i]
+                amount
             );
 
             shells[address(shell)][address(tokens[i])] = sub(
                 shells[address(shell)][address(tokens[i])],
-                amountsWithdrawn[i]
+                amount
             );
 
         }
