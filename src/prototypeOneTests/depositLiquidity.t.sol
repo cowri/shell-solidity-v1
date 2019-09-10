@@ -3,12 +3,12 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../PrototypeOne.sol";
+import "../Prototype.sol";
 import "../Shell.sol";
 import "../ERC20Token.sol";
 
 contract DappTest is DSTest {
-    PrototypeOne pool;
+    Prototype pool;
     address shell1;
     address shell2;
     ERC20Token TEST1;
@@ -26,7 +26,7 @@ contract DappTest is DSTest {
         addrs[1] = address(TEST2);
         addrs[2] = address(TEST2);
 
-        pool = new PrototypeOne();
+        pool = new Prototype();
 
         TEST1.approve(address(pool), tokenAmount);
         TEST2.approve(address(pool), tokenAmount);
@@ -45,7 +45,7 @@ contract DappTest is DSTest {
 
     }
 
-    function testAddLiquidity () public {
+    function testDepositLiquidity () public {
 
         uint256 tokenAmount = 1000000000 * (10 ** 18);
 
@@ -74,7 +74,7 @@ contract DappTest is DSTest {
         token2Balance = TEST2.balanceOf(address(this));
         token3Balance = TEST3.balanceOf(address(this));
 
-        assertEq(token1Balance, tokenAmount - ( amountToStake * 2) + 1);
+        assertEq(token1Balance, tokenAmount - ( amountToStake * 2));
         assertEq(token2Balance, tokenAmount - ( amountToStake * 2 / 100 ));
         assertEq(token3Balance, tokenAmount - ( amountToStake / 10000 ));
 
