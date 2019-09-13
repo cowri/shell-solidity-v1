@@ -7,16 +7,29 @@ import "ds-math/math.sol";
 contract ShellGovernance is DSMath, CowriState {
 
         event log_named_address      (bytes32 key, address val);
+        event log_addr_arr      (bytes32 key, address[] val);
+        event log_shell_arr      (bytes32 key, Shell[] val);
+        event log_named_uint      (bytes32 key, uint val);
+        event log_erc20_arr (bytes32 key, ERC20Token[] val);
 
-    function createShell (address[] memory _tokens) public returns (address) {
-        _tokens = sortAddresses(_tokens);
-        require(!isDuplicateShell(_tokens), "Must not be a duplicate shell.");
-        Shell shell = new Shell(_tokens);
-        emit log_named_address("shell", address(shell));
+    function createShell (address[] memory tokens) public returns (address) {
+        tokens = sortAddresses(tokens);
+        require(!isDuplicateShell(tokens), "Must not be a duplicate shell.");
+        Shell shell = new Shell(tokens);
+
+        for (uint8 i = 0; i < tokens.length; i++) {
+            for (uint8 j = i + 1; j < tokens.length; j++){
+                pairsToAllShells[tokens[i]][tokens[j]].push(shell);
+                pairsToAllShells[tokens[j]][tokens[i]].push(shell);
+                pairsToAllShellAddresses[tokens[i]][tokens[j]].push(address(shell));
+                pairsToAllShellAddresses[tokens[j]][tokens[i]].push(address(shell));
+            }
+        }
+
         return(address(shell));
     }
 
-    function activateShell (address _shell) public {
+    function activateShell (address _shell) public returns (bool) {
 
         require(hasSufficientCapital(_shell), "Shell must have sufficient capital");
 
@@ -26,32 +39,90 @@ contract ShellGovernance is DSMath, CowriState {
 
         for (uint8 i = 0; i < tokens.length; i++) {
             for (uint8 j = i + 1; j < tokens.length; j++){
-                pairsToShells[tokens[i]][tokens[j]].push(shell);
-                pairsToShells[tokens[j]][tokens[i]].push(shell);
-                pairsToShellAddresses[tokens[j]][tokens[i]].push(_shell);
-                pairsToShellAddresses[tokens[i]][tokens[j]].push(_shell);
+                pairsToActiveShells[tokens[i]][tokens[j]].push(shell);
+                pairsToActiveShells[tokens[j]][tokens[i]].push(shell);
+                pairsToActiveShellAddresses[tokens[j]][tokens[i]].push(_shell);
+                pairsToActiveShellAddresses[tokens[i]][tokens[j]].push(_shell);
             }
         }
 
         addSupportedTokens(tokens);
 
+        return true;
+
     }
 
     function deactivateShell (address _shell) public {
-        require(hasSufficientCapital(_shell), "Must not have sufficient capital");
+        require(!hasSufficientCapital(_shell), "Must not have sufficient capital");
         require(isInShellList(_shell), "Shell must be in shell list.");
 
         Shell shell = Shell(_shell);
         address[] memory tokens = shell.getTokenAddresses();
 
         for (uint8 i = 0; i < tokens.length; i++) {
-            for (uint8 j = i + 1; j < tokens.length; j++){
-                //remove shell from pairsToShells and pairsToShellAddresses
+            for (uint8 j = i + 1; j < tokens.length; j++) {
+
+                bool skipped;
+
+                address[] memory replacementShellAddressesItoJ = new address[](pairsToActiveShellAddresses[tokens[i]][tokens[j]].length - 1);
+                Shell[] memory replacementShellsItoJ = new Shell[](pairsToActiveShells[tokens[i]][tokens[j]].length - 1);
+
+                for (uint8 k = 0; k < pairsToActiveShellAddresses[tokens[i]][tokens[j]].length; k++) {
+                    if (pairsToActiveShellAddresses[tokens[i]][tokens[j]][k] == _shell) {
+                        skipped = true;
+                    } else if (skipped) {
+                        replacementShellAddressesItoJ[k-1] = pairsToActiveShellAddresses[tokens[i]][tokens[j]][k];
+                        replacementShellsItoJ[k-1] = pairsToActiveShells[tokens[i]][tokens[j]][k];
+                    } else {
+                        replacementShellAddressesItoJ[k] = pairsToActiveShellAddresses[tokens[i]][tokens[j]][k];
+                        replacementShellsItoJ[k] = pairsToActiveShells[tokens[i]][tokens[j]][k];
+                    }
+                }
+
+                address[] memory replacementShellAddressesJtoI = new address[](pairsToActiveShellAddresses[tokens[j]][tokens[i]].length - 1);
+                Shell[] memory replacementShellsJtoI = new Shell[](pairsToActiveShells[tokens[j]][tokens[i]].length - 1);
+
+                for (uint8 k = 0; k < pairsToActiveShellAddresses[tokens[j]][tokens[i]].length; k++) {
+                    if (pairsToActiveShellAddresses[tokens[j]][tokens[i]][k] == _shell) {
+                        skipped = true;
+                    } else if (skipped) {
+                        replacementShellAddressesJtoI[k-1] = pairsToActiveShellAddresses[tokens[j]][tokens[i]][k];
+                        replacementShellsJtoI[k-1] = pairsToActiveShells[tokens[i]][tokens[j]][k];
+                    } else {
+                        replacementShellAddressesJtoI[k] = pairsToActiveShellAddresses[tokens[j]][tokens[i]][k];
+                        replacementShellsJtoI[k] = pairsToActiveShells[tokens[j]][tokens[i]][k];
+                    }
+                }
+
+                // emit log_addr_arr("before replacment addresses", pairsToActiveShellAddresses[tokens[i]][tokens[j]]);
+                // emit log_addr_arr("before replacment addresses", pairsToActiveShellAddresses[tokens[j]][tokens[i]]);
+                // emit log_shell_arr("before replacement shell", pairsToActiveShells[tokens[i]][tokens[j]]);
+                // emit log_shell_arr("before replacement shell", pairsToActiveShells[tokens[j]][tokens[i]]);
+                pairsToActiveShellAddresses[tokens[i]][tokens[j]] = replacementShellAddressesItoJ;
+                pairsToActiveShells[tokens[i]][tokens[j]] = replacementShellsItoJ;
+                pairsToActiveShellAddresses[tokens[j]][tokens[i]] = replacementShellAddressesJtoI;
+                pairsToActiveShells[tokens[j]][tokens[i]] = replacementShellsJtoI;
+
+                // emit log_addr_arr("after replacing addresses", pairsToActiveShellAddresses[tokens[i]][tokens[j]]);
+                // emit log_addr_arr("after replacing addresses", pairsToActiveShellAddresses[tokens[j]][tokens[i]]);
+                // emit log_shell_arr("after replacing shells", pairsToActiveShells[tokens[i]][tokens[j]]);
+                // emit log_shell_arr("after replacing shells", pairsToActiveShells[tokens[j]][tokens[i]]);
+                emit log_named_uint("j", j);
             }
+            emit log_named_uint("i", i);
         }
+
+        // // for (uint8 i = 0; i < tokens.length; i++){
+        // //     for (uint8 j = ; j < tokens.length; j++) {
+        // //         emit log_named_address("tokens[i]", tokens[i]);
+        // //         emit log_named_address("tokens[j]", tokens[j]);
+        // //         emit log_addr_arr("after all replacements", pairsToActiveShellAddresses[tokens[i]][tokens[j]]);
+        // //     }
+        // }
+
     }
 
-    function hasSufficientCapital(address shellAddress) public view returns(bool) {
+    function hasSufficientCapital(address shellAddress) public  returns(bool) {
 
         uint256 capital = wdiv(
             Shell(shellAddress).totalSupply(),
@@ -84,26 +155,34 @@ contract ShellGovernance is DSMath, CowriState {
         return _addresses;
     }
 
-    function isDuplicateShell (address[] memory _addresses) public view returns(bool) {
+    function findShellByTokens (address[] memory _addresses) public returns (address) {
 
         address[] memory addresses = sortAddresses(_addresses);
-        Shell[] memory shells = pairsToShells[_addresses[0]][_addresses[1]];
+        Shell[] memory shells = pairsToAllShells[addresses[0]][addresses[1]];
 
         for (uint8 i = 0; i < shells.length; i++) {
             address[] memory comparisons = shells[i].getTokenAddresses();
             if (comparisons.length != addresses.length) continue;
             for (uint8 j = 0; j <= comparisons.length; j++) {
-                if (j == comparisons.length) return true;
+                if (j == comparisons.length) return address(shells[i]);
                 if (addresses[j] != comparisons[j]) break;
             }
         }
 
-        return false;
+        return address(0);
+
+    }
+
+    function isDuplicateShell (address[] memory _addresses) public  returns(bool) {
+
+        if (findShellByTokens(_addresses) == address(0)) return false;
+        return true;
+
     }
 
     function setMinCapital(uint256 _minCapital) public {
-        require(_minCapital >= 10000000000000000000000, 'Minimum capital must be more than 10 thousand');
-        require(_minCapital <= 1000000000000000000000000, 'Minimum capital must be no more than 1 million');
+        require(_minCapital >= 10000 * ( 10 ** 18), 'Minimum capital must be more than 10 thousand');
+        require(_minCapital <= 1000000 * (10 ** 18), 'Minimum capital must be no more than 1 million');
         minCapital = _minCapital;
     }
 
@@ -120,6 +199,18 @@ contract ShellGovernance is DSMath, CowriState {
         }
     }
 
+    function getAllShellsForPair (address one, address two) public view returns (address[] memory) {
+        return pairsToAllShellAddresses[one][two];
+    }
+
+    function getActiveShellsForPair (address one, address two) public  returns (address[] memory) {
+        emit log_named_address("one", one);
+        emit log_named_address("two", two);
+        address[] memory result = pairsToActiveShellAddresses[one][two];
+        emit log_addr_arr("result", result);
+        return result;
+    }
+
     function getShellBalance(uint index, address _address) public view returns(uint) {
         return(shellList[index].balanceOf(_address));
     }
@@ -128,5 +219,18 @@ contract ShellGovernance is DSMath, CowriState {
         return shells[_shell][_token];
     }
 
+    function getTotalShellCapital(address shell) public  returns (uint) {
+
+        address[] memory tokens = Shell(shell).getTokenAddresses();
+        emit log_addr_arr("erc20s", tokens);
+        uint256 totalCapital;
+        emit log_named_uint("totes cap",totalCapital);
+        for (uint i = 0; i < tokens.length; i++) {
+            totalCapital = add(totalCapital, shells[shell][address(tokens[i])]);
+        }
+
+        return totalCapital;
+
+    }
 
 }

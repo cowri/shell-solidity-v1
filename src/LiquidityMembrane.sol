@@ -8,6 +8,9 @@ import "./ERC20Token.sol";
 
 contract LiquidityMembrane is DSMath, Adjusters, CowriState {
 
+    event log_named_uint (bytes32 key, uint val);
+
+            event log_addr           (bytes32 key, address val);
     function depositLiquidity(address shellAddress, uint amount) public returns (uint256) {
 
         Shell shell = Shell(shellAddress);
@@ -22,6 +25,8 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
 
         ERC20Token[] memory tokens = shell.getTokens();
         for(uint i = 0; i < tokens.length; i++) {
+
+            uint256 balance = tokens[i].balanceOf(msg.sender);
 
             adjustedTransferFrom(
                 tokens[i],
@@ -45,10 +50,15 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
         Shell shell = Shell(shellAddress);
 
         uint256 totalCapital = getTotalCapital(shell);
+
+        emit log_named_uint("total capital", totalCapital);
+
         uint256 capitalWithdrawn = wdiv(
             wmul(getTotalCapital(shell), liquidityTokensToBurn),
             shell.totalSupply()
         );
+
+        emit log_named_uint("Capwithdrawn", capitalWithdrawn);
 
         ERC20Token[] memory tokens = Shell(shellAddress).getTokens();
         uint256[] memory amountsWithdrawn = new uint256[](tokens.length);
@@ -58,6 +68,8 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
                 wmul(capitalWithdrawn, shells[address(shell)][address(tokens[i])]),
                 totalCapital
             );
+
+            emit log_named_uint("amount", amount); 
 
             amountsWithdrawn[i] = adjustedTransfer(
                 tokens[i],
