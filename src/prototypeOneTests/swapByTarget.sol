@@ -2,13 +2,13 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../PrototypeOne.sol";
+import "../Prototype.sol";
 import "../Shell.sol";
 import "../TOKEN.sol";
 
 contract DappTest is DSTest {
 
-    PrototypeOne pool;
+    Prototype pool;
     address shell1;
     address shell2;
     TOKEN TEST1;
@@ -24,7 +24,7 @@ contract DappTest is DSTest {
         TEST2 = new TOKEN("TEST TWO", "TEST2", decimalAmount, tokenAmount);
         TEST3 = new TOKEN("TEST THREE", "TEST3", decimalAmount, tokenAmount);
 
-        pool = new PrototypeOne();
+        pool = new Prototype();
 
         TEST1.approve(address(pool), tokenAmount);
         TEST2.approve(address(pool), tokenAmount);
@@ -41,8 +41,11 @@ contract DappTest is DSTest {
         shell2Addrs[2] = address(TEST3);
         shell2 = pool.createShell(shell2Addrs);
 
-        shell1Liquidity = pool.depositLiquidity(shell1, 1000 * ( 10 ** 18));
-        shell2Liquidity = pool.depositLiquidity(shell2, 3000 * ( 10 ** 18));
+        shell1Liquidity = pool.depositLiquidity(shell1, 10000 * ( 10 ** 18));
+        shell2Liquidity = pool.depositLiquidity(shell2, 30000 * ( 10 ** 18));
+
+        pool.activateShell(shell1);
+        pool.activateShell(shell2);
 
     }
 
@@ -52,16 +55,16 @@ contract DappTest is DSTest {
         uint256 swapAmount = 100 * ( 10 ** 18 );
 
         uint256 swap1 = pool.swapByTarget(swapAmount, address(TEST1), address(TEST2));
-        assertEq(swap1, 102564102564102564103);
+        assertEq(swap1, 100250626566416040100);
 
         uint256 swap2 = pool.swapByTarget(swapAmount, address(TEST2), address(TEST1));
-        assertEq(swap2, 97437540038436899423);
+        assertEq(swap2, 99749375003916015564);
 
         uint256 swap3 = pool.swapByTarget(swapAmount, address(TEST1), address(TEST3));
-        assertEq(swap3, 103514588859416445623);
+        assertEq(swap3, 100335076822491010134);
 
         uint256 swap4 = pool.swapByTarget(swapAmount, address(TEST3), address(TEST2));
-        assertEq(swap4, 100066314463184420522);
+        assertEq(swap4, 100000628661969066939);
 
     }
 

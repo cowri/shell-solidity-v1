@@ -5,6 +5,7 @@ import "./Shell.sol";
 import "./ERC20Token.sol";
 
 contract PrototypeOne is DSMath {
+        event log_addr_arr           (bytes32 key, address[] val);
 
     address[] supportedTokens;
     Shell[] public shellList;

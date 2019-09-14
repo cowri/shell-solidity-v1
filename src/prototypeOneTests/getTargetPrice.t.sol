@@ -2,13 +2,13 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../PrototypeOne.sol";
+import "../Prototype.sol";
 import "../Shell.sol";
 import "../TOKEN.sol";
 
 contract DappTest is DSTest {
 
-    PrototypeOne pool;
+    Prototype pool;
     address shell1;
     address shell2;
     TOKEN TEST1;
@@ -24,7 +24,7 @@ contract DappTest is DSTest {
         TEST2 = new TOKEN("TEST TWO", "TEST2", decimalAmount, tokenAmount);
         TEST3 = new TOKEN("TEST THREE", "TEST3", decimalAmount, tokenAmount);
 
-        pool = new PrototypeOne();
+        pool = new Prototype();
 
         TEST1.approve(address(pool), tokenAmount);
         TEST2.approve(address(pool), tokenAmount);
@@ -41,8 +41,11 @@ contract DappTest is DSTest {
         shell2Addrs[2] = address(TEST3);
         shell2 = pool.createShell(shell2Addrs);
 
-        shell1Liquidity = pool.depositLiquidity(shell1, 1000 * ( 10 ** 18));
-        shell2Liquidity = pool.depositLiquidity(shell2, 3000 * ( 10 ** 18));
+        shell1Liquidity = pool.depositLiquidity(shell1, 10000 * ( 10 ** 18));
+        shell2Liquidity = pool.depositLiquidity(shell2, 30000 * ( 10 ** 18));
+
+        pool.activateShell(shell1);
+        pool.activateShell(shell2);
 
     }
 
@@ -50,19 +53,19 @@ contract DappTest is DSTest {
     function testGetTargetPrice () public {
 
         uint256 price1 = pool.getTargetPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
-        assertEq(price1, 102564102564102564103);
-        pool.swap(address(TEST1), address(TEST2), 100 * ( 10 ** 18 ));
+        assertEq(price1, 100250626566416040100);
+        pool.swapByTarget(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
 
         uint256 price2 = pool.getTargetPrice(100 * ( 10 ** 18 ), address(TEST2), address(TEST1));
-        assertEq(price2, 97560975609756097561);
-        pool.swap(address(TEST2), address(TEST1), 100 * ( 10 ** 18 ));
+        assertEq(price2, 99749375003916015564);
+        pool.swapByTarget(100 * ( 10 ** 18 ), address(TEST2), address(TEST1));
 
         uint256 price3 = pool.getTargetPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST3));
-        assertEq(price3, 103385236083968984429);
-        pool.swap(address(TEST1), address(TEST3), 100 * ( 10 ** 18 ));
+        assertEq(price3, 100335076822491010134);
+        pool.swapByTarget(100 * ( 10 ** 18 ), address(TEST1), address(TEST3));
 
         uint256 price4 = pool.getTargetPrice(100 * ( 10 ** 18), address(TEST3), address(TEST2));
-        assertEq(price4, 100046158268067684857);
+        assertEq(price4, 100000628661969066939);
 
     }
 
