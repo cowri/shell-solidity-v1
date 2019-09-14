@@ -2,14 +2,8 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-<<<<<<< HEAD:src/testExchange/getOriginPrice/getOriginPrice.t.sol
 import "../../Prototype.sol";
 import "../../ERC20Token.sol";
-=======
-import "../Prototype.sol";
-import "../Shell.sol";
-import "../TOKEN.sol";
->>>>>>> master:src/prototypeOneTests/getOriginPrice.t.sol
 
 contract DappTest is DSTest {
 

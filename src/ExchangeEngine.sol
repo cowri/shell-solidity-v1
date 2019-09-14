@@ -26,11 +26,7 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
     }
 
     function getOriginPrice (uint256 originAmount, address origin, address target) public view returns (uint256) {
-<<<<<<< HEAD
         address[] memory _shells = pairsToActiveShellAddresses[origin][target];
-=======
-        address[] memory _shells = pairsToShellAddresses[origin][target];
->>>>>>> master
         (uint256 originLiquidity, uint256 targetLiquidity) = getPairLiquidity(_shells, origin, target);
         return calculateOriginPrice(originAmount, originLiquidity, targetLiquidity);
     }
@@ -43,11 +39,7 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
     }
 
     function getTargetPrice (uint256 targetAmount, address origin, address target) public view returns (uint256) {
-<<<<<<< HEAD
         address[] memory _shells = pairsToActiveShellAddresses[origin][target];
-=======
-        address[] memory _shells = pairsToShellAddresses[origin][target];
->>>>>>> master
         (uint256 originLiquidity, uint256 targetLiquidity) = getPairLiquidity(_shells, origin, target);
         return calculateTargetPrice(targetAmount, originLiquidity, targetLiquidity);
     }
@@ -62,11 +54,7 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
 
     function executeOriginTrade (uint256 originAmount, address origin, address target, address recipient) private returns (uint256) {
 
-<<<<<<< HEAD
         address[] memory _shells = pairsToActiveShellAddresses[origin][target];
-=======
-        address[] memory _shells = pairsToShellAddresses[origin][target];
->>>>>>> master
         (uint256 originLiquidity, uint256 targetLiquidity) = getPairLiquidity(_shells, origin, target);
 
         uint256 targetAmount = calculateOriginPrice(originAmount, originLiquidity, targetLiquidity);
@@ -87,11 +75,7 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
 
     function executeTargetTrade (uint256 targetAmount, address origin, address target, address recipient) private returns (uint256) {
 
-<<<<<<< HEAD
         address[] memory _shells = pairsToActiveShellAddresses[origin][target];
-=======
-        address[] memory _shells = pairsToShellAddresses[origin][target];
->>>>>>> master
         (uint256 originLiquidity, uint256 targetLiquidity) = getPairLiquidity(_shells, origin, target);
 
         uint256 originAmount = calculateTargetPrice(targetAmount, originLiquidity, targetLiquidity);
