@@ -3,9 +3,8 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../Prototype.sol";
-import "../Shell.sol";
-import "../ERC20Token.sol";
+import "../../Prototype.sol";
+import "../../ERC20Token.sol";
 
 contract DappTest is DSTest {
     Prototype pool;

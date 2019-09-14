@@ -3,9 +3,8 @@ pragma solidity ^0.5.6;
 import "ds-test/test.sol";
 import "ds-math/math.sol";
 
-import "../Prototype.sol";
-import "../Shell.sol";
-import "../TOKEN.sol";
+import "../../Prototype.sol";
+import "../../ERC20Token.sol";
 
 contract DappTest is DSTest, DSMath{
     Prototype pool;
@@ -21,21 +20,21 @@ contract DappTest is DSTest, DSMath{
     uint256 shell4Liquidity;
     uint256 shell5Liquidity;
     uint256 shell6Liquidity;
-    TOKEN TEST1;
-    TOKEN TEST2;
-    TOKEN TEST3;
-    TOKEN TEST4;
-    TOKEN TEST5;
-    TOKEN TEST6;
+    ERC20Token TEST1;
+    ERC20Token TEST2;
+    ERC20Token TEST3;
+    ERC20Token TEST4;
+    ERC20Token TEST5;
+    ERC20Token TEST6;
 
     function setUp() public {
         uint256 tokenAmount = 100000000 * (10 ** 18);
-        TEST1 = new TOKEN("TEST ONE", "TEST1", 18, tokenAmount);
-        TEST2 = new TOKEN("TEST TWO", "TEST2", 16, tokenAmount / 100);
-        TEST3 = new TOKEN("TEST THREE", "TEST3", 14, tokenAmount / 10000);
-        TEST4 = new TOKEN("TEST FOUR", "TEST4", 12, tokenAmount / 1000000);
-        TEST5 = new TOKEN("TEST FIVE", "TEST5", 10, tokenAmount / 100000000);
-        TEST6 = new TOKEN("TEST SIX", "TEST6", 8, tokenAmount / 10000000000);
+        TEST1 = new ERC20Token("TEST ONE", "TEST1", 18, tokenAmount);
+        TEST2 = new ERC20Token("TEST TWO", "TEST2", 16, tokenAmount / 100);
+        TEST3 = new ERC20Token("TEST THREE", "TEST3", 14, tokenAmount / 10000);
+        TEST4 = new ERC20Token("TEST FOUR", "TEST4", 12, tokenAmount / 1000000);
+        TEST5 = new ERC20Token("TEST FIVE", "TEST5", 10, tokenAmount / 100000000);
+        TEST6 = new ERC20Token("TEST SIX", "TEST6", 8, tokenAmount / 10000000000);
 
         pool = new Prototype();
 

@@ -2,28 +2,26 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../PrototypeOne.sol";
-import "../Prototype.sol";
-import "../Shell.sol";
-import "../TOKEN.sol";
+import "../../Prototype.sol";
+import "../../ERC20Token.sol";
 
 contract DappTest is DSTest {
 
     Prototype pool;
     address shell1;
     address shell2;
-    TOKEN TEST1;
-    TOKEN TEST2;
-    TOKEN TEST3;
+    ERC20Token TEST1;
+    ERC20Token TEST2;
+    ERC20Token TEST3;
     uint256 shell1Liquidity;
     uint256 shell2Liquidity;
 
     function setUp () public {
         uint256 tokenAmount = 10000000000 * (10 ** 18);
         uint8 decimalAmount = 18;
-        TEST1 = new TOKEN("TEST ONE", "TEST1", decimalAmount, tokenAmount);
-        TEST2 = new TOKEN("TEST TWO", "TEST2", decimalAmount, tokenAmount);
-        TEST3 = new TOKEN("TEST THREE", "TEST3", decimalAmount, tokenAmount);
+        TEST1 = new ERC20Token("TEST ONE", "TEST1", decimalAmount, tokenAmount);
+        TEST2 = new ERC20Token("TEST TWO", "TEST2", decimalAmount, tokenAmount);
+        TEST3 = new ERC20Token("TEST THREE", "TEST3", decimalAmount, tokenAmount);
 
         pool = new Prototype();
 
@@ -51,7 +49,7 @@ contract DappTest is DSTest {
     }
 
 
-    function testSwapByOrigin () public {
+    function testSwapByOriginAtoBthenBtoAthenAtoCthenCtoB () public {
 
         uint256 balanceOrigin1;
         uint256 balanceOrigin2;

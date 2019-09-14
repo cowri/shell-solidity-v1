@@ -2,21 +2,19 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../Prototype.sol";
-import "../Shell.sol";
-import "../TOKEN.sol";
-import "../CowriState.sol";
+import "../../Prototype.sol";
+import "../../ERC20Token.sol";
 
 contract DappTest is DSTest {
     Prototype pool;
-    TOKEN TEST1;
-    TOKEN TEST2;
+    ERC20Token TEST1;
+    ERC20Token TEST2;
     address shell;
 
     function setUp() public {
         uint256 tokenAmount = 1000000000 * (10 ** 18);
-        TEST1 = new TOKEN("TEST ONE", "TEST1", 18, tokenAmount);
-        TEST2 = new TOKEN("TEST TWO", "TEST2", 18, tokenAmount);
+        TEST1 = new ERC20Token("TEST ONE", "TEST1", 18, tokenAmount);
+        TEST2 = new ERC20Token("TEST TWO", "TEST2", 18, tokenAmount);
 
         pool = new Prototype();
 
@@ -31,7 +29,7 @@ contract DappTest is DSTest {
 
         pool.setMinCapital(10000 * (10 ** 18));
 
-        uint256 amounts = 10000 * (10 ** 18);
+        uint256 amounts = 100000 * (10 ** 18);
 
         pool.depositLiquidity(shell, amounts);
 
@@ -39,10 +37,20 @@ contract DappTest is DSTest {
 
         pool.withdrawLiquidity(shell, amounts * 2);
 
+        pool.depositLiquidity(shell, amounts);
+
     }
 
-    function testDeactivateLightlyPopulatedShell () public {
-        pool.deactivateShell(shell);
+    function testDeactivateShellWithTooMuchCapital () public {
+
+        ( bool success, bytes memory returnData ) = address(pool).call(
+                abi.encodePacked(
+                    pool.deactivateShell.selector,
+                    abi.encode(shell)
+                )
+            );
+        assert(!success);
+
     }
 
 }

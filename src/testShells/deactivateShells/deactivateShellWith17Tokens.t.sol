@@ -2,52 +2,49 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../PrototypeOne.sol";
-import "../Prototype.sol";
-import "../Shell.sol";
-import "../TOKEN.sol";
-import "../CowriState.sol";
+import "../../Prototype.sol";
+import "../../ERC20Token.sol";
 
 contract DappTest is DSTest {
     Prototype pool;
-    TOKEN TEST1;
-    TOKEN TEST2;
-    TOKEN TEST3;
-    TOKEN TEST4;
-    TOKEN TEST5;
-    TOKEN TEST6;
-    TOKEN TEST7;
-    TOKEN TEST8;
-    TOKEN TEST9;
-    TOKEN TEST10;
-    TOKEN TEST11;
-    TOKEN TEST12;
-    TOKEN TEST13;
-    TOKEN TEST14;
-    TOKEN TEST15;
-    TOKEN TEST16;
-    TOKEN TEST17;
+    ERC20Token TEST1;
+    ERC20Token TEST2;
+    ERC20Token TEST3;
+    ERC20Token TEST4;
+    ERC20Token TEST5;
+    ERC20Token TEST6;
+    ERC20Token TEST7;
+    ERC20Token TEST8;
+    ERC20Token TEST9;
+    ERC20Token TEST10;
+    ERC20Token TEST11;
+    ERC20Token TEST12;
+    ERC20Token TEST13;
+    ERC20Token TEST14;
+    ERC20Token TEST15;
+    ERC20Token TEST16;
+    ERC20Token TEST17;
     address shell;
 
     function setUp() public {
         uint256 tokenAmount = 1000000000 * (10 ** 18);
-        TEST1 = new TOKEN("TEST ONE", "TEST1", 18, tokenAmount);
-        TEST2 = new TOKEN("TEST TWO", "TEST2", 18, tokenAmount);
-        TEST3 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST4 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST5 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST6 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST7 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST8 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST9 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST10 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST11 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST12 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST13 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST14 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST15 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST16 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST17 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST1 = new ERC20Token("TEST ONE", "TEST1", 18, tokenAmount);
+        TEST2 = new ERC20Token("TEST TWO", "TEST2", 18, tokenAmount);
+        TEST3 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST4 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST5 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST6 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST7 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST8 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST9 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST10 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST11 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST12 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST13 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST14 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST15 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST16 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST17 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
 
         pool = new Prototype();
 
@@ -102,7 +99,7 @@ contract DappTest is DSTest {
 
     }
 
-    function testDeactivateExcessivelyPopulatedShell () public {
+    function testDeactivateShellWith17Tokens () public {
         pool.deactivateShell(shell);
     }
 
