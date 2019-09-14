@@ -17,9 +17,6 @@ contract DappTest is DSTest {
     TOKEN TEST6;
     TOKEN TEST7;
     TOKEN TEST8;
-    TOKEN TEST9;
-    TOKEN TEST10;
-    TOKEN TEST11;
     address shell;
 
     function setUp() public {

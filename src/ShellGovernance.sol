@@ -94,31 +94,13 @@ contract ShellGovernance is DSMath, CowriState {
                     }
                 }
 
-                // emit log_addr_arr("before replacment addresses", pairsToActiveShellAddresses[tokens[i]][tokens[j]]);
-                // emit log_addr_arr("before replacment addresses", pairsToActiveShellAddresses[tokens[j]][tokens[i]]);
-                // emit log_shell_arr("before replacement shell", pairsToActiveShells[tokens[i]][tokens[j]]);
-                // emit log_shell_arr("before replacement shell", pairsToActiveShells[tokens[j]][tokens[i]]);
                 pairsToActiveShellAddresses[tokens[i]][tokens[j]] = replacementShellAddressesItoJ;
                 pairsToActiveShells[tokens[i]][tokens[j]] = replacementShellsItoJ;
                 pairsToActiveShellAddresses[tokens[j]][tokens[i]] = replacementShellAddressesJtoI;
                 pairsToActiveShells[tokens[j]][tokens[i]] = replacementShellsJtoI;
 
-                // emit log_addr_arr("after replacing addresses", pairsToActiveShellAddresses[tokens[i]][tokens[j]]);
-                // emit log_addr_arr("after replacing addresses", pairsToActiveShellAddresses[tokens[j]][tokens[i]]);
-                // emit log_shell_arr("after replacing shells", pairsToActiveShells[tokens[i]][tokens[j]]);
-                // emit log_shell_arr("after replacing shells", pairsToActiveShells[tokens[j]][tokens[i]]);
-                emit log_named_uint("j", j);
             }
-            emit log_named_uint("i", i);
         }
-
-        // // for (uint8 i = 0; i < tokens.length; i++){
-        // //     for (uint8 j = ; j < tokens.length; j++) {
-        // //         emit log_named_address("tokens[i]", tokens[i]);
-        // //         emit log_named_address("tokens[j]", tokens[j]);
-        // //         emit log_addr_arr("after all replacements", pairsToActiveShellAddresses[tokens[i]][tokens[j]]);
-        // //     }
-        // }
 
     }
 
@@ -204,11 +186,7 @@ contract ShellGovernance is DSMath, CowriState {
     }
 
     function getActiveShellsForPair (address one, address two) public  returns (address[] memory) {
-        emit log_named_address("one", one);
-        emit log_named_address("two", two);
-        address[] memory result = pairsToActiveShellAddresses[one][two];
-        emit log_addr_arr("result", result);
-        return result;
+        return pairsToActiveShellAddresses[one][two];
     }
 
     function getShellBalance(uint index, address _address) public view returns(uint) {

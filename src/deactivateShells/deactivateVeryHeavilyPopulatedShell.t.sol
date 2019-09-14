@@ -24,9 +24,6 @@ contract DappTest is DSTest {
     TOKEN TEST12;
     TOKEN TEST13;
     TOKEN TEST14;
-    TOKEN TEST15;
-    TOKEN TEST16;
-    TOKEN TEST17;
     address shell;
 
     function setUp() public {
@@ -45,9 +42,6 @@ contract DappTest is DSTest {
         TEST12 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
         TEST13 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
         TEST14 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST15 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST16 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST17 = new TOKEN("TEST THREE", "TEST3", 18, tokenAmount);
 
         pool = new Prototype();
 
@@ -65,9 +59,6 @@ contract DappTest is DSTest {
         TEST12.approve(address(pool), tokenAmount);
         TEST13.approve(address(pool), tokenAmount);
         TEST14.approve(address(pool), tokenAmount);
-        TEST15.approve(address(pool), tokenAmount);
-        TEST16.approve(address(pool), tokenAmount);
-        TEST17.approve(address(pool), tokenAmount);
 
         address[] memory shellAddrs = new address[](14);
         shellAddrs[0] = address(TEST1);

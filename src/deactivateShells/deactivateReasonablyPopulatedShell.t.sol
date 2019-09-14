@@ -5,7 +5,6 @@ import "ds-test/test.sol";
 import "../Prototype.sol";
 import "../Shell.sol";
 import "../TOKEN.sol";
-import "../CowriState.sol";
 
 contract DappTest is DSTest {
     Prototype pool;
