@@ -21,6 +21,20 @@ contract ShellGovernance is DSMath, CowriState {
             for (uint8 j = i + 1; j < tokens.length; j++){
                 pairsToAllShells[tokens[i]][tokens[j]].push(shell);
                 pairsToAllShells[tokens[j]][tokens[i]].push(shell);
+
+                // Shell[] memory ItoJ = pairsToAllShells[tokens[i]][tokens[j]];
+                // Shell[] memory newItoJ = new Shell[](ItoJ.length + 1);
+                // newItoJ[ItoJ.length] = shell;
+                // for (uint k = 0; k < ItoJ.length; k++) newItoJ[k] = ItoJ[k];
+
+                // Shell[] memory JtoI = pairsToAllShells[tokens[j]][tokens[i]];
+                // Shell[] memory newJtoI = new Shell[](JtoI.length + 1);
+                // newItoJ[JtoI.length] = shell;
+                // for (uint k = 0; k < JtoI.length; k++) newJtoI[k] = JtoI[k];
+
+                // pairsToAllShells[tokens[i]][tokens[j]] = newItoJ;
+                // pairsToAllShells[tokens[j]][tokens[i]] = newJtoI;
+
             }
         }
 
