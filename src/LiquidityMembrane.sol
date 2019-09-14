@@ -45,7 +45,10 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
         Shell shell = Shell(shellAddress);
 
         uint256 totalCapital = getTotalCapital(shell);
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
         uint256 capitalWithdrawn = wdiv(
             wmul(getTotalCapital(shell), liquidityTokensToBurn),
             shell.totalSupply()

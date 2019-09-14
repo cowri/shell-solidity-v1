@@ -29,12 +29,21 @@ contract DappTest is DSTest, DSMath{
 
     function setUp() public {
         uint256 tokenAmount = 100000000 * (10 ** 18);
+<<<<<<< HEAD:src/testLiquidityMembrane/withdrawLiquidity/withdrawLiquidity.t.sol
         TEST1 = new ERC20Token("TEST ONE", "TEST1", 18, tokenAmount);
         TEST2 = new ERC20Token("TEST TWO", "TEST2", 16, tokenAmount / 100);
         TEST3 = new ERC20Token("TEST THREE", "TEST3", 14, tokenAmount / 10000);
         TEST4 = new ERC20Token("TEST FOUR", "TEST4", 12, tokenAmount / 1000000);
         TEST5 = new ERC20Token("TEST FIVE", "TEST5", 10, tokenAmount / 100000000);
         TEST6 = new ERC20Token("TEST SIX", "TEST6", 8, tokenAmount / 10000000000);
+=======
+        TEST1 = new TOKEN("TEST ONE", "TEST1", 18, tokenAmount);
+        TEST2 = new TOKEN("TEST TWO", "TEST2", 16, tokenAmount / 100);
+        TEST3 = new TOKEN("TEST THREE", "TEST3", 14, tokenAmount / 10000);
+        TEST4 = new TOKEN("TEST FOUR", "TEST4", 12, tokenAmount / 1000000);
+        TEST5 = new TOKEN("TEST FIVE", "TEST5", 10, tokenAmount / 100000000);
+        TEST6 = new TOKEN("TEST SIX", "TEST6", 8, tokenAmount / 10000000000);
+>>>>>>> master:src/prototypeOneTests/withdrawLiquidity.t.sol
 
         pool = new Prototype();
 

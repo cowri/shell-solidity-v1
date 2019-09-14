@@ -2,8 +2,14 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
+<<<<<<< HEAD:src/testLiquidityMembrane/withdrawLiquidity/withdrawAfterSwapByOrigin.t.sol
 import "../../Prototype.sol";
 import "../../ERC20Token.sol";
+=======
+import "../Prototype.sol";
+import "../Shell.sol";
+import "../TOKEN.sol";
+>>>>>>> master:src/prototypeOneTests/withdrawAfterSwapByOrigin.t.sol
 
 contract DappTest is DSTest {
 
