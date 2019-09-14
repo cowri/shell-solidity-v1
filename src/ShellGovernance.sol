@@ -21,8 +21,6 @@ contract ShellGovernance is DSMath, CowriState {
             for (uint8 j = i + 1; j < tokens.length; j++){
                 pairsToAllShells[tokens[i]][tokens[j]].push(shell);
                 pairsToAllShells[tokens[j]][tokens[i]].push(shell);
-                pairsToAllShellAddresses[tokens[i]][tokens[j]].push(address(shell));
-                pairsToAllShellAddresses[tokens[j]][tokens[i]].push(address(shell));
             }
         }
 
@@ -41,8 +39,6 @@ contract ShellGovernance is DSMath, CowriState {
             for (uint8 j = i + 1; j < tokens.length; j++){
                 pairsToActiveShells[tokens[i]][tokens[j]].push(shell);
                 pairsToActiveShells[tokens[j]][tokens[i]].push(shell);
-                pairsToActiveShellAddresses[tokens[j]][tokens[i]].push(_shell);
-                pairsToActiveShellAddresses[tokens[i]][tokens[j]].push(_shell);
             }
         }
 
@@ -64,39 +60,31 @@ contract ShellGovernance is DSMath, CowriState {
 
                 bool skipped;
 
-                address[] memory replacementShellAddressesItoJ = new address[](pairsToActiveShellAddresses[tokens[i]][tokens[j]].length - 1);
                 Shell[] memory replacementShellsItoJ = new Shell[](pairsToActiveShells[tokens[i]][tokens[j]].length - 1);
 
-                for (uint8 k = 0; k < pairsToActiveShellAddresses[tokens[i]][tokens[j]].length; k++) {
-                    if (pairsToActiveShellAddresses[tokens[i]][tokens[j]][k] == _shell) {
+                for (uint8 k = 0; k < pairsToActiveShells[tokens[i]][tokens[j]].length; k++) {
+                    if (address(pairsToActiveShells[tokens[i]][tokens[j]][k]) == _shell) {
                         skipped = true;
                     } else if (skipped) {
-                        replacementShellAddressesItoJ[k-1] = pairsToActiveShellAddresses[tokens[i]][tokens[j]][k];
                         replacementShellsItoJ[k-1] = pairsToActiveShells[tokens[i]][tokens[j]][k];
                     } else {
-                        replacementShellAddressesItoJ[k] = pairsToActiveShellAddresses[tokens[i]][tokens[j]][k];
                         replacementShellsItoJ[k] = pairsToActiveShells[tokens[i]][tokens[j]][k];
                     }
                 }
 
-                address[] memory replacementShellAddressesJtoI = new address[](pairsToActiveShellAddresses[tokens[j]][tokens[i]].length - 1);
                 Shell[] memory replacementShellsJtoI = new Shell[](pairsToActiveShells[tokens[j]][tokens[i]].length - 1);
 
-                for (uint8 k = 0; k < pairsToActiveShellAddresses[tokens[j]][tokens[i]].length; k++) {
-                    if (pairsToActiveShellAddresses[tokens[j]][tokens[i]][k] == _shell) {
+                for (uint8 k = 0; k < pairsToActiveShells[tokens[j]][tokens[i]].length; k++) {
+                    if (address(pairsToActiveShells[tokens[j]][tokens[i]][k]) == _shell) {
                         skipped = true;
                     } else if (skipped) {
-                        replacementShellAddressesJtoI[k-1] = pairsToActiveShellAddresses[tokens[j]][tokens[i]][k];
                         replacementShellsJtoI[k-1] = pairsToActiveShells[tokens[i]][tokens[j]][k];
                     } else {
-                        replacementShellAddressesJtoI[k] = pairsToActiveShellAddresses[tokens[j]][tokens[i]][k];
                         replacementShellsJtoI[k] = pairsToActiveShells[tokens[j]][tokens[i]][k];
                     }
                 }
 
-                pairsToActiveShellAddresses[tokens[i]][tokens[j]] = replacementShellAddressesItoJ;
                 pairsToActiveShells[tokens[i]][tokens[j]] = replacementShellsItoJ;
-                pairsToActiveShellAddresses[tokens[j]][tokens[i]] = replacementShellAddressesJtoI;
                 pairsToActiveShells[tokens[j]][tokens[i]] = replacementShellsJtoI;
 
             }
@@ -182,15 +170,25 @@ contract ShellGovernance is DSMath, CowriState {
     }
 
     function getAllShellsForPair (address one, address two) public view returns (address[] memory) {
-        return pairsToAllShellAddresses[one][two];
+        Shell[] memory _shells = pairsToActiveShells[one][two];
+        address[] memory shellAddresses = new address[](_shells.length);
+        for (uint8 i = 0; i < _shells.length; i++) {
+            shellAddresses[i] = address(_shells[i]);
+        }
+        return shellAddresses;
     }
 
     function getActiveShellsForPair (address one, address two) public  returns (address[] memory) {
-        return pairsToActiveShellAddresses[one][two];
+        Shell[] memory _shells = pairsToActiveShells[one][two];
+        address[] memory shellAddresses = new address[](_shells.length);
+        for (uint8 i = 0; i < _shells.length; i++) {
+            shellAddresses[i] = address(_shells[i]);
+        }
+        return shellAddresses;
     }
 
-    function getShellBalance(uint index, address _address) public view returns(uint) {
-        return(shellList[index].balanceOf(_address));
+    function getShellBalance(address _shell, address _token) public view returns(uint) {
+        return shells[_shell][_token];
     }
 
     function getShellBalanceOf(address _shell, address _token) public view returns (uint) {
@@ -200,9 +198,7 @@ contract ShellGovernance is DSMath, CowriState {
     function getTotalShellCapital(address shell) public  returns (uint) {
 
         address[] memory tokens = Shell(shell).getTokenAddresses();
-        emit log_addr_arr("erc20s", tokens);
         uint256 totalCapital;
-        emit log_named_uint("totes cap",totalCapital);
         for (uint i = 0; i < tokens.length; i++) {
             totalCapital = add(totalCapital, shells[shell][address(tokens[i])]);
         }

@@ -10,9 +10,7 @@ contract CowriState {
     address[] public supportedTokens;
     Shell[] public shellList;
     mapping(address => mapping(address => Shell[])) public pairsToActiveShells;
-    mapping(address => mapping(address => address[])) public pairsToActiveShellAddresses;
     mapping(address => mapping(address => Shell[])) public pairsToAllShells;
-    mapping(address => mapping(address => address[])) public pairsToAllShellAddresses;
     mapping(address => mapping(address => uint)) public shells;
 
 }

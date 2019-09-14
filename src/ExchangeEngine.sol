@@ -8,12 +8,12 @@ import "./Adjusters.sol";
 
 contract ExchangeEngine is DSMath, Adjusters, CowriState {
 
-   function getPairLiquidity (address[] memory _shells, address origin, address target) private view returns (uint256, uint256) {
+   function getPairLiquidity (Shell[] memory _shells, address origin, address target) private view returns (uint256, uint256) {
         uint256 originLiquidity;
         uint256 targetLiquidity;
         for (uint8 i = 0; i < _shells.length; i++) {
-            originLiquidity += shells[_shells[i]][origin];
-            targetLiquidity += shells[_shells[i]][target];
+            originLiquidity += shells[address(_shells[i])][origin];
+            targetLiquidity += shells[address(_shells[i])][target];
         }
         return (originLiquidity, targetLiquidity);
     }
@@ -26,7 +26,7 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
     }
 
     function getOriginPrice (uint256 originAmount, address origin, address target) public view returns (uint256) {
-        address[] memory _shells = pairsToActiveShellAddresses[origin][target];
+        Shell[] memory _shells = pairsToActiveShells[origin][target];
         (uint256 originLiquidity, uint256 targetLiquidity) = getPairLiquidity(_shells, origin, target);
         return calculateOriginPrice(originAmount, originLiquidity, targetLiquidity);
     }
@@ -39,7 +39,7 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
     }
 
     function getTargetPrice (uint256 targetAmount, address origin, address target) public view returns (uint256) {
-        address[] memory _shells = pairsToActiveShellAddresses[origin][target];
+        Shell[] memory _shells = pairsToActiveShells[origin][target];
         (uint256 originLiquidity, uint256 targetLiquidity) = getPairLiquidity(_shells, origin, target);
         return calculateTargetPrice(targetAmount, originLiquidity, targetLiquidity);
     }
@@ -54,7 +54,7 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
 
     function executeOriginTrade (uint256 originAmount, address origin, address target, address recipient) private returns (uint256) {
 
-        address[] memory _shells = pairsToActiveShellAddresses[origin][target];
+        Shell[] memory _shells = pairsToActiveShells[origin][target];
         (uint256 originLiquidity, uint256 targetLiquidity) = getPairLiquidity(_shells, origin, target);
 
         uint256 targetAmount = calculateOriginPrice(originAmount, originLiquidity, targetLiquidity);
@@ -75,7 +75,7 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
 
     function executeTargetTrade (uint256 targetAmount, address origin, address target, address recipient) private returns (uint256) {
 
-        address[] memory _shells = pairsToActiveShellAddresses[origin][target];
+        Shell[] memory _shells = pairsToActiveShells[origin][target];
         (uint256 originLiquidity, uint256 targetLiquidity) = getPairLiquidity(_shells, origin, target);
 
         uint256 originAmount = calculateTargetPrice(targetAmount, originLiquidity, targetLiquidity);
@@ -86,13 +86,13 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
 
     }
 
-    function balanceShells (address[] memory _shells, address origin, uint256 originAmount, address target, uint256 targetAmount, uint256 targetLiquidity) private {
+    function balanceShells (Shell[] memory _shells, address origin, uint256 originAmount, address target, uint256 targetAmount, uint256 targetLiquidity) private {
         uint256 originBalance;
         uint256 targetBalance;
         for (uint8 i = 0; i < _shells.length; i++) {
 
-            targetBalance = shells[_shells[i]][target];
-            shells[_shells[i]][target] = sub(
+            targetBalance = shells[address(_shells[i])][target];
+            shells[address(_shells[i])][target] = sub(
                 targetBalance,
                 wdiv(
                     wmul(targetAmount, targetBalance),
@@ -100,8 +100,8 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
                 )
             );
 
-            originBalance = shells[_shells[i]][origin];
-            shells[_shells[i]][origin] = add(
+            originBalance = shells[address(_shells[i])][origin];
+            shells[address(_shells[i])][origin] = add(
                 originBalance,
                 wdiv(
                     wmul(originAmount, targetBalance),
