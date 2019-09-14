@@ -11,4 +11,7 @@ contract DappTest is DSMath, DSTest {
         sandbox = new Sandbox();
     }
 
+    function testMe () public {
+    }
+
 }
