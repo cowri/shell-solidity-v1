@@ -48,12 +48,6 @@ contract DappTest is DSMath, DSTest {
 
     function testDepositLiquidity () public {
 
-        uint256 tokenAmount = 1000000000 * (10 ** 18);
-
-        uint256 token1Balance;
-        uint256 token2Balance;
-        uint256 token3Balance;
-
         uint256 test1Withdrawn;
         uint256 test2Withdrawn;
         uint256 test3Withdrawn;
@@ -61,20 +55,17 @@ contract DappTest is DSMath, DSTest {
         uint256 amount;
         uint256 balance;
 
-        // uint256 amount = pool.depositLiquidity(shell1, amountToStake);
-        // uint256 balance = Shell(shell1).balanceOf(address(this));
+        amount = pool.depositLiquidity(shell1, amountToStake);
+        balance = Shell(shell1).balanceOf(address(this));
 
-        // token1Balance = TEST1.balanceOf(address(this));
-        // token2Balance = TEST2.balanceOf(address(this));
+        test1Withdrawn = amountToStake / 2;
+        test2Withdrawn = amountToStake / 2 / 100;
 
-        // test1Withdrawn = amountToStake / 2;
-        // test2Withdrawn = amountToStake / 2 / 100;
+        assertEq(TEST1.balanceOf(address(this)), tokenAmount - test1Withdrawn);
+        assertEq(TEST2.balanceOf(address(this)), tokenAmount - test2Withdrawn);
 
-        // assertEq(token1Balance, tokenAmount - test1Withdrawn);
-        // assertEq(token2Balance, tokenAmount - test2Withdrawn);
-
-        // assertEq(amount,  amountToStake);
-        // assertEq(balance, amountToStake);
+        assertEq(amount,  amountToStake);
+        assertEq(balance, amountToStake);
 
         amount = pool.depositLiquidity(shell2, amountToStake);
         balance = Shell(shell2).balanceOf(address(this));
@@ -83,13 +74,13 @@ contract DappTest is DSMath, DSTest {
         // token2Balance = TEST2.balanceOf(address(this));
         // token3Balance = TEST3.balanceOf(address(this));
 
-        // test1Withdrawn = test1Withdrawn + wdiv(amountToStake, 3 * WAD);
-        // test2Withdrawn = test2Withdrawn + wdiv(amountToStake, 300 * WAD);
-        // test3Withdrawn = wdiv(amountToStake, 3000 * WAD);
+        test1Withdrawn = test1Withdrawn + wdiv(amountToStake, 3 * WAD);
+        test2Withdrawn = test2Withdrawn + wdiv(amountToStake, 300 * WAD) - 1;
+        test3Withdrawn = wdiv(amountToStake, 30000 * WAD) - 1;
 
-        // assertEq(token1Balance, tokenAmount - test1Withdrawn);
-        // assertEq(token2Balance, tokenAmount - test2Withdrawn);
-        // assertEq(token3Balance, tokenAmount - test3Withdrawn);
+        assertEq(TEST1.balanceOf(address(this)), tokenAmount - test1Withdrawn);
+        assertEq(TEST2.balanceOf(address(this)), tokenAmount - test2Withdrawn);
+        assertEq(TEST3.balanceOf(address(this)), tokenAmount - test3Withdrawn);
 
         assertEq(balance, amountToStake);
         assertEq(amount, amountToStake);
