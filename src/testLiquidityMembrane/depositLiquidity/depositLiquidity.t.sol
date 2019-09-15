@@ -2,26 +2,22 @@
 pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
+import "ds-math/math.sol";
 
-<<<<<<< HEAD:src/testLiquidityMembrane/depositLiquidity/depositLiquidity.t.sol
 import "../../Prototype.sol";
 import "../../ERC20Token.sol";
-=======
-import "../Prototype.sol";
-import "../Shell.sol";
-import "../ERC20Token.sol";
->>>>>>> master:src/prototypeOneTests/depositLiquidity.t.sol
 
-contract DappTest is DSTest {
+contract DappTest is DSMath, DSTest {
     Prototype pool;
     address shell1;
     address shell2;
+    uint256 amountToStake = 500 * WAD;
+    uint256 tokenAmount = 1000000000 * WAD;
     ERC20Token TEST1;
     ERC20Token TEST2;
     ERC20Token TEST3;
 
     function setUp() public {
-        uint256 tokenAmount = 1000000000 * (10 ** 18);
         TEST1 = new ERC20Token("TEST ONE", "TEST1", 18, tokenAmount);
         TEST2 = new ERC20Token("TEST TWO", "TEST2", 16, tokenAmount);
         TEST3 = new ERC20Token("TEST THREE", "TEST3", 14, tokenAmount);
@@ -58,33 +54,45 @@ contract DappTest is DSTest {
         uint256 token2Balance;
         uint256 token3Balance;
 
-        uint256 amountToStake = 500 * (10 ** 18);
-        uint256 amount1 = pool.depositLiquidity(shell1, amountToStake);
-        uint256 balance1 = Shell(shell1).balanceOf(address(this));
+        uint256 test1Withdrawn;
+        uint256 test2Withdrawn;
+        uint256 test3Withdrawn;
 
+        uint256 amount;
+        uint256 balance;
 
-        token1Balance = TEST1.balanceOf(address(this));
-        token2Balance = TEST2.balanceOf(address(this));
+        // uint256 amount = pool.depositLiquidity(shell1, amountToStake);
+        // uint256 balance = Shell(shell1).balanceOf(address(this));
 
-        assertEq(token1Balance, tokenAmount - amountToStake);
-        assertEq(token2Balance, tokenAmount - ( amountToStake / 100 ));
+        // token1Balance = TEST1.balanceOf(address(this));
+        // token2Balance = TEST2.balanceOf(address(this));
 
-        assertEq(balance1, amountToStake * 2);
-        assertEq(amount1, amountToStake * 2);
+        // test1Withdrawn = amountToStake / 2;
+        // test2Withdrawn = amountToStake / 2 / 100;
 
-        uint256 amount2 = pool.depositLiquidity(shell2, amountToStake);
-        uint256 balance2 = Shell(shell2).balanceOf(address(this));
+        // assertEq(token1Balance, tokenAmount - test1Withdrawn);
+        // assertEq(token2Balance, tokenAmount - test2Withdrawn);
 
-        token1Balance = TEST1.balanceOf(address(this));
-        token2Balance = TEST2.balanceOf(address(this));
-        token3Balance = TEST3.balanceOf(address(this));
+        // assertEq(amount,  amountToStake);
+        // assertEq(balance, amountToStake);
 
-        assertEq(token1Balance, tokenAmount - ( amountToStake * 2));
-        assertEq(token2Balance, tokenAmount - ( amountToStake * 2 / 100 ));
-        assertEq(token3Balance, tokenAmount - ( amountToStake / 10000 ));
+        amount = pool.depositLiquidity(shell2, amountToStake);
+        balance = Shell(shell2).balanceOf(address(this));
 
-        assertEq(balance2, amountToStake * 3);
-        assertEq(amount2, amountToStake * 3);
+        // token1Balance = TEST1.balanceOf(address(this));
+        // token2Balance = TEST2.balanceOf(address(this));
+        // token3Balance = TEST3.balanceOf(address(this));
+
+        // test1Withdrawn = test1Withdrawn + wdiv(amountToStake, 3 * WAD);
+        // test2Withdrawn = test2Withdrawn + wdiv(amountToStake, 300 * WAD);
+        // test3Withdrawn = wdiv(amountToStake, 3000 * WAD);
+
+        // assertEq(token1Balance, tokenAmount - test1Withdrawn);
+        // assertEq(token2Balance, tokenAmount - test2Withdrawn);
+        // assertEq(token3Balance, tokenAmount - test3Withdrawn);
+
+        assertEq(balance, amountToStake);
+        assertEq(amount, amountToStake);
 
     }
 
