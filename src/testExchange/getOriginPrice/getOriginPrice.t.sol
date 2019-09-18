@@ -49,7 +49,7 @@ contract DappTest is DSTest {
     }
 
 
-    function testGetSwapRate () public {
+    function testGetOriginPrice () public {
 
         uint256 price1 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
         assertEq(price1, 99750623441396508728);

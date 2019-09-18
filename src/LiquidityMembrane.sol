@@ -8,29 +8,29 @@ import "./ERC20Token.sol";
 
 contract LiquidityMembrane is DSMath, Adjusters, CowriState {
 
-    function depositLiquidity(address shellAddress, uint amount) public returns (uint256) {
+    function depositLiquidity(address _shell, uint amount) public returns (uint256) {
 
-        Shell shell = Shell(shellAddress);
-        uint capitalDeposited = mul(shell.getTokens().length, amount);
+        Shell shell = Shell(_shell);
+        address[] memory tokens = shell.getTokens();
+        uint capitalDeposited = mul(tokens.length, amount);
 
         uint liqTokensMinted = shell.totalSupply() == 0
             ? capitalDeposited
             : wdiv(
                 wmul(shell.totalSupply(), capitalDeposited),
-                getTotalCapital(shell)
+                getTotalCapital(_shell)
             );
 
-        ERC20Token[] memory tokens = shell.getTokens();
         for(uint i = 0; i < tokens.length; i++) {
 
             adjustedTransferFrom(
-                tokens[i],
+                ERC20Token(tokens[i]),
                 msg.sender,
                 amount
             );
 
-            shells[shellAddress][address(tokens[i])] = add(
-                shells[shellAddress][address(tokens[i])],
+            shells[_shell][address(tokens[i])] = add(
+                shells[_shell][address(tokens[i])],
                 amount
             );
 
@@ -41,16 +41,16 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
         return liqTokensMinted;
     }
 
-    function withdrawLiquidity(address shellAddress, uint liquidityTokensToBurn) public returns (uint256[] memory) {
-        Shell shell = Shell(shellAddress);
+    function withdrawLiquidity(address _shell, uint liquidityTokensToBurn) public returns (uint256[] memory) {
+        Shell shell = Shell(_shell);
 
-        uint256 totalCapital = getTotalCapital(shell);
+        uint256 totalCapital = getTotalCapital(_shell);
         uint256 capitalWithdrawn = wdiv(
-            wmul(getTotalCapital(shell), liquidityTokensToBurn),
+            wmul(totalCapital, liquidityTokensToBurn),
             shell.totalSupply()
         );
 
-        ERC20Token[] memory tokens = Shell(shellAddress).getTokens();
+        address[] memory tokens = shell.getTokens();
         uint256[] memory amountsWithdrawn = new uint256[](tokens.length);
         for(uint i = 0; i < tokens.length; i++) {
 
@@ -60,30 +60,28 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
             );
 
             amountsWithdrawn[i] = adjustedTransfer(
-                tokens[i],
+                ERC20Token(tokens[i]),
                 msg.sender,
                 amount
             );
 
-            shells[address(shell)][address(tokens[i])] = sub(
-                shells[address(shell)][address(tokens[i])],
+            shells[_shell][address(tokens[i])] = sub(
+                shells[_shell][address(tokens[i])],
                 amount
             );
 
         }
 
-        Shell(shellAddress).testBurn(msg.sender, liquidityTokensToBurn);
+        shell.testBurn(msg.sender, liquidityTokensToBurn);
 
         return amountsWithdrawn;
     }
 
 
-    function getTotalCapital(Shell shell) public view returns (uint totalCapital) {
-        address[] memory tokens = shell.getTokenAddresses();
-        for (uint i = 0; i < tokens.length; i++) {
-            totalCapital = add(totalCapital, shells[address(shell)][tokens[i]]);
-        }
-        return(totalCapital);
+    function getTotalCapital(address shell) public view returns (uint totalCapital) {
+        address[] memory tokens = Shell(shell).getTokens();
+        for (uint i = 0; i < tokens.length; i++) totalCapital = add(totalCapital, shells[shell][tokens[i]]);
+        return totalCapital;
     }
 
 }

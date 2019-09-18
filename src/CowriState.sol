@@ -8,9 +8,9 @@ contract CowriState {
 
     uint256 public minCapital;
     address[] public supportedTokens;
-    Shell[] public shellList;
-    mapping(address => mapping(address => Shell[])) public pairsToActiveShells;
-    mapping(address => mapping(address => Shell[])) public pairsToAllShells;
+    address[] public shellList;
+    mapping(address => mapping(address => address[])) public pairsToActiveShells;
+    mapping(address => mapping(address => address[])) public pairsToAllShells;
     mapping(address => mapping(address => uint)) public shells;
 
 }

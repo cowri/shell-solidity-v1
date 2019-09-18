@@ -8,26 +8,18 @@ import "./ERC20Token.sol";
 
 contract Shell is ERC20Mintable, ERC20Burnable {
     using SafeMath for uint256;
-    ERC20Token[] public tokens;
-    address[] public tokenAddresses;
+    address[] public tokens;
 
     constructor(address[] memory _tokens) public {
-        tokenAddresses = _tokens;
-        for (uint8 i = 0; i < _tokens.length; i++) {
-            tokens.push(ERC20Token(_tokens[i]));
-        }
+        tokens = _tokens;
     }
 
     function testBurn(address account, uint amount) public {
         _burn(account, amount);
     }
 
-    function getTokens() public view returns(ERC20Token[] memory) {
+    function getTokens() public view returns(address[] memory) {
         return tokens;
-    }
-
-    function getTokenAddresses() public view returns (address[] memory) {
-        return tokenAddresses;
     }
 
 }

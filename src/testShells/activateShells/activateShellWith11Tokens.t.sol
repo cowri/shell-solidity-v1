@@ -22,6 +22,8 @@ contract DappTest is DSTest {
     ERC20Token TEST11;
     address shell;
 
+    event log_addr_arr(bytes32 key, address[] val);
+
     function setUp () public {
 
         uint256 tokenAmount = 1000000000 * (10 ** 18);
@@ -74,6 +76,10 @@ contract DappTest is DSTest {
 
     function testActivateShellWith11Tokens () public {
         pool.activateShell(shell);
+        address[] memory allShells = pool.getActiveShellsForPair(address(TEST1), address(TEST2));
+        address[] memory activeShells = pool.getActiveShellsForPair(address(TEST1), address(TEST2));
+        emit log_addr_arr("all shells", allShells);
+        emit log_addr_arr("active shells", activeShells);
     }
 
 }
