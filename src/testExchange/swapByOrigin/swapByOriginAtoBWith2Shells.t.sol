@@ -49,7 +49,7 @@ contract DappTest is DSTest {
     }
 
 
-    function testSwapByOriginAtoB () public {
+    function testSwapByOriginAtoBWith2Shells () public {
 
         assertEq(
             pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST1), address(TEST2)),
