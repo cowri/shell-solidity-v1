@@ -13,11 +13,12 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
         Shell shell = Shell(_shell);
         address[] memory tokens = shell.getTokens();
         uint capitalDeposited = mul(tokens.length, amount);
+        uint256 totalSupply = shell.totalSupply();
 
-        uint liqTokensMinted = shell.totalSupply() == 0
+        uint liqTokensMinted = totalSupply == 0
             ? capitalDeposited
             : wdiv(
-                wmul(shell.totalSupply(), capitalDeposited),
+                wmul(totalSupply, capitalDeposited),
                 getTotalCapital(_shell)
             );
 

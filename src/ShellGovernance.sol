@@ -14,41 +14,19 @@ contract ShellGovernance is DSMath, CowriState {
 
     function createShell (address[] memory tokens) public returns (address) {
         require(!isDuplicateShell(tokens), "Must not be a duplicate shell.");
-        Shell shell = new Shell(tokens);
-
-        emit log_addr("after new shell", address(shell));
+        // Shell shell = new Shell(tokens);
 
         for (uint8 i = 0; i < tokens.length; i++) {
             for (uint8 j = i + 1; j < tokens.length; j++){
-                pairsToAllShells[tokens[i]][tokens[j]].push(address(shell));
-                pairsToAllShells[tokens[j]][tokens[i]].push(address(shell));
-
-                emit log_addr_arr("i to j", pairsToAllShells[tokens[i]][tokens[j]]);
-                emit log_addr_arr("j to i", pairsToAllShells[tokens[j]][tokens[i]]);
-
-                // Shell[] memory ItoJ = pairsToAllShells[tokens[i]][tokens[j]];
-                // Shell[] memory newItoJ = new Shell[](ItoJ.length + 1);
-                // newItoJ[ItoJ.length] = shell;
-                // for (uint k = 0; k < ItoJ.length; k++) newItoJ[k] = ItoJ[k];
-
-                // Shell[] memory JtoI = pairsToAllShells[tokens[j]][tokens[i]];
-                // Shell[] memory newJtoI = new Shell[](JtoI.length + 1);
-                // newItoJ[JtoI.length] = shell;
-                // for (uint k = 0; k < JtoI.length; k++) newJtoI[k] = JtoI[k];
-
-                // pairsToAllShells[tokens[i]][tokens[j]] = newItoJ;
-                // pairsToAllShells[tokens[j]][tokens[i]] = newJtoI;
-
+                pairsToAllShells[tokens[i]][tokens[j]].push(address(this));
+                pairsToAllShells[tokens[j]][tokens[i]].push(address(this));
             }
         }
 
-        return(address(shell));
+        return(address(this));
     }
 
     function activateShell (address _shell) public returns (bool) {
-
-        emit log_addr("_shell", _shell);
-
         require(hasSufficientCapital(_shell), "Shell must have sufficient capital");
 
         Shell shell = Shell(_shell);
@@ -60,8 +38,6 @@ contract ShellGovernance is DSMath, CowriState {
             for (uint8 j = i + 1; j < tokens.length; j++){
                 pairsToActiveShells[tokens[i]][tokens[j]].push(_shell);
                 pairsToActiveShells[tokens[j]][tokens[i]].push(_shell);
-                emit log_addr_arr("i to j", pairsToActiveShells[tokens[i]][tokens[j]]);
-                emit log_addr_arr("j to i", pairsToActiveShells[tokens[j]][tokens[i]]);
             }
         }
 
@@ -75,6 +51,7 @@ contract ShellGovernance is DSMath, CowriState {
     function deactivateShell (address _shell) public {
         require(!hasSufficientCapital(_shell), "Must not have sufficient capital");
         require(isInShellList(_shell), "Shell must be in shell list.");
+
 
         Shell shell = Shell(_shell);
         address[] memory tokens = shell.getTokens();
@@ -132,9 +109,7 @@ contract ShellGovernance is DSMath, CowriState {
     }
 
     function isInShellList(address _shell) public view returns(bool) {
-        for (uint8 i = 0; i<shellList.length; i++) {
-            if (address(shellList[i]) == _shell) return true;
-        }
+        for (uint8 i = 0; i<shellList.length; i++) if (address(shellList[i]) == _shell) return true;
         return false;
     }
 
