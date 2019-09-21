@@ -13,6 +13,25 @@ contract ShellGovernance is DSMath, CowriState {
         event log_erc20_arr (bytes32 key, ERC20Token[] val);
 
     function createShell (address[] memory tokens) public returns (address) {
+        address _shellFactory = shellFactory;
+        tokens = sortAddresses(tokens);
+
+        // solium-disable-next-line security/no-inline-assembly
+        assembly {
+            let ptr := mload(0x40)
+            calldatacopy(ptr, 0, calldatasize)
+            let result := delegatecall(gas, _shellFactory, ptr, calldatasize, 0, 0)
+            let size := returndatasize
+            returndatacopy(ptr, 0, size)
+
+            switch result
+                case 0 { revert(ptr, size) }
+                default { return(ptr, size) }
+        }
+
+    }
+
+    function registerShell (address[] memory tokens) public returns (address) {
         require(!isDuplicateShell(tokens), "Must not be a duplicate shell.");
         // Shell shell = new Shell(tokens);
 

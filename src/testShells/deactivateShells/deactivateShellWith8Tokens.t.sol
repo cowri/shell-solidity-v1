@@ -4,9 +4,12 @@ import "ds-test/test.sol";
 
 import "../../Prototype.sol";
 import "../../ERC20Token.sol";
+import "../../Shell.sol";
+import "../../ShellFactory.sol";
 
 contract DappTest is DSTest {
     Prototype pool;
+    ShellFactory shellFactory;
     ERC20Token TEST1;
     ERC20Token TEST2;
     ERC20Token TEST3;
@@ -28,7 +31,8 @@ contract DappTest is DSTest {
         TEST7 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
         TEST8 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
 
-        pool = new Prototype();
+        shellFactory = new ShellFactory();
+        pool = new Prototype(address(shellFactory));
 
         TEST1.approve(address(pool), tokenAmount);
         TEST2.approve(address(pool), tokenAmount);

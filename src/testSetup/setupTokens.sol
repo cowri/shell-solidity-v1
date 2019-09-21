@@ -1,15 +1,15 @@
+
+
+
 pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../../Prototype.sol";
-import "../../ERC20Token.sol";
-import "../../Shell.sol";
-import "../../ShellFactory.sol";
+import "../ERC20Token.sol";
+import "./SetupPool.sol";
 
-contract DappTest is DSTest {
-    Prototype pool;
-    ShellFactory shellFactory;
+contract TokenSetup is PoolSetup {
+
     ERC20Token TEST1;
     ERC20Token TEST2;
     ERC20Token TEST3;
@@ -24,12 +24,14 @@ contract DappTest is DSTest {
     ERC20Token TEST12;
     ERC20Token TEST13;
     ERC20Token TEST14;
-    address shell;
+    ERC20Token TEST15;
+    ERC20Token TEST16;
+    ERC20Token TEST17;
 
-    function setUp() public {
+    function setupTokens () public {
         uint256 tokenAmount = 1000000000 * (10 ** 18);
-        TEST1 = new ERC20Token("TEST ONE", "TEST1", 18, tokenAmount);
-        TEST2 = new ERC20Token("TEST TWO", "TEST2", 18, tokenAmount);
+        TEST1 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST2 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
         TEST3 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
         TEST4 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
         TEST5 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
@@ -42,9 +44,10 @@ contract DappTest is DSTest {
         TEST12 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
         TEST13 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
         TEST14 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST15 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST16 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
+        TEST17 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
 
-        shellFactory = new ShellFactory();
-        pool = new Prototype(address(shellFactory));
 
         TEST1.approve(address(pool), tokenAmount);
         TEST2.approve(address(pool), tokenAmount);
@@ -60,39 +63,9 @@ contract DappTest is DSTest {
         TEST12.approve(address(pool), tokenAmount);
         TEST13.approve(address(pool), tokenAmount);
         TEST14.approve(address(pool), tokenAmount);
-
-        address[] memory shellAddrs = new address[](14);
-        shellAddrs[0] = address(TEST1);
-        shellAddrs[1] = address(TEST2);
-        shellAddrs[2] = address(TEST3);
-        shellAddrs[3] = address(TEST4);
-        shellAddrs[4] = address(TEST5);
-        shellAddrs[5] = address(TEST6);
-        shellAddrs[6] = address(TEST7);
-        shellAddrs[7] = address(TEST8);
-        shellAddrs[8] = address(TEST9);
-        shellAddrs[9] = address(TEST10);
-        shellAddrs[10] = address(TEST11);
-        shellAddrs[11] = address(TEST12);
-        shellAddrs[12] = address(TEST13);
-        shellAddrs[13] = address(TEST14);
-
-        shell = pool.createShell(shellAddrs);
-
-        pool.setMinCapital(10000 * (10 ** 18));
-
-        uint256 amounts = 10000 * (10 ** 18);
-
-        pool.depositLiquidity(shell, amounts);
-
-        pool.activateShell(shell);
-
-        pool.withdrawLiquidity(shell, amounts * 14);
+        TEST15.approve(address(pool), tokenAmount);
+        TEST16.approve(address(pool), tokenAmount);
+        TEST17.approve(address(pool), tokenAmount);
 
     }
-
-    function testDeactivateShellWith14Tokens () public {
-        pool.deactivateShell(shell);
-    }
-
 }

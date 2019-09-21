@@ -8,6 +8,11 @@ import "./CowriState.sol";
 
 contract Prototype is ShellGovernance, LiquidityMembrane, ExchangeEngine {
 
+
+    constructor (address _shellFactory) public {
+        shellFactory = _shellFactory;
+    }
+
     function __init__ () public { }
 
 }

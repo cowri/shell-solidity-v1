@@ -6,82 +6,42 @@ import "ds-test/test.sol";
 
 import "../../Prototype.sol";
 import "../../ERC20Token.sol";
+import "../../ShellFactory.sol";
+import "../../Shell.sol";
+import "../../testSetup/setupShells.sol";
 
-contract DappTest is DSTest {
-    Prototype pool;
-    ERC20Token TEST1;
-    ERC20Token TEST2;
-    ERC20Token TEST3;
-    ERC20Token TEST4;
-    ERC20Token TEST5;
-    ERC20Token TEST6;
-    ERC20Token TEST7;
-    ERC20Token TEST8;
-    ERC20Token TEST9;
-    ERC20Token TEST10;
-    ERC20Token TEST11;
-    ERC20Token TEST12;
-    ERC20Token TEST13;
-    ERC20Token TEST14;
+contract DappTest is DSTest, ShellSetup {
     address shell;
 
     function setUp () public {
 
-        uint256 tokenAmount = 1000000000 * (10 ** 18);
-        TEST1 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST2 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST3 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST4 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST5 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST6 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST7 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST8 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST9 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST10 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST11 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST12 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST13 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-        TEST14 = new ERC20Token("TEST THREE", "TEST3", 18, tokenAmount);
-
-        pool = new Prototype();
-
-        TEST1.approve(address(pool), tokenAmount);
-        TEST2.approve(address(pool), tokenAmount);
-        TEST3.approve(address(pool), tokenAmount);
-        TEST4.approve(address(pool), tokenAmount);
-        TEST5.approve(address(pool), tokenAmount);
-        TEST6.approve(address(pool), tokenAmount);
-        TEST7.approve(address(pool), tokenAmount);
-        TEST8.approve(address(pool), tokenAmount);
-        TEST9.approve(address(pool), tokenAmount);
-        TEST10.approve(address(pool), tokenAmount);
-        TEST11.approve(address(pool), tokenAmount);
-        TEST12.approve(address(pool), tokenAmount);
-        TEST13.approve(address(pool), tokenAmount);
-        TEST14.approve(address(pool), tokenAmount);
-
+        setupPool();
+        setupTokens();
 
     }
 
     function testCreateShellWith14Tokens () public {
 
-        address[] memory shellAddrs = new address[](14);
-        shellAddrs[0] = address(TEST1);
-        shellAddrs[1] = address(TEST2);
-        shellAddrs[2] = address(TEST3);
-        shellAddrs[3] = address(TEST4);
-        shellAddrs[4] = address(TEST5);
-        shellAddrs[5] = address(TEST6);
-        shellAddrs[6] = address(TEST7);
-        shellAddrs[7] = address(TEST8);
-        shellAddrs[8] = address(TEST9);
-        shellAddrs[9] = address(TEST10);
-        shellAddrs[10] = address(TEST11);
-        shellAddrs[11] = address(TEST12);
-        shellAddrs[12] = address(TEST13);
-        shellAddrs[13] = address(TEST14);
+        shell = setup14TokenShell();
 
-        shell = pool.createShell(shellAddrs);
+        address[] memory tokens = Shell(shell).getTokens();
+
+        assertEq(address(TEST1), tokens[0]);
+        assertEq(address(TEST2), tokens[1]);
+        assertEq(address(TEST3), tokens[2]);
+        assertEq(address(TEST4), tokens[3]);
+        assertEq(address(TEST5), tokens[4]);
+        assertEq(address(TEST6), tokens[5]);
+        assertEq(address(TEST7), tokens[6]);
+        assertEq(address(TEST8), tokens[7]);
+        assertEq(address(TEST9), tokens[8]);
+        assertEq(address(TEST10), tokens[9]);
+        assertEq(address(TEST11), tokens[10]);
+        assertEq(address(TEST12), tokens[11]);
+        assertEq(address(TEST13), tokens[12]);
+        assertEq(address(TEST14), tokens[13]);
+
+
     }
 
 }
