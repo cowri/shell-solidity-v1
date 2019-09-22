@@ -15,6 +15,23 @@ contract ShellSetup is TokenSetup {
         return pool.createShell(shellAddrs);
     }
 
+    function setup3TokenShell () public returns (address) {
+        address[] memory shellAddrs = new address[](3);
+        shellAddrs[0] = address(TEST1);
+        shellAddrs[1] = address(TEST2);
+        shellAddrs[2] = address(TEST3);
+        return pool.createShell(shellAddrs);
+    }
+
+    function setup4TokenShell () public returns (address) {
+        address[] memory shellAddrs = new address[](4);
+        shellAddrs[0] = address(TEST1);
+        shellAddrs[1] = address(TEST2);
+        shellAddrs[2] = address(TEST3);
+        shellAddrs[3] = address(TEST4);
+        return pool.createShell(shellAddrs);
+    }
+
     function setup5TokenShell () public returns (address) {
 
         address[] memory shellAddrs = new address[](5);
@@ -27,6 +44,36 @@ contract ShellSetup is TokenSetup {
         return pool.createShell(shellAddrs);
 
     }
+
+    function setup6TokenShell () public returns (address) {
+
+        address[] memory shellAddrs = new address[](6);
+        shellAddrs[0] = address(TEST1);
+        shellAddrs[1] = address(TEST2);
+        shellAddrs[2] = address(TEST3);
+        shellAddrs[3] = address(TEST4);
+        shellAddrs[4] = address(TEST5);
+        shellAddrs[5] = address(TEST6);
+
+        return pool.createShell(shellAddrs);
+
+    }
+
+    function setup7TokenShell () public returns (address) {
+
+        address[] memory shellAddrs = new address[](7);
+        shellAddrs[0] = address(TEST1);
+        shellAddrs[1] = address(TEST2);
+        shellAddrs[2] = address(TEST3);
+        shellAddrs[3] = address(TEST4);
+        shellAddrs[4] = address(TEST5);
+        shellAddrs[5] = address(TEST6);
+        shellAddrs[6] = address(TEST7);
+
+        return pool.createShell(shellAddrs);
+
+    }
+
 
     function setup8TokenShell () public returns (address) {
 

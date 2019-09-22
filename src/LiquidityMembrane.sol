@@ -30,8 +30,8 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
                 amount
             );
 
-            shells[_shell][address(tokens[i])] = add(
-                shells[_shell][address(tokens[i])],
+            shellBalances[_shell][address(tokens[i])] = add(
+                shellBalances[_shell][address(tokens[i])],
                 amount
             );
 
@@ -56,7 +56,7 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
         for(uint i = 0; i < tokens.length; i++) {
 
             uint amount = wdiv(
-                wmul(capitalWithdrawn, shells[address(shell)][address(tokens[i])]),
+                wmul(capitalWithdrawn, shellBalances[address(shell)][address(tokens[i])]),
                 totalCapital
             );
 
@@ -66,8 +66,8 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
                 amount
             );
 
-            shells[_shell][address(tokens[i])] = sub(
-                shells[_shell][address(tokens[i])],
+            shellBalances[_shell][address(tokens[i])] = sub(
+                shellBalances[_shell][address(tokens[i])],
                 amount
             );
 
@@ -81,7 +81,7 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
 
     function getTotalCapital(address shell) public view returns (uint totalCapital) {
         address[] memory tokens = Shell(shell).getTokens();
-        for (uint i = 0; i < tokens.length; i++) totalCapital = add(totalCapital, shells[shell][tokens[i]]);
+        for (uint i = 0; i < tokens.length; i++) totalCapital = add(totalCapital, shellBalances[shell][tokens[i]]);
         return totalCapital;
     }
 

@@ -12,6 +12,7 @@ contract CowriState {
     address public shellFactory;
     mapping(address => mapping(address => address[])) public pairsToActiveShells;
     mapping(address => mapping(address => address[])) public pairsToAllShells;
-    mapping(address => mapping(address => uint)) public shells;
+    mapping(address => mapping(address => uint)) public shellBalances;
+    mapping(address => bool) public shells;
 
 }

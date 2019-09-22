@@ -12,9 +12,17 @@ contract ShellGovernance is DSMath, CowriState {
         event log_named_uint      (bytes32 key, uint val);
         event log_erc20_arr (bytes32 key, ERC20Token[] val);
 
+    // event log
+
     function createShell (address[] memory tokens) public returns (address) {
-        address _shellFactory = shellFactory;
         tokens = sortAddresses(tokens);
+        address shell = delegateShellCreation(tokens);
+        shells[shell] = true;
+        return shell;
+    }
+
+    function delegateShellCreation (address[] memory tokens) private returns (address) {
+        address _shellFactory = shellFactory;
 
         // solium-disable-next-line security/no-inline-assembly
         assembly {
@@ -31,9 +39,14 @@ contract ShellGovernance is DSMath, CowriState {
 
     }
 
-    function registerShell (address[] memory tokens) public returns (address) {
-        require(!isDuplicateShell(tokens), "Must not be a duplicate shell.");
-        // Shell shell = new Shell(tokens);
+    modifier isOfficialShell (address shell) {
+        require(shells[shell], "Must be an official Cowri Shell.");
+        _;
+    }
+
+    function registerShell (address shell) public returns (address) {
+        address[] memory tokens = Shell(shell).getTokens();
+        require(!isDuplicateShell(tokens), "Must not be a duplicate of a registered shell.");
 
         for (uint8 i = 0; i < tokens.length; i++) {
             for (uint8 j = i + 1; j < tokens.length; j++){
@@ -42,7 +55,6 @@ contract ShellGovernance is DSMath, CowriState {
             }
         }
 
-        return(address(this));
     }
 
     function activateShell (address _shell) public returns (bool) {
@@ -197,12 +209,12 @@ contract ShellGovernance is DSMath, CowriState {
         return pairsToActiveShells[one][two];
     }
 
-    function getShellBalance(address _shell, address _token) public view returns(uint) {
-        return shells[_shell][_token];
+    function getShellBalance(address _shell) public view returns(uint) {
+        return Shell(_shell).totalSupply();
     }
 
     function getShellBalanceOf(address _shell, address _token) public view returns (uint) {
-        return shells[_shell][_token];
+        return shellBalances[_shell][_token];
     }
 
     function getTotalShellCapital(address shell) public  returns (uint) {
@@ -210,7 +222,7 @@ contract ShellGovernance is DSMath, CowriState {
         address[] memory tokens = Shell(shell).getTokens();
         uint256 totalCapital;
         for (uint i = 0; i < tokens.length; i++) {
-            totalCapital = add(totalCapital, shells[shell][address(tokens[i])]);
+            totalCapital = add(totalCapital, shellBalances[shell][address(tokens[i])]);
         }
 
         return totalCapital;

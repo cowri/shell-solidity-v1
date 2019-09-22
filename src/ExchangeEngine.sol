@@ -14,8 +14,8 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
         uint256 originLiquidity;
         uint256 targetLiquidity;
         for (uint8 i = 0; i < _shells.length; i++) {
-            originLiquidity += shells[_shells[i]][origin];
-            targetLiquidity += shells[_shells[i]][target];
+            originLiquidity += shellBalances[_shells[i]][origin];
+            targetLiquidity += shellBalances[_shells[i]][target];
         }
         return (originLiquidity, targetLiquidity);
     }
@@ -29,7 +29,6 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
 
     function getOriginPrice (uint256 originAmount, address origin, address target) public  returns (uint256) {
         address[] memory _shells = pairsToActiveShells[origin][target];
-        emit log_addr_arr("shells", _shells);
         (uint256 originLiquidity, uint256 targetLiquidity) = getPairLiquidity(_shells, origin, target);
         return calculateOriginPrice(originAmount, originLiquidity, targetLiquidity);
     }
@@ -94,8 +93,8 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
         uint256 targetBalance;
         for (uint8 i = 0; i < _shells.length; i++) {
 
-            targetBalance = shells[_shells[i]][target];
-            shells[_shells[i]][target] = sub(
+            targetBalance = shellBalances[_shells[i]][target];
+            shellBalances[_shells[i]][target] = sub(
                 targetBalance,
                 wdiv(
                     wmul(targetAmount, targetBalance),
@@ -103,8 +102,8 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
                 )
             );
 
-            originBalance = shells[_shells[i]][origin];
-            shells[_shells[i]][origin] = add(
+            originBalance = shellBalances[_shells[i]][origin];
+            shellBalances[_shells[i]][origin] = add(
                 originBalance,
                 wdiv(
                     wmul(originAmount, targetBalance),

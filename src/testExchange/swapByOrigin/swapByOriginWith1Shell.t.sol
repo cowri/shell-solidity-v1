@@ -4,34 +4,19 @@ import "ds-test/test.sol";
 
 import "../../Prototype.sol";
 import "../../ERC20Token.sol";
+import "../../testSetup/setupShells.sol";
 
-contract DappTest is DSTest {
+contract DappTest is DSTest, ShellSetup {
 
-    Prototype pool;
     address shell1;
-    ERC20Token TEST1;
-    ERC20Token TEST2;
     uint256 shell1Liquidity;
 
     function setUp () public {
-        uint256 tokenAmount = 10000000000 * (10 ** 18);
-        uint8 decimalAmount = 18;
-        TEST1 = new ERC20Token("TEST ONE", "TEST1", decimalAmount, tokenAmount);
-        TEST2 = new ERC20Token("TEST TWO", "TEST2", decimalAmount, tokenAmount);
 
-        pool = new Prototype();
-
-        TEST1.approve(address(pool), tokenAmount);
-        TEST2.approve(address(pool), tokenAmount);
-
-        address[] memory shell1Addrs = new address[](2);
-        shell1Addrs[0] = address(TEST1);
-        shell1Addrs[1] = address(TEST2);
-        shell1 = pool.createShell(shell1Addrs);
-
-
+        setupPool();
+        setupTokens();
+        shell1 = setup2TokenShell();
         shell1Liquidity = pool.depositLiquidity(shell1, 10000 * ( 10 ** 18));
-
         pool.activateShell(shell1);
 
     }
@@ -39,10 +24,10 @@ contract DappTest is DSTest {
 
     function testSwapByOriginAtoBWith1Shell () public {
 
-        /* assertEq( */
-            pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
-            /* 99750623441396508728 */
-        /* ); */
+        assertEq(
+            pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST1), address(TEST2)),
+            99009900990099009901
+        );
 
         /* assertEq( */
         /*     pool.getShellBalanceOf(shell1, address(TEST1)), */
