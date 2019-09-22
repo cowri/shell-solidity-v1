@@ -8,30 +8,40 @@ import "./ERC20Token.sol";
 
 contract LiquidityMembrane is DSMath, Adjusters, CowriState {
 
+    event log_named_uint(bytes32 key, uint256 val); 
+
     function depositLiquidity(address shellAddress, uint amount) public returns (uint256) {
 
         Shell shell = Shell(shellAddress);
-        uint capitalDeposited = mul(shell.getTokens().length, amount);
-
-        uint liqTokensMinted = shell.totalSupply() == 0
-            ? capitalDeposited
-            : wdiv(
-                wmul(shell.totalSupply(), capitalDeposited),
-                getTotalCapital(shell)
-            );
-
+        uint256 totalCapital = getTotalCapital(shell);
+        uint256 totalSupply = shell.totalSupply();
+        uint256 liqTokensMinted;
+        uint256 adjustedAmount;
         ERC20Token[] memory tokens = shell.getTokens();
+
+        if (totalSupply == 0) {
+
+            liqTokensMinted = amount;
+            adjustedAmount = wdiv(amount, tokens.length * WAD);
+
+        } else liqTokensMinted = wdiv(wmul(totalSupply, amount), totalCapital);
+
         for(uint i = 0; i < tokens.length; i++) {
+
+            uint256 currentBalance = shells[shellAddress][address(tokens[i])];
+            uint256 relativeAmount = totalSupply != 0
+                ? wdiv(wmul(amount, currentBalance), totalCapital)
+                : adjustedAmount;
 
             adjustedTransferFrom(
                 tokens[i],
                 msg.sender,
-                amount
+                relativeAmount
             );
 
             shells[shellAddress][address(tokens[i])] = add(
-                shells[shellAddress][address(tokens[i])],
-                amount
+                currentBalance,
+                relativeAmount
             );
 
         }
@@ -42,7 +52,9 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
     }
 
     function withdrawLiquidity(address shellAddress, uint liquidityTokensToBurn) public returns (uint256[] memory) {
+
         Shell shell = Shell(shellAddress);
+        assert(shell.balanceOf(msg.sender) >= liquidityTokensToBurn);
 
         uint256 totalCapital = getTotalCapital(shell);
         uint256 capitalWithdrawn = wdiv(

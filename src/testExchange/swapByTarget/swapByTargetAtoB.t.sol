@@ -55,7 +55,7 @@ contract DappTest is DSTest {
 
         assertEq(
             pool.swapByTarget(swapAmount, address(TEST1), address(TEST2)),
-            100250626566416040100
+            100671140939597315436
         );
 
     }

@@ -35,10 +35,6 @@ contract DappTest is DSTest {
 
         pool.activateShell(shell);
 
-        pool.withdrawLiquidity(shell, amounts * 2);
-
-        pool.depositLiquidity(shell, amounts);
-
     }
 
     function testDeactivateShellWithTooMuchCapital () public {

@@ -59,7 +59,7 @@ contract DappTest is DSTest {
 
         pool.activateShell(shell);
 
-        pool.withdrawLiquidity(shell, amounts * 8);
+        pool.withdrawLiquidity(shell, amounts);
 
     }
 
