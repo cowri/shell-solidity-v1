@@ -17,7 +17,7 @@ contract DappTest is DSTest, ShellSetup {
 
         setupPool();
         setupTokens();
-        shell = setup2TokenShell();
+        shell = setupShellAB();
         pool.setMinCapital(10000 * (10 ** 18));
 
     }

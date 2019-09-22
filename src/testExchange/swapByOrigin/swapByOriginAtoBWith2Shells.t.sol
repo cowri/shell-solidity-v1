@@ -16,8 +16,8 @@ contract DappTest is DSTest, ShellSetup {
 
         setupPool();
         setupTokens();
-        shell1 = setup2TokenShell();
-        shell2 = setup3TokenShell();
+        shell1 = setupShellAB();
+        shell2 = setupShellABC();
 
         shell1Liquidity = pool.depositLiquidity(shell1, 10000 * ( 10 ** 18));
         shell2Liquidity = pool.depositLiquidity(shell2, 30000 * ( 10 ** 18));
@@ -28,31 +28,31 @@ contract DappTest is DSTest, ShellSetup {
     }
 
 
-    function testSwapByOriginAtoB () public {
+    function testSwapByOriginAtoBWith2Shells () public {
 
         assertEq(
-            pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST1), address(TEST2)),
-            99750623441396508728
+            pool.swapByOrigin(100 * ( 10 ** 18 ), address(testA), address(testB)),
+            9933774834437086092
         );
 
         assertEq(
-            pool.getShellBalanceOf(shell1, address(TEST1)),
-            10025000000000000000000
+            pool.getShellBalanceOf(shell1, address(testA)),
+            5033333333333333333333
         );
 
         assertEq(
-            pool.getShellBalanceOf(shell2, address(TEST1)),
-            30075000000000000000000
+            pool.getShellBalanceOf(shell2, address(testA)),
+            10066666666666666666667
         );
 
         assertEq(
-            pool.getShellBalanceOf(shell1, address(TEST2)),
-            9975062344139650872818
+            pool.getShellBalanceOf(shell1, address(testB)),
+            4966887417218543046358
         );
 
         assertEq(
-            pool.getShellBalanceOf(shell2, address(TEST2)),
-            29925187032418952618454
+            pool.getShellBalanceOf(shell2, address(testB)),
+            9933774834437086092715
         );
 
     }

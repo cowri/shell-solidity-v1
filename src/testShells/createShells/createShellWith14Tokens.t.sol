@@ -22,24 +22,24 @@ contract DappTest is DSTest, ShellSetup {
 
     function testCreateShellWith14Tokens () public {
 
-        shell = setup14TokenShell();
+        shell = setupShellABCDEFGHIJKLMN();
 
         address[] memory tokens = Shell(shell).getTokens();
 
-        assertEq(address(TEST1), tokens[0]);
-        assertEq(address(TEST2), tokens[1]);
-        assertEq(address(TEST3), tokens[2]);
-        assertEq(address(TEST4), tokens[3]);
-        assertEq(address(TEST5), tokens[4]);
-        assertEq(address(TEST6), tokens[5]);
-        assertEq(address(TEST7), tokens[6]);
-        assertEq(address(TEST8), tokens[7]);
-        assertEq(address(TEST9), tokens[8]);
-        assertEq(address(TEST10), tokens[9]);
-        assertEq(address(TEST11), tokens[10]);
-        assertEq(address(TEST12), tokens[11]);
-        assertEq(address(TEST13), tokens[12]);
-        assertEq(address(TEST14), tokens[13]);
+        assertEq(address(testA), tokens[0]);
+        assertEq(address(testB), tokens[1]);
+        assertEq(address(testC), tokens[2]);
+        assertEq(address(testD), tokens[3]);
+        assertEq(address(testE), tokens[4]);
+        assertEq(address(testF), tokens[5]);
+        assertEq(address(testG), tokens[6]);
+        assertEq(address(testH), tokens[7]);
+        assertEq(address(testI), tokens[8]);
+        assertEq(address(testJ), tokens[9]);
+        assertEq(address(testK), tokens[10]);
+        assertEq(address(testL), tokens[11]);
+        assertEq(address(testM), tokens[12]);
+        assertEq(address(testN), tokens[13]);
 
 
     }

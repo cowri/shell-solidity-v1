@@ -17,8 +17,8 @@ contract DappTest is DSTest, ShellSetup {
 
         setupPool();
         setupTokens();
-        shell1 = setup2TokenShell();
-        shell2 = setup3TokenShell();
+        shell1 = setupShellAB();
+        shell2 = setupShellABC();
         shell1Liquidity = pool.depositLiquidity(shell1, 10000 * ( 10 ** 18));
         shell2Liquidity = pool.depositLiquidity(shell2, 30000 * ( 10 ** 18));
         pool.activateShell(shell1);
@@ -32,8 +32,8 @@ contract DappTest is DSTest, ShellSetup {
         uint256 swapAmount = 100 * ( 10 ** 18 );
 
         assertEq(
-            pool.swapByTarget(swapAmount, address(TEST1), address(TEST2)),
-            100250626566416040100
+            pool.swapByTarget(swapAmount, address(testA), address(testB)),
+            100671140939597315436
         );
 
     }

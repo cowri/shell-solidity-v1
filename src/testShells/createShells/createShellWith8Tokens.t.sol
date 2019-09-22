@@ -22,19 +22,19 @@ contract DappTest is DSTest, ShellSetup {
 
     function testCreateShellWith8Tokens () public {
 
-        shell = setup8TokenShell();
+        shell = setupShellABCDEFGH();
         emit log_named_address("shell", shell);
 
         address[] memory tokens = Shell(shell).getTokens();
 
-        assertEq(address(TEST1), tokens[0]);
-        assertEq(address(TEST2), tokens[1]);
-        assertEq(address(TEST3), tokens[2]);
-        assertEq(address(TEST4), tokens[3]);
-        assertEq(address(TEST5), tokens[4]);
-        assertEq(address(TEST6), tokens[5]);
-        assertEq(address(TEST7), tokens[6]);
-        assertEq(address(TEST8), tokens[7]);
+        assertEq(address(testA), tokens[0]);
+        assertEq(address(testB), tokens[1]);
+        assertEq(address(testC), tokens[2]);
+        assertEq(address(testD), tokens[3]);
+        assertEq(address(testE), tokens[4]);
+        assertEq(address(testF), tokens[5]);
+        assertEq(address(testG), tokens[6]);
+        assertEq(address(testH), tokens[7]);
 
     }
 

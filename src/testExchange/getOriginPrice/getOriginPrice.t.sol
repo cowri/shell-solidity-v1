@@ -17,8 +17,8 @@ contract DappTest is DSTest, ShellSetup {
 
         setupPool();
         setupTokens();
-        shell1 = setup2TokenShell();
-        shell2 = setup3TokenShell();
+        shell1 = setupShellAB();
+        shell2 = setupShellABC();
 
         shell1Liquidity = pool.depositLiquidity(shell1, 10000 * ( 10 ** 18));
         shell2Liquidity = pool.depositLiquidity(shell2, 30000 * ( 10 ** 18));
@@ -31,20 +31,20 @@ contract DappTest is DSTest, ShellSetup {
 
     function testGetOriginPrice () public {
 
-        uint256 price1 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
-        assertEq(price1, 99750623441396508728);
-        pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
+        uint256 price1 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(testA), address(testB));
+        assertEq(price1, 99337748344370860927);
+        pool.swapByOrigin(100 * ( 10 ** 18 ), address(testA), address(testB));
 
-        uint256 price2 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(TEST2), address(TEST1));
-        assertEq(price2, 100249375003896484436);
-        pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST2), address(TEST1));
+        uint256 price2 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(testB), address(testA));
+        assertEq(price2, 100662222418436272129);
+        pool.swapByOrigin(100 * ( 10 ** 18 ), address(testB), address(testA));
 
-        uint256 price3 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST3));
-        assertEq(price3, 99668393392175843776);
-        pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST1), address(TEST3));
+        uint256 price3 = pool.getOriginPrice(100 * ( 10 ** 18 ), address(testA), address(testC));
+        assertEq(price3, 99014229006085281365);
+        pool.swapByOrigin(100 * ( 10 ** 18 ), address(testA), address(testC));
 
-        uint256 price4 = pool.getOriginPrice(100 * ( 10 ** 18), address(TEST3), address(TEST2));
-        assertEq(price4, 99999518091363897811);
+        uint256 price4 = pool.getOriginPrice(100 * ( 10 ** 18), address(testC), address(testB));
+        assertEq(price4, 99994557837570967079);
 
     }
 

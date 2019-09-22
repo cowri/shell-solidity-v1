@@ -12,7 +12,7 @@ contract ExchangeEngine is DSMath, Adjusters, CowriState {
 
     function getPairLiquidity (address[] memory _shells, address origin, address target) private view returns (uint256, uint256) {
         uint256 originLiquidity;
-        uint256 targetLiquidity;
+       uint256 targetLiquidity;
         for (uint8 i = 0; i < _shells.length; i++) {
             originLiquidity += shellBalances[_shells[i]][origin];
             targetLiquidity += shellBalances[_shells[i]][target];

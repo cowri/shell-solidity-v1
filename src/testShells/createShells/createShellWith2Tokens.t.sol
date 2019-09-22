@@ -22,10 +22,10 @@ contract DappTest is DSTest, ShellSetup {
 
     function testCreateShellWith2Tokens () public {
 
-        shell = setup2TokenShell();
+        shell = setupShellAB();
         address[] memory tokens = Shell(shell).getTokens();
-        assertEq(address(TEST1), tokens[0]);
-        assertEq(address(TEST2), tokens[1]);
+        assertEq(address(testA), tokens[0]);
+        assertEq(address(testB), tokens[1]);
 
     }
 
