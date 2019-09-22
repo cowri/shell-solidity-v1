@@ -49,21 +49,21 @@ contract DappTest is DSTest {
     }
 
 
-    function testSwapByOriginAtoBthenBtoAthenAtoCthenCtoB () public {
+    function testSwapByOriginCtoB () public {
 
         assertEq(
             pool.swapByOrigin(100 * ( 10 ** 18 ), address(TEST3), address(TEST2)),
-            99667774086378737542
+            99009900990099009901
         );
 
         assertEq(
             pool.getShellBalanceOf(shell2, address(TEST3)),
-            30100000000000000000000
+            10100000000000000000000
         );
 
         assertEq(
             pool.getShellBalanceOf(shell2, address(TEST2)),
-            29900332225913621262458
+            9900990099009900990099
         );
 
     }

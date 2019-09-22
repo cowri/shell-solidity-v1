@@ -52,7 +52,9 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
     }
 
     function withdrawLiquidity(address shellAddress, uint liquidityTokensToBurn) public returns (uint256[] memory) {
+
         Shell shell = Shell(shellAddress);
+        assert(shell.balanceOf(msg.sender) >= liquidityTokensToBurn);
 
         uint256 totalCapital = getTotalCapital(shell);
         uint256 capitalWithdrawn = wdiv(

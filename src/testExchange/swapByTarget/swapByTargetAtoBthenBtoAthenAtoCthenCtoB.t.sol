@@ -55,22 +55,22 @@ contract DappTest is DSTest {
 
         assertEq(
             pool.swapByTarget(swapAmount, address(TEST1), address(TEST2)),
-            100250626566416040100
+            100671140939597315436
         );
 
         assertEq(
             pool.swapByTarget(swapAmount, address(TEST2), address(TEST1)),
-            99749375003916015564
+            99328889087736566597
         );
 
         assertEq(
             pool.swapByTarget(swapAmount, address(TEST1), address(TEST3)),
-            100335076822491010134
+            101014620477707726030
         );
 
         assertEq(
             pool.swapByTarget(swapAmount, address(TEST3), address(TEST2)),
-            100000628661969066939
+            100004519469649275597
         );
 
     }

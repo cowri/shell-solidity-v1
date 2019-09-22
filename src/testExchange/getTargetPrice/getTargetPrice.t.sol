@@ -52,19 +52,19 @@ contract DappTest is DSTest {
     function testGetTargetPrice () public {
 
         uint256 price1 = pool.getTargetPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
-        assertEq(price1, 100250626566416040100);
+        assertEq(price1, 100671140939597315436);
         pool.swapByTarget(100 * ( 10 ** 18 ), address(TEST1), address(TEST2));
 
         uint256 price2 = pool.getTargetPrice(100 * ( 10 ** 18 ), address(TEST2), address(TEST1));
-        assertEq(price2, 99749375003916015564);
+        assertEq(price2, 99328889087736566597);
         pool.swapByTarget(100 * ( 10 ** 18 ), address(TEST2), address(TEST1));
 
         uint256 price3 = pool.getTargetPrice(100 * ( 10 ** 18 ), address(TEST1), address(TEST3));
-        assertEq(price3, 100335076822491010134);
+        assertEq(price3, 101014620477707726030);
         pool.swapByTarget(100 * ( 10 ** 18 ), address(TEST1), address(TEST3));
 
         uint256 price4 = pool.getTargetPrice(100 * ( 10 ** 18), address(TEST3), address(TEST2));
-        assertEq(price4, 100000628661969066939);
+        assertEq(price4, 100004519469649275597);
 
     }
 
