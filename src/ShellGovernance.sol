@@ -2,9 +2,10 @@ pragma solidity ^0.5.0;
 
 import "./Shell.sol";
 import "./CowriState.sol";
+import "./Utilities.sol";
 import "ds-math/math.sol";
 
-contract ShellGovernance is DSMath, CowriState {
+contract ShellGovernance is DSMath, Utilities, CowriState {
 
         event log_addr      (bytes32 key, address val);
         event log_addr_arr      (bytes32 key, address[] val);
@@ -50,8 +51,8 @@ contract ShellGovernance is DSMath, CowriState {
 
         for (uint8 i = 0; i < tokens.length; i++) {
             for (uint8 j = i + 1; j < tokens.length; j++){
-                pairsToAllShells[tokens[i]][tokens[j]].push(address(this));
-                pairsToAllShells[tokens[j]][tokens[i]].push(address(this));
+                uint256 pairKey = makeKey(tokens[i], tokens[j]);
+                pairsToAllShells[pairKey].push(shell);
             }
         }
 
@@ -65,8 +66,8 @@ contract ShellGovernance is DSMath, CowriState {
 
         for (uint8 i = 0; i < tokens.length; i++) {
             for (uint8 j = i + 1; j < tokens.length; j++){
-                pairsToActiveShells[tokens[i]][tokens[j]].push(_shell);
-                pairsToActiveShells[tokens[j]][tokens[i]].push(_shell);
+                uint256 pairKey = makeKey(tokens[i], tokens[j]);
+                pairsToActiveShells[pairKey].push(_shell);
             }
         }
 
@@ -89,33 +90,20 @@ contract ShellGovernance is DSMath, CowriState {
             for (uint8 j = i + 1; j < tokens.length; j++) {
 
                 bool skipped;
+                uint256 pairKey = makeKey(tokens[i], tokens[j]);
+                address[] memory replacement = new address[](pairsToActiveShells[pairKey].length - 1);
 
-                address[] memory replacementShellsItoJ = new address[](pairsToActiveShells[tokens[i]][tokens[j]].length - 1);
-
-                for (uint8 k = 0; k < pairsToActiveShells[tokens[i]][tokens[j]].length; k++) {
-                    if (address(pairsToActiveShells[tokens[i]][tokens[j]][k]) == _shell) {
+                for (uint8 k = 0; k < pairsToActiveShells[pairKey].length; k++) {
+                    if (address(pairsToActiveShells[pairKey][k]) == _shell) {
                         skipped = true;
                     } else if (skipped) {
-                        replacementShellsItoJ[k-1] = pairsToActiveShells[tokens[i]][tokens[j]][k];
+                        replacement[k-1] = pairsToActiveShells[pairKey][k];
                     } else {
-                        replacementShellsItoJ[k] = pairsToActiveShells[tokens[i]][tokens[j]][k];
+                        replacement[k] = pairsToActiveShells[pairKey][k];
                     }
                 }
 
-                address[] memory replacementShellsJtoI = new address[](pairsToActiveShells[tokens[j]][tokens[i]].length - 1);
-
-                for (uint8 k = 0; k < pairsToActiveShells[tokens[j]][tokens[i]].length; k++) {
-                    if (address(pairsToActiveShells[tokens[j]][tokens[i]][k]) == _shell) {
-                        skipped = true;
-                    } else if (skipped) {
-                        replacementShellsJtoI[k-1] = pairsToActiveShells[tokens[i]][tokens[j]][k];
-                    } else {
-                        replacementShellsJtoI[k] = pairsToActiveShells[tokens[j]][tokens[i]][k];
-                    }
-                }
-
-                pairsToActiveShells[tokens[i]][tokens[j]] = replacementShellsItoJ;
-                pairsToActiveShells[tokens[j]][tokens[i]] = replacementShellsJtoI;
+                pairsToActiveShells[pairKey] = replacement;
 
             }
         }
@@ -138,7 +126,7 @@ contract ShellGovernance is DSMath, CowriState {
     }
 
     function isInShellList(address _shell) public view returns(bool) {
-        for (uint8 i = 0; i<shellList.length; i++) if (address(shellList[i]) == _shell) return true;
+        for (uint8 i = 0; i < shellList.length; i++) if (address(shellList[i]) == _shell) return true;
         return false;
     }
 
@@ -157,8 +145,9 @@ contract ShellGovernance is DSMath, CowriState {
 
     function findShellByTokens (address[] memory _addresses) public returns (address) {
 
+        uint256 pairKey = makeKey(_addresses[0], _addresses[1]);
+        address[] memory shells = pairsToAllShells[pairKey];
         address[] memory addresses = sortAddresses(_addresses);
-        address[] memory shells = pairsToAllShells[addresses[0]][addresses[1]];
 
         for (uint8 i = 0; i < shells.length; i++) {
             address[] memory comparisons = Shell(shells[i]).getTokens();
@@ -191,20 +180,22 @@ contract ShellGovernance is DSMath, CowriState {
         for (uint8 i = 0; i < tokens.length; i++) {
             supportedToken = true;
             for (uint8 j = 0; j < supportedTokens.length; j++) {
-                if(tokens[i] == supportedTokens[j]) {
+                if (tokens[i] == supportedTokens[j]) {
                     supportedToken = false;
                 }
             }
-            if(supportedToken == true) supportedTokens.push(tokens[i]);
+            if (supportedToken == true) supportedTokens.push(tokens[i]);
         }
     }
 
     function getAllShellsForPair (address one, address two) public view returns (address[] memory) {
-        return pairsToActiveShells[one][two];
+        uint256 pairKey = makeKey(one, two);
+        return pairsToAllShells[pairKey];
     }
 
-    function getActiveShellsForPair (address one, address two) public  returns (address[] memory) {
-        return pairsToActiveShells[one][two];
+    function getActiveShellsForPair (address one, address two) public view returns (address[] memory) {
+        uint256 pairKey = makeKey(one, two);
+        return pairsToActiveShells[pairKey];
     }
 
     function getShellBalance(address _shell) public view returns(uint) {
@@ -212,15 +203,17 @@ contract ShellGovernance is DSMath, CowriState {
     }
 
     function getShellBalanceOf(address _shell, address _token) public view returns (uint) {
-        return shellBalances[_shell][_token];
+        uint256 pairKey = makeKey(_shell, _token);
+        return shellBalances[pairKey];
     }
 
-    function getTotalShellCapital(address shell) public  returns (uint) {
+    function getTotalShellCapital(address shell) public view returns (uint) {
 
         address[] memory tokens = Shell(shell).getTokens();
         uint256 totalCapital;
         for (uint i = 0; i < tokens.length; i++) {
-            totalCapital = add(totalCapital, shellBalances[shell][address(tokens[i])]);
+            uint256 balanceKey = makeKey(shell, tokens[i]);
+            totalCapital = add(totalCapital, shellBalances[balanceKey]);
         }
 
         return totalCapital;

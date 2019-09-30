@@ -8,23 +8,18 @@ import "../../testSetup/setupShells.sol";
 
 contract DappTest is DSTest, ShellSetup {
 
-    address shell1;
-    address shell2;
-    uint256 shell1Liquidity;
-    uint256 shell2Liquidity;
+    address shell;
+    uint256 shellLiquidity;
 
     function setUp () public {
 
         setupPool();
         setupTokens();
-        shell1 = setupShellAB();
-        shell2 = setupShellABC();
+        shell = setupShellABC();
 
-        shell1Liquidity = pool.depositLiquidity(shell1, 10000 * ( 10 ** 18));
-        shell2Liquidity = pool.depositLiquidity(shell2, 30000 * ( 10 ** 18));
+        shellLiquidity = pool.depositLiquidity(shell, 30000 * ( 10 ** 18));
 
-        pool.activateShell(shell1);
-        pool.activateShell(shell2);
+        pool.activateShell(shell);
 
     }
 
@@ -37,12 +32,12 @@ contract DappTest is DSTest, ShellSetup {
         );
 
         assertEq(
-            pool.getShellBalanceOf(shell2, address(testC)),
+            pool.getShellBalanceOf(shell, address(testC)),
             10100000000000000000000
         );
 
         assertEq(
-            pool.getShellBalanceOf(shell2, address(testB)),
+            pool.getShellBalanceOf(shell, address(testB)),
             9900990099009900990099
         );
 

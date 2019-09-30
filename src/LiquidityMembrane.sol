@@ -1,12 +1,12 @@
 pragma solidity ^0.5.0;
 
 import "ds-math/math.sol";
-import "./Adjusters.sol";
+import "./Utilities.sol";
 import "./CowriState.sol";
 import "./Shell.sol";
 import "./ERC20Token.sol";
 
-contract LiquidityMembrane is DSMath, Adjusters, CowriState {
+contract LiquidityMembrane is DSMath, Utilities, CowriState {
 
     event log_named_uint(bytes32 key, uint256 val);
 
@@ -28,7 +28,8 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
 
         for(uint i = 0; i < tokens.length; i++) {
 
-            uint256 currentBalance = shellBalances[_shell][address(tokens[i])];
+            uint256 balanceKey = makeKey(_shell, address(tokens[i]));
+            uint256 currentBalance = shellBalances[balanceKey];
             uint256 relativeAmount = totalSupply != 0
                 ? wdiv(wmul(amount, currentBalance), totalCapital)
                 : adjustedAmount;
@@ -39,7 +40,7 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
                 relativeAmount
             );
 
-            shellBalances[_shell][address(tokens[i])] = add(
+            shellBalances[balanceKey] = add(
                 currentBalance,
                 relativeAmount
             );
@@ -66,8 +67,9 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
         uint256[] memory amountsWithdrawn = new uint256[](tokens.length);
         for(uint i = 0; i < tokens.length; i++) {
 
+            uint256 balanceKey = makeKey(address(shell), address(tokens[i]));
             uint amount = wdiv(
-                wmul(capitalWithdrawn, shellBalances[address(shell)][address(tokens[i])]),
+                wmul(capitalWithdrawn, shellBalances[balanceKey]),
                 totalCapital
             );
 
@@ -77,8 +79,8 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
                 amount
             );
 
-            shellBalances[_shell][address(tokens[i])] = sub(
-                shellBalances[_shell][address(tokens[i])],
+            shellBalances[balanceKey] = sub(
+                shellBalances[balanceKey],
                 amount
             );
 
@@ -92,7 +94,10 @@ contract LiquidityMembrane is DSMath, Adjusters, CowriState {
 
     function getTotalCapital(address shell) public view returns (uint totalCapital) {
         address[] memory tokens = Shell(shell).getTokens();
-        for (uint i = 0; i < tokens.length; i++) totalCapital = add(totalCapital, shellBalances[shell][tokens[i]]);
+        for (uint i = 0; i < tokens.length; i++) {
+            uint256 balanceKey = makeKey(shell, tokens[i]);
+            totalCapital = add(totalCapital, shellBalances[balanceKey]);
+         }
         return totalCapital;
     }
 

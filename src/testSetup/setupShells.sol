@@ -233,6 +233,26 @@ contract ShellSetup is TokenSetup {
         return pool.createShell(shellAddrs);
     }
 
+    function setupShellABCDEFGHIJKLMNO () public returns (address) {
+        address[] memory shellAddrs = new address[](15);
+        shellAddrs[0] = address(testA);
+        shellAddrs[1] = address(testB);
+        shellAddrs[2] = address(testC);
+        shellAddrs[3] = address(testD);
+        shellAddrs[4] = address(testE);
+        shellAddrs[5] = address(testF);
+        shellAddrs[6] = address(testG);
+        shellAddrs[7] = address(testH);
+        shellAddrs[8] = address(testI);
+        shellAddrs[9] = address(testJ);
+        shellAddrs[10] = address(testK);
+        shellAddrs[11] = address(testL);
+        shellAddrs[12] = address(testM);
+        shellAddrs[13] = address(testN);
+        shellAddrs[14] = address(testO);
+        return pool.createShell(shellAddrs);
+    }
+
     function setupShellABCDEFGHIJKLMNOPQ () public returns (address) {
         address[] memory shellAddrs = new address[](17);
         shellAddrs[0] = address(testA);

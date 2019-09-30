@@ -4,7 +4,11 @@ import "ds-math/math.sol";
 import "./Shell.sol";
 import "./ERC20Token.sol";
 
-contract Adjusters is DSMath {
+contract Utilities is DSMath {
+
+    function makeKey(address a, address b) internal pure returns (uint256) {
+        return add(uint256(a), uint256(b));
+    }
 
     function adjustedTransferFrom (ERC20Token token, address source, uint256 amount) internal returns (uint256) {
 
