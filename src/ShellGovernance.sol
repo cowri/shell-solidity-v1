@@ -63,8 +63,6 @@ contract ShellGovernance is DSMath, CowriState {
         Shell shell = Shell(_shell);
         address[] memory tokens = shell.getTokens();
 
-        emit log_addr_arr("tokens", tokens);
-
         for (uint8 i = 0; i < tokens.length; i++) {
             for (uint8 j = i + 1; j < tokens.length; j++){
                 pairsToActiveShells[tokens[i]][tokens[j]].push(_shell);

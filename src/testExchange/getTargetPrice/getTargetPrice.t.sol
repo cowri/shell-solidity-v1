@@ -36,7 +36,7 @@ contract DappTest is DSTest, ShellSetup {
         pool.swapByTarget(100 * ( 10 ** 18 ), address(testA), address(testB));
 
         uint256 price2 = pool.getTargetPrice(100 * ( 10 ** 18 ), address(testB), address(testA));
-        assertEq(price2, 99328889087736566597);
+        assertEq(price2, 99328889087736566596);
         pool.swapByTarget(100 * ( 10 ** 18 ), address(testB), address(testA));
 
         uint256 price3 = pool.getTargetPrice(100 * ( 10 ** 18 ), address(testA), address(testC));
