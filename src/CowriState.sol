@@ -1,10 +1,8 @@
 pragma solidity ^0.5.0;
 
-import "ds-math/math.sol";
-import "./Shell.sol";
-import "./ERC20Token.sol";
+import "openzeppelin-contracts/contracts/ownership/Ownable.sol";
 
-contract CowriState {
+contract CowriState is Ownable {
 
     uint256 public minCapital;
     address[] public supportedTokens;
