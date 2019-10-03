@@ -8,7 +8,8 @@ import "./ERC20Token.sol";
 
 contract LiquidityMembrane is DSMath, Utilities, CowriState {
 
-    event log_named_uint(bytes32 key, uint256 val);
+    event addLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
+    event removeLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
 
     function depositLiquidity(address _shell, uint amount) public returns (uint256) {
 
@@ -18,6 +19,7 @@ contract LiquidityMembrane is DSMath, Utilities, CowriState {
         uint256 liqTokensMinted;
         uint256 adjustedAmount;
         address[] memory tokens = shell.getTokens();
+        uint256[] liquidityAdded = new uint256[](tokens.length - 1);
 
         if (totalSupply == 0) {
 
@@ -34,6 +36,8 @@ contract LiquidityMembrane is DSMath, Utilities, CowriState {
                 ? wdiv(wmul(amount, currentBalance), totalCapital)
                 : adjustedAmount;
 
+            liquidityAdded[i] = relativeAmount;
+
             adjustedTransferFrom(
                 ERC20Token(tokens[i]),
                 msg.sender,
@@ -48,6 +52,8 @@ contract LiquidityMembrane is DSMath, Utilities, CowriState {
         }
 
         shell.mint(msg.sender, liqTokensMinted);
+
+        emit addLiquidity(msg.sender, _shell, tokens, liquidityAdded);
 
         return liqTokensMinted;
     }
@@ -87,6 +93,8 @@ contract LiquidityMembrane is DSMath, Utilities, CowriState {
         }
 
         shell.testBurn(msg.sender, liquidityTokensToBurn);
+
+        emit removeLiquidity(msg.sender, _shell, tokens, amountsWithdrawn);
 
         return amountsWithdrawn;
     }

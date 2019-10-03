@@ -8,6 +8,8 @@ import "./Utilities.sol";
 
 contract ExchangeEngine is DSMath, Utilities, CowriState {
 
+    event trade(address indexed buyer, address indexed origin, uint256 originSold, address indexed target, uint256 targetBought);
+
     function getLiquidity (address[] memory _shells, address token) private view returns (uint256) {
         uint256 liquidity;
         for (uint8 i = 0; i < _shells.length; i++) {
@@ -101,7 +103,11 @@ contract ExchangeEngine is DSMath, Utilities, CowriState {
         }
 
         adjustedTransferFrom(ERC20Token(origin), recipient, originAmount);
-        return adjustedTransfer(ERC20Token(target), recipient, targetAmount);
+        uint256 adjustedAmount = adjustedTransfer(ERC20Token(target), recipient, targetAmount);
+
+        emit transfer(msg.sender, origin, originAmount, target, adjustedAmount);
+
+        return adjustedAmount;
 
     }
 
@@ -132,7 +138,12 @@ contract ExchangeEngine is DSMath, Utilities, CowriState {
         }
 
         adjustedTransfer(ERC20Token(target), recipient, targetAmount);
-        return adjustedTransferFrom(ERC20Token(origin), recipient, originAmount);
+        uint256 adjustedAmount = adjustedTransferFrom(ERC20Token(origin), recipient, originAmount);
+
+        emit trade(msg.sender, origin, originAmount, target, adjustedAmount);
+
+        return adjustedAmount;
+
 
     }
 

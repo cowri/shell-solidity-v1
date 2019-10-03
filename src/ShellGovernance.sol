@@ -7,13 +7,9 @@ import "ds-math/math.sol";
 
 contract ShellGovernance is DSMath, Utilities, CowriState {
 
-        event log_addr      (bytes32 key, address val);
-        event log_addr_arr      (bytes32 key, address[] val);
-        event log_shell_arr      (bytes32 key, Shell[] val);
-        event log_named_uint      (bytes32 key, uint val);
-        event log_erc20_arr (bytes32 key, ERC20Token[] val);
-
-    // event log
+    event shellRegistered(address indexed shell, address[] indexed tokens);
+    event shellActivated(address indexed shell, address[] indexed tokens);
+    event shellDeactivated(address indexed shell, address[] indexed tokens);
 
     function createShell (address[] memory tokens) public returns (address) {
         tokens = sortAddresses(tokens);
@@ -56,6 +52,8 @@ contract ShellGovernance is DSMath, Utilities, CowriState {
             }
         }
 
+        emit shellRegistered(shell, tokens);
+
     }
 
     function activateShell (address _shell) public returns (bool) {
@@ -74,6 +72,8 @@ contract ShellGovernance is DSMath, Utilities, CowriState {
         shellList.push(_shell);
         addSupportedTokens(tokens);
 
+        emit shellActivated(shell, tokens);
+
         return true;
 
     }
@@ -81,7 +81,6 @@ contract ShellGovernance is DSMath, Utilities, CowriState {
     function deactivateShell (address _shell) public {
         require(!hasSufficientCapital(_shell), "Must not have sufficient capital");
         require(isInShellList(_shell), "Shell must be in shell list.");
-
 
         Shell shell = Shell(_shell);
         address[] memory tokens = shell.getTokens();
@@ -107,6 +106,8 @@ contract ShellGovernance is DSMath, Utilities, CowriState {
 
             }
         }
+
+        emit shellDeactivated(shell, tokens);
 
     }
 
