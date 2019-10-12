@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import "ds-math/math.sol";
 import "./Shell.sol";
 import "./ERC20Token.sol";
 import "./CowriRoot.sol";
@@ -84,18 +83,14 @@ contract ExchangeEngine is CowriRoot {
     event log_uint(bytes32 key, uint256 val);
 
     function swapByOrigin (address origin, address target, uint256 originAmount, uint256 minTargetAmount, uint256 deadline) public returns (uint256) {
-
-        emit log_uint("timestamp", block.timestamp);
-
-
-        require(block.timestamp >= deadline, "transaction must be processed before deadline");
+        require(block.timestamp <= deadline, "transaction must be processed before deadline");
         require(originAmount > 0, "origin amount must be above 0");
         require(minTargetAmount > 0, "minimum target amount must be above 0");
         return executeOriginTrade(origin, target, originAmount, minTargetAmount, msg.sender);
     }
 
     function transferByOrigin (address origin, address target, uint256 originAmount, uint256 minTargetAmount, address recipient, uint256 deadline) public returns (uint256) {
-        require(block.timestamp >= deadline, "transaction must be processed before deadline");
+        require(block.timestamp <= deadline, "transaction must be processed before deadline");
         require(recipient != address(this), "recipient must not be exchange address");
         require(recipient != address(0), "recipient must not be zero address");
         require(originAmount > 0, "origin amount must be above 0");
@@ -129,7 +124,7 @@ contract ExchangeEngine is CowriRoot {
         adjustedTransferFrom(ERC20Token(origin), recipient, originAmount);
         uint256 adjustedAmount = adjustedTransfer(ERC20Token(target), recipient, targetAmount);
 
-        emit transfer(msg.sender, origin, originAmount, target, adjustedAmount);
+        emit trade(msg.sender, origin, originAmount, target, adjustedAmount);
 
         return adjustedAmount;
 
@@ -167,14 +162,14 @@ contract ExchangeEngine is CowriRoot {
     }
 
     function swapByTarget (address origin, address target, uint256 targetAmount, uint256 maxOriginAmount, uint256 deadline) public returns (uint256) {
-        require(block.timestamp >= deadline, "transaction must be processed before deadline");
+        require(block.timestamp <= deadline, "transaction must be processed before deadline");
         require(targetAmount > 0, "target amount must be greater than 0");
         require(maxOriginAmount > 0, "max amount amount must be greater than 0");
         return executeTargetTrade(origin, target, targetAmount, maxOriginAmount, msg.sender);
     }
 
     function transferByTarget (address origin, address target, uint256 targetAmount, uint256 maxOriginAmount, address recipient, uint256 deadline) public returns (uint256) {
-        require(block.timestamp >= deadline, "transaction must be processed before deadline");
+        require(block.timestamp <= deadline, "transaction must be processed before deadline");
         require(recipient != address(this), "recipient must not be exchange address");
         require(recipient != address(0), "recipient must not be zero address");
         require(targetAmount > 0, "target amount must be greater than 0");

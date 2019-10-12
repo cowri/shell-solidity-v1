@@ -18,17 +18,17 @@ contract DappTest is DSTest, ShellSetup {
         shell = setupShellAB();
 
         uint256 amount = 10000 * (10 ** 18);
-        uint256 deadline = 0;
+        uint256 deadline = now + 50;
 
-        pool.setMinCapital(amount);
-        pool.depositLiquidity(shell, amount, amount, deadline);
+        pool.setShellActivationThreshold(amount);
+        pool.depositLiquidity(shell, amount, deadline);
 
         pool.activateShell(shell);
 
-        pool.withdrawLiquidity(shell, amount, amount, deadline);
+        pool.withdrawLiquidity(shell, amount, getLimits(2, amount / 2), deadline);
 
     }
-
+    event log_bool(bool key);
     function testDeactivateShellWithTooMuchCapital () public {
 
         ( bool success, bytes memory returnData ) = address(pool).call(
@@ -37,7 +37,8 @@ contract DappTest is DSTest, ShellSetup {
                     abi.encode(shell)
                 )
             );
-        assert(!success);
+
+        assertTrue(success);
 
     }
 

@@ -1,19 +1,16 @@
 pragma solidity ^0.5.0;
 
-import "ds-math/math.sol";
 import "./CowriRoot.sol";
 
 contract LiquidityMembrane is CowriRoot {
 
     event addLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
     event removeLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
+    event log_named_uint(bytes32 key, uint256 val);
 
-    function depositLiquidity(address _shell, uint256 amount, uint256 maxTokens, uint256 deadline) public returns (uint256) {
-
-        emit log_uint("timestamp", block.timestamp);
-
-        require(block.timestamp >= deadline, "must be processed before deadline");
-        require(maxTokens > 0, "maxTokens must be above 0");
+    function depositLiquidity(address _shell, uint256 amount, uint256 deadline) public returns (uint256) {
+        emit log_named_uint("deadline", deadline);
+        require(block.timestamp <= deadline, "must be processed before deadline");
         require(amount > 0, "amount must be above 0");
 
         Shell shell = Shell(_shell);
@@ -22,7 +19,7 @@ contract LiquidityMembrane is CowriRoot {
         uint256 liqTokensMinted;
         uint256 adjustedAmount;
         address[] memory tokens = shell.getTokens();
-        uint256[] liquidityAdded = new uint256[](tokens.length - 1);
+        uint256[] memory liquidityAdded = new uint256[](tokens.length);
 
         if (totalSupply == 0) {
 
@@ -63,10 +60,8 @@ contract LiquidityMembrane is CowriRoot {
 
     event log_uint(bytes32 key, uint256 val);
 
-    function withdrawLiquidity(address _shell, uint256 liquidityToBurn, uint256 deadline) public returns (uint256[] memory) {
-        emit log_uint("timestamp", block.timestamp);
-
-        require(block.timestamp >= deadline, "must be processed before deadline");
+    function withdrawLiquidity(address _shell, uint256 liquidityToBurn, uint256[] memory limits, uint256 deadline) public returns (uint256[] memory) {
+        require(block.timestamp <= deadline, "must be processed before deadline");
 
         Shell shell = Shell(_shell);
         require(shell.balanceOf(msg.sender) >= liquidityToBurn, "must only burn tokens you have");
@@ -86,6 +81,11 @@ contract LiquidityMembrane is CowriRoot {
                 wmul(capitalWithdrawn, shellBalances[balanceKey]),
                 totalCapital
             );
+
+            emit log_named_uint("limits[i]", limits[i]);
+            emit log_named_uint("amount", amount);
+
+            require(limits[i] <= amount, "withdrawn amount must be equal to or above minimum amount");
 
             amountsWithdrawn[i] = adjustedTransfer(
                 ERC20Token(tokens[i]),

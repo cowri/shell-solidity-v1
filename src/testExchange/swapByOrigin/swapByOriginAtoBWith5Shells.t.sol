@@ -30,13 +30,13 @@ contract DappTest is DSTest, ShellSetup {
         shell5 = setupShellABF();
 
         uint256 amount = 10000 * (10 ** 18);
-        uint256 deadline = 0;
+        uint256 deadline = now + 50;
 
-        shell1Liquidity = pool.depositLiquidity(shell1, amount, amount, deadline);
-        shell2Liquidity = pool.depositLiquidity(shell2, amount, amount, deadline);
-        shell3Liquidity = pool.depositLiquidity(shell3, amount, amount, deadline);
-        shell4Liquidity = pool.depositLiquidity(shell4, amount, amount, deadline);
-        shell5Liquidity = pool.depositLiquidity(shell5, amount, amount, deadline);
+        shell1Liquidity = pool.depositLiquidity(shell1, amount, deadline);
+        shell2Liquidity = pool.depositLiquidity(shell2, amount, deadline);
+        shell3Liquidity = pool.depositLiquidity(shell3, amount, deadline);
+        shell4Liquidity = pool.depositLiquidity(shell4, amount, deadline);
+        shell5Liquidity = pool.depositLiquidity(shell5, amount, deadline);
 
         pool.activateShell(shell1);
         pool.activateShell(shell2);
@@ -50,7 +50,7 @@ contract DappTest is DSTest, ShellSetup {
     function testSwapByOriginAtoBWith5Shells () public {
 
         uint256 amount = 100 * ( 10 ** 18 );
-        uint256 deadline = 0;
+        uint256 deadline = now + 50;
         // assertEq(
             pool.swapByOrigin(address(testA), address(testB), amount, amount / 2, deadline);
             // 99750623441396508728

@@ -58,22 +58,22 @@ contract DappTest is DSTest, ShellSetup {
         shell14 = setupShellABCDEFG();
 
         uint256 amount = 30000 * (10 ** 18);
-        uint256 deadline = 0;
+        uint256 deadline = now + 50;
 
-        shell1Liquidity = pool.depositLiquidity(shell1, amount, amount, deadline);
-        shell2Liquidity = pool.depositLiquidity(shell2, amount, amount, deadline);
-        shell3Liquidity = pool.depositLiquidity(shell3, amount, amount, deadline);
-        shell4Liquidity = pool.depositLiquidity(shell4, amount, amount, deadline);
-        shell5Liquidity = pool.depositLiquidity(shell5, amount, amount, deadline);
-        shell6Liquidity = pool.depositLiquidity(shell6, amount, amount, deadline);
-        shell7Liquidity = pool.depositLiquidity(shell7, amount, amount, deadline);
-        shell8Liquidity = pool.depositLiquidity(shell8, amount, amount, deadline);
-        shell9Liquidity = pool.depositLiquidity(shell9, amount, amount, deadline);
-        shell10Liquidity = pool.depositLiquidity(shell10, amount, amount, deadline);
-        shell11Liquidity = pool.depositLiquidity(shell11, amount, amount, deadline);
-        shell12Liquidity = pool.depositLiquidity(shell12, amount, amount, deadline);
-        shell13Liquidity = pool.depositLiquidity(shell13, amount, amount, deadline);
-        shell14Liquidity = pool.depositLiquidity(shell14, amount, amount, deadline);
+        shell1Liquidity = pool.depositLiquidity(shell1, amount, deadline);
+        shell2Liquidity = pool.depositLiquidity(shell2, amount, deadline);
+        shell3Liquidity = pool.depositLiquidity(shell3, amount, deadline);
+        shell4Liquidity = pool.depositLiquidity(shell4, amount, deadline);
+        shell5Liquidity = pool.depositLiquidity(shell5, amount, deadline);
+        shell6Liquidity = pool.depositLiquidity(shell6, amount, deadline);
+        shell7Liquidity = pool.depositLiquidity(shell7, amount, deadline);
+        shell8Liquidity = pool.depositLiquidity(shell8, amount, deadline);
+        shell9Liquidity = pool.depositLiquidity(shell9, amount, deadline);
+        shell10Liquidity = pool.depositLiquidity(shell10, amount, deadline);
+        shell11Liquidity = pool.depositLiquidity(shell11, amount, deadline);
+        shell12Liquidity = pool.depositLiquidity(shell12, amount, deadline);
+        shell13Liquidity = pool.depositLiquidity(shell13, amount, deadline);
+        shell14Liquidity = pool.depositLiquidity(shell14, amount, deadline);
 
         pool.activateShell(shell1);
         pool.activateShell(shell2);
@@ -96,7 +96,7 @@ contract DappTest is DSTest, ShellSetup {
     function testSwapByOriginAtoBWith14Shells () public {
 
 
-        uint256 deadline = 0;
+        uint256 deadline = now + 50;
         uint256 amount = 100 * ( 10 ** 18 );
         // assertEq(
             pool.swapByOrigin(address(testA), address(testB), amount, amount / 2, deadline);

@@ -18,6 +18,11 @@ contract DappTest is DSTest, DSMath, ShellSetup {
     uint256 shell3Liquidity;
     uint256 shell4Liquidity;
     uint256 shell5Liquidity;
+    uint256[] shell1Limits;
+    uint256[] shell2Limits;
+    uint256[] shell3Limits;
+    uint256[] shell4Limits;
+    uint256[] shell5Limits;
 
     function setUp() public {
 
@@ -30,22 +35,27 @@ contract DappTest is DSTest, DSMath, ShellSetup {
         shell5 = setupShellABCDEF();
 
         uint256 amountToStake = 5000 * (10 ** 18);
-        uint256 deadline = 0;
+        uint256 amountToWithdraw = 100 * (10 ** 18);
 
-        shell1Liquidity = pool.depositLiquidity(shell1, amountToStake, amountToStake, deadline);
-        shell2Liquidity = pool.depositLiquidity(shell2, amountToStake, amountToStake, deadline);
-        shell3Liquidity = pool.depositLiquidity(shell3, amountToStake, amountToStake, deadline);
-        shell4Liquidity = pool.depositLiquidity(shell4, amountToStake, amountToStake, deadline);
-        shell5Liquidity = pool.depositLiquidity(shell5, amountToStake, amountToStake, deadline);
+        shell1Liquidity = pool.depositLiquidity(shell1, amountToStake, now + 50);
+        shell2Liquidity = pool.depositLiquidity(shell2, amountToStake, now + 50);
+        shell3Liquidity = pool.depositLiquidity(shell3, amountToStake, now + 50);
+        shell4Liquidity = pool.depositLiquidity(shell4, amountToStake, now + 50);
+        shell5Liquidity = pool.depositLiquidity(shell5, amountToStake, now + 50);
+
+        shell1Limits = getLimits(2, amountToWithdraw / 2);
+        shell2Limits = getLimits(3, amountToWithdraw / 3);
+        shell3Limits = getLimits(4, amountToWithdraw / 4);
+        shell4Limits = getLimits(5, amountToWithdraw / 5);
+        shell5Limits = getLimits(6, amountToWithdraw / 6);
 
     }
 
     function testWithdrawLiquidity () public {
 
         uint256 amount = 100 * (10 ** 18);
-        uint256 deadline = 0; 
 
-        uint256[] memory shell1Withdraw1 = pool.withdrawLiquidity(address(shell1), amount, amount, deadline);
+        uint256[] memory shell1Withdraw1 = pool.withdrawLiquidity(address(shell1), amount, shell1Limits, now + 50);
 
         assertEq(shell1Withdraw1[0], wdiv(amount, WAD * 2));
         assertEq(shell1Withdraw1[1], wdiv(
@@ -53,7 +63,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
             WAD * 10
         ));
 
-        uint256[] memory shell1Withdraw2 = pool.withdrawLiquidity(address(shell1), amount, amount, deadline);
+        uint256[] memory shell1Withdraw2 = pool.withdrawLiquidity(address(shell1), amount, shell1Limits, now + 50);
 
         assertEq(shell1Withdraw2[0], wdiv(amount, WAD * 2));
         assertEq(shell1Withdraw2[1], wdiv(
@@ -61,7 +71,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
             WAD * 10
         ));
 
-        uint256[] memory shell1Withdraw3 = pool.withdrawLiquidity(address(shell1), amount, amount, deadline);
+        uint256[] memory shell1Withdraw3 = pool.withdrawLiquidity(address(shell1), amount, shell1Limits, now + 50);
 
         assertEq(shell1Withdraw3[0], wdiv(amount, WAD * 2));
         assertEq(shell1Withdraw3[1], wdiv(
@@ -69,7 +79,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
             WAD * 10
         ));
 
-        uint256[] memory shell1Withdraw4 = pool.withdrawLiquidity(address(shell1), amount, amount, deadline);
+        uint256[] memory shell1Withdraw4 = pool.withdrawLiquidity(address(shell1), amount, shell1Limits, now + 50);
 
         assertEq(shell1Withdraw4[0], wdiv(amount, WAD * 2));
         assertEq(shell1Withdraw4[1], wdiv(
@@ -77,7 +87,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
             WAD * 10
         ));
 
-        uint256[] memory shell1Withdraw5 = pool.withdrawLiquidity(address(shell1), amount, amount, deadline);
+        uint256[] memory shell1Withdraw5 = pool.withdrawLiquidity(address(shell1), amount, shell1Limits, now + 50);
 
         assertEq(shell1Withdraw5[0], wdiv(amount, WAD * 2));
         assertEq(shell1Withdraw5[1], wdiv(
@@ -85,7 +95,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
             WAD * 10
         ));
 
-        uint256[] memory shell2Withdraw1 = pool.withdrawLiquidity(address(shell2), amount, amount, deadline);
+        uint256[] memory shell2Withdraw1 = pool.withdrawLiquidity(address(shell2), amount, shell2Limits, now + 50);
 
         assertEq(shell2Withdraw1[0], wdiv(amount, WAD * 3));
 
@@ -99,7 +109,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
             WAD * 100
         ));
 
-        uint256[] memory shell2Withdraw2 = pool.withdrawLiquidity(address(shell2), amount, amount, deadline);
+        uint256[] memory shell2Withdraw2 = pool.withdrawLiquidity(address(shell2), amount, shell2Limits, now + 50);
 
         assertEq(shell2Withdraw2[0], wdiv(amount, WAD * 3));
         assertEq(shell2Withdraw2[1], wdiv(
@@ -111,7 +121,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
             WAD * 100
         ));
 
-        uint256[] memory shell2Withdraw3 = pool.withdrawLiquidity(address(shell2), amount, amount, deadline);
+        uint256[] memory shell2Withdraw3 = pool.withdrawLiquidity(address(shell2), amount, shell2Limits, now + 50);
 
         assertEq(shell2Withdraw3[0], wdiv(amount, WAD * 3));
         assertEq(shell2Withdraw3[1], wdiv(
@@ -123,7 +133,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
             WAD * 100
         ));
 
-        uint256[] memory shell3Withdraw1 = pool.withdrawLiquidity(address(shell3), amount, amount, deadline);
+        uint256[] memory shell3Withdraw1 = pool.withdrawLiquidity(address(shell3), amount, shell3Limits, now + 50);
 
         assertEq(shell3Withdraw1[0], wdiv(amount, WAD * 4));
         assertEq(shell3Withdraw1[1], wdiv(
@@ -139,7 +149,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
             WAD * 1000
         ));
 
-        uint256[] memory shell4Withdraw1 = pool.withdrawLiquidity(address(shell4), amount, amount, deadline);
+        uint256[] memory shell4Withdraw1 = pool.withdrawLiquidity(address(shell4), amount, shell4Limits, now + 50);
 
         assertEq(shell4Withdraw1[0], wdiv(amount, WAD * 5));
         assertEq(shell4Withdraw1[1], wdiv(
@@ -159,7 +169,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
             WAD * 10000
         ));
 
-        uint256[] memory shell5Withdraw1 = pool.withdrawLiquidity(address(shell5), amount, amount, deadline);
+        uint256[] memory shell5Withdraw1 = pool.withdrawLiquidity(address(shell5), amount, shell5Limits, now + 50);
 
         assertEq(shell5Withdraw1[0], wdiv(amount, 6 * WAD));
         uint256 expected = wdiv(

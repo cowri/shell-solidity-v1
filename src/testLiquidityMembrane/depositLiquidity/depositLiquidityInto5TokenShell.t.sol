@@ -22,8 +22,8 @@ contract DappTest is DSTest, DSMath, ShellSetup {
     function testDepositLiquidityTo5TokenShell () public {
 
         uint256 amountToStake = 500 * WAD;
-        uint256 deadline = 0;
-        pool.depositLiquidity(shell, amountToStake, amountToStake, deadline);
+        uint256 deadline = now + 50;
+        pool.depositLiquidity(shell, amountToStake, deadline);
 
     }
 

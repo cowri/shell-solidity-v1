@@ -5,6 +5,13 @@ import "./setupTokens.sol";
 
 contract ShellSetup is TokenSetup {
 
+    function getLimits (uint256 length, uint256 amounts) internal returns (uint256[] memory) {
+        uint256[] memory limitArray = new uint256[](length);
+        for (uint i = 0; i < length; i++){
+            limitArray[i] = amounts;
+        }
+        return limitArray;
+    }
 
     function setupShellAB () public returns (address) {
         address[] memory shellAddrs = new address[](2);

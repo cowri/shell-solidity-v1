@@ -70,7 +70,7 @@ contract ShellGovernance is CowriRoot {
         shellList.push(_shell);
         addSupportedTokens(tokens);
 
-        emit shellActivated(shell, tokens);
+        emit shellActivated(_shell, tokens);
 
         return true;
 
@@ -105,9 +105,12 @@ contract ShellGovernance is CowriRoot {
             }
         }
 
-        emit shellDeactivated(shell, tokens);
+        emit log("hello");
+        emit shellDeactivated(_shell, tokens);
+        emit log("hello");
 
     }
+    event log(bytes32 key);
 
     function hasSufficientCapital(address _shell) public  returns(bool) {
 

@@ -18,10 +18,10 @@ contract DappTest is DSTest, ShellSetup {
         shell = setupShellABCDEFGHIJKLMNOPQ();
 
         uint256 amount = 10000 * (10 ** 18);
-        uint256 deadline = 0;
+        uint256 deadline = now + 50;
 
-        pool.setMinCapital(amount);
-        pool.depositLiquidity(shell, amount, amount, deadline);
+        pool.setShellActivationThreshold(amount);
+        pool.depositLiquidity(shell, amount, deadline);
 
     }
 

@@ -21,10 +21,10 @@ contract DappTest is DSTest, ShellSetup {
         shell2 = setupShellABC();
 
         uint256 amount = 10000 * ( 10 ** 18 );
-        uint256 deadline = 0;
+        uint256 deadline = now + 50;
 
-        shell1Liquidity = pool.depositLiquidity(shell1, amount, amount, deadline);
-        shell2Liquidity = pool.depositLiquidity(shell2, amount * 3, amount * 3, deadline);
+        shell1Liquidity = pool.depositLiquidity(shell1, amount, deadline);
+        shell2Liquidity = pool.depositLiquidity(shell2, amount * 3, deadline);
 
         pool.activateShell(shell1);
         pool.activateShell(shell2);
@@ -35,11 +35,11 @@ contract DappTest is DSTest, ShellSetup {
     function testSwapByTargetCtoB () public {
 
         uint256 amount = 100 * ( 10 ** 18 );
-        uint256 deadline = 0;
+        uint256 deadline = now + 50;
 
         assertEq(
             pool.swapByTarget(address(testC), address(testB), amount, amount * 2, deadline),
-            1010101010101010101
+            1008080808080808080
         );
 
     }

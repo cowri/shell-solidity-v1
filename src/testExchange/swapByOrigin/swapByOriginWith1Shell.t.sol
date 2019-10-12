@@ -18,9 +18,9 @@ contract DappTest is DSTest, ShellSetup {
         shell1 = setupShellAB();
 
         uint256 amount = 10000 * ( 10 ** 18 );
-        uint256 deadline = 0;
+        uint256 deadline = now + 50;
 
-        shell1Liquidity = pool.depositLiquidity(shell1, amount, amount, deadline);
+        shell1Liquidity = pool.depositLiquidity(shell1, amount, deadline);
         pool.activateShell(shell1);
 
     }
@@ -33,7 +33,7 @@ contract DappTest is DSTest, ShellSetup {
 
         assertEq(
             pool.swapByOrigin(address(testA), address(testB), amount, amount / 2, deadline),
-            9803921568627450980
+            9783738115554804744
         );
 
     }
