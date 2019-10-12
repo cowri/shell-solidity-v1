@@ -3,10 +3,13 @@ pragma solidity ^0.5.0;
 import "ds-math/math.sol";
 import "./Shell.sol";
 import "./ERC20Token.sol";
-import "./CowriState.sol";
-import "./Utilities.sol";
+import "./CowriRoot.sol";
 
-contract ExchangeEngine is DSMath, Utilities, CowriState {
+contract ExchangeEngine is CowriRoot {
+
+    function getRevenue (address token) public view returns (uint256) {
+        return revenue[token];
+    }
 
     event trade(address indexed buyer, address indexed origin, uint256 originSold, address indexed target, uint256 targetBought);
 
@@ -32,12 +35,18 @@ contract ExchangeEngine is DSMath, Utilities, CowriState {
         assert(originLiquidity > 0);
         assert(targetLiquidity > 0);
 
+        uint256 originAmountWithFee = wmul(
+            originAmount,
+            wdiv(BASIS - platformFee, BASIS)
+        );
+
         uint256 targetAmount;
         for (uint8 i = 0; i < _shells.length; i++) {
             uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
             uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
-            uint256 originCut = wdiv(wmul(originAmount, targetBalance), targetLiquidity);
-            targetAmount += calculateOriginPrice(originCut, originBalance, targetBalance);
+            uint256 originCut = wdiv(wmul(originAmountWithFee, targetBalance), targetLiquidity);
+            uint256 originCutWithFee = wmul(originCut, wdiv(BASIS - liquidityFee, BASIS));
+            targetAmount += calculateOriginPrice(originCutWithFee, originBalance, targetBalance);
         }
 
         return targetAmount;
@@ -62,10 +71,13 @@ contract ExchangeEngine is DSMath, Utilities, CowriState {
             uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
             uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
             uint256 targetContribution = wdiv(wmul(targetAmount, targetBalance), targetLiquidity);
-            originAmount += calculateTargetPrice(targetContribution, originBalance, targetBalance);
+            uint256 originCut = calculateTargetPrice(targetContribution, originBalance, targetBalance);
+            uint256 originCutWithFee = wmul(originCut, wdiv(BASIS - liquidityFee, BASIS));
+            originAmount += originCutWithFee;
         }
 
-        return originAmount;
+        uint256 originAmountWithFee = wmul(originAmount, wdiv(BASIS - platformFee, BASIS));
+        return originAmountWithFee;
 
     }
 
@@ -96,16 +108,19 @@ contract ExchangeEngine is DSMath, Utilities, CowriState {
         address[] memory _shells = pairsToActiveShells[makeKey(origin, target)];
         uint256 targetLiquidity = getLiquidity(_shells, target);
 
+        uint256 originAmountWithFee = wmul(
+            originAmount,
+            wdiv(BASIS - platformFee, BASIS)
+        );
+
+        revenue[origin] += sub(originAmount, originAmountWithFee);
+
         uint256 targetAmount;
         for (uint8 i = 0; i < _shells.length; i++) {
-            uint256 originKey = makeKey(_shells[i], origin);
-            uint256 originBalance = shellBalances[originKey];
-            uint256 targetKey = makeKey(_shells[i], target);
-            uint256 targetBalance = shellBalances[targetKey];
-            uint256 originCut = wdiv(wmul(originAmount, targetBalance), targetLiquidity);
-            uint256 targetContribution = calculateOriginPrice(originCut, originBalance, targetBalance);
-            shellBalances[originKey] = add(originBalance, originCut);
-            shellBalances[targetKey] = sub(targetBalance, targetContribution);
+            uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
+            uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
+            uint256 originCut = executeOriginCreditOrigin(_shells[i], origin, originAmountWithFee, targetBalance, targetLiquidity);
+            uint256 targetContribution = executeOriginDebitTarget(_shells[i], target, originCut, originBalance, targetBalance);
             targetAmount += targetContribution;
         }
 
@@ -117,6 +132,37 @@ contract ExchangeEngine is DSMath, Utilities, CowriState {
         emit transfer(msg.sender, origin, originAmount, target, adjustedAmount);
 
         return adjustedAmount;
+
+    }
+
+    function executeOriginDebitTarget (address shell, address target, uint256 originCut, uint256 originBalance, uint256 targetBalance) private returns (uint256) {
+
+        uint256 targetContribution = wdiv(
+            wmul(originCut, targetBalance),
+            add(originCut, originBalance)
+        );
+
+        shellBalances[makeKey(shell, target)] -= targetContribution;
+
+        return targetContribution;
+
+    }
+
+    function executeOriginCreditOrigin (address shell, address origin, uint256 originAmountWithFee, uint256 targetBalance, uint256 targetLiquidity) private returns (uint256) {
+
+        uint256 originCut = wdiv(
+            wmul(originAmountWithFee, targetBalance),
+            targetLiquidity
+        );
+
+        uint256 originCutWithFee = wmul(
+            originCut,
+            wdiv(BASIS - liquidityFee, BASIS)
+        );
+
+        shellBalances[makeKey(shell, origin)] += originCutWithFee;
+
+        return originCutWithFee;
 
     }
 
@@ -143,19 +189,21 @@ contract ExchangeEngine is DSMath, Utilities, CowriState {
 
         uint256 originAmount;
         for (uint8 i = 0; i < _shells.length; i++) {
-            uint256 originKey = makeKey(_shells[i], origin);
-            uint256 targetKey = makeKey(_shells[i], target);
-            uint256 originBalance = shellBalances[originKey];
-            uint256 targetBalance = shellBalances[targetKey];
-            uint256 targetContribution = wdiv(wmul(targetAmount, targetBalance), targetLiquidity);
-            uint256 originCut = calculateTargetPrice(targetContribution, originBalance, targetBalance);
-            shellBalances[originKey] = add(originBalance, originCut);
-            shellBalances[targetKey] = sub(targetBalance, targetContribution);
+            uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
+            uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
+            uint256 targetContribution = executeTargetDebitTarget(_shells[i], target, targetAmount, targetBalance, targetLiquidity);
+            uint256 originCut = executeTargetCreditOrigin(_shells[i], origin, targetContribution, originBalance, targetBalance);
             originAmount += originCut;
         }
 
-        require(maxOriginAmount >= originAmount, "calculated origin amount must be less than specified max");
+        uint256 originAmountWithFee = wmul(
+            originAmount,
+            wdiv(BASIS - platformFee, BASIS)
+        );
 
+        require(maxOriginAmount >= originAmountWithFee, "calculated origin amount must be less than specified max");
+
+        revenue[origin] = sub(originAmount, originAmountWithFee);
         adjustedTransfer(ERC20Token(target), recipient, targetAmount);
         uint256 adjustedAmount = adjustedTransferFrom(ERC20Token(origin), recipient, originAmount);
 
@@ -163,7 +211,32 @@ contract ExchangeEngine is DSMath, Utilities, CowriState {
 
         return adjustedAmount;
 
+    }
 
+
+    function executeTargetCreditOrigin (address shell, address origin, uint256 targetContribution, uint256 originBalance, uint256 targetBalance) private returns (uint256) {
+
+        uint256 originCut = calculateTargetPrice(targetContribution, originBalance, targetBalance);
+        uint256 originCutWithFee = wmul(
+            originCut,
+            wdiv(BASIS - liquidityFee, BASIS)
+        );
+
+        shellBalances[makeKey(shell, origin)] += originCutWithFee;
+
+        return originCutWithFee;
+
+    }
+
+    function executeTargetDebitTarget (address shell, address target, uint256 targetAmount, uint256 targetBalance, uint256 targetLiquidity) private returns (uint256) {
+
+        uint256 targetContribution = wdiv(
+            wmul(targetAmount, targetBalance),
+            targetLiquidity
+        );
+
+        shellBalances[makeKey(shell, target)] -= targetContribution;
+        return targetContribution;
     }
 
 }

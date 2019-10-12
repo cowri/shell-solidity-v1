@@ -2,7 +2,7 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../../Prototype.sol";
+import "../../CowriPool.sol";
 import "../../ERC20Token.sol";
 import "../../testSetup/setupShells.sol";
 
@@ -33,6 +33,10 @@ contract DappTest is DSTest, ShellSetup {
         uint256 deadline = 0;
 
         assertEq(
+<<<<<<< HEAD
+            pool.swapByOrigin(100 * ( 10 ** 18 ), address(testC), address(testB)),
+            9880405414606827637
+=======
             pool.swapByOrigin(address(testC), address(testB), amount, amount / 2, deadline),
             9900990099009900990
         );
@@ -45,6 +49,7 @@ contract DappTest is DSTest, ShellSetup {
         assertEq(
             pool.getShellBalanceOf(shell, address(testB)),
             9900990099009900990099
+>>>>>>> master
         );
 
     }

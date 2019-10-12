@@ -2,7 +2,7 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../../Prototype.sol";
+import "../../CowriPool.sol";
 import "../../ERC20Token.sol";
 import "../../testSetup/setupShells.sol";
 
@@ -30,7 +30,6 @@ contract DappTest is DSTest, ShellSetup {
         pool.activateShell(shell2);
 
     }
-
 
     function testGetOriginPrice () public {
 

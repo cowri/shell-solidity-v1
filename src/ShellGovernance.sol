@@ -1,11 +1,9 @@
 pragma solidity ^0.5.0;
 
 import "./Shell.sol";
-import "./CowriState.sol";
-import "./Utilities.sol";
-import "ds-math/math.sol";
+import "./CowriRoot.sol";
 
-contract ShellGovernance is DSMath, Utilities, CowriState {
+contract ShellGovernance is CowriRoot {
 
     event shellRegistered(address indexed shell, address[] indexed tokens);
     event shellActivated(address indexed shell, address[] indexed tokens);
@@ -120,7 +118,7 @@ contract ShellGovernance is DSMath, Utilities, CowriState {
             shell.getTokens().length
         );
 
-        if (capital >= minCapital) return true;
+        if (capital >= shellActivationThreshold) return true;
 
         return false;
 
@@ -170,10 +168,10 @@ contract ShellGovernance is DSMath, Utilities, CowriState {
 
     }
 
-    function setMinCapital(uint256 _minCapital) public {
-        require(_minCapital >= 10000 * ( 10 ** 18), 'Minimum capital must be more than 10 thousand');
-        require(_minCapital <= 1000000 * (10 ** 18), 'Minimum capital must be no more than 1 million');
-        minCapital = _minCapital;
+    function setShellActivationThreshold(uint256 threshold) public onlyOwner {
+        require(threshold >= 10000 * ( 10 ** 18), 'Minimum capital must be more than 10 thousand');
+        require(threshold <= 1000000 * (10 ** 18), 'Minimum capital must be no more than 1 million');
+        shellActivationThreshold = threshold;
     }
 
     function addSupportedTokens(address[] memory tokens) private {

@@ -1,12 +1,9 @@
 pragma solidity ^0.5.0;
 
 import "ds-math/math.sol";
-import "./Utilities.sol";
-import "./CowriState.sol";
-import "./Shell.sol";
-import "./ERC20Token.sol";
+import "./CowriRoot.sol";
 
-contract LiquidityMembrane is DSMath, Utilities, CowriState {
+contract LiquidityMembrane is CowriRoot {
 
     event addLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
     event removeLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);

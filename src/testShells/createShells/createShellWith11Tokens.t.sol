@@ -4,7 +4,7 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../../Prototype.sol";
+import "../../CowriPool.sol";
 import "../../ERC20Token.sol";
 import "../../ShellFactory.sol";
 import "../../Shell.sol";

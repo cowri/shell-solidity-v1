@@ -2,7 +2,7 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 
-import "../../Prototype.sol";
+import "../../CowriPool.sol";
 import "../../ERC20Token.sol";
 import "../../testSetup/setupShells.sol";
 
@@ -41,15 +41,15 @@ contract DappTest is DSTest, ShellSetup {
 
         uint256 shell1Token1 = pool.getShellBalanceOf(shell1, address(testA));
         uint256 shell1Token2 = pool.getShellBalanceOf(shell1, address(testB));
-        assertEq(shell1Token1, 4999779259193854575957);
-        assertEq(shell1Token2, 5000220750551876379691);
+        assertEq(shell1Token1, 4999780182146306678555);
+        assertEq(shell1Token2, 5000219827518095963562);
 
         uint256 shell2Token1 = pool.getShellBalanceOf(shell2, address(testA));
         uint256 shell2Token2 = pool.getShellBalanceOf(shell2, address(testB));
         uint256 shell2Token3 = pool.getShellBalanceOf(shell2, address(testC));
-        assertEq(shell2Token1, 10099558518387709151914);
-        assertEq(shell2Token2, 9900446943266181792303);
-        assertEq(shell2Token3, 10000985770993914718635);
+        assertEq(shell2Token1, 10099350384292613357109);
+        assertEq(shell2Token2, 9900655043221866154149);
+        assertEq(shell2Token3, 10000981664805984646440);
 
         uint256 amount = 500 * ( 10 ** 18 );
         uint256 deadline = 0;
