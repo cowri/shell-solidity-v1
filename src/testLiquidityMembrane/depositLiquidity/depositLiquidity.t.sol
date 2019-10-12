@@ -30,9 +30,10 @@ contract DappTest is DSTest, DSMath, ShellSetup {
         uint256 amount;
         uint256 balance;
         uint256 amountToStake = 500 * WAD;
+        uint256 deadline = 0;
         uint256 tokenAmount = 1000000000 * WAD;
 
-        amount = pool.depositLiquidity(shell1, amountToStake);
+        amount = pool.depositLiquidity(shell1, amountToStake, amountToStake, deadline);
         balance = Shell(shell1).balanceOf(address(this));
 
         test1Withdrawn = amountToStake / 2;
@@ -44,7 +45,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
         assertEq(amount,  amountToStake);
         assertEq(balance, amountToStake);
 
-        amount = pool.depositLiquidity(shell2, amountToStake);
+        amount = pool.depositLiquidity(shell2, amountToStake, amountToStake, deadline);
         balance = Shell(shell2).balanceOf(address(this));
 
         test1Withdrawn = test1Withdrawn + wdiv(amountToStake, 3 * WAD);

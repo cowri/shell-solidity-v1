@@ -11,7 +11,13 @@ contract LiquidityMembrane is DSMath, Utilities, CowriState {
     event addLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
     event removeLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
 
-    function depositLiquidity(address _shell, uint amount) public returns (uint256) {
+    function depositLiquidity(address _shell, uint256 amount, uint256 maxTokens, uint256 deadline) public returns (uint256) {
+
+        emit log_uint("timestamp", block.timestamp);
+
+        require(block.timestamp >= deadline, "must be processed before deadline");
+        require(maxTokens > 0, "maxTokens must be above 0");
+        require(amount > 0, "amount must be above 0");
 
         Shell shell = Shell(_shell);
         uint256 totalCapital = getTotalCapital(_shell);
@@ -58,14 +64,19 @@ contract LiquidityMembrane is DSMath, Utilities, CowriState {
         return liqTokensMinted;
     }
 
-    function withdrawLiquidity(address _shell, uint liquidityTokensToBurn) public returns (uint256[] memory) {
+    event log_uint(bytes32 key, uint256 val);
+
+    function withdrawLiquidity(address _shell, uint256 liquidityToBurn, uint256 deadline) public returns (uint256[] memory) {
+        emit log_uint("timestamp", block.timestamp);
+
+        require(block.timestamp >= deadline, "must be processed before deadline");
 
         Shell shell = Shell(_shell);
-        assert(shell.balanceOf(msg.sender) >= liquidityTokensToBurn);
+        require(shell.balanceOf(msg.sender) >= liquidityToBurn, "must only burn tokens you have");
 
         uint256 totalCapital = getTotalCapital(_shell);
         uint256 capitalWithdrawn = wdiv(
-            wmul(totalCapital, liquidityTokensToBurn),
+            wmul(totalCapital, liquidityToBurn),
             shell.totalSupply()
         );
 
@@ -92,7 +103,7 @@ contract LiquidityMembrane is DSMath, Utilities, CowriState {
 
         }
 
-        shell.testBurn(msg.sender, liquidityTokensToBurn);
+        shell.testBurn(msg.sender, liquidityToBurn);
 
         emit removeLiquidity(msg.sender, _shell, tokens, amountsWithdrawn);
 

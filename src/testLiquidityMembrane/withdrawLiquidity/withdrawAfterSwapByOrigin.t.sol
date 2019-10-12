@@ -20,8 +20,11 @@ contract DappTest is DSTest, ShellSetup {
         shell1 = setupShellAB();
         shell2 = setupShellABC();
 
-        shell1Liquidity = pool.depositLiquidity(shell1, 10000 * (10 ** 18));
-        shell2Liquidity = pool.depositLiquidity(shell2, 30000 * (10 ** 18));
+        uint256 amount = 10000 * ( 10 ** 18 );
+        uint256 deadline = 0;
+
+        shell1Liquidity = pool.depositLiquidity(shell1, amount, amount, deadline);
+        shell2Liquidity = pool.depositLiquidity(shell2, amount, amount, deadline);
 
         pool.activateShell(shell1);
         pool.activateShell(shell2);
@@ -48,11 +51,14 @@ contract DappTest is DSTest, ShellSetup {
         assertEq(shell2Token2, 9900446943266181792303);
         assertEq(shell2Token3, 10000985770993914718635);
 
-        uint256[] memory shell1Withdrawal = pool.withdrawLiquidity(shell1, 500 * ( 10 ** 18 ));
+        uint256 amount = 500 * ( 10 ** 18 );
+        uint256 deadline = 0;
+
+        uint256[] memory shell1Withdrawal = pool.withdrawLiquidity(shell1, amount, amount, deadline);
         assertEq(shell1Withdrawal[0], 249988962959692728798);
         assertEq(shell1Withdrawal[1], 25001103752759381898);
 
-        uint256[] memory shell2Withdrawal = pool.withdrawLiquidity(shell2, 1500 * ( 10 ** 18 ));
+        uint256[] memory shell2Withdrawal = pool.withdrawLiquidity(shell2, amount, amount, deadline);
         assertEq(shell2Withdrawal[0], 504977925919385457596);
         assertEq(shell2Withdrawal[1], 49502234716330908961);
         assertEq(shell2Withdrawal[2], 5000492885496957359);

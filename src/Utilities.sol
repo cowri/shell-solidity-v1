@@ -17,11 +17,11 @@ contract Utilities is DSMath {
             ? amount / pow(10, 18 - decimals)
             : mul(amount, pow(10, decimals - 18));
 
-        token.transferFrom(
+        assert(token.transferFrom(
             source,
             address(this),
             adjustedAmount
-        );
+        ));
 
         return adjustedAmount;
 
@@ -34,10 +34,10 @@ contract Utilities is DSMath {
             ? amount / pow(10, 18 - decimals)
             : mul(amount, pow(10, decimals - 18));
 
-        token.transfer(
+        assert(token.transfer(
             recipient,
             adjustedAmount
-        );
+        ));
 
         return adjustedAmount;
 

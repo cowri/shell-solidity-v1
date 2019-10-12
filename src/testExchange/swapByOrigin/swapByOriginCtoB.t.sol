@@ -17,7 +17,10 @@ contract DappTest is DSTest, ShellSetup {
         setupTokens();
         shell = setupShellABC();
 
-        shellLiquidity = pool.depositLiquidity(shell, 30000 * ( 10 ** 18));
+        uint256 amount = 30000 * ( 10 ** 18 );
+        uint256 deadline = 0;
+
+        shellLiquidity = pool.depositLiquidity(shell, amount, amount, deadline);
 
         pool.activateShell(shell);
 
@@ -26,8 +29,11 @@ contract DappTest is DSTest, ShellSetup {
 
     function testSwapByOriginCtoB () public {
 
+        uint256 amount = 100 * ( 10 ** 18 );
+        uint256 deadline = 0;
+
         assertEq(
-            pool.swapByOrigin(100 * ( 10 ** 18 ), address(testC), address(testB)),
+            pool.swapByOrigin(address(testC), address(testB), amount, amount / 2, deadline),
             9900990099009900990
         );
 
