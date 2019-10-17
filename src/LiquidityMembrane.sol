@@ -4,12 +4,25 @@ import "./CowriRoot.sol";
 
 contract LiquidityMembrane is CowriRoot {
 
-    event addLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
-    event removeLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
-    event log_named_uint(bytes32 key, uint256 val);
+    event addLiquidity(
+        address indexed provider,
+        address indexed shell,
+        address[] indexed tokens,
+        uint256[] amounts
+    );
 
-    function depositLiquidity(address _shell, uint256 amount, uint256 deadline) public returns (uint256) {
-        emit log_named_uint("deadline", deadline);
+    event removeLiquidity(
+        address indexed provider,
+        address indexed shell,
+        address[] indexed tokens,
+        uint256[] amounts
+    );
+
+    function depositLiquidity(
+        address _shell,
+        uint256 amount,
+        uint256 deadline
+    ) public returns (uint256) {
         require(block.timestamp <= deadline, "must be processed before deadline");
         require(amount > 0, "amount must be above 0");
 
@@ -60,7 +73,12 @@ contract LiquidityMembrane is CowriRoot {
 
     event log_uint(bytes32 key, uint256 val);
 
-    function withdrawLiquidity(address _shell, uint256 liquidityToBurn, uint256[] memory limits, uint256 deadline) public returns (uint256[] memory) {
+    function withdrawLiquidity(
+        address _shell,
+        uint256 liquidityToBurn,
+        uint256[] memory limits,
+        uint256 deadline
+    ) public returns (uint256[] memory) {
         require(block.timestamp <= deadline, "must be processed before deadline");
 
         Shell shell = Shell(_shell);
@@ -76,14 +94,12 @@ contract LiquidityMembrane is CowriRoot {
         uint256[] memory amountsWithdrawn = new uint256[](tokens.length);
         for(uint i = 0; i < tokens.length; i++) {
 
-            uint256 balanceKey = makeKey(address(shell), address(tokens[i]));
+            uint256 balanceKey = makeKey(_shell, tokens[i]);
+
             uint amount = wdiv(
                 wmul(capitalWithdrawn, shellBalances[balanceKey]),
                 totalCapital
             );
-
-            emit log_named_uint("limits[i]", limits[i]);
-            emit log_named_uint("amount", amount);
 
             require(limits[i] <= amount, "withdrawn amount must be equal to or above minimum amount");
 
@@ -108,7 +124,9 @@ contract LiquidityMembrane is CowriRoot {
     }
 
 
-    function getTotalCapital(address shell) public view returns (uint totalCapital) {
+    function getTotalCapital(
+        address shell
+    ) public view returns (uint totalCapital) {
         address[] memory tokens = Shell(shell).getTokens();
         for (uint i = 0; i < tokens.length; i++) {
             uint256 balanceKey = makeKey(shell, tokens[i]);

@@ -7,7 +7,6 @@ import "./ShellGovernance.sol";
 
 contract CowriPool is ShellGovernance, LiquidityMembrane, ExchangeEngine {
 
-
     constructor (address _shellFactory) public {
         shellFactory = _shellFactory;
     }

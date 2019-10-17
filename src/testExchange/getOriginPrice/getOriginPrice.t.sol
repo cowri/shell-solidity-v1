@@ -38,18 +38,18 @@ contract DappTest is DSTest, ShellSetup {
 
         uint256 price1 = pool.getOriginPrice(address(testA), address(testB), amount);
         assertEq(price1, 99130537445712109313);
-        pool.swapByOrigin(address(testA), address(testB), amount, amount / 2, deadline);
+        pool.macroSwapByOrigin(address(testA), address(testB), amount, amount / 2, deadline);
 
         uint256 price2 = pool.getOriginPrice(address(testB), address(testA), amount);
-        assertEq(price2, 100449473561079964336);
-        pool.swapByOrigin(address(testB), address(testA), amount, amount / 2, deadline);
+        assertEq(price2, 100449341234597670845);
+        pool.macroSwapByOrigin(address(testB), address(testA), amount, amount / 2, deadline);
 
         uint256 price3 = pool.getOriginPrice(address(testA), address(testC), amount);
-        assertEq(price3, 98808355194015353560);
-        pool.swapByOrigin(address(testA), address(testC), amount, amount / 2, deadline);
+        assertEq(price3, 98808354336691015019);
+        pool.macroSwapByOrigin(address(testA), address(testC), amount, amount / 2, deadline);
 
         uint256 price4 = pool.getOriginPrice(address(testC), address(testB), amount);
-        assertEq(price4, 99784611814325772976);
+        assertEq(price4, 99784513319592252180);
 
     }
 

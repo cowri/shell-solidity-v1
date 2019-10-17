@@ -33,18 +33,18 @@ contract DappTest is DSTest, ShellSetup {
         uint256 deadline = now + 50;
 
         assertEq(
-            pool.swapByOrigin(address(testC), address(testB), amount, amount / 2, deadline),
-            9880405414606827637
+            pool.macroSwapByOrigin(address(testC), address(testB), amount, amount / 2, deadline),
+            9879427135339903077
         );
 
         assertEq(
             pool.getShellBalanceOf(shell, address(testC)),
-            10099790020000000000000
+            10099780040998000000000
         );
 
         assertEq(
             pool.getShellBalanceOf(shell, address(testB)),
-            9901195945853931723622
+            9901205728646600969224
         );
 
     }

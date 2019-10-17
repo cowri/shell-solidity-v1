@@ -15,12 +15,11 @@ contract CowriRoot is DSMath, Ownable {
     address[] public shellList;
     address public shellFactory;
     mapping(address => bool) public shells;
+    mapping(address => uint256) public omnibusIndexes;
     mapping(address => uint256) public revenue;
     mapping(uint256 => uint256) public shellBalances;
     mapping(uint256 => address[]) public pairsToAllShells;
     mapping(uint256 => address[]) public pairsToActiveShells;
-
-
 
     function makeKey(address a, address b) internal pure returns (uint256) {
         return add(uint256(a), uint256(b));

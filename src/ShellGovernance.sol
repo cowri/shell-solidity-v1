@@ -5,18 +5,33 @@ import "./CowriRoot.sol";
 
 contract ShellGovernance is CowriRoot {
 
-    event shellRegistered(address indexed shell, address[] indexed tokens);
-    event shellActivated(address indexed shell, address[] indexed tokens);
-    event shellDeactivated(address indexed shell, address[] indexed tokens);
+    event shellRegistered(
+        address indexed shell,
+        address[] indexed tokens
+    );
 
-    function createShell (address[] memory tokens) public returns (address) {
+    event shellActivated(
+        address indexed shell,
+        address[] indexed tokens
+    );
+
+    event shellDeactivated(
+        address indexed shell,
+        address[] indexed tokens
+    );
+
+    function createShell (
+        address[] memory tokens
+    ) public returns (address) {
         tokens = sortAddresses(tokens);
         address shell = delegateShellCreation(tokens);
         shells[shell] = true;
         return shell;
     }
 
-    function delegateShellCreation (address[] memory tokens) private returns (address) {
+    function delegateShellCreation (
+        address[] memory tokens
+    ) private returns (address) {
         address _shellFactory = shellFactory;
 
         // solium-disable-next-line security/no-inline-assembly
@@ -34,12 +49,16 @@ contract ShellGovernance is CowriRoot {
 
     }
 
-    modifier isOfficialShell (address shell) {
+    modifier isOfficialShell (
+        address shell
+    ) {
         require(shells[shell], "Must be an official Cowri Shell.");
         _;
     }
 
-    function registerShell (address shell) public returns (address) {
+    function registerShell (
+        address shell
+    ) public returns (address) {
         address[] memory tokens = Shell(shell).getTokens();
         require(!isDuplicateShell(tokens), "Must not be a duplicate of a registered shell.");
 
@@ -54,7 +73,9 @@ contract ShellGovernance is CowriRoot {
 
     }
 
-    function activateShell (address _shell) public returns (bool) {
+    function activateShell (
+        address _shell
+    ) public returns (bool) {
         require(hasSufficientCapital(_shell), "Shell must have sufficient capital");
 
         Shell shell = Shell(_shell);
@@ -76,7 +97,9 @@ contract ShellGovernance is CowriRoot {
 
     }
 
-    function deactivateShell (address _shell) public {
+    function deactivateShell (
+        address _shell
+    ) public {
         require(!hasSufficientCapital(_shell), "Must not have sufficient capital");
         require(isInShellList(_shell), "Shell must be in shell list.");
 
@@ -105,14 +128,13 @@ contract ShellGovernance is CowriRoot {
             }
         }
 
-        emit log("hello");
         emit shellDeactivated(_shell, tokens);
-        emit log("hello");
 
     }
-    event log(bytes32 key);
 
-    function hasSufficientCapital(address _shell) public  returns(bool) {
+    function hasSufficientCapital(
+        address _shell
+    ) public  returns(bool) {
 
         Shell shell = Shell(_shell);
 
@@ -127,12 +149,16 @@ contract ShellGovernance is CowriRoot {
 
     }
 
-    function isInShellList(address _shell) public view returns(bool) {
+    function isInShellList(
+        address _shell
+    ) public view returns(bool) {
         for (uint8 i = 0; i < shellList.length; i++) if (address(shellList[i]) == _shell) return true;
         return false;
     }
 
-    function sortAddresses (address[] memory _addresses) internal pure returns (address[] memory) {
+    function sortAddresses (
+        address[] memory _addresses
+    ) internal pure returns (address[] memory) {
         for(uint8 i = 0 ; i < _addresses.length;i++) {
             for(uint8 j = i+1 ; j < _addresses.length;j++) {
                 if (uint256(_addresses[i]) > uint256(_addresses[j])) {
@@ -145,7 +171,9 @@ contract ShellGovernance is CowriRoot {
         return _addresses;
     }
 
-    function findShellByTokens (address[] memory _addresses) public returns (address) {
+    function findShellByTokens (
+        address[] memory _addresses
+    ) public returns (address) {
 
         uint256 pairKey = makeKey(_addresses[0], _addresses[1]);
         address[] memory shells = pairsToAllShells[pairKey];
@@ -164,52 +192,72 @@ contract ShellGovernance is CowriRoot {
 
     }
 
-    function isDuplicateShell (address[] memory _addresses) public  returns(bool) {
-
+    function isDuplicateShell (
+        address[] memory _addresses
+    ) public  returns(bool) {
         if (findShellByTokens(_addresses) == address(0)) return false;
         return true;
-
     }
 
-    function setShellActivationThreshold(uint256 threshold) public onlyOwner {
+    function setShellActivationThreshold(
+        uint256 threshold
+    ) public onlyOwner {
         require(threshold >= 10000 * ( 10 ** 18), 'Minimum capital must be more than 10 thousand');
         require(threshold <= 1000000 * (10 ** 18), 'Minimum capital must be no more than 1 million');
         shellActivationThreshold = threshold;
     }
 
-    function addSupportedTokens(address[] memory tokens) private {
+    function addSupportedTokens(
+        address[] memory tokens
+    ) private {
         bool supportedToken;
         for (uint8 i = 0; i < tokens.length; i++) {
-            supportedToken = true;
+            supportedToken = false;
             for (uint8 j = 0; j < supportedTokens.length; j++) {
                 if (tokens[i] == supportedTokens[j]) {
-                    supportedToken = false;
+                    supportedToken = true;
                 }
             }
-            if (supportedToken == true) supportedTokens.push(tokens[i]);
+            if (supportedToken == false) {
+                supportedTokens.push(tokens[i]);
+                omnibusIndexes[tokens[i]] = supportedTokens.length - 1;
+            }
         }
     }
 
-    function getAllShellsForPair (address one, address two) public view returns (address[] memory) {
+    function getAllShellsForPair (
+        address one,
+        address two
+    ) public view returns (address[] memory) {
         uint256 pairKey = makeKey(one, two);
         return pairsToAllShells[pairKey];
     }
 
-    function getActiveShellsForPair (address one, address two) public view returns (address[] memory) {
+    function getActiveShellsForPair (
+        address one,
+        address two
+    ) public view returns (address[] memory) {
         uint256 pairKey = makeKey(one, two);
         return pairsToActiveShells[pairKey];
     }
 
-    function getShellBalance(address _shell) public view returns(uint) {
+    function getShellBalance(
+        address _shell
+    ) public view returns(uint) {
         return Shell(_shell).totalSupply();
     }
 
-    function getShellBalanceOf(address _shell, address _token) public view returns (uint) {
+    function getShellBalanceOf(
+        address _shell,
+        address _token
+    ) public view returns (uint) {
         uint256 pairKey = makeKey(_shell, _token);
         return shellBalances[pairKey];
     }
 
-    function getTotalShellCapital(address shell) public view returns (uint) {
+    function getTotalShellCapital(
+        address shell
+    ) public view returns (uint) {
 
         address[] memory tokens = Shell(shell).getTokens();
         uint256 totalCapital;

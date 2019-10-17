@@ -38,8 +38,8 @@ contract DappTest is DSTest, ShellSetup {
         uint256 deadline = now + 50;
 
         assertEq(
-            pool.swapByTarget(address(testC), address(testB), amount, amount * 2, deadline),
-            1008080808080808080
+            pool.macroSwapByTarget(address(testC), address(testB), amount, amount * 2, deadline),
+            1007980000000000000
         );
 
     }
