@@ -11,9 +11,6 @@ contract DappTest is DSMath, DSTest {
         sandbox = new Sandbox();
     }
 
-    function testsRollOver () public {
-        uint256 rollover = sandbox.rollsOver();
-        emit log_named_uint("rollover", rollover);
-    }
+    // function testMe () public { }
 
 }
