@@ -72,18 +72,18 @@ contract ExchangeEngine is CowriRoot {
         assert(originLiquidity > 0);
         assert(targetLiquidity > 0);
 
-        uint256 originAmountWithFee = wmul(
+        uint256 originAmountWithProtocolFee = wmul(
             originAmount,
-            wdiv(BASIS - platformFee, BASIS)
+            wdiv(BASIS - protocolFee, BASIS)
         );
 
         uint256 targetAmount;
         for (uint8 i = 0; i < _shells.length; i++) {
             uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
             uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
-            uint256 originCut = wdiv(wmul(originAmountWithFee, targetBalance), targetLiquidity);
-            uint256 originCutWithFee = wmul(originCut, wdiv(BASIS - liquidityFee, BASIS));
-            targetAmount += calculateOriginPrice(originCutWithFee, originBalance, targetBalance);
+            uint256 originCut = wdiv(wmul(originAmountWithProtocolFee, targetBalance), targetLiquidity);
+            uint256 originCutWithLiquidityFee = wmul(originCut, wdiv(BASIS - liquidityFee, BASIS));
+            targetAmount += calculateOriginPrice(originCutWithLiquidityFee, originBalance, targetBalance);
         }
 
         return targetAmount;
@@ -130,66 +130,118 @@ contract ExchangeEngine is CowriRoot {
             uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
             uint256 targetContribution = wdiv(wmul(targetAmount, targetBalance), targetLiquidity);
             uint256 originCut = calculateTargetPrice(targetContribution, originBalance, targetBalance);
-            uint256 originCutWithFee = wmul(originCut, wdiv(BASIS - liquidityFee, BASIS));
-            originAmount += originCutWithFee;
+            originAmount += originCut;
         }
 
-        return wmul(originAmount, wdiv(BASIS - platformFee, BASIS));
+        return wmul(originAmount, wdiv(BASIS + protocolFee, BASIS));
 
     }
 
+    event log_arr(bytes32, address[]);
+    /**
+    * Execute any amount of micro or macro swaps
+    *
+    * @param _shells array of shell addresses
+    * @param tokens array of token addresses
+    * @param pairs pairs of origin and targets as indexes referring to tokens array
+    * @param amounts amount of input, origin for origin trade, target for target trade
+    * @param limits limits of output, min target for origin trade, max origin for target trade
+    * @param types true for origin trade, false for target trade
+    * @return origin amount or target amount from origin/target trades.
+    */
     function omnibus (
         address[] memory _shells,
         address[] memory tokens,
         uint256[] memory pairs,
         uint256[] memory amounts,
         uint256[] memory limits,
-        bool[] memory types, // true is by origin false is by target
+        bool[] memory types,
         uint256 deadline
-    ) public {
+    ) public returns (uint256[] memory) {
         require(block.timestamp <= deadline, "transaction must be processed before deadline");
 
-        address[] memory shell = new address[](1);
-        uint256[] memory derivedAmounts = new uint256[](tokens.length);
-        uint256[] memory originAmounts = new uint256[](tokens.length);
-        for (uint256 i = _shells.length; i < _shells.length; i++) {
-            shell[0] = _shells[i];
+        address[] memory shellArr;
+        uint256[] memory derivedAmounts = new uint256[](pairs.length / 2);
+        uint256[] memory protocolFees = new uint256[](pairs.length / 2);
+        for (uint256 i = 0; i < _shells.length; i++) {
+
+            if (_shells[i] == address(0)) {
+                shellArr = pairsToActiveShells
+                    [makeKey(tokens[pairs[i*2]], tokens[pairs[i*2+1]])];
+            } else {
+                shellArr = new address[](1);
+                shellArr[0] = _shells[i];
+            }
 
             if (types[i]) { // origin trade
 
-                uint256 originAmountWithFee = calculateOriginFee(amounts[i]);
-                originAmounts[pairs[i * 2]] += originAmountWithFee;
-                derivedAmounts[i] = executeOriginTrade(
-                    shell,
+                protocolFees[pairs[i * 2]] += calculateProtocolFeeForOriginTrade(amounts[i]);
+                uint256 targetAmountAfterLiquidityFee = executeOriginTrade(
+                    shellArr,
                     tokens[pairs[i * 2]],
                     tokens[pairs[i * 2 + 1]],
-                    originAmountWithFee,
-                    limits[i]
+                    calculateOriginAmountForOriginTrade(amounts[i])
+                );
+
+                require(targetAmountAfterLiquidityFee >= limits[i],
+                    "target amounnt was not greater than or equal to min target amount");
+
+                derivedAmounts[i] = targetAmountAfterLiquidityFee;
+
+            } else { // target trade
+
+                uint256 originAmountIncludingFees = executeTargetTrade(
+                    shellArr,
+                    tokens[pairs[i * 2]],
+                    tokens[pairs[i * 2 + 1]],
+                    amounts[i]
+                );
+
+                protocolFees[pairs[i*2]] += calculateProtocolFeeForTargetTrade(originAmountIncludingFees);
+                originAmountIncludingFees = calculateOriginAmountForTargetTrade(originAmountIncludingFees);
+
+                require(originAmountIncludingFees <= limits[i],
+                    "origin amount was not greater than or equal to max origin amount");
+
+                derivedAmounts[i] = originAmountIncludingFees;
+
+            }
+
+        }
+
+        for (uint256 i = 0; i < tokens.length; i++) revenue[tokens[i]] += protocolFees[i];
+
+        for (uint256 i = 0; i < derivedAmounts.length; i++) {
+            if (types[i]) { // origin trade
+
+                finalizeOriginTrade(
+                    tokens[pairs[i*2]],
+                    tokens[pairs[i*2+1]],
+                    amounts[i],
+                    derivedAmounts[i],
+                    msg.sender
                 );
 
             } else { // target trade
 
-        //         derivedAmounts[i] = calculateOriginFee(
-        //             executeTargetTrade(
-        //                 shell,
-        //                 tokens[pairs[i * 2]],
-        //                 tokens[pairs[i * 2 + 1]],
-        //                 amounts[i],
-        //                 limits[i]
-        //             )
-        //         );
-        //         originAmounts[pairs[i * 2]] = derivedAmounts[i];
+                finalizeTargetTrade(
+                    tokens[pairs[i*2]],
+                    tokens[pairs[i*2+1]],
+                    derivedAmounts[i],
+                    amounts[i],
+                    msg.sender
+                );
 
             }
+
         }
 
-        // for (uint256 i = 0; i < pairs.length; i + 2) {
-        //     revenue[tokens[pairs[i]]] += originAmounts[i / 2];
-        // }
-
-        // return derivedAmounts;
+        return derivedAmounts;
 
     }
+
+    event log_arr(bytes32, uint256[]);
+    event log_named_bool(bytes32, bool);
 
     function microSwapByOrigin (
         address shell,
@@ -198,18 +250,34 @@ contract ExchangeEngine is CowriRoot {
         uint256 originAmount,
         uint256 minTargetAmount,
         uint256 deadline
-    ) public swapRequirements(originAmount, minTargetAmount, deadline) returns (uint256) {
+    ) public returns (uint256) {
 
-        uint256 originAmountWithFee = calculateOriginFee(originAmount);
-        revenue[origin] += sub(originAmount, originAmountWithFee);
+        require(block.timestamp <= deadline,
+            "transaction must be processed before deadline");
+        require(originAmount > 0 && minTargetAmount > 0,
+            "origin amount and min target amount must be valid values");
+
+        revenue[origin] += calculateProtocolFeeForOriginTrade(originAmount);
 
         address[] memory _shells = new address[](1);
         _shells[0] = shell;
-        uint256 targetAmount = executeOriginTrade(_shells, origin, target, originAmountWithFee, minTargetAmount);
+        uint256 targetAmountWithLiquidityFee = executeOriginTrade(
+            _shells,
+            origin,
+            target,
+            calculateOriginAmountForOriginTrade(originAmount)
+        );
 
-        revenue[target] += targetAmount;
+        require(targetAmountWithLiquidityFee >= minTargetAmount,
+            "target amount was not greater than minimum target amount");
 
-        return finalizeOriginTrade(origin, target, originAmount, targetAmount, msg.sender);
+        return finalizeOriginTrade(
+            origin,
+            target,
+            originAmount,
+            targetAmountWithLiquidityFee,
+            msg.sender
+        );
 
     }
 
@@ -221,18 +289,37 @@ contract ExchangeEngine is CowriRoot {
         uint256 minTargetAmount,
         address recipient,
         uint256 deadline
-    ) public transferRequirements(originAmount, minTargetAmount, recipient, deadline) returns (uint256) {
+    ) public returns (uint256) {
 
-        uint256 originAmountWithFee = calculateOriginFee(originAmount);
-        revenue[origin] += sub(originAmount, originAmountWithFee);
+        require(block.timestamp <= deadline,
+            "transaction must be processed before deadline");
+        require(recipient != address(this) && recipient != address(0),
+            "recipient must be valid address");
+        require(originAmount > 0 && minTargetAmount > 0,
+            "origin amount and min target amount must be valid values");
+
+        revenue[origin] += calculateProtocolFeeForOriginTrade(originAmount);
 
         address[] memory _shells = new address[](1);
         _shells[0] = shell;
-        uint256 targetAmount = executeOriginTrade(_shells, origin, target, originAmountWithFee, minTargetAmount);
+        uint256 targetAmountAfterFees = executeOriginTrade(
+            _shells,
+            origin,
+            target,
+            calculateOriginAmountForOriginTrade(originAmount)
+        );
 
-        revenue[target] += targetAmount;
+        require(targetAmountAfterFees >= minTargetAmount,
+            "target amount was not greater than minimum target amount");
 
-        return finalizeOriginTrade(origin, target, originAmount, targetAmount, msg.sender);
+        return finalizeOriginTrade(
+            origin,
+            target,
+            originAmount,
+            targetAmountAfterFees,
+            msg.sender
+        );
+
     }
 
     function macroSwapByOrigin (
@@ -241,19 +328,36 @@ contract ExchangeEngine is CowriRoot {
         uint256 originAmount,
         uint256 minTargetAmount,
         uint256 deadline
-    ) public swapRequirements(originAmount, minTargetAmount, deadline) returns (uint256) {
+    ) public returns (uint256) {
 
-        uint256 originAmountWithFee = calculateOriginFee(originAmount);
-        revenue[origin] += sub(originAmount, originAmountWithFee);
+        require(block.timestamp <= deadline,
+            "transaction must be processed before deadline");
+        require(originAmount > 0 && minTargetAmount > 0,
+            "origin amount and min target amount must be valid values");
+
+        revenue[origin] += calculateProtocolFeeForOriginTrade(originAmount);
 
         address[] memory _shells = pairsToActiveShells[makeKey(origin, target)];
-        uint256 targetAmount = executeOriginTrade(_shells, origin, target, originAmountWithFee, minTargetAmount);
+        uint256 targetAmountAfterFees = executeOriginTrade(
+            _shells,
+            origin,
+            target,
+            calculateOriginAmountForOriginTrade(originAmount)
+        );
 
-        revenue[target] += targetAmount;
+        require(targetAmountAfterFees >= minTargetAmount,
+            "target amount was not greater than or equal to min target amount");
 
-        return finalizeOriginTrade(origin, target, originAmount, targetAmount, msg.sender);
+        return finalizeOriginTrade(
+            origin,
+            target,
+            originAmount,
+            targetAmountAfterFees,
+            msg.sender
+        );
 
     }
+
 
     function macroTransferByOrigin (
         address origin,
@@ -262,19 +366,39 @@ contract ExchangeEngine is CowriRoot {
         uint256 minTargetAmount,
         address recipient,
         uint256 deadline
-    ) public transferRequirements(originAmount, minTargetAmount, recipient, deadline) returns (uint256) {
+    ) public returns (uint256) {
 
-        uint256 originAmountWithFee = calculateOriginFee(originAmount);
-        revenue[origin] += sub(originAmount, originAmountWithFee);
+        require(block.timestamp <= deadline,
+            "transaction must be processed before deadline");
+        require(recipient != address(this) && recipient != address(0),
+            "recipient must be valid address");
+        require(originAmount > 0 && minTargetAmount > 0,
+            "origin amount and min target amount must be valid values");
+
+        revenue[origin] += calculateProtocolFeeForOriginTrade(originAmount);
 
         address[] memory _shells = pairsToActiveShells[makeKey(origin, target)];
-        uint256 targetAmount = executeOriginTrade(_shells, origin, target, originAmountWithFee, minTargetAmount);
+        uint256 targetAmountAfterFees = executeOriginTrade(
+            _shells,
+            origin,
+            target,
+            calculateOriginAmountForOriginTrade(originAmount)
+        );
 
-        revenue[target] += targetAmount;
+        require(targetAmountAfterFees >= minTargetAmount,
+            "target amount was not greater than or equal to minimum target amount");
 
-        return finalizeOriginTrade(origin, target, originAmount, targetAmount, recipient);
+        return finalizeOriginTrade(
+            origin,
+            target,
+            originAmount,
+            targetAmountAfterFees,
+            recipient
+        );
 
     }
+
+    event log_named_address(bytes32, address);
 
     function finalizeOriginTrade (
         address origin,
@@ -291,37 +415,83 @@ contract ExchangeEngine is CowriRoot {
 
     }
 
-    function calculateOriginFee (
+    function calculateOriginAmountForOriginTrade (
         uint256 originAmount
     ) private view returns (uint256) {
-
-        return wmul(
+        return sub(
             originAmount,
-            wdiv(BASIS - platformFee, BASIS)
+            calculateProtocolFeeForOriginTrade(originAmount)
         );
-
     }
+
+    function calculateProtocolFeeForOriginTrade (
+        uint256 originAmount
+    ) private view returns (uint256) {
+        return sub(
+            originAmount,
+            wmul(
+                originAmount,
+                wdiv(BASIS - protocolFee, BASIS)
+            )
+        );
+    }
+
+    function calculateOriginAmountForTargetTrade (
+        uint256 originAmount
+    ) private view returns (uint256) {
+        return wmul(originAmount, wdiv(BASIS + protocolFee, BASIS));
+        // return add(
+        //     originAmount,
+        //     calculateProtocolFeeForOriginTrade(originAmount)
+        // );
+    }
+
+    function calculateProtocolFeeForTargetTrade (
+        uint256 originAmount
+    ) private view returns (uint256) {
+        return sub(
+            // wdiv(wmul(originAmount, BASIS + protocolFee), BASIS),
+            wmul(originAmount, wdiv(BASIS + protocolFee, BASIS)),
+            originAmount
+        );
+    }
+
+    event log_addr(bytes32 key, address val);
 
     function executeOriginTrade (
         address[] memory _shells,
         address origin,
         address target,
-        uint256 originAmountWithFee,
-        uint256 minTargetAmount
+        uint256 originAmountAfterProtocolFee
     ) private returns (uint256) {
 
         uint256 targetLiquidity = getLiquidity(_shells, target);
 
         uint256 targetAmount;
         for (uint8 i = 0; i < _shells.length; i++) {
+
             uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
             uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
-            uint256 originCut = executeOriginCreditOrigin(_shells[i], origin, originAmountWithFee, targetBalance, targetLiquidity);
-            uint256 targetContribution = executeOriginDebitTarget(_shells[i], target, originCut, originBalance, targetBalance);
-            targetAmount += targetContribution;
-        }
 
-        require(minTargetAmount < targetAmount, "calcualted target amount must be greater than specified target amount");
+            uint256 originCutWithLiquidityFee = executeOriginCreditOrigin(
+                _shells[i],
+                origin,
+                originAmountAfterProtocolFee,
+                targetBalance,
+                targetLiquidity
+            );
+
+            uint256 targetContribution = executeOriginDebitTarget(
+                _shells[i],
+                target,
+                originCutWithLiquidityFee,
+                originBalance,
+                targetBalance
+            );
+
+            targetAmount += targetContribution;
+
+        }
 
         return targetAmount;
 
@@ -334,14 +504,35 @@ contract ExchangeEngine is CowriRoot {
         uint256 targetAmount,
         uint256 maxOriginAmount,
         uint256 deadline
-    ) public swapRequirements(targetAmount, maxOriginAmount, deadline) returns (uint256) {
+    ) public returns (uint256) {
+
+        require(block.timestamp <= deadline,
+            "transaction must be processed before deadline");
+        require(targetAmount > 0 && maxOriginAmount > 0,
+            "target amount and max origin amount must be valid values");
 
         address[] memory _shells = new address[](1);
         _shells[0] = shell;
-        uint256 originAmountWithFee = executeTargetTrade(_shells, origin, target, targetAmount, maxOriginAmount);
+        uint256 originAmountIncludingFees = executeTargetTrade(
+            _shells,
+            origin,
+            target,
+            targetAmount
+        );
 
+        revenue[origin] += calculateProtocolFeeForTargetTrade(originAmountIncludingFees);
+        originAmountIncludingFees = calculateOriginAmountForTargetTrade(originAmountIncludingFees);
 
-        return finalizeTargetTrade(origin, originAmountWithFee, target, targetAmount, msg.sender);
+        require(maxOriginAmount >= originAmountIncludingFees,
+            "origin amount must be less than or equal to maximum origin amount");
+
+        return finalizeTargetTrade(
+            origin,
+            target,
+            originAmountIncludingFees,
+            targetAmount,
+            msg.sender
+        );
 
     }
 
@@ -353,45 +544,38 @@ contract ExchangeEngine is CowriRoot {
         uint256 maxOriginAmount,
         address recipient,
         uint256 deadline
-    ) public transferRequirements(targetAmount, maxOriginAmount, recipient, deadline) returns (uint256) {
+    ) public returns (uint256) {
+
+        require(block.timestamp <= deadline,
+            "transaction must be processed before deadline");
+        require(recipient != address(this) && recipient != address(0),
+            "recipient must be valid address");
+        require(targetAmount > 0 && maxOriginAmount > 0,
+            "target amount and max origin amount must be valid values");
 
         address[] memory _shells = new address[](1);
         _shells[0] = shell;
-        uint256 originAmountWithFee = executeTargetTrade(
+        uint256 originAmountIncludingFees = executeTargetTrade(
             _shells,
             origin,
             target,
-            targetAmount,
-            maxOriginAmount
+            targetAmount
         );
 
-        return finalizeTargetTrade(origin, originAmountWithFee, target, targetAmount, recipient);
+        revenue[origin] += calculateProtocolFeeForTargetTrade(originAmountIncludingFees);
+        originAmountIncludingFees = calculateOriginAmountForTargetTrade(originAmountIncludingFees);
 
-    }
+        require(maxOriginAmount >= originAmountIncludingFees,
+            "origin amount must be less than or equal to maximum origin amount");
 
-    modifier swapRequirements (
-        uint256 amount,
-        uint256 limit,
-        uint256 deadline
-    ) {
-        require(block.timestamp <= deadline, "transaction must be processed before deadline");
-        require(amount > 0, "specified amount must be greater than 0");
-        require(limit > 0, "limiting amount must be greater than 0");
-        _;
-    }
+        return finalizeTargetTrade(
+            origin,
+            target,
+            originAmountIncludingFees,
+            targetAmount,
+            recipient
+        );
 
-    modifier transferRequirements (
-        uint256 amount,
-        uint256 limit,
-        address recipient,
-        uint256 deadline
-    ) {
-        require(block.timestamp <= deadline, "transaction must be processed before deadline");
-        require(recipient != address(this), "recipient must not be exchange address");
-        require(recipient != address(0), "recipient must not be zero address");
-        require(amount > 0, "specified amount must be greater than 0");
-        require(limit > 0, "limiting amount must be greater than 0");
-        _;
     }
 
     function macroSwapByTarget (
@@ -400,17 +584,33 @@ contract ExchangeEngine is CowriRoot {
         uint256 targetAmount,
         uint256 maxOriginAmount,
         uint256 deadline
-    ) public swapRequirements(targetAmount, maxOriginAmount, deadline) returns (uint256) {
+    ) public returns (uint256) {
 
-        uint256 originAmountWithFee = executeTargetTrade(
+        require(block.timestamp <= deadline,
+            "transaction must be processed before deadline");
+        require(targetAmount > 0 && maxOriginAmount > 0,
+            "target amount and max origin amount must be valid values");
+
+        uint256 originAmountIncludingFees = executeTargetTrade(
             pairsToActiveShells[makeKey(origin, target)],
             origin,
             target,
-            targetAmount,
-            maxOriginAmount
+            targetAmount
         );
 
-        return finalizeTargetTrade(origin, originAmountWithFee, target, targetAmount, msg.sender);
+        revenue[origin] += calculateProtocolFeeForTargetTrade(originAmountIncludingFees);
+        originAmountIncludingFees = calculateOriginAmountForTargetTrade(originAmountIncludingFees);
+
+        require(maxOriginAmount >= originAmountIncludingFees,
+            "origin amount must be less than or equal to maximum origin amount");
+
+        return finalizeTargetTrade(
+            origin,
+            target,
+            originAmountIncludingFees,
+            targetAmount,
+            msg.sender
+        );
 
     }
 
@@ -421,31 +621,49 @@ contract ExchangeEngine is CowriRoot {
         uint256 maxOriginAmount,
         address recipient,
         uint256 deadline
-    ) public transferRequirements(targetAmount, maxOriginAmount, recipient, deadline) returns (uint256) {
+    ) public returns (uint256) {
 
-        uint256 originAmountWithFee = executeTargetTrade(
+        require(block.timestamp <= deadline,
+            "transaction must be processed before deadline");
+        require(recipient != address(this) && recipient != address(0),
+            "recipient must be valid address");
+        require(targetAmount > 0 && maxOriginAmount > 0,
+            "target amount and max origin amount must be valid values");
+
+        uint256 originAmountIncludingFees = executeTargetTrade(
             pairsToActiveShells[makeKey(origin, target)],
             origin,
             target,
-            targetAmount,
-            maxOriginAmount
+            targetAmount
         );
 
-        return finalizeTargetTrade(origin, originAmountWithFee, target, targetAmount, recipient);
+        revenue[origin] += calculateProtocolFeeForTargetTrade(originAmountIncludingFees);
+        originAmountIncludingFees = calculateOriginAmountForTargetTrade(originAmountIncludingFees);
+
+        require(maxOriginAmount >= originAmountIncludingFees,
+            "origin amount must be less than or equal to maximum origin amount");
+
+        return finalizeTargetTrade(
+            origin,
+            target,
+            originAmountIncludingFees,
+            targetAmount,
+            msg.sender
+        );
 
     }
 
     function finalizeTargetTrade (
         address origin,
-        uint256 originAmountWithFee,
         address target,
+        uint256 originAmountWithFees,
         uint256 targetAmount,
         address recipient
     ) private returns (uint256) {
 
         adjustedTransfer(ERC20Token(target), recipient, targetAmount);
-        uint256 adjustedAmount = adjustedTransferFrom(ERC20Token(origin), recipient, originAmountWithFee);
-        emit trade(msg.sender, origin, originAmountWithFee, target, adjustedAmount);
+        uint256 adjustedAmount = adjustedTransferFrom(ERC20Token(origin), recipient, originAmountWithFees);
+        emit trade(msg.sender, origin, originAmountWithFees, target, adjustedAmount);
         return adjustedAmount;
 
     }
@@ -454,16 +672,17 @@ contract ExchangeEngine is CowriRoot {
         address[] memory _shells,
         address origin,
         address target,
-        uint256 targetAmount,
-        uint256 maxOriginAmount
+        uint256 targetAmount
     ) private returns (uint256) {
 
         uint256 targetLiquidity = getLiquidity(_shells, target);
 
-        uint256 originAmount;
+        uint256 originAmountsWithLiquidityFees;
         for (uint8 i = 0; i < _shells.length; i++) {
+
             uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
             uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
+
             uint256 targetContribution = executeTargetDebitTarget(
                 _shells[i],
                 target,
@@ -471,24 +690,18 @@ contract ExchangeEngine is CowriRoot {
                 targetBalance,
                 targetLiquidity
             );
-            uint256 originCut = executeTargetCreditOrigin(
+
+            originAmountsWithLiquidityFees += executeTargetCreditOrigin(
                 _shells[i],
                 origin,
                 targetContribution,
                 originBalance,
                 targetBalance
             );
-            originAmount += originCut;
+
         }
 
-        uint256 originAmountWithFee = calculateOriginFee(originAmount);
-
-        require(maxOriginAmount >= originAmountWithFee, "calculated origin amount must be less than specified max");
-
-        revenue[origin] += sub(originAmount, originAmountWithFee);
-
-
-        return originAmountWithFee;
+        return originAmountsWithLiquidityFees;
 
     }
 
@@ -515,24 +728,24 @@ contract ExchangeEngine is CowriRoot {
     function executeOriginCreditOrigin (
         address shell,
         address origin,
-        uint256 originAmountWithFee,
+        uint256 originAmountAfterProtocolFee,
         uint256 targetBalance,
         uint256 targetLiquidity
     ) private returns (uint256) {
 
         uint256 originCut = wdiv(
-            wmul(originAmountWithFee, targetBalance),
+            wmul(originAmountAfterProtocolFee, targetBalance),
             targetLiquidity
         );
 
-        uint256 originCutWithFee = wmul(
+        uint256 originCutAfterLiquidityFee = wmul(
             originCut,
             wdiv(BASIS - liquidityFee, BASIS)
         );
 
-        shellBalances[makeKey(shell, origin)] += originCutWithFee;
+        shellBalances[makeKey(shell, origin)] += originCut;
 
-        return originCutWithFee;
+        return originCutAfterLiquidityFee;
 
     }
 
@@ -550,14 +763,14 @@ contract ExchangeEngine is CowriRoot {
             targetBalance
         );
 
-        uint256 originCutWithFee = wmul(
-            originCut,
-            wdiv(BASIS - liquidityFee, BASIS)
+        uint256 originCutWithLiquidityFee = wmul(
+            sub(originCut, protocolFee),
+            wdiv(BASIS + liquidityFee, BASIS)
         );
 
-        shellBalances[makeKey(shell, origin)] += originCutWithFee;
+        shellBalances[makeKey(shell, origin)] += originCutWithLiquidityFee;
 
-        return originCutWithFee;
+        return originCutWithLiquidityFee;
 
     }
 
@@ -575,6 +788,7 @@ contract ExchangeEngine is CowriRoot {
         );
 
         shellBalances[makeKey(shell, target)] -= targetContribution;
+
         return targetContribution;
     }
 

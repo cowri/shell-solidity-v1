@@ -11,9 +11,9 @@ contract CowriRoot is DSMath, Ownable {
     uint256 internal constant DOT_DIVISOR = 1000000000000;
     bytes16 internal constant FLOAT_DOT = 0x4012e848000000000000000000000000;
     bytes16 internal constant FLOAT_WAD = 0x403abc16d674ec800000000000000000;
-    uint256 internal BASIS = 10000;
+    uint256 internal constant BASIS = 10000;
     uint256 public liquidityFee = 20;
-    uint256 public platformFee = 1;
+    uint256 public protocolFee = 1;
     uint256 public shellActivationThreshold;
     address[] public supportedTokens;
     address[] public shellList;

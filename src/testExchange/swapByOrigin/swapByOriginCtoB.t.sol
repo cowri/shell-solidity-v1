@@ -34,17 +34,17 @@ contract DappTest is DSTest, ShellSetup {
 
         assertEq(
             pool.macroSwapByOrigin(address(testC), address(testB), amount, amount / 2, deadline),
-            9879427135339903077
+            9880405414606827637
         );
 
         assertEq(
             pool.getShellBalanceOf(shell, address(testC)),
-            10099780040998000000000
+            10099990000000000000000
         );
 
         assertEq(
             pool.getShellBalanceOf(shell, address(testB)),
-            9901205728646600969224
+            9901195945853931723622
         );
 
     }

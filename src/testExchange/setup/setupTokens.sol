@@ -4,8 +4,7 @@
 pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
-
-import "../ERC20Token.sol";
+import "../../ERC20Token.sol";
 import "./setupPool.sol";
 
 contract TokenSetup is PoolSetup {

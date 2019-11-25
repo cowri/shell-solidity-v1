@@ -4,10 +4,19 @@ import "./CowriRoot.sol";
 
 contract LiquidityMembrane is CowriRoot {
 
-    event addLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
-    event removeLiquidity(address indexed provider, address indexed shell, address[] indexed tokens, uint256[] amounts);
-    event log_named_uint(bytes32 key, uint256 val);
-    event log_arr(bytes32, uint256[]);
+    event addLiquidity(
+        address indexed provider,
+        address indexed shell,
+        address[] indexed tokens,
+        uint256[] amounts
+    );
+
+    event removeLiquidity(
+        address indexed provider,
+        address indexed shell,
+        address[] indexed tokens,
+        uint256[] amounts
+    );
 
     function calculateGeoometricMeansWithFloats (address _shell, uint256[] memory amounts) public returns (uint256, uint256) {
 
@@ -160,7 +169,11 @@ contract LiquidityMembrane is CowriRoot {
 
     }
 
-    function depositLiquidity(address _shell, uint256 amount, uint256 deadline) public returns (uint256) {
+    function depositLiquidity(
+        address _shell,
+        uint256 amount,
+        uint256 deadline
+    ) public returns (uint256) {
         // emit log_named_uint("deadline", deadline);
         require(block.timestamp <= deadline, "must be processed before deadline");
         require(amount > 0, "amount must be above 0");

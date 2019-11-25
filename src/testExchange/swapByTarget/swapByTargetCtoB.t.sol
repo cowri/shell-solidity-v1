@@ -13,7 +13,7 @@ contract DappTest is DSTest, ShellSetup {
     uint256 shell1Liquidity;
     uint256 shell2Liquidity;
 
-    function setUp () public {
+    function setUp () public {  
 
         setupPool();
         setupTokens();
@@ -39,7 +39,7 @@ contract DappTest is DSTest, ShellSetup {
 
         assertEq(
             pool.macroSwapByTarget(address(testC), address(testB), amount, amount * 2, deadline),
-            1007980000000000000
+            1012222424242424242
         );
 
     }

@@ -39,22 +39,22 @@ contract DappTest is DSTest, ShellSetup {
 
         assertEq(
             pool.macroSwapByTarget(address(testA), address(testB), amount, amount * 2, deadline),
-            100459751677852348993
+            100882570469798657716
         );
 
         assertEq(
             pool.macroSwapByTarget(address(testB), address(testA), amount, amount * 2, deadline),
-            9912164871883207237
+            9953616362448716629
         );
 
         assertEq(
             pool.macroSwapByTarget(address(testA), address(testC), amount, amount * 2, deadline),
-            100801156984340044742
+            101228130071452782862
         );
 
         assertEq(
             pool.macroSwapByTarget(address(testC), address(testB), amount, amount * 2, deadline),
-            997958561297089630
+            1002132173009880412
         );
 
     }

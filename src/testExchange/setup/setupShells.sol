@@ -5,7 +5,7 @@ import "./setupTokens.sol";
 
 contract ShellSetup is TokenSetup {
 
-    function getLimits (uint256 length, uint256 amounts) internal pure returns (uint256[] memory) {
+    function getLimits (uint256 length, uint256 amounts) internal returns (uint256[] memory) {
         uint256[] memory limitArray = new uint256[](length);
         for (uint i = 0; i < length; i++){
             limitArray[i] = amounts;
@@ -202,21 +202,6 @@ contract ShellSetup is TokenSetup {
         shellAddrs[6] = address(testG);
         shellAddrs[7] = address(testH);
         shellAddrs[8] = address(testI);
-        return pool.createShell(shellAddrs);
-    }
-
-    function setupShellABCDEFGHIJ () public returns (address) {
-        address[] memory shellAddrs = new address[](10);
-        shellAddrs[0] = address(testA);
-        shellAddrs[1] = address(testB);
-        shellAddrs[2] = address(testC);
-        shellAddrs[3] = address(testD);
-        shellAddrs[4] = address(testE);
-        shellAddrs[5] = address(testF);
-        shellAddrs[6] = address(testG);
-        shellAddrs[7] = address(testH);
-        shellAddrs[8] = address(testI);
-        shellAddrs[9] = address(testJ);
         return pool.createShell(shellAddrs);
     }
 

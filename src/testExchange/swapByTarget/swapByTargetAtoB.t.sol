@@ -31,7 +31,6 @@ contract DappTest is DSTest, ShellSetup {
 
     }
 
-
     function testSwapByTargetAtoB () public {
 
         uint256 amount = 100 * ( 10 ** 18 );
@@ -39,7 +38,7 @@ contract DappTest is DSTest, ShellSetup {
 
         assertEq(
             pool.macroSwapByTarget(address(testA), address(testB), amount, amount * 2, deadline),
-            100459751677852348993
+            100882570469798657716
         );
 
     }

@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "./Shell.sol";
-import "./CowriRoot.sol";
+import "../../Shell.sol";
+import "../../CowriRoot.sol";
 
-contract ShellGovernance is CowriRoot {
+contract TestShellGovernance is CowriRoot {
 
     event shellRegistered(
         address indexed shell,
@@ -134,7 +134,7 @@ contract ShellGovernance is CowriRoot {
 
     function hasSufficientCapital(
         address _shell
-    ) public view returns(bool) {
+    ) public  returns(bool) {
 
         Shell shell = Shell(_shell);
 
@@ -173,7 +173,7 @@ contract ShellGovernance is CowriRoot {
 
     function findShellByTokens (
         address[] memory _addresses
-    ) public view returns (address) {
+    ) public returns (address) {
 
         uint256 pairKey = makeKey(_addresses[0], _addresses[1]);
         address[] memory shells = pairsToAllShells[pairKey];
@@ -194,7 +194,7 @@ contract ShellGovernance is CowriRoot {
 
     function isDuplicateShell (
         address[] memory _addresses
-    ) public view returns(bool) {
+    ) public  returns(bool) {
         if (findShellByTokens(_addresses) == address(0)) return false;
         return true;
     }
@@ -202,8 +202,6 @@ contract ShellGovernance is CowriRoot {
     function setShellActivationThreshold(
         uint256 threshold
     ) public onlyOwner {
-        require(threshold >= 10000 * ( 10 ** 18), 'Minimum capital must be more than 10 thousand');
-        require(threshold <= 1000000 * (10 ** 18), 'Minimum capital must be no more than 1 million');
         shellActivationThreshold = threshold;
     }
 
