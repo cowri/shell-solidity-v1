@@ -3,15 +3,15 @@ pragma solidity ^0.5.6;
 import "ds-test/test.sol";
 
 import "../../CowriPool.sol";
-import "../../ShellFactory.sol";
+import "../../CowriShellFactory.sol";
 
 contract PoolSetup {
 
-    ShellFactory shellFactory;
+    CowriShellFactory shellFactory;
     CowriPool pool;
 
     function setupPool () public {
-        shellFactory = new ShellFactory();
+        shellFactory = new CowriShellFactory();
         pool = new CowriPool(address(shellFactory));
         pool.setShellActivationThreshold(1);
     }

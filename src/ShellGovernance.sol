@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "./Shell.sol";
+import "./CowriShell.sol";
 import "./CowriRoot.sol";
 
 contract ShellGovernance is CowriRoot {
@@ -58,8 +58,8 @@ contract ShellGovernance is CowriRoot {
 
     function registerShell (
         address shell
-    ) public returns (address) {
-        address[] memory tokens = Shell(shell).getTokens();
+    ) external returns (address) {
+        address[] memory tokens = CowriShell(shell).getTokens();
         require(!isDuplicateShell(tokens), "Must not be a duplicate of a registered shell.");
 
         for (uint8 i = 0; i < tokens.length; i++) {
@@ -75,10 +75,10 @@ contract ShellGovernance is CowriRoot {
 
     function activateShell (
         address _shell
-    ) public returns (bool) {
+    ) external returns (bool) {
         require(hasSufficientCapital(_shell), "Shell must have sufficient capital");
 
-        Shell shell = Shell(_shell);
+        CowriShell shell = CowriShell(_shell);
         address[] memory tokens = shell.getTokens();
 
         for (uint8 i = 0; i < tokens.length; i++) {
@@ -99,11 +99,11 @@ contract ShellGovernance is CowriRoot {
 
     function deactivateShell (
         address _shell
-    ) public {
+    ) external returns (bool) {
         require(!hasSufficientCapital(_shell), "Must not have sufficient capital");
         require(isInShellList(_shell), "Shell must be in shell list.");
 
-        Shell shell = Shell(_shell);
+        CowriShell shell = CowriShell(_shell);
         address[] memory tokens = shell.getTokens();
 
         for (uint8 i = 0; i < tokens.length; i++) {
@@ -129,14 +129,15 @@ contract ShellGovernance is CowriRoot {
         }
 
         emit shellDeactivated(_shell, tokens);
+        return true;
 
     }
 
     function hasSufficientCapital(
         address _shell
-    ) public view returns(bool) {
+    ) private view returns(bool) {
 
-        Shell shell = Shell(_shell);
+        CowriShell shell = CowriShell(_shell);
 
         uint256 capital = wdiv(
             shell.totalSupply(),
@@ -180,7 +181,7 @@ contract ShellGovernance is CowriRoot {
         address[] memory addresses = sortAddresses(_addresses);
 
         for (uint8 i = 0; i < shells.length; i++) {
-            address[] memory comparisons = Shell(shells[i]).getTokens();
+            address[] memory comparisons = CowriShell(shells[i]).getTokens();
             if (comparisons.length != addresses.length) continue;
             for (uint8 j = 0; j <= comparisons.length; j++) {
                 if (j == comparisons.length) return address(shells[i]);
@@ -243,23 +244,23 @@ contract ShellGovernance is CowriRoot {
 
     function getShellBalance(
         address _shell
-    ) public view returns(uint) {
-        return Shell(_shell).totalSupply();
+    ) external view returns(uint) {
+        return CowriShell(_shell).totalSupply();
     }
 
     function getShellBalanceOf(
         address _shell,
         address _token
-    ) public view returns (uint) {
+    ) external view returns (uint) {
         uint256 pairKey = makeKey(_shell, _token);
         return shellBalances[pairKey];
     }
 
     function getTotalShellCapital(
         address shell
-    ) public view returns (uint) {
+    ) external view returns (uint256) {
 
-        address[] memory tokens = Shell(shell).getTokens();
+        address[] memory tokens = CowriShell(shell).getTokens();
         uint256 totalCapital;
         for (uint i = 0; i < tokens.length; i++) {
             uint256 balanceKey = makeKey(shell, tokens[i]);

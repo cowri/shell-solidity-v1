@@ -6,7 +6,7 @@ import "openzeppelin-contracts/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "./ERC20Token.sol";
 
-contract Shell is ERC20Mintable, ERC20Burnable {
+contract CowriShell is ERC20Mintable, ERC20Burnable {
     using SafeMath for uint256;
     address[] public tokens;
 

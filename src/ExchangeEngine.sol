@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "./Shell.sol";
+import "./CowriShell.sol";
 import "./ERC20Token.sol";
 import "./CowriRoot.sol";
 
@@ -47,10 +47,10 @@ contract ExchangeEngine is CowriRoot {
     }
 
     function getMicroOriginPrice (
-        uint256 originAmount,
         address shell,
         address origin,
-        address target
+        address target,
+        uint256 originAmount
     ) public  returns (uint256) {
 
         return calculateOriginPrice(
@@ -101,10 +101,10 @@ contract ExchangeEngine is CowriRoot {
     }
 
     function getMicroTargetPrice (
-        uint256 targetAmount,
         address shell,
         address origin,
-        address target
+        address target,
+        uint256 targetAmount
     ) public view returns (uint256) {
         return calculateTargetPrice(
             targetAmount,

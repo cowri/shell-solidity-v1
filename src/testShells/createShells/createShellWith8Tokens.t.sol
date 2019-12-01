@@ -6,8 +6,7 @@ import "ds-test/test.sol";
 
 import "../../CowriPool.sol";
 import "../../ERC20Token.sol";
-import "../../ShellFactory.sol";
-import "../../Shell.sol";
+import "../../CowriShell.sol";
 import "../../testSetup/setupShells.sol";
 
 contract DappTest is DSTest, ShellSetup {
@@ -25,7 +24,7 @@ contract DappTest is DSTest, ShellSetup {
         shell = setupShellABCDEFGH();
         emit log_named_address("shell", shell);
 
-        address[] memory tokens = Shell(shell).getTokens();
+        address[] memory tokens = CowriShell(shell).getTokens();
 
         assertEq(address(testA), tokens[0]);
         assertEq(address(testB), tokens[1]);

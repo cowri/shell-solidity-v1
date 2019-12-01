@@ -1,14 +1,14 @@
 pragma solidity ^0.5.0;
 
-import "./Shell.sol";
+import "./CowriShell.sol";
 
-contract ShellFactory {
+contract CowriShellFactory {
 
     constructor() public { }
 
     function createShell (address[] memory tokens) public returns (address) {
 
-        Shell shell = new Shell(tokens);
+        CowriShell shell = new CowriShell(tokens);
         return address(shell);
 
     }

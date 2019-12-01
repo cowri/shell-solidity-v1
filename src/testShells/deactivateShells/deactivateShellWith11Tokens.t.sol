@@ -4,8 +4,6 @@ import "ds-test/test.sol";
 
 import "../../CowriPool.sol";
 import "../../ERC20Token.sol";
-import "../../ShellFactory.sol";
-import "../../Shell.sol";
 import "../../testSetup/setupShells.sol";
 
 contract DappTest is DSTest, ShellSetup {

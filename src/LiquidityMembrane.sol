@@ -18,9 +18,12 @@ contract LiquidityMembrane is CowriRoot {
         uint256[] amounts
     );
 
-    function calculateGeoometricMeansWithFloats (address _shell, uint256[] memory amounts) public returns (uint256, uint256) {
+    function calculateGeoometricMeansWithFloats (
+        address _shell,
+        uint256[] memory amounts
+    ) public returns (uint256, uint256) {
 
-        address[] memory tokens = Shell(_shell).getTokens();
+        address[] memory tokens = CowriShell(_shell).getTokens();
 
         bytes16 prevProduct = 0x3fff0000000000000000000000000000;
         bytes16 nextProduct = 0x3fff0000000000000000000000000000;
@@ -38,9 +41,13 @@ contract LiquidityMembrane is CowriRoot {
         );
     }
 
-    function calculateGeometricMeansWithWads (address _shell, uint256[] memory amounts, bool deposit) public returns (uint256, uint256) {
+    function calculateGeometricMeansWithWads (
+        address _shell,
+        uint256[] memory amounts,
+        bool deposit
+    ) public returns (uint256, uint256) {
 
-        address[] memory tokens = Shell(_shell).getTokens();
+        address[] memory tokens = CowriShell(_shell).getTokens();
         uint256 prevProduct = WAD;
         uint256 nextProduct = WAD;
         uint256 prevRoot = WAD;
@@ -92,7 +99,10 @@ contract LiquidityMembrane is CowriRoot {
 
     }
 
-    function calculateRootWad (uint256 base, uint256 root) internal returns (uint256) {
+    function calculateRootWad (
+        uint256 base,
+        uint256 root
+    ) internal returns (uint256) {
         uint256 guess = toUInt(fast_aprx_root_wad(fromUInt(base / WAD), root));
 
         return refine_root_wad(
@@ -103,7 +113,10 @@ contract LiquidityMembrane is CowriRoot {
         );
     }
 
-    function calculateRootFloat (bytes16 base, uint256 root) internal returns (bytes16) {
+    function calculateRootFloat (
+        bytes16 base,
+        uint256 root
+    ) internal returns (bytes16) {
 
         bytes16 guess = fast_aprx_root_float(base, root);
         return refine_root_float(guess, base, root, 5);
@@ -112,9 +125,12 @@ contract LiquidityMembrane is CowriRoot {
 
     event log_named_bytes32(bytes32 key, bytes32 val);
 
-    function depositSelectiveLiquidity (address _shell, uint256[] memory _amounts) public returns (uint256) {
+    function depositSelectiveLiquidity (
+        address _shell,
+        uint256[] calldata _amounts
+    ) external returns (uint256) {
 
-        Shell shell = Shell(_shell);
+        CowriShell shell = CowriShell(_shell);
         (uint256 previousInvariant, uint256 nextInvariant) = calculateGeometricMeansWithWads(_shell, _amounts, true);
 
         uint256 outstanding = shell.totalSupply();
@@ -140,9 +156,12 @@ contract LiquidityMembrane is CowriRoot {
 
     }
 
-    function withdrawSelectiveLiquidity (address _shell, uint256[] memory _amounts) public returns (uint256) {
+    function withdrawSelectiveLiquidity (
+        address _shell,
+        uint256[] calldata _amounts
+    ) external returns (uint256) {
 
-        Shell shell = Shell(_shell);
+        CowriShell shell = CowriShell(_shell);
         (uint256 previousInvariant, uint256 nextInvariant) = calculateGeometricMeansWithWads(_shell, _amounts, false);
 
         uint256 outstanding = shell.totalSupply();
@@ -173,12 +192,12 @@ contract LiquidityMembrane is CowriRoot {
         address _shell,
         uint256 amount,
         uint256 deadline
-    ) public returns (uint256) {
+    ) external returns (uint256) {
         // emit log_named_uint("deadline", deadline);
         require(block.timestamp <= deadline, "must be processed before deadline");
         require(amount > 0, "amount must be above 0");
 
-        Shell shell = Shell(_shell);
+        CowriShell shell = CowriShell(_shell);
         uint256 totalCapital = getTotalCapital(_shell);
         uint256 totalSupply = shell.totalSupply();
         uint256 liqTokensMinted;
@@ -225,15 +244,15 @@ contract LiquidityMembrane is CowriRoot {
 
     event log_uint(bytes32 key, uint256 val);
 
-    function withdrawLiquidity(
+    function withdrawLiquidity (
         address _shell,
         uint256 liquidityToBurn,
-        uint256[] memory limits,
+        uint256[] calldata limits,
         uint256 deadline
-    ) public returns (uint256[] memory) {
+    ) external returns (uint256[] memory) {
         require(block.timestamp <= deadline, "must be processed before deadline");
 
-        Shell shell = Shell(_shell);
+        CowriShell shell = CowriShell(_shell);
         require(shell.balanceOf(msg.sender) >= liquidityToBurn, "must only burn tokens you have");
 
         uint256 totalCapital = getTotalCapital(_shell);
@@ -279,7 +298,7 @@ contract LiquidityMembrane is CowriRoot {
     function getTotalCapital(
         address shell
     ) public view returns (uint totalCapital) {
-        address[] memory tokens = Shell(shell).getTokens();
+        address[] memory tokens = CowriShell(shell).getTokens();
         for (uint i = 0; i < tokens.length; i++) {
             uint256 balanceKey = makeKey(shell, tokens[i]);
             totalCapital = add(totalCapital, shellBalances[balanceKey]);

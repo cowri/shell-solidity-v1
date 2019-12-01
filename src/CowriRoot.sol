@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-contracts/contracts/ownership/Ownable.sol";
 import "ds-math/math.sol";
-import "./Shell.sol";
+import "./CowriShell.sol";
 import "./ERC20Token.sol";
 
 contract CowriRoot is DSMath, Ownable {
@@ -68,7 +68,7 @@ contract CowriRoot is DSMath, Ownable {
     }
 
     function getTotalCapital(address shell) public view returns (uint totalCapital) {
-        address[] memory tokens = Shell(shell).getTokens();
+        address[] memory tokens = CowriShell(shell).getTokens();
         for (uint i = 0; i < tokens.length; i++) {
             totalCapital = add(
                 totalCapital,

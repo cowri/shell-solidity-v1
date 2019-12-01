@@ -4,7 +4,7 @@ import "ds-test/test.sol";
 
 import "../../CowriPool.sol";
 import "../../ERC20Token.sol";
-import "../../Shell.sol";
+import "../../CowriShell.sol";
 import "../../testSetup/setupShells.sol";
 
 contract DappTest is DSTest, ShellSetup {
@@ -61,9 +61,6 @@ contract DappTest is DSTest, ShellSetup {
         pool.activateShell(shell7);
         pool.activateShell(shell8);
 
-        emit log_named_uint("shell 3 liq", shell3Liquidity);
-        emit log_named_uint("shell 3 D balance ", pool.getShellBalanceOf(shell3, address(testD)));
-        emit log_addrs("shell 3 tokens", Shell(shell3).getTokens());
     }
 
     event log_addrs(bytes32 key, address[] value);

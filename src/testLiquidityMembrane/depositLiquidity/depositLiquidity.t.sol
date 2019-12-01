@@ -34,7 +34,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
         uint256 tokenAmount = 1000000000 * WAD;
 
         amount = pool.depositLiquidity(shell1, amountToStake, deadline);
-        balance = Shell(shell1).balanceOf(address(this));
+        balance = CowriShell(shell1).balanceOf(address(this));
 
         test1Withdrawn = amountToStake / 2;
         test2Withdrawn = amountToStake / 2 / 10;
@@ -46,7 +46,7 @@ contract DappTest is DSTest, DSMath, ShellSetup {
         assertEq(balance, amountToStake);
 
         amount = pool.depositLiquidity(shell2, amountToStake, deadline);
-        balance = Shell(shell2).balanceOf(address(this));
+        balance = CowriShell(shell2).balanceOf(address(this));
 
         test1Withdrawn = test1Withdrawn + wdiv(amountToStake, 3 * WAD);
         test2Withdrawn = test2Withdrawn + wdiv(amountToStake, 30 * WAD) - 1;
