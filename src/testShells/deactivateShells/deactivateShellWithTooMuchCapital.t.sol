@@ -26,7 +26,7 @@ contract DappTest is DSTest, ShellSetup {
         pool.withdrawLiquidity(shell, amount, getLimits(2, amount / 2), deadline);
 
     }
-    event log_bool(bool key);
+    
     function testDeactivateShellWithTooMuchCapital () public {
 
         ( bool success, bytes memory returnData ) = address(pool).call(

@@ -221,7 +221,6 @@ contract ShellGovernance is CowriRoot {
             }
             if (supportedToken == false) {
                 supportedTokens.push(tokens[i]);
-                omnibusIndexes[tokens[i]] = supportedTokens.length - 1;
             }
         }
     }

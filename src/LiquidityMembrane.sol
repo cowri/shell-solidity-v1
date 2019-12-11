@@ -18,6 +18,66 @@ contract LiquidityMembrane is CowriRoot {
         uint256[] amounts
     );
 
+    function interShellTransfer (address originShell, address targetShell, uint256 amount) public returns (uint256) {
+        
+        CowriShell origin = CowriShell(originShell);
+        CowriShell target = CowriShell(targetShell);
+
+        address[] memory originTokens = origin.getTokens();
+        address[] memory targetTokens = target.getTokens();
+        uint256[] memory targetDeposits = new uint256[](targetTokens.length);
+        uint256 overlap;
+
+        for (uint i = 0; i < targetTokens.length; i++) {
+            for (uint j = 0; j < originTokens.length; j++) {
+                if (targetTokens[i] == originTokens[j]) {
+                    overlap++;
+                    break;
+                }
+            }
+        }
+
+        uint256 factor = wdiv(sub(origin.totalSupply(), amount), origin.totalSupply());
+        factor = wpow(factor, originTokens.length);
+        factor = calculateRoot(factor, overlap);
+
+        for (uint i = 0; i < targetTokens.length; i++) {
+            for (uint j = 0; j < originTokens.length; j++) {
+                if (targetTokens[i] == originTokens[j]) {
+                    uint256 balance = shellBalances[makeKey(address(origin), originTokens[j])];
+                    targetDeposits[i] = sub(balance, wmul(factor, balance));
+                    shellBalances[makeKey(address(origin), originTokens[j])] = sub(
+                        balance,
+                        targetDeposits[i]
+                    );
+                }
+            }
+        }
+
+        // selectively deposit into new shell
+        for (uint i = 0; i < targetTokens.length; i++) {
+            shellBalances[makeKey(targetShell, targetTokens[i])] += targetDeposits[i];
+        }
+
+        // determine minted tokens
+        (uint256 previousTargetInvariant, uint256 nextTargetInvariant) = calculateInvariants(
+            address(targetShell),
+            targetDeposits,
+            true
+        );
+
+        uint256 minted = wdiv(
+            wmul(sub(nextTargetInvariant, previousTargetInvariant), target.totalSupply()),
+            previousTargetInvariant
+        );
+
+        target.mint(msg.sender, minted);
+        origin.testBurn(msg.sender, amount);
+
+        return minted;
+
+    }
+
     function calculateInvariants (
         address _shell,
         uint256[] memory amounts,
@@ -76,7 +136,7 @@ contract LiquidityMembrane is CowriRoot {
     ) internal returns (uint256) {
 
         return refineRoot(
-            fastAprxRoot(base / WAD, root),
+            base <= WAD ? base : fastAprxRoot(base / WAD, root),
             base,
             root,
             10
@@ -160,7 +220,6 @@ contract LiquidityMembrane is CowriRoot {
         uint256 amount,
         uint256 deadline
     ) external returns (uint256) {
-        // emit log_named_uint("deadline", deadline);
         require(block.timestamp <= deadline, "must be processed before deadline");
         require(amount > 0, "amount must be above 0");
 
@@ -208,8 +267,6 @@ contract LiquidityMembrane is CowriRoot {
 
         return liqTokensMinted;
     }
-
-    event log_uint(bytes32 key, uint256 val);
 
     function withdrawLiquidity (
         address _shell,

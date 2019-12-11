@@ -12,8 +12,6 @@ import "../../testSetup/setupShells.sol";
 contract DappTest is DSTest, ShellSetup {
     address shell;
 
-    event log_addr_arr(bytes32 key, address[] val);
-
     function setUp () public {
         setupPool();
         setupTokens();

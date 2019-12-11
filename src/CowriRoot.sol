@@ -15,7 +15,6 @@ contract CowriRoot is DSMath, Ownable {
     address[] public shellList;
     address public shellFactory;
     mapping(address => bool) public shells;
-    mapping(address => uint256) public omnibusIndexes;
     mapping(address => uint256) public revenue;
     mapping(uint256 => uint256) public shellBalances;
     mapping(address => uint256) public shellInvariants;
@@ -140,7 +139,7 @@ contract CowriRoot is DSMath, Ownable {
         else if (root == 5) root_constant = 0x33325D2CAA82F5E925C8E764FE8759FB;
         else if (root == 6) root_constant = 0x35547663DC486AD2DCB1465E89225311;
         else if (root == 7) root_constant = 0x36DA8866B6B0E2E783E98A3559DA298D;
-        else if (root == 8) root_constant = 0x33325D2CAA82F5E925C8E764FE8759FB;
+        else if (root == 8) root_constant = 0x37FF15E8DA7F3CF70153BD1676640A6B;
         else if (root == 9) root_constant = 0x38E2A06A849183030D89E4A91ACF4789;
         else if (root == 10) root_constant = 0x3998A8D23FD354A64A8204519E58453B;
         else if (root == 11) root_constant = 0x3A2D986CF04F002BD97B9295ACDFA06F;

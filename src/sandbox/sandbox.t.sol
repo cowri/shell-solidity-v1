@@ -4,13 +4,15 @@ import "ds-test/test.sol";
 import "ds-math/math.sol";
 import "./sandbox.sol";
 
-contract DappTest is DSMath, DSTest {
+contract SandboxTest is DSMath, DSTest {
     Sandbox sandbox;
 
     function setUp() public {
         sandbox = new Sandbox();
     }
 
-    // function testMe () public { }
+    // function testMe () public {
+
+    // }
 
 }

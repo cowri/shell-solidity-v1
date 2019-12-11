@@ -3,9 +3,9 @@ pragma solidity ^0.5.6;
 import "ds-test/test.sol";
 import "ds-math/math.sol";
 
-import "../../CowriPool.sol";
-import "../../ERC20Token.sol";
-import "../../testSetup/setupShells.sol";
+import "../../../CowriPool.sol";
+import "../../../ERC20Token.sol";
+import "../../../testSetup/setupShells.sol";
 
 contract DappTest is DSTest, DSMath, ShellSetup {
     address shell1;

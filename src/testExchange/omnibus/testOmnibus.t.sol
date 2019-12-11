@@ -63,8 +63,6 @@ contract DappTest is DSTest, ShellSetup {
 
     }
 
-    event log_addrs(bytes32 key, address[] value);
-
     function testOmnibus () public {
 
         address[] memory _shells = new address[](6);
@@ -149,10 +147,6 @@ contract DappTest is DSTest, ShellSetup {
             deadline
         );
 
-        emit log_arr("results", results);
-
     }
-
-    event log_arr(bytes32 key, uint256[] val);
 
 }
