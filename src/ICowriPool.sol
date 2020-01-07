@@ -23,17 +23,7 @@ interface ICowriPool {
         uint256 targetAmount
     ) external view returns (uint256);
 
-    function omnibus (
-        address[] calldata _shells,
-        address[] calldata tokenns,
-        uint256[] calldata pairs,
-        uint256[] calldata amounts,
-        uint256[] calldata limits,
-        bool[] calldata types,
-        uint256 deadlinne
-    ) external returns (uint256[] memory);
-
-    function microSwapByOrigin (
+    function swapByOrigin (
         address shell,
         address origin,
         address target,
@@ -42,34 +32,51 @@ interface ICowriPool {
         uint256 deadline
     ) external returns (uint256);
 
-    function microTransferByOrigin (
+    function swapByOrigin (
+        address[] calldata shells,
+        address origin,
+        address target,
+        uint256 originAmount,
+        uint256 minTargetAmount,
+        uint256 deadline
+    ) external returns (uint256);
+
+    function swapByOrigin (
+        address origin,
+        address target,
+        uint256 originAmount,
+        uint256 minTargetAmount,
+        uint256 deadline
+    ) external returns (uint256);
+
+    function transferByOrigin (
         address shell,
         address origin,
         address target,
         uint256 originAmount,
-        uint256 minTargetAmount,
-        address recipient,
-        uint256 deadline
+        uint256 targetMin,
+        uint256 deadline,
+        address recipient
     ) external returns (uint256);
 
-    function macroSwapByOrigin (
+    function transferByOrigin (
         address origin,
         address target,
         uint256 originAmount,
         uint256 minTargetAmount,
-        uint256 deadline
+        uint256 deadline,
+        address recipient
     ) external returns (uint256);
 
-    function macroTransferByOrigin (
+    function swapByTarget (
         address origin,
         address target,
-        uint256 originAmount,
-        uint256 minTargetAmount,
-        address recipient,
+        uint256 targetAmount,
+        uint256 maxOriginAmount,
         uint256 deadline
     ) external returns (uint256);
 
-    function microSwapByTarget (
+    function swapByTarget (
         address shell,
         address origin,
         address target,
@@ -78,7 +85,16 @@ interface ICowriPool {
         uint256 deadline
     ) external returns (uint256);
 
-    function microTransferByTarget (
+    function swapByTarget (
+        address[] calldata shells,
+        address origin,
+        address target,
+        uint256 targetAmount,
+        uint256 maxOriginAmount,
+        uint256 deadline
+    ) external returns (uint256);
+
+    function tansferByTarget (
         address shell,
         address origin,
         address target,
@@ -88,15 +104,8 @@ interface ICowriPool {
         uint256 deadline
     ) external returns (uint256);
 
-    function macroSwapByTarget (
-        address origin,
-        address target,
-        uint256 targetAmount,
-        uint256 maxOriginAmount,
-        uint256 deadline
-    ) external returns (uint256);
 
-    function macroTransferByTarget (
+    function tansferByTarget (
         address origin,
         address target,
         uint256 targetAmount,

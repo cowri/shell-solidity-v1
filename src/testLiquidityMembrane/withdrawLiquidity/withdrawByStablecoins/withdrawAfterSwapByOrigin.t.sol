@@ -30,10 +30,10 @@ contract DappTest is DSTest, ShellSetup {
         pool.activateShell(shell2);
 
         uint256 swapAmount = 100 * (10 ** 18);
-        pool.macroSwapByOrigin(address(testA), address(testB), swapAmount, swapAmount / 2, deadline);
-        pool.macroSwapByOrigin(address(testB), address(testA), swapAmount, swapAmount / 2, deadline);
-        pool.macroSwapByOrigin(address(testA), address(testC), swapAmount, swapAmount / 2, deadline);
-        pool.macroSwapByOrigin(address(testC), address(testB), swapAmount, swapAmount / 2, deadline);
+        pool.swapByOrigin(address(testA), address(testB), swapAmount, swapAmount / 2, deadline);
+        pool.swapByOrigin(address(testB), address(testA), swapAmount, swapAmount / 2, deadline);
+        pool.swapByOrigin(address(testA), address(testC), swapAmount, swapAmount / 2, deadline);
+        pool.swapByOrigin(address(testC), address(testB), swapAmount, swapAmount / 2, deadline);
 
     }
 

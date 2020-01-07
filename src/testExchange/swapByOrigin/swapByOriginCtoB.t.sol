@@ -33,7 +33,7 @@ contract DappTest is DSTest, ShellSetup {
         uint256 deadline = now + 50;
 
         assertEq(
-            pool.macroSwapByOrigin(address(testC), address(testB), amount, amount / 2, deadline),
+            pool.swapByOrigin(address(testC), address(testB), amount, amount / 2, deadline),
             9880405414606827637
         );
 

@@ -33,7 +33,7 @@ contract DappTest is DSTest, ShellSetup {
     function testMicroSwapByOrigin () public {
 
         assertEq(
-            pool.macroSwapByOrigin(
+            pool.swapByOrigin(
                 address(testA),
                 address(testB),
                 10 * ( 10 ** 18 ),
