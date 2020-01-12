@@ -18,61 +18,73 @@ contract LiquidityMembrane is CowriRoot {
         uint256[] amounts
     );
 
-    function interShellTransfer (address originShell, address targetShell, uint256 amount) public returns (uint256) {
-        
-        CowriShell origin = CowriShell(originShell);
-        CowriShell target = CowriShell(targetShell);
-
-        address[] memory originTokens = origin.getTokens();
-        address[] memory targetTokens = target.getTokens();
-        uint256[] memory targetDeposits = new uint256[](targetTokens.length);
+    function getOverlap (address[] memory left, address[] memory right) private returns (uint256) {
         uint256 overlap;
-
-        for (uint i = 0; i < targetTokens.length; i++) {
-            for (uint j = 0; j < originTokens.length; j++) {
-                if (targetTokens[i] == originTokens[j]) {
+        for (uint i = 0; i < left.length; i++) {
+            for (uint j = 0; j < right.length; j++) {
+                if (left[i] == right[j]) {
                     overlap++;
                     break;
                 }
             }
         }
+        return overlap;
+    }
 
-        uint256 factor = wdiv(sub(origin.totalSupply(), amount), origin.totalSupply());
+    function interShellTransfer (address originShell, address targetShell, uint256 amount) public returns (uint256) {
+
+        address[] memory originTokens = CowriShell(originShell).getTokens();
+        address[] memory targetTokens = CowriShell(targetShell).getTokens();
+        uint256[] memory targetHaltStops = new uint256[](targetTokens.length * 2);
+        uint256[] memory originHaltStops = new uint256[](originTokens.length * 2);
+
+        uint256 factor = wdiv(
+            sub(CowriShell(originShell).totalSupply(), amount),
+            CowriShell(originShell).totalSupply()
+        );
         factor = wpow(factor, originTokens.length);
-        factor = calculateRoot(factor, overlap);
+        factor = calculateRoot(factor, getOverlap(originTokens, targetTokens));
 
-        for (uint i = 0; i < targetTokens.length; i++) {
-            for (uint j = 0; j < originTokens.length; j++) {
+        // get the origin withdrawal amount and the target deposit amount
+        // while setting the arrays for halt stop check
+        for (uint j = 0; j < originTokens.length; j++) {
+            for (uint i = 0; i < targetTokens.length; i++) {
                 if (targetTokens[i] == originTokens[j]) {
-                    uint256 balance = shellBalances[makeKey(address(origin), originTokens[j])];
-                    targetDeposits[i] = sub(balance, wmul(factor, balance));
-                    shellBalances[makeKey(address(origin), originTokens[j])] = sub(
-                        balance,
-                        targetDeposits[i]
-                    );
+                    uint256 balance = shellBalances[makeKey(originShell, originTokens[j])];
+                    originHaltStops[j*2+1] = wmul(factor, balance);
+                    shellBalances[makeKey(originShell, originTokens[j])] = originHaltStops[j*2+1];
+                    originHaltStops[j*2] = sub(balance, originHaltStops[j*2+1]);
+                    targetHaltStops[i*2] = originHaltStops[j*2];
                 }
             }
         }
 
-        // selectively deposit into new shell
+        // selectively deposit into target shell and set the remaining info
+        // for the target deposit halt stop check
         for (uint i = 0; i < targetTokens.length; i++) {
-            shellBalances[makeKey(targetShell, targetTokens[i])] += targetDeposits[i];
+            targetHaltStops[i*2+1] = add(shellBalances[makeKey(targetShell, targetTokens[i])], targetHaltStops[i*2]);
+            shellBalances[makeKey(targetShell, targetTokens[i])] = targetHaltStops[i*2+1];
         }
 
-        // determine minted tokens
+        haltStopCheck(originHaltStops, false);
+        haltStopCheck(targetHaltStops, true);
+
+        uint256[] memory targetDeposits = new uint256[](targetTokens.length);
+        for (uint i = 0; i < targetDeposits.length; i++) targetDeposits[i] = targetHaltStops[i*2];
+
         (uint256 previousTargetInvariant, uint256 nextTargetInvariant) = calculateInvariants(
-            address(targetShell),
+            targetShell,
             targetDeposits,
             true
         );
 
         uint256 minted = wdiv(
-            wmul(sub(nextTargetInvariant, previousTargetInvariant), target.totalSupply()),
+            wmul(sub(nextTargetInvariant, previousTargetInvariant), CowriShell(targetShell).totalSupply()),
             previousTargetInvariant
         );
 
-        target.mint(msg.sender, minted);
-        origin.testBurn(msg.sender, amount);
+        CowriShell(targetShell).mint(msg.sender, minted);
+        CowriShell(originShell).testBurn(msg.sender, amount);
 
         return minted;
 
@@ -133,44 +145,47 @@ contract LiquidityMembrane is CowriRoot {
     function calculateRoot (
         uint256 base,
         uint256 root
-    ) internal returns (uint256) {
+    ) public returns (uint256) {
 
         return refineRoot(
             base <= WAD ? base : fastAprxRoot(base / WAD, root),
             base,
             root,
-            10
+            4
         );
 
     }
 
     function depositSelectiveLiquidity (
         address _shell,
-        uint256[] calldata _amounts
-    ) external returns (uint256) {
+        uint256[] memory _amounts
+    ) public returns (uint256) {
 
         CowriShell shell = CowriShell(_shell);
-        uint256 outstanding = shell.totalSupply();
         address[] memory tokens = shell.getTokens();
+        uint256[] memory haltStopCheckPayload = new uint256[](tokens.length * 2);
+
+        for (uint i = 0; i < tokens.length; i++) {
+            if (_amounts[i] > 0) {
+                haltStopCheckPayload[i*2] = _amounts[i];
+                haltStopCheckPayload[i*2+1] = add(shellBalances[makeKey(_shell, tokens[i])], _amounts[i]);
+                shellBalances[makeKey(_shell, tokens[i])] = haltStopCheckPayload[i*2+1];
+            } else {
+                haltStopCheckPayload[i*2+1] = shellBalances[makeKey(_shell, tokens[i])];
+            }
+        }
+
+        haltStopCheck(haltStopCheckPayload, true);
 
         (uint256 previousInvariant, uint256 nextInvariant) = calculateInvariants(_shell, _amounts, true);
 
+        uint256 outstanding = shell.totalSupply();
         uint256 minted = wdiv(
             wmul(sub(nextInvariant, previousInvariant), outstanding),
             previousInvariant
         );
 
         shell.mint(msg.sender, minted);
-
-        for (uint i = 0; i < tokens.length; i++) {
-            if (_amounts[i] > 0) {
-                shellBalances[makeKey(_shell, tokens[i])] = add(
-                    shellBalances[makeKey(_shell, tokens[i])],
-                    _amounts[i]
-                );
-                adjustedTransferFrom(ERC20Token(tokens[i]), msg.sender, _amounts[i]);
-            }
-        }
 
         for (uint i = 0; i < tokens.length; i++) {
             if (_amounts[i] > 0) adjustedTransferFrom(ERC20Token(tokens[i]), msg.sender, _amounts[i]);
@@ -180,32 +195,58 @@ contract LiquidityMembrane is CowriRoot {
 
     }
 
+    function haltStopCheck (
+        uint256[] memory _payload,
+        bool isDeposit
+    ) public returns (uint256) {
+
+        uint256 right = WAD;
+        for (uint i = 0; i < _payload.length / 2; i++) right = wmul(right, _payload[i*2+1]);
+
+        for (uint i = 0; i < _payload.length / 2; i++) {
+            if (_payload[i*2] > 0) {
+                if (isDeposit) {
+                    uint256 left = wpow(wdiv(_payload[i*2+1], haltAlpha), _payload.length / 2 - 1);
+                    require(wdiv(left, wdiv(right, _payload[i*2+1])) < WAD, "halt stop deposit");
+                } else {
+                    uint256 left = wpow(wmul(_payload[i*2+1], haltAlpha), _payload.length / 2 - 1);
+                    require(wdiv(left, wdiv(right, _payload[i*2+1])) > WAD, "halt stop withdraw");
+                }
+            }
+        }
+
+    }
+
     function withdrawSelectiveLiquidity (
         address _shell,
-        uint256[] calldata _amounts
-    ) external returns (uint256) {
+        uint256[] memory _amounts
+    ) public returns (uint256) {
 
         CowriShell shell = CowriShell(_shell);
+        address[] memory tokens = shell.getTokens();
+        uint256[] memory haltStopCheckPayload = new uint256[](tokens.length * 2);
+
+        for (uint i = 0; i < tokens.length; i++) {
+            if (_amounts[i] > 0) {
+                haltStopCheckPayload[i*2] = _amounts[i];
+                haltStopCheckPayload[i*2+1] = sub(shellBalances[makeKey(_shell, tokens[i])], _amounts[i]);
+                shellBalances[makeKey(_shell, tokens[i])] = haltStopCheckPayload[i*2+1];
+            } else {
+                haltStopCheckPayload[i*2+1] = shellBalances[makeKey(_shell, tokens[i])];
+            }
+        }
+
+        haltStopCheck(haltStopCheckPayload, false);
+
         (uint256 previousInvariant, uint256 nextInvariant) = calculateInvariants(_shell, _amounts, false);
 
         uint256 outstanding = shell.totalSupply();
-        address[] memory tokens = shell.getTokens();
-
-        uint256  burned = wdiv(
+        uint256 burned = wdiv(
             wmul(sub(previousInvariant, nextInvariant), outstanding),
             previousInvariant
         );
 
         shell.testBurn(msg.sender, burned);
-
-        for (uint i = 0; i < tokens.length; i++) {
-            if (_amounts[i] > 0) {
-                shellBalances[makeKey(_shell, tokens[i])] = sub(
-                    shellBalances[makeKey(_shell, tokens[i])],
-                    _amounts[i]
-                );
-            }
-        }
 
         for (uint i = 0; i < tokens.length; i++) {
             if (_amounts[i] > 0) adjustedTransfer(ERC20Token(tokens[i]), msg.sender, _amounts[i]);

@@ -11,6 +11,7 @@ contract CowriRoot is DSMath, Ownable {
     uint256 public liquidityFee = 20;
     uint256 public protocolFee = 1;
     uint256 public shellActivationThreshold;
+    uint256 public haltAlpha = 1111111111111111111;
     address[] public supportedTokens;
     address[] public shellList;
     address public shellFactory;

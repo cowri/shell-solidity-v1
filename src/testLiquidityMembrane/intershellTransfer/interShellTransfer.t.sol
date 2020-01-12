@@ -16,20 +16,15 @@ contract DappTest is DSTest, DSMath, ShellSetup {
 
         setupPool();
         setupTokens();
-        // shell1 = setupShellABDEFGHI();
-        // shell2 = setupShellABCDEFGHI();
-
         shell1 = setupShellABC();
-        shell2 = setupShellABCDEFGH();
+        shell2 = setupShellABCD();
 
-        uint256 amount;
-        uint256 balance;
-        uint256 amountToStake = 10 * WAD;
+        uint256 amountToStake = 100 * WAD;
         uint256 deadline = now + 50;
 
-        amount = pool.depositLiquidity(shell1, amountToStake * 9, deadline);
+        uint256 amount = pool.depositLiquidity(shell1, amountToStake * 3, deadline);
         emit log_named_uint("amount", amount);
-        amount = pool.depositLiquidity(shell2, amountToStake * 8, deadline);
+        amount = pool.depositLiquidity(shell2, amountToStake * 4, deadline);
         emit log_named_uint("amount", amount);
 
     }

@@ -14,6 +14,10 @@ contract CowriShell is ERC20Mintable, ERC20Burnable {
         tokens = _tokens;
     }
 
+    function getNumberOfTokens () public returns (uint256) {
+        return tokens.length;
+    }
+
     function testBurn(address account, uint amount) public {
         _burn(account, amount);
     }

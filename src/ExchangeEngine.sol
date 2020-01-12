@@ -300,6 +300,9 @@ contract ExchangeEngine is CowriRoot {
             uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
             uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
 
+            emit log_named_uint("origin balance before", originBalance);
+            emit log_named_uint("target balance before", targetBalance);
+
             uint256 originCutAfterLiquidityFee = executeOriginCreditOrigin(
                 _shells[i],
                 origin,
@@ -316,6 +319,14 @@ contract ExchangeEngine is CowriRoot {
                 targetBalance
             );
 
+            // haltCheck(
+            //     _shells[i],
+            //     origin,
+            //     target,
+            //     add(originCutAfterLiquidityFee, originBalance),
+            //     sub(targetBalance, targetContribution)
+            // );
+
             targetAmount += targetContribution;
 
         }
@@ -330,6 +341,47 @@ contract ExchangeEngine is CowriRoot {
             recipient
         );
 
+    }
+
+    function haltCheck (address shell, address origin, address target, uint256 originBalance, uint256 targetBalance) private {
+            uint256 power = CowriShell(shell).getNumberOfTokens() - 1;
+            uint256 product = getHaltCheckProduct(shell, origin, target);
+
+            emit log_named_uint("power", power);
+            emit log_named_uint("product", product);
+
+            uint256 originCheck = wmul(
+                wpow(wmul(targetBalance, haltAlpha), power),
+                wdiv(WAD, product)
+            );
+
+            emit log_named_uint("origin check", originCheck);
+            emit log_named_uint("origin balance", originBalance);
+
+            // require(originBalance < originCheck, "halt stop origin");
+
+            uint256 targetCheck = wmul(
+                wpow(wdiv(originBalance, haltAlpha), power),
+                wdiv(WAD, product)
+            );
+
+            emit log_named_uint("target check", targetCheck);
+            emit log_named_uint("target balance", targetBalance);
+
+            // require(targetBalance > targetCheck, "halt stop target");
+
+    }
+
+    event log_named_uint(bytes32, uint256);
+
+    function getHaltCheckProduct (address shell, address origin, address target) private returns (uint256) {
+        address[] memory tokens = CowriShell(shell).getTokens();
+        uint256 product = WAD;
+        for (uint i = 0; i < tokens.length; i++) {
+            if (tokens[i] == origin || tokens[i] == target) continue;
+            product = wmul(product, shellBalances[makeKey(shell, tokens[i])]);
+        }
+        return product;
     }
 
     function swapByTarget (

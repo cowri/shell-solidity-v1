@@ -80,7 +80,7 @@ contract DappTest is DSTest, ShellSetup {
 
         assertEq(
             testA.balanceOf(address(pool)),
-            310000000000000000000
+            309999000000000000000
         );
 
         assertEq(
