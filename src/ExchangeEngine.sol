@@ -1,10 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "./CowriShell.sol";
 import "./ERC20Token.sol";
-import "./CowriRoot.sol";
+import "./LoihiRoot.sol";
 
-contract ExchangeEngine is CowriRoot {
+contract ExchangeEngine is LoihiRoot {
 
     function getRevenue (
         address token

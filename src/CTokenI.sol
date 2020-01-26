@@ -1,8 +1,6 @@
 pragma solidity ^0.5.12;
 
-
-
-interface CErc20Interface {
+interface CErc20I {
     function mint(uint mintAmount) external returns (uint);
     function redeem(uint redeemTokens) external returns (uint);
     function redeemUnderlying(uint redeemAmount) external returns (uint);

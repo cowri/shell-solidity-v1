@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
-import "./CowriRoot.sol";
+import "./LoihiRoot.sol";
 
-contract LiquidityMembrane is CowriRoot {
+contract LiquidityMembrane is LoihiRoot {
 
     event addLiquidity(
         address indexed provider,

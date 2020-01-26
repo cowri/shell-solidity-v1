@@ -2,34 +2,25 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-contracts/contracts/ownership/Ownable.sol";
 import "ds-math/math.sol";
-import "./CowriShell.sol";
 import "./ERC20Token.sol";
 
-contract CowriRoot is DSMath, Ownable {
+contract LoihiRoot is DSMath, Ownable {
 
     uint256 internal constant BASIS = 10000;
     uint256 public liquidityFee = 20;
-    uint256 public protocolFee = 1;
-    uint256 public shellActivationThreshold;
+    uint256 public protocolFee = 0;
     uint256 public haltAlpha = 1111111111111111111;
     address[] public supportedTokens;
     address[] public shellList;
     address public shellFactory;
-    mapping(address => bool) public shells;
+    mapping(address => uint256) public balances;
     mapping(address => uint256) public revenue;
-    mapping(uint256 => uint256) public shellBalances;
-    mapping(address => uint256) public shellInvariants;
-    mapping(uint256 => address[]) public pairsToAllShells;
-    mapping(uint256 => address[]) public pairsToActiveShells;
+
     bytes16 private constant POSITIVE_ZERO = 0x00000000000000000000000000000000;
     bytes16 private constant NEGATIVE_ZERO = 0x80000000000000000000000000000000;
     bytes16 private constant POSITIVE_INFINITY = 0x7FFF0000000000000000000000000000;
     bytes16 private constant NEGATIVE_INFINITY = 0xFFFF0000000000000000000000000000;
     bytes16 private constant NaN = 0x7FFF8000000000000000000000000000;
-
-    function makeKey(address a, address b) internal pure returns (uint256) {
-        return add(uint256(a), uint256(b));
-    }
 
     function adjustedTransferFrom (ERC20Token token, address source, uint256 amount) internal returns (uint256) {
 
