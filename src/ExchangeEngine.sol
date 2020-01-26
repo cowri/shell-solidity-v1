@@ -5,12 +5,6 @@ import "./LoihiRoot.sol";
 
 contract ExchangeEngine is LoihiRoot {
 
-    function getRevenue (
-        address token
-    ) public view returns (uint256) {
-        return revenue[token];
-    }
-
     event trade(
         address indexed buyer,
         address indexed origin,
@@ -18,19 +12,6 @@ contract ExchangeEngine is LoihiRoot {
         address indexed target,
         uint256 targetBought
     );
-
-    function getLiquidity (
-        address[] memory _shells,
-        address token
-    ) private view returns (uint256) {
-
-        uint256 liquidity;
-        for (uint8 i = 0; i < _shells.length; i++) {
-            liquidity += shellBalances[makeKey(_shells[i], token)];
-        }
-        return liquidity;
-
-    }
 
     function calculateOriginPrice (
         uint256 originAmount,
@@ -45,49 +26,6 @@ contract ExchangeEngine is LoihiRoot {
 
     }
 
-    function getMicroOriginPrice (
-        address shell,
-        address origin,
-        address target,
-        uint256 originAmount
-    ) public  returns (uint256) {
-
-        return calculateOriginPrice(
-            originAmount,
-            shellBalances[makeKey(shell, origin)],
-            shellBalances[makeKey(shell, target)]
-        );
-
-    }
-
-    function getOriginPrice (
-        address origin,
-        address target,
-        uint256 originAmount
-    ) public view returns (uint256) {
-        address[] memory _shells = pairsToActiveShells[makeKey(origin, target)];
-        uint256 originLiquidity = getLiquidity(_shells, origin);
-        uint256 targetLiquidity = getLiquidity(_shells, target);
-        assert(originLiquidity > 0);
-        assert(targetLiquidity > 0);
-
-        uint256 originAmountWithProtocolFee = wmul(
-            originAmount,
-            wdiv(BASIS - protocolFee, BASIS)
-        );
-
-        uint256 targetAmount;
-        for (uint8 i = 0; i < _shells.length; i++) {
-            uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
-            uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
-            uint256 originCut = wdiv(wmul(originAmountWithProtocolFee, targetBalance), targetLiquidity);
-            uint256 originCutWithLiquidityFee = wmul(originCut, wdiv(BASIS - liquidityFee, BASIS));
-            targetAmount += calculateOriginPrice(originCutWithLiquidityFee, originBalance, targetBalance);
-        }
-
-        return targetAmount;
-    }
-
     function calculateTargetPrice (
         uint256 targetAmount,
         uint256 originLiquidity,
@@ -99,17 +37,11 @@ contract ExchangeEngine is LoihiRoot {
         );
     }
 
-    function getMicroTargetPrice (
-        address shell,
+    function getOriginPrice (
         address origin,
         address target,
-        uint256 targetAmount
+        uint256 originAmount
     ) public view returns (uint256) {
-        return calculateTargetPrice(
-            targetAmount,
-            shellBalances[makeKey(shell, origin)],
-            shellBalances[makeKey(shell, target)]
-        );
     }
 
     function getTargetPrice (
@@ -117,109 +49,22 @@ contract ExchangeEngine is LoihiRoot {
         address target,
         uint256 targetAmount
     ) public view returns (uint256) {
-        address[] memory _shells = pairsToActiveShells[makeKey(origin, target)];
-        uint256 originLiquidity = getLiquidity(_shells, origin);
-        uint256 targetLiquidity = getLiquidity(_shells, target);
-        require(originLiquidity > 0, "origin liquidity is zero");
-        require(targetLiquidity > 0, "target liquidity is zero");
-
-        uint256 originAmount;
-        for (uint8 i = 0; i < _shells.length; i++) {
-            uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
-            uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
-            uint256 targetContribution = wdiv(wmul(targetAmount, targetBalance), targetLiquidity);
-            uint256 originCut = calculateTargetPrice(targetContribution, originBalance, targetBalance);
-            originAmount += originCut;
-        }
-
-        return wmul(originAmount, wdiv(BASIS + protocolFee, BASIS));
-
     }
 
-
-    function swapByOrigin (
-        address shell,
-        address origin,
-        address target,
-        uint256 originAmount,
-        uint256 targetMin,
-        uint256 deadline
-    ) public  returns (uint256) {
-
-        address[] memory _shells = new address[](1);
-        _shells[0] = shell;
-        return executeOriginTrade(_shells, origin, target, originAmount, targetMin, deadline, msg.sender);
-
+    function swapByOrigin (address origin, address target, uint256 originAmount, uint256 targetMin, uint256 deadline) public  returns (uint256) {
+        return executeOriginTrade(origin, target, originAmount, targetMin, deadline, msg.sender);
     }
 
-    function swapByOrigin (
-        address origin,
-        address target,
-        uint256 originAmount,
-        uint256 targetMin,
-        uint256 deadline
-    ) public  returns (uint256) {
-
-        address[] memory _shells = pairsToActiveShells[makeKey(origin, target)];
-        return executeOriginTrade(_shells, origin, target, originAmount, targetMin, deadline, msg.sender);
-
+    function transferByOrigin (address origin, address target, uint256 originAmount, uint256 targetMin, uint256 deadline, address recipient) public returns (uint256) {
+        return executeOriginTrade(origin, target, originAmount, targetMin, deadline, recipient);
     }
 
-    function swapByOrigin (
-        address[] memory _shells,
-        address origin,
-        address target,
-        uint256 originAmount,
-        uint256 targetMin,
-        uint256 deadline
-    ) public returns (uint256) {
-
-        return executeOriginTrade(_shells, origin, target, originAmount, targetMin, deadline, msg.sender);
-
+    function swapByTarget (address origin, address target, uint256 targetAmount, uint256 originMax, uint256 deadline) public returns (uint256) {
+        return executeTargetTrade(origin, target, targetAmount, originMax, deadline, msg.sender);
     }
 
-    function transferByOrigin (
-        address shell,
-        address origin,
-        address target,
-        uint256 originAmount,
-        uint256 targetMin,
-        uint256 deadline,
-        address recipient
-    ) public returns (uint256) {
-
-        address[] memory _shells = new address[](1);
-        _shells[0] = shell;
-        return executeOriginTrade(_shells, origin, target, originAmount, targetMin, deadline, recipient);
-
-    }
-
-    function transferByOrigin (
-        address origin,
-        address target,
-        uint256 originAmount,
-        uint256 targetMin,
-        uint256 deadline,
-        address recipient
-    ) public returns (uint256) {
-
-        address[] memory _shells = pairsToActiveShells[makeKey(origin, target)];
-        return executeOriginTrade(_shells, origin, target, originAmount, targetMin, deadline, recipient);
-
-    }
-
-    function transferByOrigin (
-        address[] memory _shells,
-        address origin,
-        address target,
-        uint256 originAmount,
-        uint256 targetMin,
-        uint256 deadline,
-        address recipient
-    ) public returns (uint256) {
-
-        return executeOriginTrade(_shells, origin, target, originAmount, targetMin, deadline, recipient);
-
+    function transferByTarget (address origin, address target, uint256 targetAmount, uint256 originMax, uint256 deadline, address recipient) public returns (uint256) {
+        return executeTargetTrade(origin, target, targetAmount, originMax, deadline, recipient);
     }
 
     function finalizeOriginTrade (
@@ -277,7 +122,6 @@ contract ExchangeEngine is LoihiRoot {
     }
 
     function executeOriginTrade (
-        address[] memory _shells,
         address origin,
         address target,
         uint256 originAmount,
@@ -291,138 +135,17 @@ contract ExchangeEngine is LoihiRoot {
         revenue[origin] += calculateProtocolFeeForOriginTrade(originAmount);
         originAmount = calculateOriginAmountForOriginTrade(originAmount);
 
-        uint256 targetLiquidity = getLiquidity(_shells, target);
-
-        uint256 targetAmount;
-        for (uint8 i = 0; i < _shells.length; i++) {
-
-            uint256 originBalance = shellBalances[makeKey(_shells[i], origin)];
-            uint256 targetBalance = shellBalances[makeKey(_shells[i], target)];
-
-            emit log_named_uint("origin balance before", originBalance);
-            emit log_named_uint("target balance before", targetBalance);
-
-            uint256 originCutAfterLiquidityFee = executeOriginCreditOrigin(
-                _shells[i],
-                origin,
-                originAmount,
-                targetBalance,
-                targetLiquidity
-            );
-
-            uint256 targetContribution = executeOriginDebitTarget(
-                _shells[i],
-                target,
-                originCutAfterLiquidityFee,
-                originBalance,
-                targetBalance
-            );
-
-            // haltCheck(
-            //     _shells[i],
-            //     origin,
-            //     target,
-            //     add(originCutAfterLiquidityFee, originBalance),
-            //     sub(targetBalance, targetContribution)
-            // );
-
-            targetAmount += targetContribution;
-
-        }
+        uint256 originCutAfterLiquidityFee = executeOriginCreditOrigin(origin, originAmount, targetBalance, targetLiquidity);
+        uint256 targetAmount = executeOriginDebitTarget(target, originCutAfterLiquidityFee, originBalance, targetBalance);
 
         require(targetAmount >= targetMin, "target amount was not greater than minimum target amount");
 
-        return finalizeOriginTrade(
-            origin,
-            target,
-            originAmount,
-            targetAmount,
-            recipient
-        );
-
-    }
-
-    function haltCheck (address shell, address origin, address target, uint256 originBalance, uint256 targetBalance) private {
-            uint256 power = CowriShell(shell).getNumberOfTokens() - 1;
-            uint256 product = getHaltCheckProduct(shell, origin, target);
-
-            emit log_named_uint("power", power);
-            emit log_named_uint("product", product);
-
-            uint256 originCheck = wmul(
-                wpow(wmul(targetBalance, haltAlpha), power),
-                wdiv(WAD, product)
-            );
-
-            emit log_named_uint("origin check", originCheck);
-            emit log_named_uint("origin balance", originBalance);
-
-            // require(originBalance < originCheck, "halt stop origin");
-
-            uint256 targetCheck = wmul(
-                wpow(wdiv(originBalance, haltAlpha), power),
-                wdiv(WAD, product)
-            );
-
-            emit log_named_uint("target check", targetCheck);
-            emit log_named_uint("target balance", targetBalance);
-
-            // require(targetBalance > targetCheck, "halt stop target");
-
-    }
-
-    event log_named_uint(bytes32, uint256);
-
-    function getHaltCheckProduct (address shell, address origin, address target) private returns (uint256) {
-        address[] memory tokens = CowriShell(shell).getTokens();
-        uint256 product = WAD;
-        for (uint i = 0; i < tokens.length; i++) {
-            if (tokens[i] == origin || tokens[i] == target) continue;
-            product = wmul(product, shellBalances[makeKey(shell, tokens[i])]);
-        }
-        return product;
-    }
-
-    function swapByTarget (
-        address origin,
-        address target,
-        uint256 targetAmount,
-        uint256 originMax,
-        uint256 deadline,
-        address[] memory _shells
-    ) public returns (uint256) {
-
-        return executeTargetTrade(_shells, origin, target, targetAmount, originMax, deadline, msg.sender);
+        return finalizeOriginTrade(origin, target, originAmount, targetAmount, recipient);
 
     }
 
 
-    function swapByTarget (
-        address origin,
-        address target,
-        uint256 targetAmount,
-        uint256 originMax,
-        uint256 deadline
-    ) public returns (uint256) {
 
-        address[] memory _shells = pairsToActiveShells[makeKey(origin, target)];
-        return executeTargetTrade(_shells, origin, target, targetAmount, originMax, deadline, msg.sender);
-
-    }
-
-    function transferByTarget (
-        address origin,
-        address target,
-        uint256 targetAmount,
-        uint256 originMax,
-        uint256 deadline,
-        address recipient
-    ) public returns (uint256) {
-
-        address[] memory _shells = pairsToActiveShells[makeKey(origin, target)];
-        return executeTargetTrade(_shells, origin, target, targetAmount, originMax, deadline, recipient);
-
-    }
 
     function transferByTarget (
         address origin,

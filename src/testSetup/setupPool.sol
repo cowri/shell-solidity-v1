@@ -1,17 +1,14 @@
 pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
+import "../Loihi.sol";
 
-import "../CowriPool.sol";
-import "../CowriShellFactory.sol";
+contract LoihiSetup {
 
-contract PoolSetup {
+    Loihi loihi;
 
-    CowriShellFactory shellFactory;
-    CowriPool pool;
-
-    function setupPool () public {
-        shellFactory = new CowriShellFactory();
-        pool = new CowriPool(address(shellFactory));
+    function setupLoihi () public {
+        loihi = new Loihi();
     }
+
 }

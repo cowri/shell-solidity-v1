@@ -10,4 +10,3 @@ interface CErc20I {
     function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) external returns (uint);
     function getCash() external view returns (uint);
 }
-
