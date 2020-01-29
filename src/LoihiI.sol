@@ -15,7 +15,7 @@ interface LoihiI {
     ) external view returns (uint256);
 
     function swapByOrigin (
-        address origin
+        address origin,
         address target,
         uint256 originAmount,
         uint256 minTargetAmount,
@@ -48,26 +48,23 @@ interface LoihiI {
         uint256 deadline
     ) external returns (uint256);
 
-    function depositSelectiveLiquidity (
-        address _shell,
+    function selectiveDeposit (
+        address[] calldata _flavors,
         uint256[] calldata _amounts
     ) external returns (uint256);
 
-    function withdrawSelectiveLiquidity (
-        address _shell,
+    function selectiveWithdraw (
+        address[] calldata _flavors,
         uint256[] calldata _amounts
     ) external returns (uint256);
 
-    function depositLiquidity (
-        address _shell,
-        uint256 amount,
+    function proportionalDeposit (
+        uint256 shellTokens,
         uint256 deadline
-    ) external returns (uint256);
+    ) external returns (uint256[] memory);
 
-    function withdrawLiquidity (
-        address _shell,
-        uint256 liquidityToBurn,
-        uint256[] calldata limits,
+    function proportionalWithdraw (
+        uint256 shellTokens,
         uint256 deadline
     ) external returns (uint256[] memory);
 

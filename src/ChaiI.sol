@@ -2,7 +2,7 @@ pragma solidity ^0.5.12;
 
 interface ChaiI {
     function draw(address src, uint wad) external;
-    function exit(address src, uint wad) public;
+    function exit(address src, uint wad) external;
     function join(address dst, uint wad) external;
     function dai(address usr) external returns (uint wad);
     function permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s) external;

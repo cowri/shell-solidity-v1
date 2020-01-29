@@ -10,9 +10,6 @@ contract LoihiRoot is DSMath, Ownable {
     uint256 public liquidityFee = 20;
     uint256 public protocolFee = 0;
     uint256 public haltAlpha = 1111111111111111111;
-    address[] public supportedTokens;
-    address[] public shellList;
-    address public shellFactory;
     mapping(address => uint256) public balances;
     mapping(address => uint256) public revenue;
 
@@ -53,17 +50,6 @@ contract LoihiRoot is DSMath, Ownable {
 
         return adjustedAmount;
 
-    }
-
-    function getTotalCapital(address shell) public view returns (uint totalCapital) {
-        address[] memory tokens = CowriShell(shell).getTokens();
-        for (uint i = 0; i < tokens.length; i++) {
-            totalCapital = add(
-                totalCapital,
-                shellBalances[makeKey(shell, tokens[i])]
-            );
-         }
-        return totalCapital;
     }
 
     function wpow(uint x, uint n) internal pure returns (uint z) {
