@@ -4,12 +4,12 @@ import "../ChaiI.sol";
 
 contract ChaiReserve {
     mapping(address => uint256) public reserves;
-    address constant reserve;
+    address constant reserve = address(0);
 
     constructor () public { }
 
     function getReserves () public returns (uint256) {
-        return reserves[address];
+        return reserves[reserve];
     }
 
     function unwrap () public returns (uint256) {
