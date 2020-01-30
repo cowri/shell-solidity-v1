@@ -11,7 +11,7 @@ contract PotLike {
     function chi() external returns (uint256);
 }
 
-contract Loihi is DSMath {
+contract Loihi is DSMath { 
 
     mapping(address => uint256) public reserves;
     mapping(address => Flavor) public flavors;
@@ -28,7 +28,7 @@ contract Loihi is DSMath {
     function getTotalBalance () internal returns (uint256) {
         uint256 balance;
         for (uint i = 0; i < reservesList; i++) {
-            balance += reservesList[i].delegateCall(abi.encodeWithSignature("getBalance()"))
+            balance += reservesList[i].delegateCall(abi.encodeWithSignature("getPool()"))
         }
         return balance;
     }
@@ -54,29 +54,69 @@ contract Loihi is DSMath {
         return executeTargetTrade(origin, originAmount, target, minTargetAmount, deadline, recipient);
     }
 
-    function executeOriginTrade (address origin, uint256 originAmount, address target, uint256 minTargetAmount, uint256 deadline, address recipient) public returns (uint256) {
-        Flavor memory originRolodex = flavors[origin];
-        Flavor memory targetRolodex = flavors[target];
-        uint256 originNumeraireAmount = originRolodex.adaptation.delegateCall(abi.encodeWithSignature("getNumeraireAmount(uint256)", originAmount));
-        uint256 originNumeraireBalance = originRolodex.reserve.delegateCall(abi.encodeWithSignature("getNumeraireBalance()"));
-        uint256 targetNumeraireBalance = targetRolodex.reserve.delegateCall(abi.encodeWithSignature("getNumeraireBalance()"));
-        uint256 targetNumeraireAmount = wdiv(
-            wmul(originNumeraireAmount, targetNumeraireBalance),
-            add(originNumeraireAmount, originNumeraireBalance)
-        );
+    function executeOriginTrade (address origin, uint256 oAmt, address target, uint256 minTargetAmount, uint256 deadline, address recipient) public returns (uint256) {
 
-        if (origin == originRolodex.reserve) {
-            originRolodex.reserve.delegateCall(abi.encode("transferFrom", msg.sender, originAmount));
-        } else {
-            uint256 originNumeraireAddition = originRolodex.adaptation.delegateCall(abi.encodeWithSignature("unwrap(intake(uint256)", originAmount));
-            originRolodex.reserve.delegateCall(abi.encodeWithSignature("wrap(uint256)"), originNumeraireAddition);
+        Flavor oRolo = flavors[origin]; // origin rolodex
+        Flavor tRolo = flavors[target]; // target rolodex
+        uint256 oAmt; // origin swap amount
+        uint256 oPool; // origin pool balance
+        uint256 tPool; // target pool balance
+        uint256 tAmt; // target swap amount
+        uint256 sheerLiq; // gross liquidity
+
+        for (uint i = 0; i < reservesList.length; i++) {
+            if (reservesList[i] == originRolodex.reserve) {
+                oAmt = oRolo.adaptation.delegateCall(abi.encodeWithSignature("getNumeraireAmount(uint)", oAmt));
+                oPool = oRolo.reserve.delegateCall(abi.encodeWithSignature("getBalance()"));
+                sheerLiq += oPool;
+            } else if (reservesList[i] == tRolo.reserve) {
+                tPool = tRolo.reserve.delegateCall(abi.encodeWithSignature("getBalance()"));
+                sheerLiq += tPool;
+            } else sheerLiq += reservesList[i].delegateCall(abi.encodeWithSignature("getBalance()"));
         }
 
-        if (target == targetRolodex.reserve) {
-            uint256 targetRolodex.delegateCall(abi.encode("transferNumeraireAmount", recipient, targetNumeraireAmount));
+        require(add(oPool, oAmt) <= wmul(oRolo.weight, wmul(sheerLiq, add(WAD, alpha))), "origin swap halt check");
+
+        if (add(oPool, oAmt) <= wmul(oRolo.weight, wmul(sheerLiq, add(WAD, beta)))) {
+            tAmt = oAmt;
+        } else if (oPool > wmul(oRolo.weight, wmul(sheerLiq, add(WAD, beta)))) {
+            uint256 fee = wmul(baseFee/2, wdiv(oAmt, wmul(oRolo.weight, sheerLiq)));
+            tAmt = wmul(oAmt, sub(WAD, fee));
         } else {
-            uint256 targetNumeraireSubtraction = targetRolodex.reserve.delegateCall(abi.encode("unwrap(uint256"), targetNumeraireAmount));
-            return targetRolodex.adaptation.delegateCall(abi.encode("transferNumeraireAmount(address,uint256)", recipient, targetNumeraireSubtraction));
+            uint256 fee = wmul(baseFee/2, wdiv(
+                sub(add(oAmt, oPool), wmul(oRolo.weight, wmul(oPool, add(WAD, beta)))),
+                wmul(oRolo.weight, oPool)
+            ));
+            tAmt = wmul(oAmt, sub(WAD, fee));
+        }
+
+        require(sub(tPool, tAmt) >= wmul(tRolo.weight, wmul(sheerLiq, sub(WAD, alpha)), "target swap halt check"));
+        
+        if (sub(tPool, tAmt) => wmul(tRolo.weight, wmul(sheerLiq, sub(WAD, beta)))) {
+            tAmt = wmul(tAmt, sub(WAD, baseFee));
+        } else if (tPool < wmul(tRolo.weight, wmul(tpool, sub(WAD, beta)))) {
+            uint256 fee = sub(WAD, add(baseFee, wmul(m/2, wdiv(tAmt, wmul(tRolo.weight, sheerLiq)));
+            tAmt = wmul(tAmt, fee);
+        } else {
+            uint256 fee = sub(WAD, add(baseFee, wmul(m/2, wdiv(
+                sub(sub(tPool, tAmt), wmul(tRolo.weight, sheerLiq, sub(WAD, beta))),
+                wmul(tRolo.weight, sheerLiq)
+            )));
+            tAmt = wmul(tAmt, fee);
+        }
+
+        if (oRolo.reserve == origin) {
+            oRolo.reserve.delegateCall(abi.encodeWithSignature("transferFrom(address, uint)", msg.sender, oAmt));
+        } else {
+            uint256 numeraire = oRolo.adapter.delegateCall(abi.encodeWithSignature("unwrap(uint)", oAmt));
+            oRolo.reserve.delegateCall(abi.encodeWithSignature("wrap(uint)", numeraire));
+        }
+
+        if (tRolo.reserve == target) {
+            tRolo.reserve.delegateCall(abi.encodeWithSignature("transfer(address, uint)", recipient, tAmt));
+        } else {
+            uint256 numeraire = tRolo.reserve.delegateCall(abi.encodeWithSignature("unwrap(uint)", tAmt));
+            return tRolo.adapter.delegateCall(abi.encodeWithSignature("wrap()", numeraire));
         }
 
     }
