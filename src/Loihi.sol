@@ -7,10 +7,6 @@ import "./CTokenI.sol";
 import "./ERC20I.sol";
 import "./ERC20Token.sol";
 
-contract PotLike {
-    function chi() external returns (uint256);
-}
-
 contract Loihi is DSMath { 
 
     mapping(address => uint256) public reserves;
@@ -22,7 +18,7 @@ contract Loihi is DSMath {
     uint256 alpha = 950000000000000000; // 95%
     uint256 beta = 475000000000000000; // half of 95%
     uint256 feeBase = 500000000000000; // 5 bps 
-    uint256 feeDerivative = 052631578940000000; // marginal fee will be 5% at alpha point
+    uint256 feeDerivative = 52631578940000000; // marginal fee will be 5% at alpha point
 
     constructor ( ) public {     }
 
@@ -146,7 +142,7 @@ contract Loihi is DSMath {
             ));
             tAmt = wmul(add(
                 sub(tPool, feeThreshold),
-                wmul(sub(feeThreshold, sub(tPool, tAmt)), WAD - fee);
+                wmul(sub(feeThreshold, sub(tPool, tAmt)), WAD - fee)
             ), WAD - feeBase);
         }
 
@@ -287,6 +283,8 @@ contract Loihi is DSMath {
                 );
         } }
 
+        // adjust shell token amount out of numeraire values into shell token denominations
+
     }
 
     function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
@@ -318,7 +316,7 @@ contract Loihi is DSMath {
 
             bool haltCheck = newBalance >= wmul(balances[i+2], wmul(newBalance, alpha - WAD));
             require(haltCheck, "withdraw halt check");
-            
+
             uint256 feeThreshold = wmul(balances[i+2], wmul(newBalance, WAD - beta));
             if (newBalance >= feeThreshold) {
                 shellsBurned += wmul(withdrawAmount, add(WAD, feeBase));
@@ -328,17 +326,19 @@ contract Loihi is DSMath {
                 ) + feeBase;
                 shellsBurned += wmul(withdrawAmount, feePrep + WAD);
             } else {
-                uint256 feePrep = wmul(
+                uint256 feePrep = wmul(feeDerivative,
                     wdiv(
                         sub(feeThreshold, newBalance),
                         wmul(balances[i+2], newSum)
-                    ),
-                    feeDerivative 
+                    )
                 );
                 shellsBurned += wmul(add(
-                    sub(oldBalance, feeThreshold)
-                    wmul(sub(feeThreshold, newBalance), feePrep + WAD);
+                    sub(oldBalance, feeThreshold),
+                    wmul(sub(feeThreshold, newBalance), feePrep + WAD)
                 ), feeBase + WAD);
         }}
+
+        // adjust shell token amount out of numeraire values into shell token denominations
+
     }
 }

@@ -6,20 +6,18 @@ import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "ds-math/math.sol";
 
 contract ChaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
-    ERC20Token underlying;
-    constructor(address under, string memory _name, string memory _symbols, uint8 _decimals, uint256 _amount)
+    ERC20 underlying;
+    constructor(address _underlying, string memory _name, string memory _symbols, uint8 _decimals, uint256 _amount)
     ERC20Detailed(_name, _symbols, _decimals)
-    public {
-        underlying = ERC20Token(under);
-    }
+    public { underlying = ERC20(_underlying); }
 
     function draw (address src, uint wad) public {
-        burnFrom(src, wad / 2);
+        _burnFrom(src, wad / 2);
         underlying.transfer(msg.sender, wad);
     }
 
     function exit (address src, uint wad) public {
-        burnFrom(src, wad);
+        _burnFrom(src, wad);
         underlying.transfer(msg.sender, wad * 2);
     }
 

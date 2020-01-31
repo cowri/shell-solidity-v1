@@ -11,4 +11,3 @@ interface ChaiI {
     function transfer(address dst, uint wad) external returns (bool);
     function transferFrom(address src, address dst, uint wad) external;
 }
-

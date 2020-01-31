@@ -7,10 +7,10 @@ import "ds-math/math.sol";
 
 contract cUsdcMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
     ERC20 underlying;
-    constructor(address underlying, string memory _name, string memory _symbols, uint8 _decimals, uint256 _amount)
+    constructor(address _underlying, string memory _name, string memory _symbols, uint8 _decimals, uint256 _amount)
     ERC20Detailed(_name, _symbols, _decimals) public {
         _mint(msg.sender, _amount);
-        underlying = ERC20(underlying);
+        underlying = ERC20(_underlying);
     }
 
     function mint (uint256 amount) public returns (uint) {
@@ -20,15 +20,15 @@ contract cUsdcMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
     }
 
     function redeem (uint256 amount) public returns (uint) {
-        burnFrom(msg.sender, amount);
+        _burnFrom(msg.sender, amount);
         underlying.transfer(msg.sender, amount * 2);
         return amount * 2;
     }
 
     function redeemUnderlying (uint256 amount) public returns (uint) {
-        burnFrom(msg.sender, amount / 2);
+        _burnFrom(msg.sender, amount / 2);
         underlying.transfer(msg.sender, amount);
-        return amount
+        return amount;
     }
 
     function getCash () external view returns (uint) {

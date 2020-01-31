@@ -16,7 +16,6 @@ contract AdapterSetup {
     UsdtAdaptation usdtAdapt;
 
     function setUpAdapters() public {
-        l = new Loihi();
         chaiAdapt = new ChaiAdaptation();
         cdaiAdapt = new cDaiAdaptation();
         cusdcAdapt = new cUsdcAdaptation();
