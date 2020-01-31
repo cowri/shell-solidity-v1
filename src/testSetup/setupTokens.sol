@@ -6,9 +6,9 @@ pragma solidity ^0.5.6;
 import "ds-test/test.sol";
 
 import "../ERC20Token.sol";
-import "./setupPool.sol";
+import "./setupLoihi.sol";
 
-contract TokenSetup is PoolSetup {
+contract TokenSetup is LoihiSetup {
 
     ERC20Token testA;
     ERC20Token testB;
@@ -50,23 +50,23 @@ contract TokenSetup is PoolSetup {
         testQ = new ERC20Token("test q", "TESTQ", 2, tokenAmount);
         testR = new ERC20Token("test r", "TESTR", 1, tokenAmount);
 
-        testA.approve(address(pool), tokenAmount);
-        testB.approve(address(pool), tokenAmount);
-        testC.approve(address(pool), tokenAmount);
-        testD.approve(address(pool), tokenAmount);
-        testE.approve(address(pool), tokenAmount);
-        testF.approve(address(pool), tokenAmount);
-        testG.approve(address(pool), tokenAmount);
-        testH.approve(address(pool), tokenAmount);
-        testI.approve(address(pool), tokenAmount);
-        testJ.approve(address(pool), tokenAmount);
-        testK.approve(address(pool), tokenAmount);
-        testL.approve(address(pool), tokenAmount);
-        testM.approve(address(pool), tokenAmount);
-        testN.approve(address(pool), tokenAmount);
-        testO.approve(address(pool), tokenAmount);
-        testP.approve(address(pool), tokenAmount);
-        testQ.approve(address(pool), tokenAmount);
+        testA.approve(address(loihi), tokenAmount);
+        testB.approve(address(loihi), tokenAmount);
+        testC.approve(address(loihi), tokenAmount);
+        testD.approve(address(loihi), tokenAmount);
+        testE.approve(address(loihi), tokenAmount);
+        testF.approve(address(loihi), tokenAmount);
+        testG.approve(address(loihi), tokenAmount);
+        testH.approve(address(loihi), tokenAmount);
+        testI.approve(address(loihi), tokenAmount);
+        testJ.approve(address(loihi), tokenAmount);
+        testK.approve(address(loihi), tokenAmount);
+        testL.approve(address(loihi), tokenAmount);
+        testM.approve(address(loihi), tokenAmount);
+        testN.approve(address(loihi), tokenAmount);
+        testO.approve(address(loihi), tokenAmount);
+        testP.approve(address(loihi), tokenAmount);
+        testQ.approve(address(loihi), tokenAmount);
 
     }
 }
