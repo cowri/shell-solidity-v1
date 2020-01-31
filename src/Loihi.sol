@@ -19,10 +19,10 @@ contract Loihi is DSMath {
     address[] public numeraireAssets;
     struct Flavor { address adaptation; address reserve; uint256 weight; }
 
-    uint256 feeBase;
-    uint256 feeDerivative;
-    uint256 alpha;
-    uint256 beta;
+    uint256 alpha = 950000000000000000; // 95%
+    uint256 beta = 475000000000000000; // half of 95%
+    uint256 feeBase = 500000000000000; // 5 bps 
+    uint256 feeDerivative = 052631578940000000; // marginal fee will be 5% at alpha point
 
     constructor ( ) public {     }
 
@@ -31,6 +31,14 @@ contract Loihi is DSMath {
     }
 
     function excludeAdaptation (address numeraire) public {
+
+    }
+
+    function includeReserve (address reserve, address numeraire) public {
+
+    }
+
+    function excludeReserve (address reserve) public {
 
     }
 
@@ -90,49 +98,56 @@ contract Loihi is DSMath {
         uint256 oPool; // origin pool balance
         uint256 tPool; // target pool balance
         uint256 tAmt; // target swap amount
-        uint256 sheerLiq; // total liquidity in all coins
+        uint256 grossLiq; // total liquidity in all coins
 
         for (uint i = 0; i < reservesList.length; i++) {
             if (reservesList[i] == oRolo.reserve) {
                 oAmt = getNumeraireAmount(oRolo.adaptation, oAmt);
                 oPool = add(getBalance(oRolo.reserve), oAmt);
-                sheerLiq += oPool;
+                grossLiq += oPool;
             } else if (reservesList[i] == tRolo.reserve) {
                 tPool = getBalance(tRolo.reserve);
-                sheerLiq += tPool;
-            } else sheerLiq += getBalance(reservesList[i]);
+                grossLiq += tPool;
+            } else grossLiq += getBalance(reservesList[i]);
         }
 
-        require(oPool <= wmul(oRolo.weight, wmul(sheerLiq, alpha + WAD)), "origin swap halt check");
+        require(oPool <= wmul(oRolo.weight, wmul(grossLiq, alpha + WAD)), "origin swap halt check");
 
-        uint256 check = wmul(oRolo.weight, wmul(sheerLiq, beta + WAD));
-        if (oPool < check) {
-            tAmt = oAmt;
-        } else if (sub(oPool, oAmt) >= check) {
-            uint256 fee = wdiv(oAmt, wmul(oRolo.weight, sheerLiq));
-            tAmt = wmul(oAmt, WAD - wmul(fee, feeDerivative));
+        uint256 feeThreshold = wmul(oRolo.weight, wmul(grossLiq, beta + WAD));
+        if (oPool < feeThreshold) {
+            oAmt = oAmt;
+        } else if (sub(oPool, oAmt) >= feeThreshold) {
+            uint256 fee = wmul(feeDerivative, wdiv(oAmt, wmul(oRolo.weight, grossLiq)));
+            oAmt = wmul(oAmt, WAD - fee);
         } else {
             uint256 fee = wmul(feeDerivative, wdiv(
-                sub(oPool, wmul(oRolo.weight, wmul(sheerLiq, beta + WAD))),
-                wmul(oRolo.weight, sheerLiq)
+                sub(oPool, feeThreshold),
+                wmul(oRolo.weight, grossLiq)
             ));
-            tAmt = wmul(oAmt, WAD - fee);
+            oAmt = add(
+                sub(feeThreshold, sub(oPool, oAmt)),
+                wmul(sub(oPool, feeThreshold), WAD - fee)
+            );
         }
 
-        require(sub(tPool, tAmt) >= wmul(tRolo.weight, wmul(sheerLiq, WAD - alpha)), "target swap halt check");
+        tAmt = oAmt;
+        require(sub(tPool, tAmt) >= wmul(tRolo.weight, wmul(grossLiq, WAD - alpha)), "target swap halt check");
 
-        check = wmul(tRolo.weight, wmul(sheerLiq, WAD - beta));
-        if (sub(tPool, tAmt) > check) {
+        feeThreshold = wmul(tRolo.weight, wmul(grossLiq, WAD - beta));
+        if (sub(tPool, tAmt) > feeThreshold) {
             tAmt = wmul(tAmt, WAD - feeBase);
-        } else if (tPool <= check) {
-            uint256 fee = wmul(feeDerivative, wdiv(tAmt, wmul(tRolo.weight, sheerLiq))) + feeBase;
+        } else if (tPool <= feeThreshold) {
+            uint256 fee = wmul(feeDerivative, wdiv(tAmt, wmul(tRolo.weight, grossLiq))) - feeBase;
             tAmt = wmul(tAmt, WAD - fee);
         } else {
             uint256 fee = wmul(feeDerivative, wdiv(
-                sub(wmul(tRolo.weight, wmul(sheerLiq, WAD - beta)), sub(tPool, tAmt)),
-                wmul(tRolo.weight, sheerLiq)
-            )) + feeBase;
-            tAmt = wmul(tAmt, WAD - fee);
+                sub(feeThreshold, sub(tPool, tAmt)),
+                wmul(tRolo.weight, grossLiq)
+            ));
+            tAmt = wmul(add(
+                sub(tPool, feeThreshold),
+                wmul(sub(feeThreshold, sub(tPool, tAmt)), WAD - fee);
+            ), WAD - feeBase);
         }
 
         if (oRolo.reserve == origin) {
@@ -159,47 +174,55 @@ contract Loihi is DSMath {
         uint256 tPool; // target pool balance
         uint256 oPool; // origin pool balance
         uint256 oAmt; // origin swap amount
-        uint256 sheerLiq; // gross liquidity
+        uint256 grossLiq; // gross liquidity
 
         for (uint i = 0; i < reservesList.length; i++) {
             if (reservesList[i] == oRolo.reserve) {
                 oPool = getBalance(oRolo.reserve);
-                sheerLiq += oPool;
+                grossLiq += oPool;
             } else if (reservesList[i] == tRolo.reserve) {
                 tAmt = getNumeraireAmount(tRolo.adaptation, tAmt);
                 tPool = sub(getBalance(tRolo.reserve), tAmt);
-                sheerLiq += tPool;
-            } else sheerLiq += getBalance(reservesList[i]);
+                grossLiq += tPool;
+            } else grossLiq += getBalance(reservesList[i]);
         }
 
-        require(tPool - tAmt >= wmul(tRolo.weight, wmul(sheerLiq, WAD - alpha)), "target halt check");
+        require(tPool - tAmt >= wmul(tRolo.weight, wmul(grossLiq, WAD - alpha)), "target halt check");
 
-        uint256 check = wmul(tRolo.weight, wmul(sheerLiq, WAD - beta));
-        if (tPool > check) {
-            oAmt = wmul(tAmt, WAD - feeBase);
-        } else if (add(tPool, tAmt) <= check) {
-            uint256 fee = wmul(feeDerivative, wdiv(tAmt, wmul(tRolo.weight, sheerLiq))) + feeBase;
-            oAmt = wmul(tAmt, WAD + fee);
+        uint256 feeThreshold = wmul(tRolo.weight, wmul(grossLiq, WAD - beta));
+        if (tPool > feeThreshold) {
+            tAmt = wmul(tAmt, WAD - feeBase);
+        } else if (add(tPool, tAmt) <= feeThreshold) {
+            uint256 fee = wmul(feeDerivative, wdiv(tAmt, wmul(tRolo.weight, grossLiq))) + feeBase;
+            tAmt = wmul(tAmt, WAD + fee);
         } else {
             uint256 fee = wmul(feeDerivative, wdiv(
-                    sub(wmul(tRolo.weight, wmul(sheerLiq, WAD - beta)), tPool),
-                    wmul(tRolo.weight, sheerLiq)
-            )) + feeBase;
-            oAmt = wmul(tAmt, WAD + fee);
-        }
-
-        require(oPool + oAmt <= wmul(oRolo.weight, wmul(sheerLiq, WAD + alpha)));
-        check = wmul(oRolo.weight, wmul(sheerLiq, WAD + beta));
-        if (oPool + oAmt < check) { }
-        else if (oPool >= check) {
-            uint256 fee = wmul(feeDerivative, wdiv(oRolo.weight, sheerLiq));
-            oAmt = wmul(oAmt, WAD + fee);
-        } else {
-            uint256 fee = wmul(feeDerivative, wdiv(
-                sub(wmul(oRolo.weight, wmul(sheerLiq, WAD + beta)), oPool),
-                wmul(oRolo.weight, sheerLiq)
+                    sub(feeThreshold, tPool),
+                    wmul(tRolo.weight, grossLiq)
             ));
+            tAmt = wmul(add(
+                sub(add(tPool, tAmt), feeThreshold),
+                wmul(sub(feeThreshold, tPool), WAD + fee)
+            ), WAD + feeBase);
+        }
+
+        oAmt = tAmt;
+        require(oPool + oAmt <= wmul(oRolo.weight, wmul(grossLiq, WAD + alpha)));
+
+        feeThreshold = wmul(oRolo.weight, wmul(grossLiq, WAD + beta));
+        if (oPool + oAmt < feeThreshold) { }
+        else if (oPool >= feeThreshold) {
+            uint256 fee = wmul(feeDerivative, wdiv(oRolo.weight, grossLiq));
             oAmt = wmul(oAmt, WAD + fee);
+        } else {
+            uint256 fee = wmul(feeDerivative, wdiv(
+                sub(feeThreshold, oPool),
+                wmul(oRolo.weight, grossLiq)
+            ));
+            oAmt = add(
+                sub(feeThreshold, oPool),
+                wmul(sub(add(oPool, oAmt), feeThreshold), WAD + fee)
+            );
         }
 
         if (oRolo.reserve == origin) {
@@ -246,18 +269,22 @@ contract Loihi is DSMath {
             uint256 newBalance = add(oldBalance, depositAmount);
 
             require(newBalance <= wmul(balances[i+2], wmul(newSum, alpha + WAD)), "halt check deposit");
-            uint256 check = wmul(balances[i+2], wmul(newSum, beta + WAD));
-            if (newBalance <= check) {
+
+            uint256 feeThreshold = wmul(balances[i+2], wmul(newSum, beta + WAD));
+            if (newBalance <= feeThreshold) {
                 newShells += depositAmount;
-            } else if (oldBalance > check) {
-                uint256 fee = wmul(feeDerivative, wdiv(depositAmount, wmul(balances[i+2], newSum)));
-                newShells = add(newShells, WAD - fee);
+            } else if (oldBalance > feeThreshold) {
+                uint256 feePrep = wmul(feeDerivative, wdiv(depositAmount, wmul(balances[i+2], newSum)));
+                newShells = add(newShells, WAD - feePrep);
             } else {
-                uint256 fee = wdiv(
-                    sub(newBalance, wmul(balances[i+2], wmul(newSum, beta+WAD))),
+                uint256 feePrep = wmul(feeDerivative, wdiv(
+                    sub(newBalance, feeThreshold),
                     wmul(balances[i+2], newBalance)
+                ));
+                newShells += add(
+                    sub(feeThreshold, oldBalance),
+                    wmul(sub(newBalance, feeThreshold), WAD - feePrep)
                 );
-                newShells = add(newShells, WAD - wmul(fee, feeDerivative));
         } }
 
     }
@@ -291,23 +318,27 @@ contract Loihi is DSMath {
 
             bool haltCheck = newBalance >= wmul(balances[i+2], wmul(newBalance, alpha - WAD));
             require(haltCheck, "withdraw halt check");
-
-            if (newBalance >= wmul(balances[i+2], wmul(newBalance, WAD - beta))) {
+            
+            uint256 feeThreshold = wmul(balances[i+2], wmul(newBalance, WAD - beta));
+            if (newBalance >= feeThreshold) {
                 shellsBurned += wmul(withdrawAmount, add(WAD, feeBase));
-            } else if (oldBalance < wmul(balances[i+2], wmul(newSum, WAD - beta))) {
-                uint256 fee = wdiv(withdrawAmount,
+            } else if (oldBalance < feeThreshold) {
+                uint256 feePrep = wdiv(withdrawAmount,
                     wmul(wmul(balances[i+2], newSum), wdiv(feeDerivative, WAD*2))
                 ) + feeBase;
-                shellsBurned += wmul(withdrawAmount, fee + WAD);
+                shellsBurned += wmul(withdrawAmount, feePrep + WAD);
             } else {
-                uint256 fee = wmul(
+                uint256 feePrep = wmul(
                     wdiv(
-                        sub(wmul(balances[i+2], wmul(newSum, WAD - beta)), newBalance),
+                        sub(feeThreshold, newBalance),
                         wmul(balances[i+2], newSum)
                     ),
-                    wdiv(feeDerivative, WAD*2)
-                ) + feeBase;
-                shellsBurned += wmul(withdrawAmount, fee + WAD);
+                    feeDerivative 
+                );
+                shellsBurned += wmul(add(
+                    sub(oldBalance, feeThreshold)
+                    wmul(sub(feeThreshold, newBalance), feePrep + WAD);
+                ), feeBase + WAD);
         }}
     }
 }

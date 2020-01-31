@@ -4,7 +4,7 @@ pragma solidity ^0.5.12;
 import "ds-math/math.sol";
 import "../CTokenI.sol";
 
-contract CUSDCAdaptation is DSMath {
+contract cUsdcAdaptation is DSMath {
 
     /**
         takes raw stablecoin amount and wraps it into an amount of flavor
