@@ -21,35 +21,31 @@ contract ChaiAdaptation is LoihiRoot {
         chai = ChaiI(_chai);
     }
 
-    // takes raw chai amount and transfers it to contract address
+    // takes raw chai amount
+    // transfers it into our balance
     function intake (address src, uint256 amount) public returns (uint256) {
         chai.transferFrom(src, address(this), amount);
         return amount;
     }
 
-    // takes numeraire dai amount and transfers corresponding chai to destination address
+    // takes numeraire amount
+    // transfers corresponding chai to destination address
     function output (address dst, uint256 amount) public returns (uint256) {
+        uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
         chai.move(dst, amount);
         return wdiv(amount, chi);
     }
 
-    // takes numeraire amount and deposits into chai
-    function lock (uint256 amount) public {
-        chai.join(address(this), amount);
-    }
-
-    // takes numeraire amount and withdraws frmo chai
-    function unlock (uint256 amount) public {
-        chai.draw(address(this), amount);
-    }
-
-    /**
-        takes number of flavor and returns corresponding number of numeraire
-     */
+    // takes chai amount
+    // tells corresponding numeraire value
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
         uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
         return wmul(amount, chi);
     }
 
+    // tells numeraire balance
+    function getNumeraireBalance () public returns (uint256) {
+        return chai.dai(address(this));
+    }
 
 }

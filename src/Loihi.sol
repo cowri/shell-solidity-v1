@@ -34,32 +34,19 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
-    function dGetBalance (address addr) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("getBalance()"));
+    function dGetNumeraireBalance (address addr) internal returns (uint256) {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("getNumeraireBalance()"));
         assert(success);
         return abi.decode(result, (uint256));
     }
 
-    function dWrap (address addr, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("wrap(uint256)", amount));
+    function dIntake (address src, uint256 amount) internal {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intake(address, uint256)", src, amount));
         assert(success);
-        return abi.decode(result, (uint256));
     }
 
-    function dUnwrap (address addr, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("unwrap(uint256)", amount));
-        assert(success);
-        return abi.decode(result, (uint256));
-    }
-
-    function dIntake (address addr, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intake(uint256)", amount));
-        assert(success);
-        return abi.decode(result, (uint256));
-    }
-
-    function dOutput (address addr, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("output(uint256)", amount));
+    function dOutput (address dst, uint256 amount) internal returns (uint256) {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("output(address, uint256)", src, amount));
         assert(success);
         return abi.decode(result, (uint256));
     }
@@ -88,14 +75,14 @@ contract Loihi is LoihiRoot {
         uint256 grossLiq; // total liquidity in all coins
 
         for (uint i = 0; i < reservesList.length; i++) {
-            if (reservesList[i] == oRolo.reserve) {
-                oNAmt = dGetNumeraireAmount(oRolo.adaptation, oAmt);
-                oPool = add(dGetBalance(oRolo.reserve), oNAmt);
+            if (reservesList[i] == oRolo.adapter) {
+                oNAmt = dGetNumeraireAmount(oRolo.adapter, oAmt);
+                oPool = add(dGetNumeraireBalance(oRolo.adapter, oNAmt);
                 grossLiq += oPool;
-            } else if (reservesList[i] == tRolo.reserve) {
-                tPool = dGetBalance(tRolo.reserve);
+            } else if (reservesList[i] == tRolo.adapter) {
+                tPool = dGetNumeraireBalance(tRolo.adapter);
                 grossLiq += tPool;
-            } else grossLiq += dGetBalance(reservesList[i]);
+            } else grossLiq += dGetNumeraireBalance(reservesList[i]);
         }
 
         require(oPool <= wmul(oRolo.weight, wmul(grossLiq, alpha + WAD)), "origin swap halt check");
@@ -139,20 +126,8 @@ contract Loihi is LoihiRoot {
             ), WAD - feeBase);
         }
 
-        if (oRolo.reserve == origin) {
-            dTransferFrom(oRolo.reserve, msg.sender, oAmt);
-        } else {
-            uint256 numeraire = dIntake(oRolo.adaptation, oAmt);
-            dWrap(oRolo.reserve, numeraire);
-        }
-
-        if (tRolo.reserve == target) {
-            uint256 raw = dGetRawAmount(tRolo.reserve, tNAmt);
-            dTransfer(tRolo.reserve, recipient, raw);
-        } else {
-            uint256 numeraire = dUnwrap(tRolo.reserve, tNAmt);
-            return dOutput(tRolo.adaptation, numeraire);
-        }
+        dIntake(oRolo.adapter, msg.sender, oAmt);
+        return dOutput(tRolo.adapter, recipient, tNAmt);
 
     }
 
@@ -216,19 +191,8 @@ contract Loihi is LoihiRoot {
             );
         }
 
-        if (oRolo.reserve == origin) {
-            dTransferFrom(oRolo.reserve, msg.sender, oAmt);
-        } else {
-            uint256 numeraire = dUnwrap(oRolo.adaptation, oAmt);
-            dWrap(oRolo.reserve, numeraire);
-        }
-
-        if (tRolo.reserve == target) {
-            dTransfer(tRolo.reserve, recipient, tAmt);
-        } else {
-            uint256 numeraire = dUnwrap(tRolo.reserve, tAmt);
-            return dWrap(tRolo.adaptation, numeraire);
-        }
+        dIntake(oRolo.adapter, msg.sender, oAmt);
+        return dOutput(tRolo.adapter, recipient, tNAmt);
 
     }
 
@@ -242,12 +206,12 @@ contract Loihi is LoihiRoot {
             for (uint j = 0; j < reservesList.length; j++) {
                 if (reservesList[i] == rolodex.reserve) {
                     if (balances[i] == 0) {
-                        balances[i] = dGetBalance(rolodex.reserve);
-                        balances[i+1] = dGetNumeraireAmount(rolodex.adaptation, _amounts[i]);
+                        balances[i] = dGetNumeraireBalance(rolodex.adapter);
+                        balances[i+1] = dGetNumeraireAmount(rolodex.adapter, _amounts[i]);
                         balances[i+2] = rolodex.weight;
                         newSum = add(balances[i+1], newSum);
                     } else {
-                        uint256 numeraireDeposit = dGetNumeraireAmount(rolodex.adaptation, _amounts[i]);
+                        uint256 numeraireDeposit = dGetNumeraireAmount(rolodex.adapter, _amounts[i]);
                         balances[i+1] = add(numeraireDeposit, balances[i+1]);
                         newSum = add(numeraireDeposit, newSum);
                     }
@@ -292,12 +256,12 @@ contract Loihi is LoihiRoot {
             for (uint j = 0; j < reservesList.length; j++) {
                 if (reservesList[i] == rolodex.reserve) {
                     if (balances[i] == 0) {
-                        balances[i] = dGetBalance(rolodex.reserve);
-                        balances[i+1] = dGetNumeraireAmount(rolodex.adaptation, _amounts[i]);
+                        balances[i] = dGetNumeraireBalance(rolodex.adapter);
+                        balances[i+1] = dGetNumeraireAmount(rolodex.adapter, _amounts[i]);
                         balances[i+2] = rolodex.weight;
                         newSum = sub(add(newSum, balances[i]), balances[i+1]);
                     } else {
-                        uint256 numeraireWithdraw = dGetNumeraireAmount(rolodex.adaptation, _amounts[i]);
+                        uint256 numeraireWithdraw = dGetNumeraireAmount(rolodex.adapter, _amounts[i]);
                         balances[i+1] = add(numeraireWithdraw, balances[i+1]);
                         newSum = sub(newSum, numeraireWithdraw);
                     }

@@ -14,13 +14,13 @@ contract cUsdcAdaptation is DSMath {
         usdc = ERC20I(usdc);
     }
 
-   // takes raw cUsdc amount and transfers it in
+    // takes raw cUsdc amount and transfers it in
     function intake (uint256 amount) public returns (uint256) {
         cUsdc.transferFrom(msg.sender, address(this), amount);
     }
 
-    // takes numeraire amount and sends corresponding cUsdc
-    // amount to destination
+    // takes numeraire amount
+    // transfers corresponding cusdc to destination
     function output (address dst, uint256 amount) public returns (uint256) {
         uint256 rate = cUsdc.exchangeRateCurrent();
         amount = wmul(amount / 10000000000, rate);
@@ -28,20 +28,15 @@ contract cUsdcAdaptation is DSMath {
         return amount;
     }
 
-    function lock (uint256 amount) public {
-        usdc.approve(amount);
-        cUsdc.mint(amount);
-    }
-
-    function unlock (uint256 amount) public {
-        uint256 rate = cUsdc.exchangeRateCurrent();
-        cUsdc.redeemUnderlying(amount);
-    }
-
-    /**
-        takes number of flavor and returns corresponding number of numeraire
-     */
+    // takes raw cusdc amount
+    // returns corresponding numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
+        uint256 rate = cUsdc.exchangeRateCurrent();
+        return wdiv(amount / 10000000000, rate);
+    }
+
+    // returns numeraire amount of balance
+    function getNumeraireBalance () public returns (uint256) {
         uint256 rate = cUsdc.exchangeRateCurrent();
         return wdiv(amount / 10000000000, rate);
     }

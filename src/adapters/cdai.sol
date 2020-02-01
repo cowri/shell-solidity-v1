@@ -6,23 +6,33 @@ import "../CTokenI.sol";
 import "../ERC20I.sol";
 
 contract cDaiAdaptation is DSMath {
+    ChaiI chai;
     CTokenI cDai;
     ERC20I dai;
 
-    constructor (address _dai, address _cDai) public {
+    constructor (address _dai, address _cDai, address _chai) public {
+        chai = ChaiI(_chai);
         dai = ERC20I(_dai);
         cDai = CTokenI(_cDai);
     }
 
-    // takes raw cToken amount and unwraps it into dai
+    // takes raw cDai amount 
+    // unwraps it into dai
+    // deposits dai amount in chai
     function intake (uint256 amount) public returns (uint256) {
         cDai.transferFrom(msg.sender, address(this), amount);
+        uint256 bal = dai.balanceOf(address(this));
         cDai.redeem(amount);
+        bal = sub(dai.balanceOf(address(this)), bal));
+        dai.approve(chai, bal);
+        chai.join(address(this), bal);
     }
 
-    // takes numeraire amount and wraps it into cdai amount
-    // then sends that to destination
+    // unwraps numeraire amount of dai from chai 
+    // wraps it into cdai amount
+    // sends that to destination
     function output (address dst, uint256 amount) public returns (uint256) {
+        chai.draw(address(this), amount);
         dai.approve(cDai, amount);
         uint256 bal = cDai.balanceOf(address(this));
         cDai.mint(amount);
@@ -31,12 +41,15 @@ contract cDaiAdaptation is DSMath {
         return bal;
     }
 
-    /**
-        takes number of flavor and returns corresponding number of numeraire
-     */
+    
+    // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
         uint256 rate = cDai.exchangeRateCurrent();
         return wdiv(amount / 10 ** 10, rate);
+    }
+
+    function getNumeraireBalance () public returns (uint256) {
+        return chai.dai(address(this));
     }
 
 }
