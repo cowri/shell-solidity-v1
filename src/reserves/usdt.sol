@@ -1,8 +1,9 @@
 pragma solidity ^0.5.12;
 
-contract ChaiReserve {
-    mapping(address => uint256) public reserves;
-    address constant reserve = address(0);
+import "../LoihiRoot.sol";
+
+contract UsdtReserve is LoihiRoot {
+    address reserve;
 
     constructor () public { }
 
@@ -19,14 +20,10 @@ contract ChaiReserve {
     }
 
     function transfer (uint256 amount) public returns (uint256) {
-        /*
-            Need to handle bad erc20
-        */
+        return amount;
     }
 
-    function transferFrom () public returns (uint256) {
-        /*
-            Need to handle bad erc20 here?
-        */
+    function transferFrom (uint256 amount) public returns (uint256) {
+        return amount;
     }
 }

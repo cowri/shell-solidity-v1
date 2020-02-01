@@ -2,74 +2,64 @@ pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
 
+import "./LoihiRoot.sol";
 import "./ChaiI.sol";
 import "./CTokenI.sol";
 import "./ERC20I.sol";
 import "./ERC20Token.sol";
 
-contract Loihi is DSMath { 
+contract Loihi is LoihiRoot { 
 
-    mapping(address => uint256) public reserves;
-    mapping(address => Flavor) public flavors;
-    address[] public reservesList;
-    address[] public numeraireAssets;
-    struct Flavor { address adaptation; address reserve; uint256 weight; }
+    constructor() public { }
 
-    uint256 alpha = 950000000000000000; // 95%
-    uint256 beta = 475000000000000000; // half of 95%
-    uint256 feeBase = 500000000000000; // 5 bps 
-    uint256 feeDerivative = 52631578940000000; // marginal fee will be 5% at alpha point
-
-    constructor ( ) public {     }
-
-    function includeAdaptation (address numeraire, address adaptation, address reserve) public {
-
+    function includeAdaptation (address flavor, address adaptation, address reserve, uint256 weight) public {
+        flavors[flavor] = Flavor(adaptation, reserve, weight);
     }
 
-    function excludeAdaptation (address numeraire) public {
-
+    function excludeAdaptation (address flavor) public {
+        delete flavors[flavor];
     }
 
-    function includeReserve (address reserve, address numeraire) public {
-
+    function includeReserve (address reserve) public {
+        reservesList.push(reserve);
     }
 
     function excludeReserve (address reserve) public {
 
     }
 
-    function getNumeraireAmount (address addr, uint256 amount) internal returns (uint256) {
+    function dGetNumeraireAmount (address addr, uint256 amount) internal returns (uint256) {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("getNumeraireAmount(uint256)", amount));
         assert(success);
         return abi.decode(result, (uint256));
     }
 
-    function getBalance (address addr) internal returns (uint256) {
+    function dGetBalance (address addr) internal returns (uint256) {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("getBalance()"));
         assert(success);
         return abi.decode(result, (uint256));
     }
 
-    function wrap (address addr, uint256 amount) internal returns (uint256) {
+    function dWrap (address addr, uint256 amount) internal returns (uint256) {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("wrap(uint256)", amount));
         assert(success);
         return abi.decode(result, (uint256));
     }
 
-    function unwrap (address addr, uint256 amount) internal returns (uint256) {
+    function dUnwrap (address addr, uint256 amount) internal returns (uint256) {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("unwrap(uint256)", amount));
         assert(success);
         return abi.decode(result, (uint256));
     }
 
-    function transfer (address addr, address recipient, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("transfer(address, uint256)", recipient, amount));
+    function dIntake (address addr, uint256 amount) internal returns (uint256) {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intake(uint256)", amount));
         assert(success);
         return abi.decode(result, (uint256));
     }
 
-    function transferFrom (address addr, address from, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("transferFrom(address, uint256)", from, amount));
+    function dOutput (address addr, uint256 amount) internal returns (uint256) {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("output(uint256)", amount));
         assert(success);
         return abi.decode(result, (uint256));
     }
@@ -91,73 +81,77 @@ contract Loihi is DSMath {
 
         Flavor memory oRolo = flavors[origin]; // origin rolodex
         Flavor memory tRolo = flavors[target]; // target rolodex
+        uint256 oNAmt;
         uint256 oPool; // origin pool balance
         uint256 tPool; // target pool balance
-        uint256 tAmt; // target swap amount
+        uint256 tNAmt; // target swap amount
         uint256 grossLiq; // total liquidity in all coins
 
         for (uint i = 0; i < reservesList.length; i++) {
             if (reservesList[i] == oRolo.reserve) {
-                oAmt = getNumeraireAmount(oRolo.adaptation, oAmt);
-                oPool = add(getBalance(oRolo.reserve), oAmt);
+                oNAmt = dGetNumeraireAmount(oRolo.adaptation, oAmt);
+                oPool = add(dGetBalance(oRolo.reserve), oNAmt);
                 grossLiq += oPool;
             } else if (reservesList[i] == tRolo.reserve) {
-                tPool = getBalance(tRolo.reserve);
+                tPool = dGetBalance(tRolo.reserve);
                 grossLiq += tPool;
-            } else grossLiq += getBalance(reservesList[i]);
+            } else grossLiq += dGetBalance(reservesList[i]);
         }
 
         require(oPool <= wmul(oRolo.weight, wmul(grossLiq, alpha + WAD)), "origin swap halt check");
 
         uint256 feeThreshold = wmul(oRolo.weight, wmul(grossLiq, beta + WAD));
         if (oPool < feeThreshold) {
-            oAmt = oAmt;
-        } else if (sub(oPool, oAmt) >= feeThreshold) {
-            uint256 fee = wmul(feeDerivative, wdiv(oAmt, wmul(oRolo.weight, grossLiq)));
-            oAmt = wmul(oAmt, WAD - fee);
+            oNAmt = oNAmt;
+        } else if (sub(oPool, oNAmt) >= feeThreshold) {
+            uint256 fee = wdiv(oNAmt, wmul(oRolo.weight, grossLiq));
+            fee = wmul(fee, feeDerivative);
+            oNAmt = wmul(oNAmt, WAD - fee);
         } else {
+            uint256 oldBalance = sub(oPool, oNAmt);
             uint256 fee = wmul(feeDerivative, wdiv(
                 sub(oPool, feeThreshold),
                 wmul(oRolo.weight, grossLiq)
             ));
-            oAmt = add(
-                sub(feeThreshold, sub(oPool, oAmt)),
+            oNAmt = add(
+                sub(feeThreshold, oldBalance),
                 wmul(sub(oPool, feeThreshold), WAD - fee)
             );
         }
 
-        tAmt = oAmt;
-        require(sub(tPool, tAmt) >= wmul(tRolo.weight, wmul(grossLiq, WAD - alpha)), "target swap halt check");
+        tNAmt = oNAmt;
+        require(sub(tPool, tNAmt) >= wmul(tRolo.weight, wmul(grossLiq, WAD - alpha)), "target swap halt check");
 
         feeThreshold = wmul(tRolo.weight, wmul(grossLiq, WAD - beta));
-        if (sub(tPool, tAmt) > feeThreshold) {
-            tAmt = wmul(tAmt, WAD - feeBase);
+        if (sub(tPool, tNAmt) > feeThreshold) {
+            tNAmt = wmul(tNAmt, WAD - feeBase);
         } else if (tPool <= feeThreshold) {
-            uint256 fee = wmul(feeDerivative, wdiv(tAmt, wmul(tRolo.weight, grossLiq))) - feeBase;
-            tAmt = wmul(tAmt, WAD - fee);
+            uint256 fee = wmul(feeDerivative, wdiv(tNAmt, wmul(tRolo.weight, grossLiq))) - feeBase;
+            tNAmt = wmul(tNAmt, WAD - fee);
         } else {
             uint256 fee = wmul(feeDerivative, wdiv(
-                sub(feeThreshold, sub(tPool, tAmt)),
+                sub(feeThreshold, sub(tPool, tNAmt)),
                 wmul(tRolo.weight, grossLiq)
             ));
-            tAmt = wmul(add(
+            tNAmt = wmul(add(
                 sub(tPool, feeThreshold),
-                wmul(sub(feeThreshold, sub(tPool, tAmt)), WAD - fee)
+                wmul(sub(feeThreshold, sub(tPool, tNAmt)), WAD - fee)
             ), WAD - feeBase);
         }
 
         if (oRolo.reserve == origin) {
-            transferFrom(oRolo.reserve, msg.sender, oAmt);
+            dTransferFrom(oRolo.reserve, msg.sender, oAmt);
         } else {
-            uint256 numeraire = unwrap(oRolo.adaptation, oAmt);
-            wrap(oRolo.reserve, numeraire);
+            uint256 numeraire = dIntake(oRolo.adaptation, oAmt);
+            dWrap(oRolo.reserve, numeraire);
         }
 
         if (tRolo.reserve == target) {
-            transfer(tRolo.reserve, recipient, tAmt);
+            uint256 raw = dGetRawAmount(tRolo.reserve, tNAmt);
+            dTransfer(tRolo.reserve, recipient, raw);
         } else {
-            uint256 numeraire = unwrap(tRolo.reserve, tAmt);
-            return wrap(tRolo.adaptation, numeraire);
+            uint256 numeraire = dUnwrap(tRolo.reserve, tNAmt);
+            return dOutput(tRolo.adaptation, numeraire);
         }
 
     }
@@ -174,13 +168,13 @@ contract Loihi is DSMath {
 
         for (uint i = 0; i < reservesList.length; i++) {
             if (reservesList[i] == oRolo.reserve) {
-                oPool = getBalance(oRolo.reserve);
+                oPool = dGetBalance(oRolo.reserve);
                 grossLiq += oPool;
             } else if (reservesList[i] == tRolo.reserve) {
-                tAmt = getNumeraireAmount(tRolo.adaptation, tAmt);
-                tPool = sub(getBalance(tRolo.reserve), tAmt);
+                tAmt = dGetNumeraireAmount(tRolo.adaptation, tAmt);
+                tPool = sub(dGetBalance(tRolo.reserve), tAmt);
                 grossLiq += tPool;
-            } else grossLiq += getBalance(reservesList[i]);
+            } else grossLiq += dGetBalance(reservesList[i]);
         }
 
         require(tPool - tAmt >= wmul(tRolo.weight, wmul(grossLiq, WAD - alpha)), "target halt check");
@@ -196,10 +190,11 @@ contract Loihi is DSMath {
                     sub(feeThreshold, tPool),
                     wmul(tRolo.weight, grossLiq)
             ));
-            tAmt = wmul(add(
+            tAmt = add(
                 sub(add(tPool, tAmt), feeThreshold),
                 wmul(sub(feeThreshold, tPool), WAD + fee)
-            ), WAD + feeBase);
+            );
+            tAmt = wmul(tAmt, WAD + feeBase);
         }
 
         oAmt = tAmt;
@@ -222,17 +217,17 @@ contract Loihi is DSMath {
         }
 
         if (oRolo.reserve == origin) {
-            transferFrom(oRolo.reserve, msg.sender, oAmt);
+            dTransferFrom(oRolo.reserve, msg.sender, oAmt);
         } else {
-            uint256 numeraire = unwrap(oRolo.adaptation, oAmt);
-            wrap(oRolo.reserve, numeraire);
+            uint256 numeraire = dUnwrap(oRolo.adaptation, oAmt);
+            dWrap(oRolo.reserve, numeraire);
         }
 
         if (tRolo.reserve == target) {
-            transfer(tRolo.reserve, recipient, tAmt);
+            dTransfer(tRolo.reserve, recipient, tAmt);
         } else {
-            uint256 numeraire = unwrap(tRolo.reserve, tAmt);
-            return wrap(tRolo.adaptation, numeraire);
+            uint256 numeraire = dUnwrap(tRolo.reserve, tAmt);
+            return dWrap(tRolo.adaptation, numeraire);
         }
 
     }
@@ -247,12 +242,12 @@ contract Loihi is DSMath {
             for (uint j = 0; j < reservesList.length; j++) {
                 if (reservesList[i] == rolodex.reserve) {
                     if (balances[i] == 0) {
-                        balances[i] = getBalance(rolodex.reserve);
-                        balances[i+1] = getNumeraireAmount(rolodex.adaptation, _amounts[i]);
+                        balances[i] = dGetBalance(rolodex.reserve);
+                        balances[i+1] = dGetNumeraireAmount(rolodex.adaptation, _amounts[i]);
                         balances[i+2] = rolodex.weight;
                         newSum = add(balances[i+1], newSum);
                     } else {
-                        uint256 numeraireDeposit = getNumeraireAmount(rolodex.adaptation, _amounts[i]);
+                        uint256 numeraireDeposit = dGetNumeraireAmount(rolodex.adaptation, _amounts[i]);
                         balances[i+1] = add(numeraireDeposit, balances[i+1]);
                         newSum = add(numeraireDeposit, newSum);
                     }
@@ -297,12 +292,12 @@ contract Loihi is DSMath {
             for (uint j = 0; j < reservesList.length; j++) {
                 if (reservesList[i] == rolodex.reserve) {
                     if (balances[i] == 0) {
-                        balances[i] = getBalance(rolodex.reserve);
-                        balances[i+1] = getNumeraireAmount(rolodex.adaptation, _amounts[i]);
+                        balances[i] = dGetBalance(rolodex.reserve);
+                        balances[i+1] = dGetNumeraireAmount(rolodex.adaptation, _amounts[i]);
                         balances[i+2] = rolodex.weight;
                         newSum = sub(add(newSum, balances[i]), balances[i+1]);
                     } else {
-                        uint256 numeraireWithdraw = getNumeraireAmount(rolodex.adaptation, _amounts[i]);
+                        uint256 numeraireWithdraw = dGetNumeraireAmount(rolodex.adaptation, _amounts[i]);
                         balances[i+1] = add(numeraireWithdraw, balances[i+1]);
                         newSum = sub(newSum, numeraireWithdraw);
                     }

@@ -1,10 +1,10 @@
 pragma solidity ^0.5.12;
 
 import "../CTokenI.sol";
+import "../LoihiRoot.sol";
 
-contract Reserve {
-    mapping(address => uint256) public reserves;
-    address constant reserve = address(0);
+contract cUsdcReserve is LoihiRoot {
+    address reserve;
 
     constructor () public { }
 

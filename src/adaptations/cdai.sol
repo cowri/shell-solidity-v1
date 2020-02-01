@@ -3,32 +3,40 @@ pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
 import "../CTokenI.sol";
+import "../ERC20I.sol";
 
 contract cDaiAdaptation is DSMath {
+    CTokenI cDai;
+    ERC20I dai;
 
-    /**
-        takes raw stablecoin amount and wraps it into an amount of flavor
-        returns amount of flavor
-     */
-    function wrap (uint256 amount) public returns (uint256) {
-        return CTokenI(address(0)).mint(amount);
+    constructor (address _dai, address _cDai) public {
+        dai = ERC20I(_dai);
+        cDai = CTokenI(_cDai);
     }
 
-    /**
-        takes (numeraire/flavor?) amount and unwraps it into raw stablecoin amount
-        returns raw stablecoin amount
-     */
-    function unwrap (uint256 amount) public returns (uint256) {
-        CTokenI(address(0)).redeem(amount);
-        CTokenI(address(0)).redeemUnderlying(amount);
+    // takes raw cToken amount and unwraps it into dai
+    function intake (uint256 amount) public returns (uint256) {
+        cDai.transferFrom(msg.sender, address(this), amount);
+        cDai.redeem(amount);
+    }
+
+    // takes numeraire amount and wraps it into cdai amount
+    // then sends that to destination
+    function output (address dst, uint256 amount) public returns (uint256) {
+        dai.approve(cDai, amount);
+        uint256 bal = cDai.balanceOf(address(this));
+        cDai.mint(amount);
+        bal = sub(cDai.balanceOf(address(this), bal);
+        cDai.transfer(dst, bal);
+        return bal;
     }
 
     /**
         takes number of flavor and returns corresponding number of numeraire
      */
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        uint256 rate = CTokenI(address(0)).exchangeRateCurrent();
-        return amount;
+        uint256 rate = cDai.exchangeRateCurrent();
+        return wdiv(amount / 10 ** 10, rate);
     }
 
 }

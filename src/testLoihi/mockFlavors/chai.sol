@@ -22,7 +22,7 @@ contract ChaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
     }
 
     function join (address dst, uint wad) public {
-        underlying.transferFrom(msg.sender, wad);
+        underlying.transferFrom(msg.sender, dst, wad);
         mint(dst, wad / 2);
     }
 

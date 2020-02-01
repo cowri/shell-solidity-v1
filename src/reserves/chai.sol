@@ -1,30 +1,40 @@
 pragma solidity ^0.5.12;
 
 import "../ChaiI.sol";
+import "../LoihiRoot.sol";
 
-contract ChaiReserve {
-    mapping(address => uint256) public reserves;
-    address constant reserve = address(0);
+interface _PotLike {
+    function chi() external returns (uint256);
+    function rho() external returns (uint256);
+    function drip() external returns (uint256);
+}
 
-    constructor () public { }
+contract ChaiReserve is LoihiRoot {
+    address reserve;
+    ChaiI chai;
+    PotLike pot;
 
-    function getReserves () public returns (uint256) {
-        return reserves[reserve];
+    constructor (address _pot, address _chai) public {
+        reserve = address(this);
+        pot = _PotLike(_pot);
+        chai = ChaiI(_chai);
     }
 
-    function unwrap () public returns (uint256) {
-
+    function getNumeraireReserves () public returns (uint256) {
+        uint256 reserved = reserves[reserve];
+        uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
+        return wmul(reserved, chi);
     }
 
-    function wrap () public returns (uint256) {
-
+    function unwrap (uint256 amount) public returns (uint256) {
+        chai.exit(address(this), amount);
+        return wmul(amount, chi);
     }
 
-    function transfer () public returns (uint256) {
-
+    function wrap (uint256 amount) public returns (uint256) {
+        chai.join(address(this, amount));
+        uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
+        return wdiv(amount, chi);
     }
 
-    function transferFrom () public returns (uint256) {
-
-    }
 }
