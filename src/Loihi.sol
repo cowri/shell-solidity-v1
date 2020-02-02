@@ -1,12 +1,6 @@
 pragma solidity ^0.5.12;
 
-import "ds-math/math.sol";
-
 import "./LoihiRoot.sol";
-import "./ChaiI.sol";
-import "./CTokenI.sol";
-import "./ERC20I.sol";
-import "./ERC20Token.sol";
 
 contract Loihi is LoihiRoot { 
 
