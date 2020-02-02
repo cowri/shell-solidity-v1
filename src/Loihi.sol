@@ -20,14 +20,6 @@ contract Loihi is LoihiRoot {
         delete flavors[flavor];
     }
 
-    function includeReserve (address reserve) public {
-        reservesList.push(reserve);
-    }
-
-    function excludeReserve (address reserve) public {
-
-    }
-
     function dGetNumeraireAmount (address addr, uint256 amount) internal returns (uint256) {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("getNumeraireAmount(uint256)", amount));
         assert(success);
@@ -40,8 +32,8 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
-    function dIntake (address src, uint256 amount) internal {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intake(address, uint256)", src, amount));
+    function dIntakeRaw (address src, uint256 amount) internal {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intakeRaw(address, uint256)", src, amount));
         assert(success);
     }
 
@@ -66,39 +58,39 @@ contract Loihi is LoihiRoot {
 
     function executeOriginTrade (address origin, uint256 oAmt, address target, uint256 minTargetAmount, uint256 deadline, address recipient) public returns (uint256) {
 
-        Flavor memory oRolo = flavors[origin]; // origin rolodex
-        Flavor memory tRolo = flavors[target]; // target rolodex
-        uint256 oNAmt;
+        Flavor memory o = flavors[origin]; // origin rolodex
+        Flavor memory t = flavors[target]; // target rolodex
+        uint256 oNAmt; // origin numeraire amount
         uint256 oPool; // origin pool balance
         uint256 tPool; // target pool balance
-        uint256 tNAmt; // target swap amount
+        uint256 tNAmt; // target numeraire swap amount
         uint256 grossLiq; // total liquidity in all coins
 
         for (uint i = 0; i < reservesList.length; i++) {
-            if (reservesList[i] == oRolo.adapter) {
-                oNAmt = dGetNumeraireAmount(oRolo.adapter, oAmt);
-                oPool = add(dGetNumeraireBalance(oRolo.adapter, oNAmt);
+            if (reservesList[i] == o.adapter) {
+                oNAmt = dGetNumeraireAmount(o.adapter, oAmt);
+                oPool = add(dGetNumeraireBalance(o.adapter, oNAmt);
                 grossLiq += oPool;
-            } else if (reservesList[i] == tRolo.adapter) {
-                tPool = dGetNumeraireBalance(tRolo.adapter);
+            } else if (reservesList[i] == t.adapter) {
+                tPool = dGetNumeraireBalance(t.adapter);
                 grossLiq += tPool;
             } else grossLiq += dGetNumeraireBalance(reservesList[i]);
         }
 
-        require(oPool <= wmul(oRolo.weight, wmul(grossLiq, alpha + WAD)), "origin swap halt check");
+        require(oPool <= wmul(o.weight, wmul(grossLiq, alpha + WAD)), "origin swap halt check");
 
-        uint256 feeThreshold = wmul(oRolo.weight, wmul(grossLiq, beta + WAD));
+        uint256 feeThreshold = wmul(o.weight, wmul(grossLiq, beta + WAD));
         if (oPool < feeThreshold) {
             oNAmt = oNAmt;
         } else if (sub(oPool, oNAmt) >= feeThreshold) {
-            uint256 fee = wdiv(oNAmt, wmul(oRolo.weight, grossLiq));
+            uint256 fee = wdiv(oNAmt, wmul(o.weight, grossLiq));
             fee = wmul(fee, feeDerivative);
             oNAmt = wmul(oNAmt, WAD - fee);
         } else {
             uint256 oldBalance = sub(oPool, oNAmt);
             uint256 fee = wmul(feeDerivative, wdiv(
                 sub(oPool, feeThreshold),
-                wmul(oRolo.weight, grossLiq)
+                wmul(o.weight, grossLiq)
             ));
             oNAmt = add(
                 sub(feeThreshold, oldBalance),
@@ -107,18 +99,18 @@ contract Loihi is LoihiRoot {
         }
 
         tNAmt = oNAmt;
-        require(sub(tPool, tNAmt) >= wmul(tRolo.weight, wmul(grossLiq, WAD - alpha)), "target swap halt check");
+        require(sub(tPool, tNAmt) >= wmul(t.weight, wmul(grossLiq, WAD - alpha)), "target swap halt check");
 
-        feeThreshold = wmul(tRolo.weight, wmul(grossLiq, WAD - beta));
+        feeThreshold = wmul(t.weight, wmul(grossLiq, WAD - beta));
         if (sub(tPool, tNAmt) > feeThreshold) {
             tNAmt = wmul(tNAmt, WAD - feeBase);
         } else if (tPool <= feeThreshold) {
-            uint256 fee = wmul(feeDerivative, wdiv(tNAmt, wmul(tRolo.weight, grossLiq))) - feeBase;
+            uint256 fee = wmul(feeDerivative, wdiv(tNAmt, wmul(t.weight, grossLiq))) - feeBase;
             tNAmt = wmul(tNAmt, WAD - fee);
         } else {
             uint256 fee = wmul(feeDerivative, wdiv(
                 sub(feeThreshold, sub(tPool, tNAmt)),
-                wmul(tRolo.weight, grossLiq)
+                wmul(t.weight, grossLiq)
             ));
             tNAmt = wmul(add(
                 sub(tPool, feeThreshold),
@@ -126,73 +118,74 @@ contract Loihi is LoihiRoot {
             ), WAD - feeBase);
         }
 
-        dIntake(oRolo.adapter, msg.sender, oAmt);
-        return dOutput(tRolo.adapter, recipient, tNAmt);
+        dIntakeRaw(o.adapter, msg.sender, oAmt);
+        dOutputNumeraire(t.adapter, recipient, tNAmt);
 
     }
 
     function executeTargetTrade (address origin, uint256 maxOriginAmount, address target, uint256 tAmt, uint256 deadline, address recipient) public returns (uint256) {
         require(deadline > now, "transaction deadline has passed");
 
-        Flavor memory tRolo = flavors[target]; // target rolodex
-        Flavor memory oRolo = flavors[origin]; // origin rolodex
+        Flavor memory t = flavors[target]; // target rolodex
+        Flavor memory o = flavors[origin]; // origin rolodex
+        uint256 tNAmt; // target numeraire swap amount
         uint256 tPool; // target pool balance
         uint256 oPool; // origin pool balance
-        uint256 oAmt; // origin swap amount
+        uint256 oNAmt; // origin numeriare swap amount
         uint256 grossLiq; // gross liquidity
 
         for (uint i = 0; i < reservesList.length; i++) {
-            if (reservesList[i] == oRolo.reserve) {
-                oPool = dGetBalance(oRolo.reserve);
+            if (reservesList[i] == o.reserve) {
+                oPool = dGetBalance(o.reserve);
                 grossLiq += oPool;
-            } else if (reservesList[i] == tRolo.reserve) {
-                tAmt = dGetNumeraireAmount(tRolo.adaptation, tAmt);
-                tPool = sub(dGetBalance(tRolo.reserve), tAmt);
+            } else if (reservesList[i] == t.reserve) {
+                tNAmt = dGetNumeraireAmount(t.adaptation, tNAmt);
+                tPool = sub(dGetBalance(t.reserve), tNAmt);
                 grossLiq += tPool;
             } else grossLiq += dGetBalance(reservesList[i]);
         }
 
-        require(tPool - tAmt >= wmul(tRolo.weight, wmul(grossLiq, WAD - alpha)), "target halt check");
+        require(tPool - tNAmt >= wmul(t.weight, wmul(grossLiq, WAD - alpha)), "target halt check");
 
-        uint256 feeThreshold = wmul(tRolo.weight, wmul(grossLiq, WAD - beta));
+        uint256 feeThreshold = wmul(t.weight, wmul(grossLiq, WAD - beta));
         if (tPool > feeThreshold) {
-            tAmt = wmul(tAmt, WAD - feeBase);
-        } else if (add(tPool, tAmt) <= feeThreshold) {
-            uint256 fee = wmul(feeDerivative, wdiv(tAmt, wmul(tRolo.weight, grossLiq))) + feeBase;
-            tAmt = wmul(tAmt, WAD + fee);
+            tNAmt = wmul(tNAmt, WAD - feeBase);
+        } else if (add(tPool, tNAmt) <= feeThreshold) {
+            uint256 fee = wmul(feeDerivative, wdiv(tNAmt, wmul(t.weight, grossLiq))) + feeBase;
+            tNAmt = wmul(tNAmt, WAD + fee);
         } else {
             uint256 fee = wmul(feeDerivative, wdiv(
                     sub(feeThreshold, tPool),
-                    wmul(tRolo.weight, grossLiq)
+                    wmul(t.weight, grossLiq)
             ));
-            tAmt = add(
-                sub(add(tPool, tAmt), feeThreshold),
+            tNAmt = add(
+                sub(add(tPool, tNAmt), feeThreshold),
                 wmul(sub(feeThreshold, tPool), WAD + fee)
             );
-            tAmt = wmul(tAmt, WAD + feeBase);
+            tNAmt = wmul(tNAmt, WAD + feeBase);
         }
 
-        oAmt = tAmt;
-        require(oPool + oAmt <= wmul(oRolo.weight, wmul(grossLiq, WAD + alpha)));
+        oNAmt = tNAmt;
+        require(oPool + oNAmt <= wmul(o.weight, wmul(grossLiq, WAD + alpha)));
 
-        feeThreshold = wmul(oRolo.weight, wmul(grossLiq, WAD + beta));
-        if (oPool + oAmt < feeThreshold) { }
+        feeThreshold = wmul(o.weight, wmul(grossLiq, WAD + beta));
+        if (oPool + oNAmt < feeThreshold) { }
         else if (oPool >= feeThreshold) {
-            uint256 fee = wmul(feeDerivative, wdiv(oRolo.weight, grossLiq));
-            oAmt = wmul(oAmt, WAD + fee);
+            uint256 fee = wmul(feeDerivative, wdiv(o.weight, grossLiq));
+            oNAmt = wmul(oNAmt, WAD + fee);
         } else {
             uint256 fee = wmul(feeDerivative, wdiv(
                 sub(feeThreshold, oPool),
-                wmul(oRolo.weight, grossLiq)
+                wmul(o.weight, grossLiq)
             ));
-            oAmt = add(
+            oNAmt = add(
                 sub(feeThreshold, oPool),
-                wmul(sub(add(oPool, oAmt), feeThreshold), WAD + fee)
+                wmul(sub(add(oPool, oNAmt), feeThreshold), WAD + fee)
             );
         }
 
-        dIntake(oRolo.adapter, msg.sender, oAmt);
-        return dOutput(tRolo.adapter, recipient, tNAmt);
+        dOutputRaw(t.adapter, recipient, tAmt);
+        dIntakeNumeraire(o.adapter, msg.sender, oNAmt);
 
     }
 

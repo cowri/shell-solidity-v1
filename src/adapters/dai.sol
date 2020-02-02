@@ -5,15 +5,24 @@ import "ds-math/math.sol";
 import "../ERC20I.sol";
 
 contract DaiAdaptation is DSMath {
-    ERC20i dai;
+    ERC20I dai;
+    ChaiI chai;
 
-    constructor (address _dai) {
-        dai = _dai;
+    constructor (address _dai, address _chai) {
+        dai = ERC20I(_dai);
+        chai = ChaiI(_chai);
     }
 
     // transfers dai in
     // wraps it in chai
-    function intake (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 amount) public returns (uint256) {
+        dai.transferFrom(msg.sender, amount);
+        dai.approve(address(chai), amount);
+        chai.join(address(this), amount);
+        return amount;
+    }
+
+    function intakeNumeraire (uint256) public returns (uint256) {
         dai.transferFrom(msg.sender, amount);
         dai.approve(address(chai), amount);
         chai.join(address(this), amount);
@@ -21,7 +30,13 @@ contract DaiAdaptation is DSMath {
 
     // unwraps chai
     // transfers out dai
-    function output (address dst, uint256 amount) public returns (uint256) {
+    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+        chai.draw(address(this), amount);
+        dai.transfer(dst, amount);
+        return amount;
+    }
+
+    function outputNumeraire (address dst, uint256 amount) public {
         chai.draw(address(this), amount);
         dai.transfer(dst, amount);
     }

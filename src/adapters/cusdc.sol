@@ -15,15 +15,22 @@ contract cUsdcAdaptation is DSMath {
     }
 
     // takes raw cUsdc amount and transfers it in
-    function intake (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 amount) public returns (uint256) {
         cUsdc.transferFrom(msg.sender, address(this), amount);
     }
 
     // takes numeraire amount
     // transfers corresponding cusdc to destination
-    function output (address dst, uint256 amount) public returns (uint256) {
+    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         uint256 rate = cUsdc.exchangeRateCurrent();
         amount = wmul(amount / 10000000000, rate);
+        cUsdc.transfer(dst, amount);
+        return amount;
+    }
+
+    // takes raw amount
+    // transfers that amount to destination
+    function outputRaw (address dst, uint256 amount) public returns (uint256) {
         cUsdc.transfer(dst, amount);
         return amount;
     }

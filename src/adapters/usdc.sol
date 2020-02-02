@@ -15,19 +15,34 @@ contract UsdcAdaptation is DSMath {
 
     // transfers usdc in
     // wraps it in csudc
-    function intake (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 amount) public {
         usdc.transferFrom(msg.sender, address(this), amount);
         usdc.approve(address(cusdc), amount);
         cusdc.mint(amount);
+        return amount;
+    }
+
+    function intakeNumeraire (uint256 amount) public returns (uint256) {
+        usdc.transferFrom(msg.sender, address(this), amount);
+        usdc.approve(address(cusdc), amount);
+        cusdc.mint(amount);
+        return amount;
     }
 
     // redeems numeraire amount from cusdc
     // transfers it to destination
-    function output (address dst, uint256 amount) public returns (uint256) {
+    function outputNumeraire (address dst, uint256 amount) public {
         cusdc.redeemUnderlying(amount);
         usdc.transfer(dst, amount);
     }
 
+    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+        uint256 bal = usdc.balanceOf(address(this));
+        cusdc.redeem(amount);
+        bal = usdc.balanceOf(address(this)) - bal;
+        usdc.transfer(dst, amount);
+        return bal;
+    }
 
     // is already numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {

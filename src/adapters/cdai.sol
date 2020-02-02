@@ -19,7 +19,7 @@ contract cDaiAdaptation is DSMath {
     // takes raw cDai amount 
     // unwraps it into dai
     // deposits dai amount in chai
-    function intake (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 amount) public returns (uint256) {
         cDai.transferFrom(msg.sender, address(this), amount);
         uint256 bal = dai.balanceOf(address(this));
         cDai.redeem(amount);
@@ -31,7 +31,7 @@ contract cDaiAdaptation is DSMath {
     // unwraps numeraire amount of dai from chai 
     // wraps it into cdai amount
     // sends that to destination
-    function output (address dst, uint256 amount) public returns (uint256) {
+    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         chai.draw(address(this), amount);
         dai.approve(cDai, amount);
         uint256 bal = cDai.balanceOf(address(this));
@@ -39,6 +39,18 @@ contract cDaiAdaptation is DSMath {
         bal = sub(cDai.balanceOf(address(this), bal);
         cDai.transfer(dst, bal);
         return bal;
+    }
+
+    // takes raw cdai amount
+    // gets numeraire dai amount
+    // unwraps dai amount of chai
+    // wraps dai into cdai and sends to destination
+    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+        uint256 numeraire = getNumeraireAmount(amount);
+        chai.draw(numeraire);
+        cdai.mint(numeraire);
+        cdai.transfer(dst, numeraire);
+        return numeraire;
     }
 
     

@@ -14,13 +14,24 @@ contract UsdtAdaptation is SafeERC20, DSMath {
     }
 
     // transfers usdt into our balance
-    function intake (uint256 amount) public returns (uint256) {
-        safeTransferFrom(usdt, msg.sender, address(this));
+    function intakeRaw (uint256 amount) public returns (uint256) {
+        safeTransferFrom(usdt, msg.sender, address(this), amount);
+        return amount;
+    }
+
+    function intakeNumeraire (uint256 amount) public {
+        safeTransferFrom(usdt, msg.sender, address(this), amount);
     }
 
     // transfers usdt out of our balance
-    function output (address dst, uint256 amount) public returns (uint256) {
-        safeTransfer(dst, amount);
+    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+        safeTransfer(usdt, dst, amount);
+        return amount;
+    }
+
+    // transfers usdt to destination
+    function outputNumeraire (address dst, uint256 amount) public  {
+        safeTransfer(usdt, dst, amount);
         return amount;
     }
 
