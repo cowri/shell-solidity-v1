@@ -2,51 +2,59 @@
 pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
-import "../CTokenI.sol";
 import "../ERC20I.sol";
+import "../ChaiI.sol";
+import "../BadERC20I.sol";
+import "../CTokenI.sol";
+import "../PotI.sol";
+import "../LoihiRoot.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract cUsdcAdapter is DSMath {
+contract cUsdcAdapter is LoihiRoot {
 
-    CTokenI cUsdc;
+    ChaiI chai;
+    CTokenI cdai;
+    ERC20I dai;
+    PotI pot;
+    CTokenI cusdc;
     ERC20I usdc;
+    IERC20 usdt;
 
-    constructor (address _cUsdc, address _usdc) public {
-        cUsdc = CTokenI(_cUsdc);
-        usdc = ERC20I(_usdc);
-    }
+    constructor () public { }
 
-    // takes raw cUsdc amount and transfers it in
+    // takes raw cusdc amount and transfers it in
     function intakeRaw (uint256 amount) public returns (uint256) {
-        cUsdc.transferFrom(msg.sender, address(this), amount);
+        cusdc.transferFrom(msg.sender, address(this), amount);
     }
 
+    event log_uint(bytes32, uint256);
     // takes numeraire amount
     // transfers corresponding cusdc to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        uint256 rate = cUsdc.exchangeRateCurrent();
+        uint256 rate = cusdc.exchangeRateCurrent();
         amount = wmul(amount / 10000000000, rate);
-        cUsdc.transfer(dst, amount);
+        cusdc.transfer(dst, amount);
         return amount;
     }
 
     // takes raw amount
     // transfers that amount to destination
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
-        cUsdc.transfer(dst, amount);
+        cusdc.transfer(dst, amount);
         return amount;
     }
 
     // takes raw cusdc amount
     // returns corresponding numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        uint256 rate = cUsdc.exchangeRateCurrent();
-        return wdiv(amount / 10000000000, rate);
+        uint256 rate = cusdc.exchangeRateCurrent();
+        return wdiv(amount, rate);
     }
 
     // returns numeraire amount of balance
     function getNumeraireBalance () public returns (uint256) {
-        uint256 rate = cUsdc.exchangeRateCurrent();
-        uint256 bal = cUsdc.balanceOf(address(this));
+        uint256 rate = cusdc.exchangeRateCurrent();
+        uint256 bal = cusdc.balanceOf(address(this));
         return wdiv(bal / 10000000000, rate);
     }
 

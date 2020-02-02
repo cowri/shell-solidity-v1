@@ -7,12 +7,6 @@ import "./sandbox.sol";
 contract SandboxTest is DSMath, DSTest {
     Sandbox sandbox;
 
-    function setUp() public {
-        sandbox = new Sandbox();
-    }
-
-    // function testMe () public {
-
-    // }
+    function setUp() public { sandbox = new Sandbox(); }
 
 }

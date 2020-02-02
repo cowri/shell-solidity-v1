@@ -1,16 +1,43 @@
 pragma solidity ^0.5.12;
 
 import "./LoihiRoot.sol";
+import "./ChaiI.sol";
+import "./CTokenI.sol";
+import "./ERC20I.sol";
+import "./BadERC20I.sol";
+import "./PotI.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract Loihi is LoihiRoot { 
+contract Loihi is LoihiRoot {
 
+    ChaiI chai;
+    CTokenI cdai;
+    ERC20I dai;
+    PotI pot;
+    CTokenI cusdc;
+    ERC20I usdc;
+    IERC20 usdt;
 
-    function includeAdaptation (address flavor, address adapter, uint256 weight) public {
+    constructor (address _chai, address _cdai, address _dai, address _pot, address _cusdc, address _usdc, address _usdt) public {
+        chai = ChaiI(_chai);
+        cdai = CTokenI(_cdai);
+        dai = ERC20I(_dai);
+        pot = PotI(_pot);
+        cusdc = CTokenI(_cusdc);
+        usdc = ERC20I(_usdc);
+        usdt = IERC20(_usdt);
+    }
+
+    function includeAdapter (address flavor, address adapter, uint256 weight) public {
         flavors[flavor] = Flavor(adapter, weight);
     }
 
-    function excludeAdaptation (address flavor) public {
+    function excludeAdapter (address flavor) public {
         delete flavors[flavor];
+    }
+
+    function includeReserve (address adapter) public {
+        reservesList.push(adapter);
     }
 
     function dGetNumeraireAmount (address addr, uint256 amount) internal returns (uint256) {
@@ -19,8 +46,13 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
+    event log_address(bytes32, address);
+    event log_bool(bytes32, bool);
+
     function dGetNumeraireBalance (address addr) internal returns (uint256) {
+        emit log_address("get numeraire balance", addr);
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("getNumeraireBalance()"));
+        emit log_bool("success", success);
         assert(success);
         return abi.decode(result, (uint256));
     }
@@ -193,28 +225,55 @@ contract Loihi is LoihiRoot {
 
     }
 
+    event log_addr_arr(bytes32, address[]);
+    event log_uint_arr(bytes32, uint256[]);
+    event log_uint(bytes32, uint256);
+    event log(string);
+
     function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
+
+        emit log_addr_arr("_flavors", _flavors);
+        emit log_uint_arr("_amounts", _amounts);
+        emit log_address("loihi", address(this));
 
         uint256 oldSum;
         uint256 newSum;
         uint256 newShells;
         uint256[] memory balances = new uint256[](reservesList.length * 3);
-        for (uint i = 0; i < _flavors.length; i += 3) {
+        emit log_uint_arr("balances before", balances);
+        emit log_uint("reserves list length", reservesList.length);
+        for (uint i = 0; i < _flavors.length; i++) {
             Flavor memory d = flavors[_flavors[i]]; // depositing adapter/weight
+            emit log_uint("i", i);
             for (uint j = 0; j < reservesList.length; j++) {
-                if (reservesList[i] == d.adapter) {
-                    if (balances[i] == 0) {
-                        balances[i] = dGetNumeraireBalance(d.adapter);
-                        balances[i+1] = dGetNumeraireAmount(d.adapter, _amounts[i]);
-                        balances[i+2] = d.weight;
-                        newSum = add(balances[i+1], newSum);
+                emit log_uint("j", j);
+                if (reservesList[j] == d.adapter) {
+                    emit log("0-0-0-0-0-0-0-0-0-0-0-0-00-00-0");
+                    if (balances[j*3+1] == 0) {
+                        emit log_address("d.adapter", d.adapter);
+                        emit log_uint_arr("first", balances);
+                        balances[j*3] = dGetNumeraireBalance(d.adapter);
+                        emit log_uint_arr("second", balances);
+                        balances[j*3+1] = dGetNumeraireAmount(d.adapter, _amounts[i]);
+                        emit log_uint_arr("third", balances);
+                        balances[j*3+2] = d.weight;
+                        newSum = add(balances[j*3+1], newSum);
+                        emit log("~!~~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~");
+                        break;
                     } else {
+                        emit log_uint("balances[j] != 0", balances[j]);
                         uint256 numeraireDeposit = dGetNumeraireAmount(d.adapter, _amounts[i]);
-                        balances[i+1] = add(numeraireDeposit, balances[i+1]);
+                        balances[j*3+1] = add(numeraireDeposit, balances[j*3+1]);
                         newSum = add(numeraireDeposit, newSum);
+                        emit log("~!~~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~");
+                        break;
                     }
+                    emit log_uint_arr("balances j*3", balances);
+                    emit log("~!~~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~");
                     break;
         } } }
+
+        emit log_uint_arr("balances after", balances);
 
         for (uint i = 0; i < balances.length; i += 3) {
             uint256 oldBalance = balances[i];

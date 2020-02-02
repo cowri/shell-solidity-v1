@@ -36,7 +36,7 @@ contract cUsdcMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
     }
 
     function exchangeRateCurrent () external view returns (uint) {
-        return wdiv(WAD, 2);
+        return WAD / 2;
     }
 
 }

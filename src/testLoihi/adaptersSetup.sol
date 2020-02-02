@@ -8,12 +8,6 @@ import "../adapters/usdc.sol";
 import "../adapters/usdt.sol";
 import "./flavorsSetup.sol";
 
-contract PotMock {
-    constructor () public { }
-    function rho () public returns (uint256) { return now - 500; }
-    function drip () public returns (uint256) { return (10 ** 18) * 2; }
-    function chi () public returns (uint256) { return (10 ** 18) * 2; }
-}
 
 contract AdaptersSetup is FlavorsSetup {
     address chaiAdapter;
@@ -24,12 +18,12 @@ contract AdaptersSetup is FlavorsSetup {
     address usdtAdapter;
 
     function setupAdapters() public {
-        usdcAdapter = address(new UsdcAdapter(usdc, cusdc));
-        chaiAdapter = address(new ChaiAdapter(dai, address(new PotMock()), chai));
-        cdaiAdapter = address(new cDaiAdapter(dai, cdai, chai));
-        cusdcAdapter = address(new cUsdcAdapter(cusdc, usdc));
-        daiAdapter = address(new DaiAdapter(dai, chai));
-        usdtAdapter = address(new UsdtAdapter(usdt));
+        usdcAdapter = address(new UsdcAdapter());
+        chaiAdapter = address(new ChaiAdapter());
+        cdaiAdapter = address(new cDaiAdapter());
+        cusdcAdapter = address(new cUsdcAdapter());
+        daiAdapter = address(new DaiAdapter());
+        usdtAdapter = address(new UsdtAdapter());
     }
 
 

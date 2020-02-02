@@ -2,27 +2,25 @@
 pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
-import "../ChaiI.sol";
 import "../ERC20I.sol";
+import "../ChaiI.sol";
+import "../BadERC20I.sol";
+import "../CTokenI.sol";
+import "../PotI.sol";
 import "../LoihiRoot.sol";
-
-interface PotLike {
-    function chi() external returns (uint256);
-    function rho() external returns (uint256);
-    function drip() external returns (uint256);
-}
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract ChaiAdapter is LoihiRoot {
 
-    ERC20I dai;
-    PotLike pot;
     ChaiI chai;
+    CTokenI cdai;
+    ERC20I dai;
+    PotI pot;
+    CTokenI cusdc;
+    ERC20I usdc;
+    IERC20 usdt;
 
-    constructor (address _dai, address _pot, address _chai) public {
-        dai = ERC20I(_dai);
-        pot = PotLike(_pot);
-        chai = ChaiI(_chai);
-    }
+    constructor () public { }
 
     // takes raw chai amount
     // transfers it into our balance

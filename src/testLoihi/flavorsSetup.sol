@@ -17,7 +17,7 @@ contract FlavorsSetup {
     address cdai;
 
     function setupFlavors() public {
-        uint256 tokenAmount = 100000 * (10 ** 18);
+        uint256 tokenAmount = 10000000000000 * (10 ** 18);
         dai = address(new DaiMock("dai", "dai", 18, tokenAmount));
         chai = address(new ChaiMock(dai, "chai", "chai", 18, tokenAmount));
         cdai = address(new cDaiMock(dai, "cDai", "cdai", 18, tokenAmount));

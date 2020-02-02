@@ -3,15 +3,25 @@ pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
 import "../ERC20I.sol";
+import "../ChaiI.sol";
+import "../BadERC20I.sol";
+import "../CTokenI.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "../PotI.sol";
+import "../LoihiRoot.sol";
 
-contract UsdtAdapter is DSMath {
+contract UsdtAdapter is LoihiRoot {
+
+    ChaiI chai;
+    CTokenI cdai;
+    ERC20I dai;
+    PotI pot;
+    CTokenI cusdc;
+    ERC20I usdc;
     IERC20 usdt;
 
-    constructor (address _usdt) public {
-        usdt = IERC20(_usdt);
-    }
+    constructor () public { }
 
     // transfers usdt into our balance
     function intakeRaw (uint256 amount) public returns (uint256) {
@@ -40,7 +50,7 @@ contract UsdtAdapter is DSMath {
     }
 
     // returns balance
-    function getNumeraireBalance (uint256 amount) public returns (uint256) {
+    function getNumeraireBalance () public returns (uint256) {
         return usdt.balanceOf(address(this));
     }
 
