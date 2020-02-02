@@ -36,12 +36,11 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
         ERC20I(usdc).approve(address(l), 100000 * (10 ** 18));
         ERC20I(usdt).approve(address(l), 100000 * (10 ** 18));
 
-
         uint256 weight = WAD / 3;
 
-        l.includeReserve(chaiAdapter);
-        l.includeReserve(cusdcAdapter);
-        l.includeReserve(usdtAdapter);
+        l.includeReserveAndReserve(dai, chaiAdapter);
+        l.includeReserveAndReserve(usdc, cusdcAdapter);
+        l.includeReserveAndReserve(usdt, usdtAdapter);
 
         l.includeAdapter(chai, chaiAdapter, weight);
         l.includeAdapter(dai, daiAdapter, weight);

@@ -32,12 +32,13 @@ contract Loihi is LoihiRoot {
         flavors[flavor] = Flavor(adapter, weight);
     }
 
-    function excludeAdapter (address flavor) public {
-        delete flavors[flavor];
+    function includeNumeraireAndReserve (address numeraire, address reserve) public {
+        numeraires.push(numeraire);
+        reserves.push(reserve);
     }
 
-    function includeReserve (address adapter) public {
-        reservesList.push(adapter);
+    function excludeAdapter (address flavor) public {
+        delete flavors[flavor];
     }
 
     function dGetNumeraireAmount (address addr, uint256 amount) internal returns (uint256) {
@@ -102,15 +103,15 @@ contract Loihi is LoihiRoot {
         Flavor memory o = flavors[origin]; // origin adapter + weight
         Flavor memory t = flavors[target]; // target adapter + weight
 
-        for (uint i = 0; i < reservesList.length; i++) {
-            if (reservesList[i] == o.adapter) {
+        for (uint i = 0; i < reserves.length; i++) {
+            if (reserves[i] == o.adapter) {
                 oNAmt = dGetNumeraireAmount(o.adapter, oAmt);
                 oPool = add(dGetNumeraireBalance(o.adapter), oNAmt);
                 grossLiq += oPool;
-            } else if (reservesList[i] == t.adapter) {
+            } else if (reserves[i] == t.adapter) {
                 tPool = dGetNumeraireBalance(t.adapter);
                 grossLiq += tPool;
-            } else grossLiq += dGetNumeraireBalance(reservesList[i]);
+            } else grossLiq += dGetNumeraireBalance(reserves[i]);
         }
 
         require(oPool <= wmul(o.weight, wmul(grossLiq, alpha + WAD)), "origin swap halt check");
@@ -170,15 +171,15 @@ contract Loihi is LoihiRoot {
         uint256 oNAmt; // origin numeriare swap amount
         uint256 grossLiq; // gross liquidity
 
-        for (uint i = 0; i < reservesList.length; i++) {
-            if (reservesList[i] == o.adapter) {
+        for (uint i = 0; i < reserves.length; i++) {
+            if (reserves[i] == o.adapter) {
                 oPool = dGetNumeraireBalance(o.adapter);
                 grossLiq += oPool;
-            } else if (reservesList[i] == t.adapter) {
+            } else if (reserves[i] == t.adapter) {
                 tNAmt = dGetNumeraireAmount(t.adapter, tNAmt);
                 tPool = sub(dGetNumeraireBalance(t.adapter), tNAmt);
                 grossLiq += tPool;
-            } else grossLiq += dGetNumeraireBalance(reservesList[i]);
+            } else grossLiq += dGetNumeraireBalance(reserves[i]);
         }
 
         require(tPool - tNAmt >= wmul(t.weight, wmul(grossLiq, WAD - alpha)), "target halt check");
@@ -239,15 +240,15 @@ contract Loihi is LoihiRoot {
         uint256 oldSum;
         uint256 newSum;
         uint256 newShells;
-        uint256[] memory balances = new uint256[](reservesList.length * 3);
+        uint256[] memory balances = new uint256[](reserves.length * 3);
         emit log_uint_arr("balances before", balances);
-        emit log_uint("reserves list length", reservesList.length);
+        emit log_uint("reserves list length", reserves.length);
         for (uint i = 0; i < _flavors.length; i++) {
             Flavor memory d = flavors[_flavors[i]]; // depositing adapter/weight
             emit log_uint("i", i);
-            for (uint j = 0; j < reservesList.length; j++) {
+            for (uint j = 0; j < reserves.length; j++) {
                 emit log_uint("j", j);
-                if (reservesList[j] == d.adapter) {
+                if (reserves[j] == d.adapter) {
                     emit log("0-0-0-0-0-0-0-0-0-0-0-0-00-00-0");
                     if (balances[j*3+1] == 0) {
                         emit log_address("d.adapter", d.adapter);
@@ -312,11 +313,11 @@ contract Loihi is LoihiRoot {
         uint256 newSum;
         uint256 oldSum;
         uint256 shellsBurned;
-        uint256[] memory balances = new uint256[](reservesList.length * 3);
+        uint256[] memory balances = new uint256[](reserves.length * 3);
         for (uint i = 0; i < _flavors.length; i += 3) {
             Flavor memory w = flavors[_flavors[i]]; // withdrawing adapter + weight
-            for (uint j = 0; j < reservesList.length; j++) {
-                if (reservesList[i] == w.adapter) {
+            for (uint j = 0; j < reserves.length; j++) {
+                if (reserves[i] == w.adapter) {
                     if (balances[i] == 0) {
                         balances[i] = dGetNumeraireBalance(w.adapter);
                         balances[i+1] = dGetNumeraireAmount(w.adapter, _amounts[i]);
@@ -366,4 +367,34 @@ contract Loihi is LoihiRoot {
         _burnFrom(msg.sender, shellsBurned);
 
     }
+
+    function balancedDeposit (uint256 totalDeposit) public returns (uint256) {
+
+        uint256 totalBalance;
+        uint256 _totalSupply;
+
+        for (uint i = 0; i < reserves.length; i++) {
+            totalBalance += dGetNumeraireBalancere(reserveList[i]);
+            Flavor memory d = flavors[numeraires[i]];
+            uint256 depositAmount = wmul(d.weight, totalDeposit);
+            dIntakeNumeraire(d.adater, depositAmount);
+        }
+
+        if (totalBalance == 0) {
+            totalBalance = 1;
+            _totalSupply = 1;
+        }
+
+        uint256 newShells = wdiv(totalDeposit, wmul(totalBalance, _totalSupply));
+        _mint(msg.sender, newShells);
+
+        return newShells;
+
+    }
+
+    function balancedWithdraw () public returns (uint256) {
+
+    }
+
+
 }

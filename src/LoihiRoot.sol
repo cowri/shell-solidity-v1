@@ -10,8 +10,8 @@ contract LoihiRoot is ERC20Mintable, ERC20Burnable, DSMath, Ownable {
 
     mapping(address => uint256) public reserves;
     mapping(address => Flavor) public flavors;
-    address[] public reservesList;
-    address[] public numeraireAssets;
+    address[] public reserves;
+    address[] public numeraires;
     struct Flavor { address adapter; uint256 weight; }
 
     uint256 alpha = 950000000000000000; // 95%
