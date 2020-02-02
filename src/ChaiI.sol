@@ -10,4 +10,6 @@ interface ChaiI {
     function move(address src, address dst, uint wad) external returns (bool);
     function transfer(address dst, uint wad) external returns (bool);
     function transferFrom(address src, address dst, uint wad) external;
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
 }

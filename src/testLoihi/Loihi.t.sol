@@ -4,30 +4,24 @@ import "ds-test/test.sol";
 import "ds-math/math.sol";
 import "../Loihi.sol";
 import "./flavorsSetup.sol";
-import "./adaptationsSetup.sol";
-import "./reservesSetup.sol";
+import "./adaptersSetup.sol";
 
-contract LoihiTest is FlavorsSetup, ReservesSetup, AdaptationsSetup, DSMath, DSTest {
+contract LoihiTest is AdaptersSetup, DSMath, DSTest {
     Loihi l;
 
     function setUp() public {
         setupFlavors();
-        setupAdaptations();
-        setupReserves();
+        setupAdapters();
         l = new Loihi();
 
         uint256 weight = WAD / 3;
 
-        l.includeReserve(chaiReserve);
-        l.includeReserve(cusdcReserve);
-        l.includeReserve(usdtReserve);
-
-        l.includeAdaptation(chai, chaiAdapt, chaiReserve, weight);
-        l.includeAdaptation(dai, daiAdapt, chaiReserve, weight);
-        l.includeAdaptation(cdai, cdaiAdapt, chaiReserve, weight);
-        l.includeAdaptation(cusdc, cusdcAdapt, cusdcReserve, weight);
-        l.includeAdaptation(usdc, usdcAdapt, cusdcReserve, weight);
-        l.includeAdaptation(usdt, usdtAdapt, usdtReserve, weight);
+        l.includeAdaptation(chai, chaiAdapter, weight);
+        l.includeAdaptation(dai, daiAdapter, weight);
+        l.includeAdaptation(cdai, cdaiAdapter, weight);
+        l.includeAdaptation(cusdc, cusdcAdapter, weight);
+        l.includeAdaptation(usdc, usdcAdapter, weight);
+        l.includeAdaptation(usdt, usdtAdapter, weight);
     }
 
     function testDepositLiquidity () public {

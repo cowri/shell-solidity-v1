@@ -3,8 +3,9 @@ pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
 import "../ERC20I.sol";
+import "../CTokenI.sol";
 
-contract UsdcAdaptation is DSMath {
+contract UsdcAdapter is DSMath {
     ERC20I usdc;
     CTokenI cusdc;
 
@@ -19,7 +20,6 @@ contract UsdcAdaptation is DSMath {
         usdc.transferFrom(msg.sender, address(this), amount);
         usdc.approve(address(cusdc), amount);
         cusdc.mint(amount);
-        return amount;
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
@@ -53,6 +53,6 @@ contract UsdcAdaptation is DSMath {
     function getNumeraireBalance () public returns (uint256) {
         uint256 rate = cusdc.exchangeRateCurrent();
         uint256 bal = cusdc.balanceOf(address(this));
-        return wmul(amount * 10000000000, rate);
+        return wmul(bal * 10000000000, rate);
     }
 }

@@ -3,12 +3,13 @@ pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
 import "../ERC20I.sol";
+import "../ChaiI.sol";
 
-contract DaiAdaptation is DSMath {
+contract DaiAdapter is DSMath {
     ERC20I dai;
     ChaiI chai;
 
-    constructor (address _dai, address _chai) {
+    constructor (address _dai, address _chai) public {
         dai = ERC20I(_dai);
         chai = ChaiI(_chai);
     }
@@ -16,14 +17,14 @@ contract DaiAdaptation is DSMath {
     // transfers dai in
     // wraps it in chai
     function intakeRaw (uint256 amount) public returns (uint256) {
-        dai.transferFrom(msg.sender, amount);
+        dai.transferFrom(msg.sender, address(this), amount);
         dai.approve(address(chai), amount);
         chai.join(address(this), amount);
         return amount;
     }
 
-    function intakeNumeraire (uint256) public returns (uint256) {
-        dai.transferFrom(msg.sender, amount);
+    function intakeNumeraire (uint256 amount) public returns (uint256) {
+        dai.transferFrom(msg.sender, address(this), amount);
         dai.approve(address(chai), amount);
         chai.join(address(this), amount);
     }

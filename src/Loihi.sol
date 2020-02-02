@@ -10,10 +10,9 @@ import "./ERC20Token.sol";
 
 contract Loihi is LoihiRoot { 
 
-    constructor() public { }
 
-    function includeAdaptation (address flavor, address adaptation, address reserve, uint256 weight) public {
-        flavors[flavor] = Flavor(adaptation, reserve, weight);
+    function includeAdaptation (address flavor, address adapter, uint256 weight) public {
+        flavors[flavor] = Flavor(adapter, weight);
     }
 
     function excludeAdaptation (address flavor) public {
@@ -32,44 +31,55 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
-    function dIntakeRaw (address src, uint256 amount) internal {
+    function dIntakeRaw (address addr, address src, uint256 amount) internal {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intakeRaw(address, uint256)", src, amount));
         assert(success);
     }
 
-    function dOutput (address dst, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("output(address, uint256)", src, amount));
+    function dIntakeNumeraire (address addr, address src, uint256 amount) internal {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intakeNumeraire(address, uint256)", src, amount));
+        assert(success);
+    }
+
+    function dOutputRaw (address addr, address dst, uint256 amount) internal returns (uint256) {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("outputRaw(address, uint256)", dst, amount));
+        assert(success);
+        return abi.decode(result, (uint256));
+    }
+
+    function dOutputNumeraire (address addr, address dst, uint256 amount) internal returns (uint256) {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("outputNumeraire(address, uint256)", dst, amount));
         assert(success);
         return abi.decode(result, (uint256));
     }
 
     function swapByTarget (address origin, uint256 maxOriginAmount, address target, uint256 targetAmount, uint256 deadline) public returns (uint256) {
-        return executeTargetTrade(origin, maxOriginAmount, target, targetAmount, deadline, msg.sender);
+        return executeTargetTrade(origin, target, maxOriginAmount, targetAmount, deadline, msg.sender);
     }
     function transferByTarget (address origin, uint256 maxOriginAmount, address target, uint256 targetAmount, uint256 deadline, address recipient) public returns (uint256) {
-        return executeTargetTrade(origin, maxOriginAmount, target, targetAmount, deadline, recipient);
+        return executeTargetTrade(origin, target, maxOriginAmount, targetAmount, deadline, recipient);
     }
     function swapByOrigin (address origin, uint256 originAmount, address target, uint256 minTargetAmount, uint256 deadline) public returns (uint256) {
-        return executeOriginTrade(origin, originAmount, target, minTargetAmount, deadline, msg.sender);
+        return executeOriginTrade(origin, target, originAmount, minTargetAmount, deadline, msg.sender);
     }
     function transferByOrigin (address origin, uint256 originAmount, address target, uint256 minTargetAmount, uint256 deadline, address recipient) public returns (uint256) {
-        return executeOriginTrade(origin, originAmount, target, minTargetAmount, deadline, recipient);
+        return executeOriginTrade(origin, target, originAmount, minTargetAmount, deadline, recipient);
     }
 
-    function executeOriginTrade (address origin, uint256 oAmt, address target, uint256 minTargetAmount, uint256 deadline, address recipient) public returns (uint256) {
+    function executeOriginTrade (address origin, address target, uint256 oAmt, uint256 minTargetAmount, uint256 deadline, address recipient) public returns (uint256) {
 
-        Flavor memory o = flavors[origin]; // origin rolodex
-        Flavor memory t = flavors[target]; // target rolodex
         uint256 oNAmt; // origin numeraire amount
         uint256 oPool; // origin pool balance
         uint256 tPool; // target pool balance
         uint256 tNAmt; // target numeraire swap amount
         uint256 grossLiq; // total liquidity in all coins
+        Flavor memory o = flavors[origin]; // origin adapter + weight
+        Flavor memory t = flavors[target]; // target adapter + weight
 
         for (uint i = 0; i < reservesList.length; i++) {
             if (reservesList[i] == o.adapter) {
                 oNAmt = dGetNumeraireAmount(o.adapter, oAmt);
-                oPool = add(dGetNumeraireBalance(o.adapter, oNAmt);
+                oPool = add(dGetNumeraireBalance(o.adapter), oNAmt);
                 grossLiq += oPool;
             } else if (reservesList[i] == t.adapter) {
                 tPool = dGetNumeraireBalance(t.adapter);
@@ -123,11 +133,11 @@ contract Loihi is LoihiRoot {
 
     }
 
-    function executeTargetTrade (address origin, uint256 maxOriginAmount, address target, uint256 tAmt, uint256 deadline, address recipient) public returns (uint256) {
+    function executeTargetTrade (address origin, address target, uint256 maxOriginAmount, uint256 tAmt, uint256 deadline, address recipient) public returns (uint256) {
         require(deadline > now, "transaction deadline has passed");
 
-        Flavor memory t = flavors[target]; // target rolodex
-        Flavor memory o = flavors[origin]; // origin rolodex
+        Flavor memory t = flavors[target]; // target adapter + weight
+        Flavor memory o = flavors[origin]; // origin adapter + weight
         uint256 tNAmt; // target numeraire swap amount
         uint256 tPool; // target pool balance
         uint256 oPool; // origin pool balance
@@ -135,14 +145,14 @@ contract Loihi is LoihiRoot {
         uint256 grossLiq; // gross liquidity
 
         for (uint i = 0; i < reservesList.length; i++) {
-            if (reservesList[i] == o.reserve) {
-                oPool = dGetBalance(o.reserve);
+            if (reservesList[i] == o.adapter) {
+                oPool = dGetNumeraireBalance(o.adapter);
                 grossLiq += oPool;
-            } else if (reservesList[i] == t.reserve) {
-                tNAmt = dGetNumeraireAmount(t.adaptation, tNAmt);
-                tPool = sub(dGetBalance(t.reserve), tNAmt);
+            } else if (reservesList[i] == t.adapter) {
+                tNAmt = dGetNumeraireAmount(t.adapter, tNAmt);
+                tPool = sub(dGetNumeraireBalance(t.adapter), tNAmt);
                 grossLiq += tPool;
-            } else grossLiq += dGetBalance(reservesList[i]);
+            } else grossLiq += dGetNumeraireBalance(reservesList[i]);
         }
 
         require(tPool - tNAmt >= wmul(t.weight, wmul(grossLiq, WAD - alpha)), "target halt check");
@@ -191,20 +201,21 @@ contract Loihi is LoihiRoot {
 
     function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
 
+        uint256 oldSum;
         uint256 newSum;
         uint256 newShells;
         uint256[] memory balances = new uint256[](reservesList.length * 3);
         for (uint i = 0; i < _flavors.length; i += 3) {
-            Flavor memory rolodex = flavors[_flavors[i]];
+            Flavor memory d = flavors[_flavors[i]]; // depositing adapter/weight
             for (uint j = 0; j < reservesList.length; j++) {
-                if (reservesList[i] == rolodex.reserve) {
+                if (reservesList[i] == d.adapter) {
                     if (balances[i] == 0) {
-                        balances[i] = dGetNumeraireBalance(rolodex.adapter);
-                        balances[i+1] = dGetNumeraireAmount(rolodex.adapter, _amounts[i]);
-                        balances[i+2] = rolodex.weight;
+                        balances[i] = dGetNumeraireBalance(d.adapter);
+                        balances[i+1] = dGetNumeraireAmount(d.adapter, _amounts[i]);
+                        balances[i+2] = d.weight;
                         newSum = add(balances[i+1], newSum);
                     } else {
-                        uint256 numeraireDeposit = dGetNumeraireAmount(rolodex.adapter, _amounts[i]);
+                        uint256 numeraireDeposit = dGetNumeraireAmount(d.adapter, _amounts[i]);
                         balances[i+1] = add(numeraireDeposit, balances[i+1]);
                         newSum = add(numeraireDeposit, newSum);
                     }
@@ -235,26 +246,32 @@ contract Loihi is LoihiRoot {
                 );
         } }
 
-        // adjust shell token amount out of numeraire values into shell token denominations
+        newShells = wdiv(newShells, wmul(oldSum, totalSupply()));
+
+        for (uint i = 0; i < _flavors.length; i++) dOutputNumeraire(_flavors[i], msg.sender, _amounts[i]);
+
+        _mint(msg.sender, newShells);
 
     }
 
     function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
 
         uint256 newSum;
+        uint256 oldSum;
         uint256 shellsBurned;
         uint256[] memory balances = new uint256[](reservesList.length * 3);
         for (uint i = 0; i < _flavors.length; i += 3) {
-            Flavor memory rolodex = flavors[_flavors[i]];
+            Flavor memory w = flavors[_flavors[i]]; // withdrawing adapter + weight
             for (uint j = 0; j < reservesList.length; j++) {
-                if (reservesList[i] == rolodex.reserve) {
+                if (reservesList[i] == w.adapter) {
                     if (balances[i] == 0) {
-                        balances[i] = dGetNumeraireBalance(rolodex.adapter);
-                        balances[i+1] = dGetNumeraireAmount(rolodex.adapter, _amounts[i]);
-                        balances[i+2] = rolodex.weight;
+                        balances[i] = dGetNumeraireBalance(w.adapter);
+                        balances[i+1] = dGetNumeraireAmount(w.adapter, _amounts[i]);
+                        balances[i+2] = w.weight;
                         newSum = sub(add(newSum, balances[i]), balances[i+1]);
+                        oldSum += balances[i];
                     } else {
-                        uint256 numeraireWithdraw = dGetNumeraireAmount(rolodex.adapter, _amounts[i]);
+                        uint256 numeraireWithdraw = dGetNumeraireAmount(w.adapter, _amounts[i]);
                         balances[i+1] = add(numeraireWithdraw, balances[i+1]);
                         newSum = sub(newSum, numeraireWithdraw);
                     }
@@ -275,22 +292,25 @@ contract Loihi is LoihiRoot {
             } else if (oldBalance < feeThreshold) {
                 uint256 feePrep = wdiv(withdrawAmount,
                     wmul(wmul(balances[i+2], newSum), wdiv(feeDerivative, WAD*2))
-                ) + feeBase;
-                shellsBurned += wmul(withdrawAmount, feePrep + WAD);
-            } else {
-                uint256 feePrep = wmul(feeDerivative,
-                    wdiv(
-                        sub(feeThreshold, newBalance),
-                        wmul(balances[i+2], newSum)
-                    )
                 );
+                shellsBurned += wmul(withdrawAmount, feePrep + feeBase + WAD);
+            } else {
+                uint256 feePrep = wdiv(
+                    sub(feeThreshold, newBalance),
+                    wmul(balances[i+2], newSum)
+                );
+                feePrep = wmul(feeDerivative, feePrep);
                 shellsBurned += wmul(add(
                     sub(oldBalance, feeThreshold),
                     wmul(sub(feeThreshold, newBalance), feePrep + WAD)
                 ), feeBase + WAD);
         }}
 
-        // adjust shell token amount out of numeraire values into shell token denominations
+        shellsBurned = wdiv(shellsBurned, wmul(oldSum, totalSupply()));
+
+        for (uint i = 0; i < _flavors.length; i++) dOutputNumeraire(_flavors[i], msg.sender, _amounts[i]);
+
+        _burnFrom(msg.sender, shellsBurned);
 
     }
 }

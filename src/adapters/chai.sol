@@ -3,6 +3,7 @@ pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
 import "../ChaiI.sol";
+import "../ERC20I.sol";
 import "../LoihiRoot.sol";
 
 interface PotLike {
@@ -11,12 +12,14 @@ interface PotLike {
     function drip() external returns (uint256);
 }
 
-contract ChaiAdaptation is LoihiRoot {
+contract ChaiAdapter is LoihiRoot {
 
+    ERC20I dai;
     PotLike pot;
     ChaiI chai;
 
-    constructor (address _dai, aireaddress _pot, address _chai) public {
+    constructor (address _dai, address _pot, address _chai) public {
+        dai = ERC20I(_dai);
         pot = PotLike(_pot);
         chai = ChaiI(_chai);
     }
@@ -30,7 +33,7 @@ contract ChaiAdaptation is LoihiRoot {
 
     // takes numeraire amount
     // transfers corresponding chai into our balance;
-    function intakeNumeraire (address src, uint256 amount) puiblic returns (uint256) {
+    function intakeNumeraire (address src, uint256 amount) public returns (uint256) {
         uint256 bal = chai.balanceOf(address(src));
         chai.move(src, address(this), amount);
         bal = sub(chai.balanceOf(address(src)), bal);
@@ -41,7 +44,7 @@ contract ChaiAdaptation is LoihiRoot {
     // transfers corresponding chai to destination address
     function outputNunmeraire (address dst, uint256 amount) public returns (uint256) {
         uint256 bal = chai.balanceOf(address(this));
-        chai.move(dst, amount);
+        chai.move(address(this), dst, amount);
         return chai.balanceOf(address(this)) - bal;
     }
 
@@ -49,7 +52,7 @@ contract ChaiAdaptation is LoihiRoot {
     // transfers corresponding chai to destination address
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
         chai.transfer(dst, amount);
-        return amount
+        return amount;
     }
 
     // takes chai amount

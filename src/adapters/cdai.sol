@@ -3,17 +3,18 @@ pragma solidity ^0.5.12;
 
 import "ds-math/math.sol";
 import "../CTokenI.sol";
+import "../ChaiI.sol";
 import "../ERC20I.sol";
 
-contract cDaiAdaptation is DSMath {
+contract cDaiAdapter is DSMath {
     ChaiI chai;
     CTokenI cDai;
     ERC20I dai;
 
     constructor (address _dai, address _cDai, address _chai) public {
-        chai = ChaiI(_chai);
         dai = ERC20I(_dai);
         cDai = CTokenI(_cDai);
+        chai = ChaiI(_chai);
     }
 
     // takes raw cDai amount 
@@ -23,20 +24,20 @@ contract cDaiAdaptation is DSMath {
         cDai.transferFrom(msg.sender, address(this), amount);
         uint256 bal = dai.balanceOf(address(this));
         cDai.redeem(amount);
-        bal = sub(dai.balanceOf(address(this)), bal));
-        dai.approve(chai, bal);
+        bal = sub(dai.balanceOf(address(this)), bal);
+        dai.approve(address(chai), bal);
         chai.join(address(this), bal);
     }
 
-    // unwraps numeraire amount of dai from chai 
+    // unwraps numeraire amount of dai from chai
     // wraps it into cdai amount
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         chai.draw(address(this), amount);
-        dai.approve(cDai, amount);
+        dai.approve(address(cDai), amount);
         uint256 bal = cDai.balanceOf(address(this));
         cDai.mint(amount);
-        bal = sub(cDai.balanceOf(address(this), bal);
+        bal = sub(cDai.balanceOf(address(this)), bal);
         cDai.transfer(dst, bal);
         return bal;
     }
@@ -47,9 +48,9 @@ contract cDaiAdaptation is DSMath {
     // wraps dai into cdai and sends to destination
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
         uint256 numeraire = getNumeraireAmount(amount);
-        chai.draw(numeraire);
-        cdai.mint(numeraire);
-        cdai.transfer(dst, numeraire);
+        chai.draw(address(this), numeraire);
+        cDai.mint(numeraire);
+        cDai.transfer(dst, numeraire);
         return numeraire;
     }
 
