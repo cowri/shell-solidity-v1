@@ -2,11 +2,11 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 import "ds-math/math.sol";
-import "../Loihi.sol";
-import "../ERC20I.sol";
-import "./flavorsSetup.sol";
-import "./adaptersSetup.sol";
-import "../ChaiI.sol";
+import "../../Loihi.sol";
+import "../../ERC20I.sol";
+import "../flavorsSetup.sol";
+import "../adaptersSetup.sol";
+import "../../ChaiI.sol";
 
 contract PotMock {
     constructor () public { }
@@ -59,7 +59,7 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
 
     }
 
-    function testBalancedDeposit () public {
+    function testBalancedDepositFromZero () public {
 
         uint256 mintedShells = l.balancedDeposit(100 * (10 ** 18));
         uint256 balance = l.balanceOf(address(this));

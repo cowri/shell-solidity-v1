@@ -70,6 +70,9 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
+    event log_address(bytes32, address);
+    event log_bytes(bytes32, bytes);
+
     function dOutputNumeraire (address addr, address dst, uint256 amount) internal returns (uint256) {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("outputNumeraire(address, uint256)", dst, amount));
         assert(success);
@@ -366,7 +369,40 @@ contract Loihi is LoihiRoot {
 
     }
 
-    function balancedWithdraw () public returns (uint256) {
+    event log(bytes32);
+    event log_uint(bytes32, uint256);
+
+    function balancedWithdraw (uint256 totalWithdrawal) public returns (uint256[] memory) {
+
+        uint256[] memory withdrawalAmounts = new uint256[](reserves.length);
+        uint256 shellsToBurn = wmul(totalWithdrawal, WAD + feeBase);
+
+        emit log("one");
+        uint256 oldTotal;
+        for (uint i = 0; i < reserves.length; i++) {
+            withdrawalAmounts[i] = dGetNumeraireBalance(reserves[i]);
+            oldTotal += withdrawalAmounts[i];
+        }
+
+        emit log("two");
+        // withdrawal_amount_i = balance_i / old_sum * numeraire_to_withdraw
+
+        for (uint i = 0; i < reserves.length; i++) {
+            emit log_uint("totalWithdrawal", totalWithdrawal);
+            emit log_uint("oldTotal", oldTotal);
+            emit log_uint("balance of i", withdrawalAmounts[i]);
+            Flavor storage w = flavors[numeraires[i]];
+            uint256 numeraireToWithdraw = wmul(totalWithdrawal, wdiv(withdrawalAmounts[i], oldTotal));
+            // uint256 numeraireToWithdraw = wdiv(withdrawalAmounts[i], wmul(oldTotal, totalWithdrawal));
+            emit log_uint("numeraireToWithdraw", numeraireToWithdraw);
+            uint256 amountWithdrawn = dOutputNumeraire(w.adapter, msg.sender, numeraireToWithdraw);
+            emit log_uint("amountWithdrawn", amountWithdrawn);
+            withdrawalAmounts[i] = amountWithdrawn;
+        }
+
+
+        _burnFrom(msg.sender, shellsToBurn);
+        return withdrawalAmounts;
 
     }
 
