@@ -16,7 +16,7 @@ contract PotMock {
     function chi () public returns (uint256) { return (10 ** 18) * 2; }
 }
 
-contract SwapByTargetTest is AdaptersSetup, DSMath, DSTest {
+contract BalancedSwapByTargetTest is AdaptersSetup, DSMath, DSTest {
     Loihi l;
 
     function setUp() public {
@@ -50,12 +50,12 @@ contract SwapByTargetTest is AdaptersSetup, DSMath, DSTest {
         l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
 
-        l.balancedDeposit(300 * (10 ** 18));
-
         l.setAlpha((5 * WAD) / 10);
         l.setBeta((25 * WAD) / 100);
         l.setFeeDerivative(WAD / 10);
         l.setFeeBase(500000000000000);
+
+        l.balancedDeposit(300 * (10 ** 18));
 
     }
 

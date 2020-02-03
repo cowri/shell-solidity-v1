@@ -110,10 +110,6 @@ contract Loihi is LoihiRoot {
     event log_address(bytes32, address);
     event log_uint(bytes32, uint256);
     function executeOriginTrade (address origin, address target, uint256 oAmt, uint256 minTargetAmount, uint256 deadline, address recipient) public returns (uint256) {
-        emit log_address("origin", origin);
-        emit log_address("target", target);
-        emit log_uint("oAmt", oAmt);
-        emit log_uint("minTargetAmount", minTargetAmount);
 
         uint256 oNAmt; // origin numeraire amount
         uint256 oPool; // origin pool balance
@@ -124,27 +120,21 @@ contract Loihi is LoihiRoot {
         Flavor memory t = flavors[target]; // target adapter + weight
 
         for (uint i = 0; i < reserves.length; i++) {
-            emit log_uint("i", i);
             if (reserves[i] == o.reserve) {
                 oNAmt = dGetNumeraireAmount(o.adapter, oAmt);
-                oPool = add(dGetNumeraireBalance(o.adapter), oNAmt);
-                grossLiq += oPool;
+                uint256 oNBalance = dGetNumeraireBalance(o.adapter);
+                oPool = add(oNBalance, oNAmt);
+                grossLiq += oNBalance;
             } else if (reserves[i] == t.reserve) {
                 tPool = dGetNumeraireBalance(t.adapter);
                 grossLiq += tPool;
-            } else grossLiq += dGetNumeraireBalance(reserves[i]);
+            } else {
+                uint256 otherNBalance = dGetNumeraireBalance(reserves[i]);
+                grossLiq += otherNBalance;
+            }
         }
 
-        emit log("after tallying total liquidity");
-
-        emit log_uint("origin halt check", wmul(o.weight, wmul(grossLiq, alpha + WAD)));
-        emit log_uint("halt check from targ", wmul(o.weight, wmul(grossLiq, WAD + alpha)));
-        emit log_uint("oPool", oPool);
-        emit log_uint("grossLiq", grossLiq);
-        emit log_uint("oweight", o.weight);
-
         require(oPool <= wmul(o.weight, wmul(grossLiq, alpha + WAD)), "origin swap origin halt check");
-
 
         uint256 feeThreshold = wmul(o.weight, wmul(grossLiq, beta + WAD));
         if (oPool < feeThreshold) {
@@ -164,29 +154,17 @@ contract Loihi is LoihiRoot {
             );
         }
 
-        emit log("after assessing origin fee");
-        emit log_uint("oNAmt", oNAmt);
-
-        emit log_uint("t.weight", t.weight);
-        emit log_uint("grossliq", grossLiq);
-        emit log_uint("WAD - alpha", WAD - alpha);
-        emit log_uint("alpha", alpha);
-
-
         tNAmt = oNAmt;
-        emit log_uint("tPool", tPool);
-        emit log_uint("tNAmt", tNAmt);
         // TODO: move this after the calculation of tNAmt?
         require(sub(tPool, tNAmt) >= wmul(t.weight, wmul(grossLiq, WAD - alpha)), "target swap halt check");
-
-        emit log("after target halt check");
 
         feeThreshold = wmul(t.weight, wmul(grossLiq, WAD - beta));
         if (sub(tPool, tNAmt) > feeThreshold) {
             tNAmt = wmul(tNAmt, WAD - feeBase);
         } else if (tPool <= feeThreshold) {
-            uint256 fee = wmul(feeDerivative, wdiv(tNAmt, wmul(t.weight, grossLiq))) - feeBase;
+            uint256 fee = wmul(feeDerivative, wdiv(tNAmt, wmul(t.weight, grossLiq)));
             tNAmt = wmul(tNAmt, WAD - fee);
+            tNAmt = wmul(tNAmt, WAD - feeBase);
         } else {
             uint256 fee = wmul(feeDerivative, wdiv(
                 sub(feeThreshold, sub(tPool, tNAmt)),
@@ -198,8 +176,6 @@ contract Loihi is LoihiRoot {
             ), WAD - feeBase);
         }
 
-        emit log_uint("oAmt", oAmt);
-        emit log_uint("tNAmt", tNAmt);
         dIntakeRaw(o.adapter, oAmt);
         dOutputNumeraire(t.adapter, recipient, tNAmt);
 

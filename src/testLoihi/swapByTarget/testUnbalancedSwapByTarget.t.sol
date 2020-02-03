@@ -1,4 +1,5 @@
 
+
 pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
@@ -16,7 +17,7 @@ contract PotMock {
     function chi () public returns (uint256) { return (10 ** 18) * 2; }
 }
 
-contract SwapByOriginTest is AdaptersSetup, DSMath, DSTest {
+contract UnbalancedSwapByTargetTest is AdaptersSetup, DSMath, DSTest {
     Loihi l;
 
     function setUp() public {
@@ -61,48 +62,28 @@ contract SwapByOriginTest is AdaptersSetup, DSMath, DSTest {
 
     event log_uint_arr(bytes32, uint256[]);
 
-    // function testSwap10Origin () public {
+    function testBalancedSwap15AndATinyBitTarget () public {
+        uint256 targetAmount = l.swapByTarget(dai, 20 * WAD, usdc, 15 * WAD, now);
+        assertEq(targetAmount, 15007500000000000000);
+    }
 
-    //     emit log_named_uint("balance", l.balanceOf(address(this)));
-    //     uint256 targetAmount = l.swapByOrigin(dai, 10 * WAD, cusdc, 9 * WAD, now);
-    //     emit log_named_uint("targetAmount", targetAmount);
-    //     assertEq(targetAmount, 9995000000000000000);
+    function testBalancedSwap25AndATinyBitTarget () public {
+        uint256 targetAmount = l.swapByTarget(dai, 30 * WAD, usdc, 25 * WAD, now);
+        assertEq(targetAmount, 25012500156250000000);
+    }
 
-    // }
+    function testBalancedSwap30TinyBitTarget () public {
+        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 30 * WAD, now);
+        assertEq(targetAmount, 30065414226000156251);
+    }
 
-    // function testSwap25Origin () public {
+    function testBalancedSwap48Point25Target () public {
+        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 48250000000000000000, now);
+        assertEq(targetAmount, 49382109995372719925);
+    }
 
-    //     emit log_named_uint("balance", l.balanceOf(address(this)));
-    //     uint256 targetAmount = l.swapByOrigin(dai, 25 * WAD, cusdc, 9 * WAD, now);
-    //     emit log_named_uint("targetAmount", targetAmount);
-    //     assertEq(targetAmount, 24987500000000000000);
-
-    // }
-
-    // function testSwap40Origin () public {
-
-    //     emit log_named_uint("balance", l.balanceOf(address(this)));
-    //     uint256 targetAmount = l.swapByOrigin(dai, 40 * WAD, cusdc, 9 * WAD, now);
-    //     emit log_named_uint("targetAmount", targetAmount);
-    //     assertEq(targetAmount, 39755112500000000001);
-
-    // }
-
-    // function testSwap50Origin () public {
-
-    //     emit log_named_uint("balance", l.balanceOf(address(this)));
-    //     uint256 targetAmount = l.swapByOrigin(dai, 50 * WAD, usdc, 9 * WAD, now);
-    //     emit log_named_uint("targetAmount", targetAmount);
-    //     assertEq(targetAmount, 49350312500000000001);
-
-    // }
-
-    // function testFailSwap80Origin () public {
-
-    //     emit log_named_uint("balance", l.balanceOf(address(this)));
-    //     uint256 targetAmount = l.swapByOrigin(dai, 80 * WAD, cusdc, 9 * WAD, now);
-    //     emit log_named_uint("targetAmount", targetAmount);
-
-    // }
+    function testFailBalancedSwap51Target () public {
+        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 50 * WAD, now);
+    }
 
 }

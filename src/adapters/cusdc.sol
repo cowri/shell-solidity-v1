@@ -62,7 +62,7 @@ contract cUsdcAdapter is LoihiRoot {
     function getNumeraireBalance () public returns (uint256) {
         uint256 rate = cusdc.exchangeRateCurrent();
         uint256 bal = cusdc.balanceOf(address(this));
-        return wmul(bal, rate);
+        return wdiv(bal, rate);
     }
 
 }
