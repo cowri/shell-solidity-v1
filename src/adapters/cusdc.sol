@@ -55,14 +55,14 @@ contract cUsdcAdapter is LoihiRoot {
     // returns corresponding numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
         uint256 rate = cusdc.exchangeRateCurrent();
-        return wdiv(amount, rate);
+        return wmul(amount, rate);
     }
 
     // returns numeraire amount of balance
     function getNumeraireBalance () public returns (uint256) {
         uint256 rate = cusdc.exchangeRateCurrent();
         uint256 bal = cusdc.balanceOf(address(this));
-        return wdiv(bal, rate);
+        return wmul(bal, rate);
     }
 
 }
