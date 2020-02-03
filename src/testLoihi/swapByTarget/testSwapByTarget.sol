@@ -61,40 +61,29 @@ contract SwapByTargetTest is AdaptersSetup, DSMath, DSTest {
 
     event log_uint_arr(bytes32, uint256[]);
 
-    // function testBalancedSwap15AndATinyBitTarget () public {
-    //     emit log_named_uint("balance", l.balanceOf(address(this)));
-    //     uint256 targetAmount = l.swapByTarget(dai, 20 * WAD, usdc, 15 * WAD, now);
-    //     emit log_named_uint("targetAmount", targetAmount);
-    //     // assertEq(targetAmount, 15007500000000000000);
-    // }
-
-    // function testBalancedSwap25AndATinyBitTarget () public {
-    //     emit log_named_uint("balance", l.balanceOf(address(this)));
-    //     uint256 targetAmount = l.swapByTarget(dai, 30 * WAD, usdc, 25 * WAD, now);
-    //     emit log_named_uint("targetAmount", targetAmount);
-    //     assertEq(targetAmount, 24999993593828125000);
-    // }
-
-    function testBalancedSwap30TinyBitTarget () public {
-        emit log_named_uint("balance", l.balanceOf(address(this)));
-        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 30 * WAD, now);
-        emit log_named_uint("targetAmount", targetAmount);
-        // assertEq(targetAmount, 30149381521712853932);
+    function testBalancedSwap15AndATinyBitTarget () public {
+        uint256 targetAmount = l.swapByTarget(dai, 20 * WAD, usdc, 15 * WAD, now);
+        assertEq(targetAmount, 15007500000000000000);
     }
 
-    // function testBalancedSwap48Point25Target () public {
-    //     emit log_named_uint("balance", l.balanceOf(address(this)));
-    //     uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 48250000000000000000, now);
-    //     emit log_named_uint("targetAmount", targetAmount);
-    //     assertEq(targetAmount, 30149381521712853932);
-    // }
+    function testBalancedSwap25AndATinyBitTarget () public {
+        uint256 targetAmount = l.swapByTarget(dai, 30 * WAD, usdc, 25 * WAD, now);
+        assertEq(targetAmount, 25012500156250000000);
+    }
 
-    // function testBalancedSwap51Target () public {
-    //     emit log_named_uint("balance", l.balanceOf(address(this)));
-    //     uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 50 * WAD, now);
-    //     emit log_named_uint("targetAmount", targetAmount);
-    //     assertEq(targetAmount, 30149381521712853932);
-    // }
+    function testBalancedSwap30TinyBitTarget () public {
+        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 30 * WAD, now);
+        assertEq(targetAmount, 30065414226000156251);
+    }
+
+    function testBalancedSwap48Point25Target () public {
+        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 48250000000000000000, now);
+        assertEq(targetAmount, 49382109995372719925);
+    }
+
+    function testFailBalancedSwap51Target () public {
+        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 50 * WAD, now);
+    }
 
 
 }
