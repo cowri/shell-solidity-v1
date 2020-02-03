@@ -11,10 +11,7 @@ contract ChaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
     ERC20Detailed(_name, _symbols, _decimals) public {
         _mint(msg.sender, _amount);
         underlying = ERC20(_underlying);
-        emit log_uint("balanceOf", balanceOf(msg.sender));
     }
-
-    event log_uint(bytes32, uint256);
 
     function draw (address src, uint wad) public {
         _burnFrom(src, wad / 2);
@@ -28,12 +25,10 @@ contract ChaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
 
     function join (address dst, uint wad) public {
         underlying.transferFrom(msg.sender, dst, wad);
-        mint(dst, wad / 2);
+        _mint(dst, wad / 2);
     }
 
-    event log_address(bytes32, address);
     function dai (address usr) public returns (uint wad) {
-        emit log_address("dai", usr);
         return balanceOf(usr) * 2;
     }
 

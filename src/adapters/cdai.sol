@@ -25,13 +25,23 @@ contract cDaiAdapter is DSMath {
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
-    function intakeRaw (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 amount) public {
         cdai.transferFrom(msg.sender, address(this), amount);
         uint256 bal = dai.balanceOf(address(this));
         cdai.redeem(amount);
         bal = sub(dai.balanceOf(address(this)), bal);
         dai.approve(address(chai), bal);
         chai.join(address(this), bal);
+    }
+
+    function intakeNumeraire (uint256 amount) public returns (uint256) {
+        uint256 rate = cdai.exchangeRateCurrent();
+        uint256 cdaiAmount = wmul(rate, amount);
+        cdai.transferFrom(msg.sender, address(this), cdaiAmount);
+        cdai.redeemUnderlying(amount);
+        dai.approve(address(chai), amount);
+        chai.join(address(this), amount);
+        return cdaiAmount;
     }
 
     // unwraps numeraire amount of dai from chai

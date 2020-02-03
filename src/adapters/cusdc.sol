@@ -23,11 +23,18 @@ contract cUsdcAdapter is LoihiRoot {
     constructor () public { }
 
     // takes raw cusdc amount and transfers it in
-    function intakeRaw (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 amount) public {
         cusdc.transferFrom(msg.sender, address(this), amount);
     }
+    
+    // takes numeraire amount and transfers corresponding cusdc in
+    function intakeNumeraire (uint256 amount) public returns (uint256) {
+        uint256 rate = cusdc.exchangeRateCurrent();
+        amount = wmul(amount, rate);
+        cusdc.transferFrom(msg.sender, address(this), amount);
+        return amount;
+    }
 
-    event log_uint(bytes32, uint256);
     // takes numeraire amount
     // transfers corresponding cusdc to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
@@ -55,7 +62,7 @@ contract cUsdcAdapter is LoihiRoot {
     function getNumeraireBalance () public returns (uint256) {
         uint256 rate = cusdc.exchangeRateCurrent();
         uint256 bal = cusdc.balanceOf(address(this));
-        return wdiv(bal / 10000000000, rate);
+        return wdiv(bal, rate);
     }
 
 }

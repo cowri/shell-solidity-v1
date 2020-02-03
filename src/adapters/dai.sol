@@ -24,17 +24,19 @@ contract DaiAdapter is LoihiRoot {
 
     // transfers dai in
     // wraps it in chai
-    function intakeRaw (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 amount) public {
         dai.transferFrom(msg.sender, address(this), amount);
         dai.approve(address(chai), amount);
         chai.join(address(this), amount);
-        return amount;
     }
 
+    // transfers dai in
+    // wraps it in chai
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         dai.transferFrom(msg.sender, address(this), amount);
         dai.approve(address(chai), amount);
         chai.join(address(this), amount);
+        return amount;
     }
 
     // unwraps chai

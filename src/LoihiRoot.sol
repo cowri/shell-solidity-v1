@@ -8,7 +8,6 @@ import "ds-math/math.sol";
 
 contract LoihiRoot is ERC20Mintable, ERC20Burnable, DSMath, Ownable {
 
-    mapping(address => uint256) public reserves;
     mapping(address => Flavor) public flavors;
     address[] public reserves;
     address[] public numeraires;

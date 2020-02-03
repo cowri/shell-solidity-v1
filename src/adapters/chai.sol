@@ -24,18 +24,17 @@ contract ChaiAdapter is LoihiRoot {
 
     // takes raw chai amount
     // transfers it into our balance
-    function intakeRaw (address src, uint256 amount) public {
-        chai.transferFrom(src, address(this), amount);
+    function intakeRaw (uint256 amount) public {
+        chai.transferFrom(msg.sender, address(this), amount);
     }
 
 
     // takes numeraire amount
     // transfers corresponding chai into our balance;
-    function intakeNumeraire (address src, uint256 amount) public returns (uint256) {
-        uint256 bal = chai.balanceOf(address(src));
-        chai.move(src, address(this), amount);
-        bal = sub(chai.balanceOf(address(src)), bal);
-        return bal;
+    function intakeNumeraire (uint256 amount) public returns (uint256) {
+        uint256 bal = chai.balanceOf(address(this));
+        chai.move(msg.sender, address(this), amount);
+        return sub(chai.balanceOf(address(this)), bal);
     }
 
     // takes numeraire amount

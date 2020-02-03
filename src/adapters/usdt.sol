@@ -23,14 +23,16 @@ contract UsdtAdapter is LoihiRoot {
 
     constructor () public { }
 
-    // transfers usdt into our balance
+    // transfers usdt in
     function intakeRaw (uint256 amount) public returns (uint256) {
         SafeERC20.safeTransferFrom(usdt, msg.sender, address(this), amount);
         return amount;
     }
 
-    function intakeNumeraire (uint256 amount) public {
+    // transfers usdt in
+    function intakeNumeraire (uint256 amount) public returns (uint256) {
         SafeERC20.safeTransferFrom(usdt, msg.sender, address(this), amount);
+        return amount;
     }
 
     // transfers usdt out of our balance

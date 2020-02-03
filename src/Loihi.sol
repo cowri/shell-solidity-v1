@@ -28,13 +28,13 @@ contract Loihi is LoihiRoot {
         usdt = IERC20(_usdt);
     }
 
-    function includeAdapter (address flavor, address adapter, uint256 weight) public {
-        flavors[flavor] = Flavor(adapter, weight);
-    }
-
     function includeNumeraireAndReserve (address numeraire, address reserve) public {
         numeraires.push(numeraire);
         reserves.push(reserve);
+    }
+
+    function includeAdapter (address flavor, address adapter, uint256 weight) public {
+        flavors[flavor] = Flavor(adapter, weight);
     }
 
     function excludeAdapter (address flavor) public {
@@ -47,25 +47,21 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
-    event log_address(bytes32, address);
-    event log_bool(bytes32, bool);
-
     function dGetNumeraireBalance (address addr) internal returns (uint256) {
-        emit log_address("get numeraire balance", addr);
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("getNumeraireBalance()"));
-        emit log_bool("success", success);
         assert(success);
         return abi.decode(result, (uint256));
     }
 
-    function dIntakeRaw (address addr, address src, uint256 amount) internal {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intakeRaw(address, uint256)", src, amount));
+    function dIntakeRaw (address addr, uint256 amount) internal {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intakeRaw(uint256)", amount));
         assert(success);
     }
 
-    function dIntakeNumeraire (address addr, address src, uint256 amount) internal {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intakeNumeraire(address, uint256)", src, amount));
+    function dIntakeNumeraire (address addr, uint256 amount) internal returns (uint256) {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intakeNumeraire(uint256)", amount));
         assert(success);
+        return abi.decode(result, (uint256));
     }
 
     function dOutputRaw (address addr, address dst, uint256 amount) internal returns (uint256) {
@@ -155,7 +151,7 @@ contract Loihi is LoihiRoot {
             ), WAD - feeBase);
         }
 
-        dIntakeRaw(o.adapter, msg.sender, oAmt);
+        dIntakeRaw(o.adapter, oAmt);
         dOutputNumeraire(t.adapter, recipient, tNAmt);
 
     }
@@ -222,59 +218,34 @@ contract Loihi is LoihiRoot {
         }
 
         dOutputRaw(t.adapter, recipient, tAmt);
-        dIntakeNumeraire(o.adapter, msg.sender, oNAmt);
+        dIntakeNumeraire(o.adapter, oNAmt);
 
     }
 
-    event log_addr_arr(bytes32, address[]);
-    event log_uint_arr(bytes32, uint256[]);
-    event log_uint(bytes32, uint256);
-    event log(string);
-
     function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
-
-        emit log_addr_arr("_flavors", _flavors);
-        emit log_uint_arr("_amounts", _amounts);
-        emit log_address("loihi", address(this));
 
         uint256 oldSum;
         uint256 newSum;
         uint256 newShells;
         uint256[] memory balances = new uint256[](reserves.length * 3);
-        emit log_uint_arr("balances before", balances);
-        emit log_uint("reserves list length", reserves.length);
         for (uint i = 0; i < _flavors.length; i++) {
             Flavor memory d = flavors[_flavors[i]]; // depositing adapter/weight
-            emit log_uint("i", i);
             for (uint j = 0; j < reserves.length; j++) {
-                emit log_uint("j", j);
                 if (reserves[j] == d.adapter) {
-                    emit log("0-0-0-0-0-0-0-0-0-0-0-0-00-00-0");
                     if (balances[j*3+1] == 0) {
-                        emit log_address("d.adapter", d.adapter);
-                        emit log_uint_arr("first", balances);
                         balances[j*3] = dGetNumeraireBalance(d.adapter);
-                        emit log_uint_arr("second", balances);
                         balances[j*3+1] = dGetNumeraireAmount(d.adapter, _amounts[i]);
-                        emit log_uint_arr("third", balances);
                         balances[j*3+2] = d.weight;
                         newSum = add(balances[j*3+1], newSum);
-                        emit log("~!~~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~");
                         break;
                     } else {
-                        emit log_uint("balances[j] != 0", balances[j]);
                         uint256 numeraireDeposit = dGetNumeraireAmount(d.adapter, _amounts[i]);
                         balances[j*3+1] = add(numeraireDeposit, balances[j*3+1]);
                         newSum = add(numeraireDeposit, newSum);
-                        emit log("~!~~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~");
                         break;
                     }
-                    emit log_uint_arr("balances j*3", balances);
-                    emit log("~!~~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~");
                     break;
         } } }
-
-        emit log_uint_arr("balances after", balances);
 
         for (uint i = 0; i < balances.length; i += 3) {
             uint256 oldBalance = balances[i];
@@ -371,21 +342,24 @@ contract Loihi is LoihiRoot {
     function balancedDeposit (uint256 totalDeposit) public returns (uint256) {
 
         uint256 totalBalance;
-        uint256 _totalSupply;
+        uint256 _totalSupply = totalSupply();
+
+        uint256[] memory amounts = new uint256[](3);
 
         for (uint i = 0; i < reserves.length; i++) {
-            totalBalance += dGetNumeraireBalancere(reserveList[i]);
+            uint256 numeBalance = dGetNumeraireBalance(reserves[i]);
+            totalBalance += numeBalance;
             Flavor memory d = flavors[numeraires[i]];
             uint256 depositAmount = wmul(d.weight, totalDeposit);
-            dIntakeNumeraire(d.adater, depositAmount);
+            amounts[i] = dIntakeNumeraire(d.adapter, depositAmount);
         }
 
         if (totalBalance == 0) {
-            totalBalance = 1;
-            _totalSupply = 1;
+            totalBalance = 10 ** 18;
+            _totalSupply = 10 ** 18;
         }
 
-        uint256 newShells = wdiv(totalDeposit, wmul(totalBalance, _totalSupply));
+        uint256 newShells = wmul(totalDeposit, wdiv(totalBalance, _totalSupply));
         _mint(msg.sender, newShells);
 
         return newShells;
