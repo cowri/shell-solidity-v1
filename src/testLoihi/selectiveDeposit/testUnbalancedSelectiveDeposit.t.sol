@@ -1,5 +1,3 @@
-
-
 pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
@@ -19,7 +17,7 @@ contract PotMock {
     function chi () public returns (uint256) { return (10 ** 18) * 2; }
 }
 
-contract UnbalancedSwapByTargetTest is AdaptersSetup, DSMath, DSTest {
+contract UnbalancedSelectiveDepositTest is AdaptersSetup, DSMath, DSTest {
     Loihi l;
 
     function setUp() public {
@@ -58,38 +56,59 @@ contract UnbalancedSwapByTargetTest is AdaptersSetup, DSMath, DSTest {
         l.setFeeDerivative(WAD / 10);
         l.setFeeBase(500000000000000);
 
-        // l.proportionalDeposit(210 * (10 ** 18));
-
         ERC20I(chai).transfer(address(l), 35 * WAD);
         ERC20I(cusdc).transfer(address(l), 50 * WAD);
         SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
 
     }
 
-    event log_uint_arr(bytes32, uint256[]);
+    function testSelectiveDeposit0x10y20z () public {
+        uint256[] memory amounts = new uint256[](3);
+        address[] memory tokens = new address[](3);
 
-    function testBalancedTargetSwap10yToZ () public {
-        uint256 originAmount = l.swapByTarget(usdt, 20 * WAD, usdc, 10 * WAD, now);
-        assertEq(originAmount, 10155125025000000000);
+        tokens[0] = dai; amounts[0] = 0;
+        tokens[1] = usdc; amounts[1] = WAD * 10;
+        tokens[2] = usdt; amounts[2] = WAD * 20;
+
+        uint256 newShells = l.selectiveDeposit(tokens, amounts);
+        assertEq(newShells, 29857954545454545448);
     }
 
-    function testBalancedTargetSwap10zToY () public {
-        uint256 targetAmount = l.swapByTarget(usdc, 30 * WAD, usdt, 10 * WAD, now);
-        assertEq(targetAmount, 10005000000000000000);
+    function testSelectiveDeposit10x15y0z () public {
+        uint256[] memory amounts = new uint256[](3);
+        address[] memory tokens = new address[](3);
+
+        tokens[0] = dai; amounts[0] = WAD * 10;
+        tokens[1] = usdc; amounts[1] = WAD * 15;
+        tokens[2] = usdt; amounts[2] = 0;
+
+        uint256 newShells = l.selectiveDeposit(tokens, amounts);
+        assertEq(newShells, 25000000000000000000);
     }
 
-    function testBalancedTargetSwap10xToZ () public {
-        uint256 targetAmount = l.swapByTarget(usdt, 20 * WAD, dai, 10 * WAD, now);
-        assertEq(targetAmount, 10308975923255625000);
+    function testSelectiveDeposit10x15y25z () public {
+        uint256[] memory amounts = new uint256[](3);
+        address[] memory tokens = new address[](3);
+
+        tokens[0] = dai; amounts[0] = WAD * 10;
+        tokens[1] = usdc; amounts[1] = WAD * 15;
+        tokens[2] = usdt; amounts[2] = WAD * 25;
+
+        uint256 newShells = l.selectiveDeposit(tokens, amounts);
+        assertEq(newShells, 49927976190476190476);
     }
 
-    function testBalancedTargetSwap10zToX () public {
-        uint256 targetAmount = l.swapByTarget(dai, 20 * WAD, usdt, 10 * WAD, now);
-        assertEq(targetAmount, 10005000000000000000);
+    function testFailSelectiveDeposit0x0y100z () public {
+        uint256[] memory amounts = new uint256[](3);
+        address[] memory tokens = new address[](3);
+
+        tokens[0] = dai; amounts[0] = 0;
+        tokens[1] = usdc; amounts[1] = 0;
+        tokens[2] = usdt; amounts[2] = WAD * 100;
+
+        uint256 newShells = l.selectiveDeposit(tokens, amounts);
     }
 
-    function testFailBalancedSwap51Target () public {
-        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 51 * WAD, now);
-    }
+
 
 }

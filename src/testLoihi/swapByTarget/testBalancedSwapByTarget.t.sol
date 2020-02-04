@@ -55,35 +55,34 @@ contract BalancedSwapByTargetTest is AdaptersSetup, DSMath, DSTest {
         l.setFeeDerivative(WAD / 10);
         l.setFeeBase(500000000000000);
 
-        l.balancedDeposit(300 * (10 ** 18));
+        l.proportionalDeposit(300 * (10 ** 18));
 
     }
 
     event log_uint_arr(bytes32, uint256[]);
 
-    function testBalancedSwap15AndATinyBitTarget () public {
-        uint256 targetAmount = l.swapByTarget(dai, 20 * WAD, usdc, 15 * WAD, now);
+    function testBalancedSwap15Target () public {
+        uint256 targetAmount = l.swapByTarget(dai, 200 * WAD, usdc, 15 * WAD, now);
         assertEq(targetAmount, 15007500000000000000);
     }
 
-    function testBalancedSwap25AndATinyBitTarget () public {
-        uint256 targetAmount = l.swapByTarget(dai, 30 * WAD, usdc, 25 * WAD, now);
+    function testBalancedSwap25Target () public {
+        uint256 targetAmount = l.swapByTarget(dai, 300 * WAD, usdc, 25 * WAD, now);
         assertEq(targetAmount, 25012500156250000000);
     }
 
-    function testBalancedSwap30TinyBitTarget () public {
-        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 30 * WAD, now);
+    function testBalancedSwap30Target () public {
+        uint256 targetAmount = l.swapByTarget(dai, 900 * WAD, usdc, 30 * WAD, now);
         assertEq(targetAmount, 30065414226000156251);
     }
 
     function testBalancedSwap48Point25Target () public {
-        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 48250000000000000000, now);
+        uint256 targetAmount = l.swapByTarget(dai, 500 * WAD, usdc, 48250000000000000000, now);
         assertEq(targetAmount, 49382109995372719925);
     }
 
     function testFailBalancedSwap51Target () public {
-        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 50 * WAD, now);
+        uint256 targetAmount = l.swapByTarget(dai, 900 * WAD, usdc, 50 * WAD, now);
     }
-
 
 }

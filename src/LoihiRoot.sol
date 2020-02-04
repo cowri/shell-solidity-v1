@@ -1,12 +1,13 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-contracts/contracts/ownership/Ownable.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/ERC20Burnable.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/ERC20Detailed.sol";
 import "ds-math/math.sol";
 
-contract LoihiRoot is ERC20Mintable, ERC20Burnable, DSMath, Ownable {
+contract LoihiRoot is ERC20, ERC20Mintable, ERC20Burnable, DSMath, Ownable {
 
     mapping(address => Flavor) public flavors;
     address[] public reserves;

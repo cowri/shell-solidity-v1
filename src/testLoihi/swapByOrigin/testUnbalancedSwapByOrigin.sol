@@ -8,6 +8,8 @@ import "../../ERC20I.sol";
 import "../flavorsSetup.sol";
 import "../adaptersSetup.sol";
 import "../../ChaiI.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/SafeERC20.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract PotMock {
     constructor () public { }
@@ -55,31 +57,33 @@ contract BalancedSwapByOriginTest is AdaptersSetup, DSMath, DSTest {
         l.setFeeDerivative(WAD / 10);
         l.setFeeBase(500000000000000);
 
-        l.proportionalDeposit(300 * (10 ** 18));
+        ERC20I(chai).transfer(address(l), 35 * WAD);
+        ERC20I(cusdc).transfer(address(l), 50 * WAD);
+        SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
 
     }
 
-    function testSwap10Origin () public {
-        uint256 targetAmount = l.swapByOrigin(dai, 10 * WAD, usdc, 9 * WAD, now);
+    function testUnbalancedOriginSwapZtoY () public {
+        uint256 targetAmount = l.swapByOrigin(usdt, 10 * WAD, usdc, 5 * WAD, now);
+        assertEq(targetAmount, 9845075000000000000);
+    }
+
+    function testUnbalancedOriginSwapYtoX () public {
+        uint256 targetAmount = l.swapByOrigin(usdc, 10 * WAD, dai, 5 * WAD, now);
+        assertEq(targetAmount, 9845075000000000000);
+    }
+
+    function testUnbalancedOriginSwapZtoX () public {
+        uint256 targetAmount = l.swapByOrigin(usdt, 10 * WAD, dai, 5 * WAD, now);
+        assertEq(targetAmount, 9698875636250000000);
+    }
+
+    function testUnbalancedOriginSwapXtoZ () public {
+        uint256 targetAmount = l.swapByOrigin(dai, 10 * WAD, usdt, 5 * WAD, now);
         assertEq(targetAmount, 9995000000000000000);
     }
 
-    function testSwap25Origin () public {
-        uint256 targetAmount = l.swapByOrigin(dai, 25 * WAD, cusdc, 9 * WAD, now);
-        assertEq(targetAmount, 24987500000000000000);
-    }
-
-    function testSwap40Origin () public {
-        uint256 targetAmount = l.swapByOrigin(dai, 40 * WAD, cusdc, 9 * WAD, now);
-        assertEq(targetAmount, 39536921025312499999);
-    }
-
-    function testSwap50Origin () public {
-        uint256 targetAmount = l.swapByOrigin(dai, 50 * WAD - 200, usdc, 9 * WAD, now);
-        assertEq(targetAmount, 48756468945312499807);
-    }
-
-    function testFailSwap80Origin () public {
+    function testFailUnbalancedOriginSwap () public {
         uint256 targetAmount = l.swapByOrigin(dai, 80 * WAD, cusdc, 9 * WAD, now);
     }
 

@@ -42,12 +42,12 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
         l.includeNumeraireAndReserve(usdc, cusdcAdapter);
         l.includeNumeraireAndReserve(usdt, usdtAdapter);
 
-        l.includeAdapter(chai, chaiAdapter, weight);
-        l.includeAdapter(dai, daiAdapter, weight);
-        l.includeAdapter(cdai, cdaiAdapter, weight);
-        l.includeAdapter(cusdc, cusdcAdapter, weight);
-        l.includeAdapter(usdc, usdcAdapter, weight);
-        l.includeAdapter(usdt, usdtAdapter, weight);
+        l.includeAdapter(chai, chaiAdapter, chaiAdapter, weight);
+        l.includeAdapter(dai, daiAdapter, chaiAdapter, weight);
+        l.includeAdapter(cdai, cdaiAdapter, chaiAdapter, weight);
+        l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, weight);
+        l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
+        l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
 
         emit log_named_uint("allowance to l for chai", ERC20I(chai).allowance(address(this), address(l)));
         emit log_named_uint("dai", ChaiI(chai).dai(address(this)));
@@ -59,19 +59,19 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
 
     }
 
-    function testBalancedDepositFromZero () public {
+    function testproportionalDepositFromZero () public {
 
-        uint256 mintedShells = l.balancedDeposit(100 * (10 ** 18));
+        uint256 mintedShells = l.proportionalDeposit(100 * (10 ** 18));
         uint256 balance = l.balanceOf(address(this));
         // emit log_named_uint("minted shells", mintedShells);
         // emit log_named_uint("balance", balance);
 
-        uint256 mintedShells2 = l.balancedDeposit(50 * (10 ** 18));
+        uint256 mintedShells2 = l.proportionalDeposit(50 * (10 ** 18));
         uint256 balance2 = l.balanceOf(address(this));
         // emit log_named_uint("mintedShells2", mintedShells2);
         // emit log_named_uint("balance2", balance2);
 
-        uint256 mintedShells3 = l.balancedDeposit(70 * (10 ** 18));
+        uint256 mintedShells3 = l.proportionalDeposit(70 * (10 ** 18));
         uint256 balance3 = l.balanceOf(address(this));
         // emit log_named_uint("mintedShells2", mintedShells3);
         // emit log_named_uint("balance2", balance3);

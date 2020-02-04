@@ -15,7 +15,7 @@ contract PotMock {
     function chi () public returns (uint256) { return (10 ** 18) * 2; }
 }
 
-contract SelectiveDepositTest is AdaptersSetup, DSMath, DSTest {
+contract LoihiTest is AdaptersSetup, DSMath, DSTest {
     Loihi l;
 
     function setUp() public {
@@ -42,29 +42,39 @@ contract SelectiveDepositTest is AdaptersSetup, DSMath, DSTest {
         l.includeNumeraireAndReserve(usdc, cusdcAdapter);
         l.includeNumeraireAndReserve(usdt, usdtAdapter);
 
-        l.includeAdapter(chai, chaiAdapter, weight);
-        l.includeAdapter(dai, daiAdapter, weight);
-        l.includeAdapter(cdai, cdaiAdapter, weight);
-        l.includeAdapter(cusdc, cusdcAdapter, weight);
-        l.includeAdapter(usdc, usdcAdapter, weight);
-        l.includeAdapter(usdt, usdtAdapter, weight);
+        l.includeAdapter(chai, chaiAdapter, chaiAdapter, weight);
+        l.includeAdapter(dai, daiAdapter, chaiAdapter, weight);
+        l.includeAdapter(cdai, cdaiAdapter, chaiAdapter, weight);
+        l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, weight);
+        l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
+        l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
 
-        l.setAlpha((5 * WAD) / 10);
-        l.setBeta((25 * WAD) / 100);
-        l.setFeeDerivative(WAD / 10);
-        l.setFeeBase(500000000000000);
 
-        l.balancedDeposit(210 * (10 ** 18));
+        l.proportionalDeposit(100 * (10 ** 18));
 
     }
 
-    function testSelectiveDeposit () public {
+    event log_uint_arr(bytes32, uint256[]);
 
-        uint256[] memory amounts = new uint256[](3);
-        address[] memory tokens = new address[](3);
+    // function testproportionalWithdraw () public {
 
+        // uint256[] memory withdrawnTokens = l.proportionalWithdraw(90 * (10 ** 18));
+        // uint256 balance = l.balanceOf(address(this));
+        // emit log_uint_arr("minted shells", withdrawnTokens);
+        // emit log_named_uint("balance", balance);
 
-    }
+        // uint256 mintedShells2 = l.proportionalDeposit(50 * (10 ** 18));
+        // uint256 balance2 = l.balanceOf(address(this));
+        // emit log_named_uint("mintedShells2", mintedShells2);
+        // emit log_named_uint("balance2", balance2);
+
+        // uint256 mintedShells3 = l.proportionalDeposit(70 * (10 ** 18));
+        // uint256 balance3 = l.balanceOf(address(this));
+        // emit log_named_uint("mintedShells2", mintedShells3);
+        // emit log_named_uint("balance2", balance3);
+        // assertTrue(false);
+
+    // }
 
     // function testSelectiveDeposit () public {
 
