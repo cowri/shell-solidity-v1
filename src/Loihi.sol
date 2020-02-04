@@ -81,14 +81,14 @@ contract Loihi is LoihiRoot {
     }
 
     function dOutputRaw (address addr, address dst, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("outputRaw(address, uint256)", dst, amount));
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("outputRaw(address,uint256)", dst, amount));
         assert(success);
         return abi.decode(result, (uint256));
     }
 
 
     function dOutputNumeraire (address addr, address dst, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("outputNumeraire(address, uint256)", dst, amount));
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("outputNumeraire(address,uint256)", dst, amount));
         assert(success);
         return abi.decode(result, (uint256));
     }
@@ -421,14 +421,21 @@ contract Loihi is LoihiRoot {
             uint256 numeBalance = dGetNumeraireBalance(reserves[i]);
             totalBalance += numeBalance;
             Flavor memory d = flavors[numeraires[i]];
-            uint256 depositAmount = wmul(d.weight, totalDeposit);
-            amounts[i] = dIntakeNumeraire(d.adapter, depositAmount);
+            amounts[i] = wmul(d.weight, totalDeposit);
         }
 
         if (totalBalance == 0) { totalBalance = 10 * WAD; _totalSupply = 10 * WAD; }
 
         uint256 newShells = wmul(totalDeposit, wdiv(totalBalance, _totalSupply));
         _mint(msg.sender, newShells);
+
+        for (uint i = 0; i < reserves.length; i++ ) {
+            Flavor memory d = flavors[numeraires[i]];
+            dIntakeNumeraire(d.adapter, amounts[i]);
+            dOutputNumeraire(d.adapter, msg.sender, amounts[i]);
+        }
+
+        emit log_uint_arr("amounts", amounts);
 
         return newShells;
 
