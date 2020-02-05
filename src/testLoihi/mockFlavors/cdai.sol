@@ -20,13 +20,13 @@ contract cDaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
     }
 
     function redeem (uint256 amount) public returns (uint) {
-        _burnFrom(msg.sender, amount);
+        _burn(msg.sender, amount);
         underlying.transfer(msg.sender, amount * 2);
         return amount * 2;
     }
 
     function redeemUnderlying (uint256 amount) public returns (uint) {
-        _burnFrom(msg.sender, amount / 2);
+        _burn(msg.sender, amount / 2);
         underlying.transfer(msg.sender, amount);
         return amount;
     }

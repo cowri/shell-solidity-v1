@@ -44,13 +44,9 @@ contract ChaiAdapter is LoihiRoot {
     // takes numeraire amount
     // transfers corresponding chai to destination address
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        emit log("Wtf");
-        emit log_addr("dst", dst);
         uint256 bal = chai.balanceOf(address(this));
-        emit log_uint("bal", bal);
         chai.move(address(this), dst, amount);
         bal = chai.balanceOf(address(this)) - bal;
-        emit log_uint("bal2", bal);
         return bal;
     }
 

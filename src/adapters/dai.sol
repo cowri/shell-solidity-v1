@@ -35,9 +35,12 @@ contract DaiAdapter is LoihiRoot {
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         dai.transferFrom(msg.sender, address(this), amount);
         dai.approve(address(chai), amount);
+        uint256 bal = chai.balanceOf(address(this));
         chai.join(address(this), amount);
+        bal = chai.balanceOf(address(this));
         return amount;
     }
+    event log_uint(bytes32, uint256);
 
     // unwraps chai
     // transfers out dai
@@ -50,6 +53,7 @@ contract DaiAdapter is LoihiRoot {
     function outputNumeraire (address dst, uint256 amount) public {
         chai.draw(address(this), amount);
         dai.transfer(dst, amount);
+
     }
 
     // returns amount, already in numeraire

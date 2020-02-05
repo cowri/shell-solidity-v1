@@ -62,6 +62,8 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         ERC20I(cusdc).transfer(address(l), 50 * WAD);
         SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
 
+        l.fakeMint(300*WAD);
+
         // uint256[] memory amounts = new uint256[](3);
         // address[] memory tokens = new address[](3);
 
@@ -73,7 +75,7 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
     }
 
-    function testSelectiveWithdraw10x5y0z () public {
+    function testUnbalancedSelectiveWithdraw10x5y0z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -85,7 +87,7 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         assertEq(newShells, 15112815789473684208);
     }
 
-    function testSelectiveWithdraw0x10y10z () public {
+    function testUnbalancedSelectiveWithdraw0x10y10z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -97,7 +99,7 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         assertEq(newShells, 20010000000000000000);
     }
 
-    function testSelectiveWithdraw10x0y5z () public {
+    function testUnbalancedSelectiveWithdraw10x0y5z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -109,7 +111,7 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         assertEq(newShells, 15112815789473684208);
     }
 
-    function testFailSelectiveWithdraw0x0y100z () public {
+    function testFailUnbalancedSelectiveWithdraw0x0y100z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 

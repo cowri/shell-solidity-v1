@@ -13,18 +13,22 @@ contract ChaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
         underlying = ERC20(_underlying);
     }
 
+    event log_uint(bytes32, uint256);
+
     function draw (address src, uint wad) public {
-        _burnFrom(src, wad / 2);
-        underlying.transfer(msg.sender, wad);
+        _burn(msg.sender, wad / 2);
+        underlying.transfer(msg.sender, wad / 2);
     }
 
     function exit (address src, uint wad) public {
-        _burnFrom(src, wad);
+        _burn(msg.sender,wad);
         underlying.transfer(msg.sender, wad * 2);
     }
 
+    event log_addr(bytes32, address);
+
     function join (address dst, uint wad) public {
-        underlying.transferFrom(msg.sender, dst, wad);
+        underlying.transferFrom(msg.sender, address(this), wad);
         _mint(dst, wad / 2);
     }
 

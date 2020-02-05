@@ -351,79 +351,100 @@ contract Loihi is LoihiRoot {
 
     }
 
-    function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
+
+    function getBalancesTokenAmountsAndWeights (address[] memory _flavors, uint256[] memory _amounts) internal returns (uint256[] memory, uint256[] memory, uint256[] memory) {
+
+        uint256[] memory balances = new uint256[](reserves.length);
+        uint256[] memory tokenAmounts = new uint256[](reserves.length);
+        uint256[] memory weights = new uint[](reserves.length);
+
+        for (uint i = 0; i < _flavors.length; i++) {
+            Flavor memory f = flavors[_flavors[i]]; // withdrawing adapter + weight
+            for (uint j = 0; j < reserves.length; j++) {
+                if (reserves[j] == f.reserve) {
+                    if (balances[j] == 0) {
+                        balances[j] = dGetNumeraireBalance(f.adapter);
+                        tokenAmounts[j] = dGetNumeraireAmount(f.adapter, _amounts[i]);
+                        weights[j] = f.weight;
+                        break;
+                    } else {
+                        tokenAmounts[j] += dGetNumeraireAmount(f.adapter, _amounts[i]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return (balances, tokenAmounts, weights);
+
+    }
+
+    function calculateShellsToBurn (uint256[] memory balances, uint256[] memory tokenAmounts, uint256[] memory weights) internal returns (uint256) {
 
         uint256 newSum;
         uint256 oldSum;
-        uint256 shellsBurned;
-        // segmented array in spans of 3 elements
-        // 1st for balance, 2nd for withdrawals, 3rd for weight
-        uint256[] memory balances = new uint256[](reserves.length * 3);
-        for (uint i = 0; i < _flavors.length; i++) {
-            Flavor memory w = flavors[_flavors[i]]; // withdrawing adapter + weight
-            for (uint j = 0; j < reserves.length; j++) {
-                if (reserves[j] == w.reserve) {
-                    if (balances[j*3] == 0) {
-                        uint256 balance = dGetNumeraireBalance(w.adapter);
-                        balances[j*3] = balance;
-                        uint256 withdrawal = dGetNumeraireAmount(w.adapter, _amounts[i]);
-                        balances[j*3+1] = withdrawal;
-                        balances[j*3+2] = w.weight;
-                        newSum = add(newSum, sub(balance, withdrawal));
-                        oldSum += balance;
-                        break;
-                    } else {
-                        uint256 withdrawal = dGetNumeraireAmount(w.adapter, _amounts[i]);
-                        balances[j*3+1] = add(withdrawal, balances[j*3+1]);
-                        newSum = sub(newSum, withdrawal);
-                        break;
-                    }
-                    break;
-        } } }
+        for (uint i = 0; i < balances.length; i++) {
+            oldSum = add(oldSum, balances[i]);
+            newSum = add(newSum, sub(balances[i], tokenAmounts[i]));
+        }
 
+        uint256 numeraireShellsToBurn;
 
         for (uint i = 0; i < reserves.length; i++) {
-            uint256 withdrawAmount = balances[i*3+1];
-            if (withdrawAmount == 0) continue;
-            uint256 oldBalance = balances[i*3];
+            if (tokenAmounts[i] == 0) continue;
+            uint256 withdrawAmount = tokenAmounts[i];
+            uint256 weight = weights[i];
+            uint256 oldBalance = balances[i];
             uint256 newBalance = sub(oldBalance, withdrawAmount);
 
-            bool haltCheck = newBalance >= wmul(balances[i*3+2], wmul(newSum, WAD - alpha));
-            require(haltCheck, "withdraw halt check");
+            require(newBalance >= wmul(weight, wmul(newSum, WAD - alpha)), "withdraw halt check");
 
-            uint256 feeThreshold = wmul(balances[i*3+2], wmul(newSum, WAD - beta));
+            uint256 feeThreshold = wmul(weight, wmul(newSum, WAD - beta));
+
             if (newBalance >= feeThreshold) {
-                shellsBurned += wmul(withdrawAmount, WAD + feeBase);
+
+                numeraireShellsToBurn += wmul(withdrawAmount, WAD + feeBase);
+
             } else if (oldBalance < feeThreshold) {
 
-                uint256 feePrep = wmul(wdiv(
-                    withdrawAmount,
-                    wmul(balances[i*3+2], newSum)
-                ), feeDerivative);
+                uint256 feePrep = wdiv(withdrawAmount, wmul(weight, newSum));
+                feePrep = wmul(feePrep, feeDerivative);
 
-                shellsBurned += wmul(
+                numeraireShellsToBurn += wmul(
                     wmul(withdrawAmount, WAD + feePrep),
                     WAD + feeBase
                 );
 
             } else {
-                uint256 feePrep = wdiv(
-                    sub(feeThreshold, newBalance),
-                    wmul(balances[i*3+2], newSum)
-                );
+
+                uint256 feePrep = wdiv(sub(feeThreshold, newBalance), wmul(weight, newSum));
                 feePrep = wmul(feeDerivative, feePrep);
-                shellsBurned += wmul(add(
+
+                numeraireShellsToBurn += wmul(add(
                     sub(oldBalance, feeThreshold),
                     wmul(sub(feeThreshold, newBalance), WAD + feePrep)
                 ), WAD + feeBase);
-            }
 
+            }
         }
 
+        return wmul(numeraireShellsToBurn, wdiv(oldSum, totalSupply()));
 
-        // for (uint i = 0; i < _flavors.length; i++) dOutputNumeraire(_flavors[i], msg.sender, _amounts[i]);
+    }
 
-        // _burnFrom(msg.sender, shellsBurned);
+    function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
+
+        ( uint256[] memory balances,
+          uint256[] memory tokenAmounts,
+          uint256[] memory weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
+
+
+        uint256 shellsBurned = calculateShellsToBurn(balances, tokenAmounts, weights);
+
+        // for (uint i = 0; i < _flavors.length; i++) dOutputNumeraire(flavors[_flavors[i]].adapter, msg.sender, _amounts[i]);
+
+        _burn(msg.sender, shellsBurned);
+
         return shellsBurned;
 
     }
@@ -442,7 +463,10 @@ contract Loihi is LoihiRoot {
             amounts[i] = wmul(d.weight, totalDeposit);
         }
 
-        if (totalBalance == 0) { totalBalance = 10 * WAD; _totalSupply = 10 * WAD; }
+        if (totalBalance == 0) {
+            totalBalance = WAD;
+            _totalSupply = WAD;
+        }
 
         uint256 newShells = wmul(totalDeposit, wdiv(totalBalance, _totalSupply));
         _mint(msg.sender, newShells);

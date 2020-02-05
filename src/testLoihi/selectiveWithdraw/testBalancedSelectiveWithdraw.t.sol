@@ -29,12 +29,12 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
             usdt
         );
 
-        ERC20I(chai).approve(address(l), 100000 * (10 ** 18));
-        ERC20I(cdai).approve(address(l), 100000 * (10 ** 18));
-        ERC20I(dai).approve(address(l), 100000 * (10 ** 18));
-        ERC20I(cusdc).approve(address(l), 100000 * (10 ** 18));
-        ERC20I(usdc).approve(address(l), 100000 * (10 ** 18));
-        ERC20I(usdt).approve(address(l), 100000 * (10 ** 18));
+        ERC20I(chai).approve(address(l), 1000000000 * (10 ** 18));
+        ERC20I(cdai).approve(address(l), 1000000000 * (10 ** 18));
+        ERC20I(dai).approve(address(l), 10000000000 * (10 ** 18));
+        ERC20I(cusdc).approve(address(l), 10000000000 * (10 ** 18));
+        ERC20I(usdc).approve(address(l), 10000000000 * (10 ** 18));
+        ERC20I(usdt).approve(address(l), 10000000000 * (10 ** 18));
 
         uint256 weight = WAD / 3;
 
@@ -66,7 +66,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
     }
 
-    function testSelectiveWithdraw10x0y0z () public {
+    function testBalancedSelectiveWithdraw10x0y0z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -74,11 +74,13 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[1] = usdc; amounts[1] = 0;
         tokens[2] = usdt; amounts[2] = 0;
 
+        emit log_named_address("loihi", address(l));
+        // emit log_named_address("me", )
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
         assertEq(newShells, 10005000000000000000);
     }
 
-    function testSelectiveWithdraw10x15y0z () public {
+    function testBalancedSelectiveWithdraw10x15y0z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -90,7 +92,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         assertEq(newShells, 25012500000000000000);
     }
 
-    function testSelectiveWithdraw10x15y20z () public {
+    function testBalancedSelectiveWithdraw10x15y20z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -102,7 +104,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         assertEq(newShells, 45022500000000000000);
     }
 
-    function testSelectiveWithdraw33333333333333x0y0z () public {
+    function testBalancedSelectiveWithdraw33333333333333x0y0z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -114,7 +116,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         assertEq(newShells, 33350000000000000000);
     }
 
-    function testSelectiveWithdraw45x0y0z () public {
+    function testBalancedSelectiveWithdraw45x0y0z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -127,7 +129,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
     }
 
-    function testSelectiveWithdraw60x0y0z () public {
+    function testBalancedSelectiveWithdraw60x0y0z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -140,7 +142,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
     }
 
-    function testFailSelectiveWithdraw150x0y0z () public {
+    function testFailBalancedSelectiveWithdraw150x0y0z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -152,7 +154,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
     }
 
-    function testSelectiveWithdraw10x0y50z () public {
+    function testBalancedSelectiveWithdraw10x0y50z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -164,7 +166,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         assertEq(newShells, 60155062500000000000);
     }
 
-    function testSelectiveWithdraw75x75y5z () public {
+    function testBalancedSelectiveWithdraw75x75y5z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
@@ -176,7 +178,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         assertEq(newShells, 155601468749999999994);
     }
 
-    function testFailSelectiveWithdraw10x10y90z () public {
+    function testFailBalancedSelectiveWithdraw10x10y90z () public {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
