@@ -271,83 +271,71 @@ contract Loihi is LoihiRoot {
     event log_address_arr(bytes32, address[]);
     event log_uint_arr(bytes32, uint256[]);
 
-    function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
+    function calculateShellsToMint (uint256[] memory _balances, uint256[] memory _deposits, uint256[] memory _weights) public returns (uint256) {
 
-        uint256 oldSum;
-        uint256 newSum;
-        uint256 newShells;
-        // array segmented in spans of 3 elements
-        // first for balance, second for deposit amount, third for weight
-        uint256[] memory balances = new uint256[](reserves.length * 3);
-
-        for (uint i = 0; i < _flavors.length; i++) {
-            Flavor memory d = flavors[_flavors[i]]; // depositing adapter/weight
-            for (uint j = 0; j < reserves.length; j++) {
-                if (reserves[j] == d.reserve) {
-                    if (balances[j*3] == 0) {
-                        uint256 balance = dGetNumeraireBalance(d.adapter);
-                        balances[j*3] = balance;
-                        uint256 deposit = dGetNumeraireAmount(d.adapter, _amounts[i]);
-                        balances[j*3+1] = deposit;
-                        balances[j*3+2] = d.weight;
-                        newSum = add(balance + deposit, newSum);
-                        oldSum += balance;
-                        break;
-                    } else {
-                        uint256 deposit = dGetNumeraireAmount(d.adapter, _amounts[i]);
-                        balances[j*3+1] = add(deposit, balances[j*3+1]);
-                        newSum = add(deposit, newSum);
-                        break;
-                    }
-                    break;
-                }
-            }
+        uint256 _newSum;
+        uint256 _oldSum;
+        for (uint i = 0; i < _balances.length; i++) {
+            _oldSum = add(_oldSum, _balances[i]);
+            _newSum = add(_newSum, add(_balances[i], _deposits[i]));
         }
 
-        for (uint i = 0; i < balances.length; i += 3) {
+        uint256 shellsToMint_;
 
-            uint256 depositAmount = balances[i+1];
-            if (depositAmount == 0) continue;
+        for (uint i = 0; i < _balances.length; i++) {
+            if (_deposits[i] == 0) continue;
+            uint256 _depositAmount = _deposits[i];
+            uint256 _weight = _weights[i];
+            uint256 _oldBalance = _balances[i];
+            uint256 _newBalance = add(_oldBalance, _depositAmount);
 
-            uint256 oldBalance = balances[i];
-            uint256 newBalance = add(oldBalance, depositAmount);
+            require(_newBalance <= wmul(_weight, wmul(_newSum, alpha + WAD)), "halt check deposit");
 
-            require(newBalance <= wmul(balances[i+2], wmul(newSum, alpha + WAD)), "halt check deposit");
+            uint256 _feeThreshold = wmul(_weight, wmul(_newSum, beta + WAD));
+            if (_newBalance <= _feeThreshold) {
 
-            uint256 feeThreshold = wmul(balances[i+2], wmul(newSum, beta + WAD));
-            if (newBalance <= feeThreshold) {
+                shellsToMint_ += _depositAmount;
 
-                newShells += depositAmount;
+            } else if (_oldBalance > _feeThreshold) {
 
-            } else if (oldBalance > feeThreshold) {
-
-                uint256 feePrep = wmul(feeDerivative, wdiv(depositAmount, wmul(balances[i+2], newSum)));
-                newShells = add(newShells, wmul(depositAmount, WAD - feePrep));
+                uint256 _feePrep = wmul(feeDerivative, wdiv(_depositAmount, wmul(_weight, _newSum)));
+                shellsToMint_ = add(shellsToMint_, wmul(_depositAmount, WAD - _feePrep));
 
             } else {
 
-                uint256 feePrep = wmul(feeDerivative, wdiv(
-                    sub(newBalance, feeThreshold),
-                    wmul(balances[i+2], newSum)
+                uint256 _feePrep = wmul(feeDerivative, wdiv(
+                    sub(_newBalance, _feeThreshold),
+                    wmul(_weight, _newSum)
                 ));
 
-                newShells += add(
-                    sub(feeThreshold, oldBalance),
-                    wmul(sub(newBalance, feeThreshold), WAD - feePrep)
+                shellsToMint_ += add(
+                    sub(_feeThreshold, _oldBalance),
+                    wmul(sub(_newBalance, _feeThreshold), WAD - _feePrep)
                 );
 
             }
         }
 
-        newShells = wmul(newShells, wdiv(oldSum, totalSupply()));
+        return wmul(shellsToMint_, wdiv(_oldSum, totalSupply()));
+
+    }
+
+    function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
+
+        ( uint256[] memory _balances,
+          uint256[] memory _deposits,
+          uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
+
+        uint256 shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
 
         for (uint i = 0; i < _flavors.length; i++) {
+            if (_amounts[i] == 0) continue;
             dIntakeNumeraire(flavors[_flavors[i]].adapter, _amounts[i]);
         }
 
+        _mint(msg.sender, shellsToMint_);
 
-        _mint(msg.sender, newShells);
-        return newShells;
+        return shellsToMint_;
 
     }
 
@@ -435,11 +423,10 @@ contract Loihi is LoihiRoot {
     function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
 
         ( uint256[] memory balances,
-          uint256[] memory tokenAmounts,
+          uint256[] memory withdrawals,
           uint256[] memory weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
 
-
-        uint256 shellsBurned = calculateShellsToBurn(balances, tokenAmounts, weights);
+        uint256 shellsBurned = calculateShellsToBurn(balances, withdrawals, weights);
 
         // for (uint i = 0; i < _flavors.length; i++) dOutputNumeraire(flavors[_flavors[i]].adapter, msg.sender, _amounts[i]);
 
