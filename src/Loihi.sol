@@ -28,6 +28,10 @@ contract Loihi is LoihiRoot {
         usdt = IERC20(_usdt);
     }
 
+    function fakeMint (uint256 amount) public {
+        _mint(msg.sender, amount);
+    }
+
     function setAlpha (uint256 _alpha) public {
         alpha = _alpha;
     }
@@ -312,24 +316,35 @@ contract Loihi is LoihiRoot {
 
             uint256 feeThreshold = wmul(balances[i+2], wmul(newSum, beta + WAD));
             if (newBalance <= feeThreshold) {
+
                 newShells += depositAmount;
+
             } else if (oldBalance > feeThreshold) {
+
                 uint256 feePrep = wmul(feeDerivative, wdiv(depositAmount, wmul(balances[i+2], newSum)));
-                newShells = add(newShells, WAD - feePrep);
+                newShells = add(newShells, wmul(depositAmount, WAD - feePrep));
+
             } else {
+
                 uint256 feePrep = wmul(feeDerivative, wdiv(
                     sub(newBalance, feeThreshold),
                     wmul(balances[i+2], newSum)
                 ));
+
                 newShells += add(
                     sub(feeThreshold, oldBalance),
                     wmul(sub(newBalance, feeThreshold), WAD - feePrep)
                 );
-        } }
+
+            }
+        }
 
         newShells = wmul(newShells, wdiv(oldSum, totalSupply()));
 
-        // for (uint i = 0; i < _flavors.length; i++) dIntakeNumeraire(_flavors[i], _amounts[i]);
+        for (uint i = 0; i < _flavors.length; i++) {
+            dIntakeNumeraire(flavors[_flavors[i]].adapter, _amounts[i]);
+        }
+
 
         _mint(msg.sender, newShells);
         return newShells;
@@ -380,14 +395,17 @@ contract Loihi is LoihiRoot {
             if (newBalance >= feeThreshold) {
                 shellsBurned += wmul(withdrawAmount, WAD + feeBase);
             } else if (oldBalance < feeThreshold) {
+
                 uint256 feePrep = wmul(wdiv(
                     withdrawAmount,
                     wmul(balances[i*3+2], newSum)
                 ), feeDerivative);
+
                 shellsBurned += wmul(
                     wmul(withdrawAmount, WAD + feePrep),
                     WAD + feeBase
                 );
+
             } else {
                 uint256 feePrep = wdiv(
                     sub(feeThreshold, newBalance),
@@ -432,10 +450,7 @@ contract Loihi is LoihiRoot {
         for (uint i = 0; i < reserves.length; i++ ) {
             Flavor memory d = flavors[numeraires[i]];
             dIntakeNumeraire(d.adapter, amounts[i]);
-            dOutputNumeraire(d.adapter, msg.sender, amounts[i]);
         }
-
-        emit log_uint_arr("amounts", amounts);
 
         return newShells;
 

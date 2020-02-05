@@ -60,6 +60,8 @@ contract UnbalancedSelectiveDepositTest is AdaptersSetup, DSMath, DSTest {
         ERC20I(cusdc).transfer(address(l), 50 * WAD);
         SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
 
+        l.fakeMint(WAD * 300);
+
     }
 
     function testSelectiveDeposit0x10y20z () public {
