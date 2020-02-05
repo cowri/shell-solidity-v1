@@ -113,160 +113,247 @@ contract Loihi is LoihiRoot {
     event log(string);
     event log_address(bytes32, address);
     event log_uint(bytes32, uint256);
-    function executeOriginTrade (address origin, address target, uint256 oAmt, uint256 minTargetAmount, uint256 deadline, address recipient) public returns (uint256) {
 
-        uint256 oNAmt; // origin numeraire amount
-        uint256 oPool; // origin pool balance
-        uint256 tPool; // target pool balance
-        uint256 tNAmt; // target numeraire swap amount
-        uint256 grossLiq; // total liquidity in all coins
-        Flavor memory o = flavors[origin]; // origin adapter + weight
-        Flavor memory t = flavors[target]; // target adapter + weight
 
-        for (uint i = 0; i < reserves.length; i++) {
-            if (reserves[i] == o.reserve) {
-                oNAmt = dGetNumeraireAmount(o.adapter, oAmt);
-                uint256 oNBalance = dGetNumeraireBalance(o.adapter);
-                oPool = add(oNBalance, oNAmt);
-                grossLiq += oNBalance;
-            } else if (reserves[i] == t.reserve) {
-                tPool = dGetNumeraireBalance(t.adapter);
-                grossLiq += tPool;
-            } else {
-                uint256 otherNBalance = dGetNumeraireBalance(reserves[i]);
-                grossLiq += otherNBalance;
-            }
-        }
 
-        require(oPool <= wmul(o.weight, wmul(grossLiq, alpha + WAD)), "origin swap origin halt check");
 
-        uint256 feeThreshold = wmul(o.weight, wmul(grossLiq, beta + WAD));
-        if (oPool < feeThreshold) {
-        } else if (sub(oPool, oNAmt) >= feeThreshold) {
-            uint256 fee = wdiv(sub(oPool, feeThreshold), wmul(o.weight, grossLiq));
-            fee = wmul(fee, feeDerivative);
-            oNAmt = wmul(oAmt, WAD - fee);
-        } else {
-            uint256 oldBalance = sub(oPool, oNAmt);
-            uint256 fee = wmul(feeDerivative, wdiv(
-                sub(oPool, feeThreshold),
-                wmul(o.weight, grossLiq)
-            ));
-            oNAmt = add(
-                sub(feeThreshold, oldBalance),
-                wmul(sub(oPool, feeThreshold), WAD - fee)
-            );
-        }
+    function executeOriginTrade (address _origin, address _target, uint256 _oAmt, uint256 _minTargetAmount, uint256 _deadline, address _recipient) public returns (uint256) {
 
-        tNAmt = oNAmt;
-        // TODO: move this after the calculation of tNAmt?
-        require(sub(tPool, tNAmt) >= wmul(t.weight, wmul(grossLiq, WAD - alpha)), "target swap halt check");
+        Flavor memory _o = flavors[_origin]; // origin adapter + weight
+        Flavor memory _t = flavors[_target]; // target adapter + weight
 
-        feeThreshold = wmul(t.weight, wmul(grossLiq, WAD - beta));
-        if (sub(tPool, tNAmt) > feeThreshold) {
-            tNAmt = wmul(tNAmt, WAD - feeBase);
-        } else if (tPool <= feeThreshold) {
+        ( uint256 _oNAmt,
+          uint256 _oPool,
+          uint256 _tPool,
+          uint256 _tNAmt,
+          uint256 _grossLiq ) = getOriginTradeVariables(_o, _t, _oAmt);
 
-            uint256 fee = wdiv(
-                sub(feeThreshold, sub(tPool, tNAmt)),
-                wmul(t.weight, grossLiq)
-            );
-            fee = wmul(fee, feeDerivative);
-            // uint256 fee = wmul(feeDerivative, wdiv(tNAmt, wmul(t.weight, grossLiq)));
-            tNAmt = wmul(tNAmt, WAD - fee);
-            tNAmt = wmul(tNAmt, WAD - feeBase);
-        } else {
-            uint256 fee = wmul(feeDerivative, wdiv(
-                sub(feeThreshold, sub(tPool, tNAmt)),
-                wmul(t.weight, grossLiq)
-            ));
-            tNAmt = wmul(add(
-                sub(tPool, feeThreshold),
-                wmul(sub(feeThreshold, sub(tPool, tNAmt)), WAD - fee)
-            ), WAD - feeBase);
-        }
+        _oNAmt = calculateOriginTradeOriginAmount(_o.weight, _oPool, _oNAmt, _grossLiq);
+        _tNAmt = _oNAmt;
+        uint256 tNAmt_ = calculateOriginTradeOriginAmount(_t.weight, _tPool, _tNAmt, _grossLiq);
 
         // dIntakeRaw(o.adapter, oAmt);
         // dOutputNumeraire(t.adapter, recipient, tNAmt);
-        return tNAmt;
+        return tNAmt_;
 
     }
 
-    function executeTargetTrade (address origin, address target, uint256 maxOriginAmount, uint256 tAmt, uint256 deadline, address recipient) public returns (uint256) {
+    function getOriginTradeVariables (Flavor memory _o, Flavor memory _t, uint256 _oAmt) private returns (uint, uint, uint, uint, uint) {
 
-        Flavor memory t = flavors[target]; // target adapter + weight
-        Flavor memory o = flavors[origin]; // origin adapter + weight
-        uint256 tNAmt; // target numeraire swap amount
-        uint256 tPool; // target pool balance
-        uint256 oPool; // origin pool balance
-        uint256 oNAmt; // origin numeriare swap amount
-        uint256 grossLiq; // gross liquidity
+        uint oNAmt_;
+        uint oPool_;
+        uint tPool_;
+        uint tNAmt_;
+        uint grossLiq_;
 
         for (uint i = 0; i < reserves.length; i++) {
-            if (reserves[i] == o.reserve) {
-                oPool = dGetNumeraireBalance(o.adapter);
-                grossLiq += oPool;
-            } else if (reserves[i] == t.reserve) {
-                tNAmt = dGetNumeraireAmount(t.adapter, tAmt);
-                uint256 tNBalance = dGetNumeraireBalance(t.adapter);
-                tPool = sub(tNBalance, tNAmt);
-                grossLiq += tNBalance;
-            } else grossLiq += dGetNumeraireBalance(reserves[i]);
+            if (reserves[i] == _o.reserve) {
+                oNAmt_ = dGetNumeraireAmount(_o.adapter, _oAmt);
+                oPool_ = dGetNumeraireBalance(_o.adapter);
+                oPool_ = add(oPool_, oNAmt_);
+                grossLiq_ += oPool_;
+            } else if (reserves[i] == _t.reserve) {
+                tPool_ = dGetNumeraireBalance(_t.adapter);
+                grossLiq_ += tPool_;
+            } else grossLiq_ += dGetNumeraireBalance(reserves[i]);
         }
 
-        require(tPool >= wmul(t.weight, wmul(grossLiq, WAD - alpha)), "target halt check for target trade");
-
-        uint256 feeThreshold = wmul(t.weight, wmul(grossLiq, WAD - beta));
-        if (tPool > feeThreshold) {
-            tNAmt = wmul(tNAmt, WAD + feeBase);
-        } else if (add(tPool, tNAmt) <= feeThreshold) {
-            uint256 fee = wdiv(sub(feeThreshold, tPool), wmul(t.weight, grossLiq));
-            fee = wmul(fee, feeDerivative);
-            tNAmt = wmul(tNAmt, WAD + fee);
-            tNAmt = wmul(tNAmt, WAD + feeBase);
-        } else {
-            uint256 fee = wmul(feeDerivative, wdiv(
-                    sub(feeThreshold, tPool),
-                    wmul(t.weight, grossLiq)
-            ));
-            tNAmt = add(
-                sub(add(tPool, tNAmt), feeThreshold),
-                wmul(sub(feeThreshold, tPool), WAD + fee)
-            );
-            tNAmt = wmul(tNAmt, WAD + feeBase);
-        }
-
-        oNAmt = tNAmt;
-
-        require(add(oPool, oNAmt) <= wmul(o.weight, wmul(grossLiq, WAD + alpha)), "origin halt check for target trade");
-
-        feeThreshold = wmul(o.weight, wmul(grossLiq, WAD + beta));
-        if (oPool + oNAmt <= feeThreshold) {
-
-        } else if (oPool >= feeThreshold) {
-            uint256 fee = wdiv(
-                sub(add(oNAmt, oPool), feeThreshold),
-                wmul(o.weight, grossLiq)
-            );
-            fee = wmul(fee, feeDerivative);
-            oNAmt = wmul(oNAmt, WAD + fee);
-        } else {
-
-            uint256 fee = wmul(feeDerivative, wdiv(
-                sub(add(oPool, oNAmt), feeThreshold),
-                wmul(o.weight, grossLiq)
-            ));
-            oNAmt = add(
-                sub(feeThreshold, oPool),
-                wmul(sub(add(oPool, oNAmt), feeThreshold), WAD + fee)
-            );
-        }
-
-        // dOutputNumeraire(t.adapter, recipient, tNAmt);
-        // dIntakeNumeraire(o.adapter, oNAmt);
-        return oNAmt;
+        return (oNAmt_, oPool_, tPool_, tNAmt_, grossLiq_);
 
     }
+
+    function calculateOriginTradeOriginAmount (uint256 _oWeight, uint256 _oPool, uint256 _oNAmt, uint256 _grossLiq) private returns (uint256) {
+
+        require(_oPool <= wmul(_oWeight, wmul(_grossLiq, alpha + WAD)), "origin swap origin halt check");
+
+        uint256 oNAmt_;
+
+        uint256 _feeThreshold = wmul(_oWeight, wmul(_grossLiq, beta + WAD));
+        if (_oPool < _feeThreshold) {
+
+            oNAmt_ = _oNAmt;
+
+        } else if (sub(_oPool, _oNAmt) >= _feeThreshold) {
+
+            uint256 _fee = wdiv(
+                sub(_oPool, _feeThreshold),
+                wmul(_oWeight, _grossLiq)
+            );
+            _fee = wmul(_fee, feeDerivative);
+            oNAmt_ = wmul(_oNAmt, WAD - _fee);
+
+        } else {
+
+            uint256 _fee = wmul(feeDerivative, wdiv(
+                sub(_oPool, _feeThreshold),
+                wmul(_oWeight, _grossLiq)
+            ));
+            oNAmt_ = add(
+                sub(_feeThreshold, sub(_oPool, _oNAmt)),
+                wmul(sub(_oPool, _feeThreshold), WAD - _fee)
+            );
+
+        }
+
+        return oNAmt_;
+
+    }
+
+    function calculateOriginTradeTargetAmount (uint256 _tWeight, uint256 _tPool, uint256 _tNAmt, uint256 _grossLiq) private returns (uint256) {
+
+        require(sub(_tPool, _tNAmt) >= wmul(_tWeight, wmul(_grossLiq, WAD - alpha)), "target swap halt check");
+
+        uint256 tNAmt_;
+
+        uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - beta));
+        if (sub(_tPool, _tNAmt) > _feeThreshold) {
+
+            tNAmt_ = wmul(_tNAmt, WAD - feeBase);
+
+        } else if (_tPool <= _feeThreshold) {
+
+            uint256 _fee = wdiv(
+                sub(_feeThreshold, sub(_tPool, _tNAmt)),
+                wmul(_tWeight, _grossLiq)
+            );
+            _fee = wmul(_fee, feeDerivative);
+            _tNAmt = wmul(_tNAmt, WAD - _fee);
+            tNAmt_ = wmul(_tNAmt, WAD - feeBase);
+
+        } else {
+
+            uint256 _fee = wmul(feeDerivative, wdiv(
+                sub(_feeThreshold, sub(_tPool, _tNAmt)),
+                wmul(_tWeight, _grossLiq)
+            ));
+            tNAmt_ = wmul(add(
+                sub(_tPool, _feeThreshold),
+                wmul(sub(_feeThreshold, sub(_tPool, _tNAmt)), WAD - _fee)
+            ), WAD - feeBase);
+        }
+
+        return tNAmt_;
+
+    }
+
+
+
+    function executeTargetTrade (address _origin, address _target, uint256 _maxOriginAmount, uint256 _tAmt, uint256 _deadline, address _recipient) public returns (uint256) {
+
+        Flavor memory _o = flavors[_origin];
+        Flavor memory _t = flavors[_target];
+
+        ( uint256 _oNAmt,
+          uint256 _oPool,
+          uint256 _tPool,
+          uint256 _tNAmt,
+          uint256 _grossLiq ) = getTargetTradeVariables(_o, _t, _tAmt) ;
+
+        _oNAmt = calculateTargetTradeTargetAmount(_t.weight, _tPool, _tNAmt, _grossLiq);
+        uint256 oNAmt_ = calculateTargetTradeOriginAmount(_o.weight, _oPool, _oNAmt, _grossLiq);
+
+        // dOutputNumeraire(_tAdapter, recipient, tNAmt);
+        // dIntakeNumeraire(_oAdapter, oNAmt);
+        return oNAmt_;
+
+    }
+
+    function getTargetTradeVariables (Flavor memory _o, Flavor memory _t, uint256 _tAmt) private returns (uint, uint, uint, uint, uint) {
+
+        uint tNAmt_;
+        uint tPool_;
+        uint oPool_;
+        uint oNAmt_;
+        uint grossLiq_;
+
+        for (uint i = 0; i < reserves.length; i++) {
+            if (reserves[i] == _o.reserve) {
+                oPool_ = dGetNumeraireBalance(_o.adapter);
+                grossLiq_ += oPool_;
+            } else if (reserves[i] == _t.reserve) {
+                tNAmt_ = dGetNumeraireAmount(_t.adapter, _tAmt);
+                tPool_ = dGetNumeraireBalance(_t.adapter);
+                tPool_ = sub(tPool_, tNAmt_);
+                grossLiq_ += tPool_;
+            } else grossLiq_ += dGetNumeraireBalance(reserves[i]);
+        }
+
+        return (oNAmt_, oPool_, tPool_, tNAmt_, grossLiq_);
+
+    }
+
+    function calculateTargetTradeTargetAmount(uint256 _tWeight, uint256 _tPool, uint256 _tNAmt, uint256 _grossLiq) public returns (uint256 tNAmt_) {
+
+        require(_tPool >= wmul(_tWeight, wmul(_grossLiq, WAD - alpha)), "target halt check for target trade");
+
+        uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - beta));
+        if (_tPool > _feeThreshold) {
+
+            tNAmt_ = wmul(_tNAmt, WAD + feeBase);
+
+        } else if (add(_tPool, _tNAmt) <= _feeThreshold) {
+
+            uint256 _fee = wdiv(sub(_feeThreshold, _tPool), wmul(_tWeight, _grossLiq));
+            _fee = wmul(_fee, feeDerivative);
+            _tNAmt = wmul(_tNAmt, WAD + _fee);
+            tNAmt_ = wmul(_tNAmt, WAD + feeBase);
+
+        } else {
+
+            uint256 _fee = wmul(feeDerivative, wdiv(
+                    sub(_feeThreshold, _tPool),
+                    wmul(_tWeight, _grossLiq)
+            ));
+
+            _tNAmt = add(
+                sub(add(_tPool, _tNAmt), _feeThreshold),
+                wmul(sub(_feeThreshold, _tPool), WAD + _fee)
+            );
+
+            tNAmt_ = wmul(_tNAmt, WAD + feeBase);
+
+        }
+
+        return tNAmt_;
+
+    }
+
+    function calculateTargetTradeOriginAmount (uint256 _oWeight, uint256 _oPool, uint256 _oNAmt, uint256 _grossLiq) public returns (uint256 oNAmt_) {
+
+        require(add(_oPool, _oNAmt) <= wmul(_oWeight, wmul(_grossLiq, WAD + alpha)), "origin halt check for target trade");
+
+        uint256 _feeThreshold = wmul(_oWeight, wmul(_grossLiq, WAD + beta));
+        if (_oPool + _oNAmt <= _feeThreshold) {
+
+            oNAmt_ = _oNAmt;
+
+        } else if (_oPool >= _feeThreshold) {
+
+            uint256 _fee = wdiv(
+                sub(add(_oNAmt, _oPool), _feeThreshold),
+                wmul(_oWeight, _grossLiq)
+            );
+            _fee = wmul(_fee, feeDerivative);
+            oNAmt_ = wmul(_oNAmt, WAD + _fee);
+
+        } else {
+
+            uint256 _fee = wmul(feeDerivative, wdiv(
+                sub(add(_oPool, _oNAmt), _feeThreshold),
+                wmul(_oWeight, _grossLiq)
+            ));
+
+            oNAmt_ = add(
+                sub(_feeThreshold, _oPool),
+                wmul(sub(add(_oPool, _oNAmt), _feeThreshold), WAD + _fee)
+            );
+
+        }
+
+        return oNAmt_;
+
+    }
+
 
     event log_address_arr(bytes32, address[]);
     event log_uint_arr(bytes32, uint256[]);

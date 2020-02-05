@@ -64,6 +64,8 @@ contract UnbalancedSwapByTargetTest is AdaptersSetup, DSMath, DSTest {
         ERC20I(cusdc).transfer(address(l), 50 * WAD);
         SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
 
+        l.fakeMint(300 * WAD);
+
     }
 
     event log_uint_arr(bytes32, uint256[]);
