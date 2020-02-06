@@ -67,37 +67,37 @@ contract Loihi is LoihiRoot {
     }
 
     function dGetNumeraireAmount (address addr, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("getNumeraireAmount(uint256)", amount));
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0xb2e87f0f, amount)); // encoded selector of "getNumeraireAmount(uint256");
         assert(success);
         return abi.decode(result, (uint256));
     }
 
     function dGetNumeraireBalance (address addr) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("getNumeraireBalance()"));
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0x10df6430)); // encoded selector of "getNumeraireBalance()";
         assert(success);
         return abi.decode(result, (uint256));
     }
 
     function dIntakeRaw (address addr, uint256 amount) internal {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intakeRaw(uint256)", amount));
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0xfa00102a, amount)); // encoded selector of "intakeRaw(uint256)";
         assert(success);
     }
 
     function dIntakeNumeraire (address addr, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("intakeNumeraire(uint256)", amount));
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0x7695ab51, amount)); // encoded selector of "intakeNumeraire(uint256)";
         assert(success);
         return abi.decode(result, (uint256));
     }
 
     function dOutputRaw (address addr, address dst, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("outputRaw(address,uint256)", dst, amount));
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0x96439650, dst, amount)); // encoded selector of "outputRaw(address,uint256)";
         assert(success);
         return abi.decode(result, (uint256));
     }
 
 
     function dOutputNumeraire (address addr, address dst, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSignature("outputNumeraire(address,uint256)", dst, amount));
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0xef40df22, dst, amount)); // encoded selector of "outputNumeraire(address,uint256)";
         assert(success);
         return abi.decode(result, (uint256));
     }
