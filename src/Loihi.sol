@@ -28,6 +28,11 @@ contract Loihi is LoihiRoot {
         usdt = IERC20(_usdt);
     }
 
+    function supportsInterface (bytes4 interfaceID) external view returns (bool) {
+        return interfaceID == ERC20ID
+            || interfaceID == ERC165ID;
+    }
+
     function fakeMint (uint256 amount) public {
         _mint(msg.sender, amount);
     }

@@ -19,5 +19,10 @@ contract LoihiRoot is ERC20, ERC20Mintable, ERC20Burnable, DSMath, Ownable {
     uint256 feeBase = 500000000000000; // 5 bps
     uint256 feeDerivative = 52631578940000000; // marginal fee will be 5% at alpha point
 
+    bytes4 constant internal ERC20ID = 0x36372b07;
+    bytes4 constant internal ERC165ID = 0x01ffc9a7;
+
+
+
 
 }
