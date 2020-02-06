@@ -352,9 +352,54 @@ contract Loihi is LoihiRoot {
 
     }
 
-
     event log_address_arr(bytes32, address[]);
     event log_uint_arr(bytes32, uint256[]);
+
+    function getBalancesTokenAmountsAndWeights (address[] memory _flavors, uint256[] memory _amounts) internal returns (uint256[] memory, uint256[] memory, uint256[] memory) {
+
+        uint256[] memory balances_ = new uint256[](reserves.length);
+        uint256[] memory tokenAmounts_ = new uint256[](reserves.length);
+        uint256[] memory weights_ = new uint[](reserves.length);
+
+        for (uint i = 0; i < _flavors.length; i++) {
+            Flavor memory _f = flavors[_flavors[i]]; // withdrawing adapter + weight
+            for (uint j = 0; j < reserves.length; j++) {
+                if (reserves[j] == _f.reserve) {
+                    if (balances_[j] == 0) {
+                        balances_[j] = dGetNumeraireBalance(_f.adapter);
+                        tokenAmounts_[j] = dGetNumeraireAmount(_f.adapter, _amounts[i]);
+                        weights_[j] = _f.weight;
+                        break;
+                    } else {
+                        tokenAmounts_[j] += dGetNumeraireAmount(_f.adapter, _amounts[i]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return (balances_, tokenAmounts_, weights_);
+
+    }
+
+    function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
+
+        ( uint256[] memory _balances,
+          uint256[] memory _deposits,
+          uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
+
+        uint256 shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
+
+        for (uint i = 0; i < _flavors.length; i++) {
+            if (_amounts[i] == 0) continue;
+            dIntakeNumeraire(flavors[_flavors[i]].adapter, _amounts[i]);
+        }
+
+        _mint(msg.sender, shellsToMint_);
+
+        return shellsToMint_;
+
+    }
 
     function calculateShellsToMint (uint256[] memory _balances, uint256[] memory _deposits, uint256[] memory _weights) public returns (uint256) {
 
@@ -383,7 +428,11 @@ contract Loihi is LoihiRoot {
 
             } else if (_oldBalance > _feeThreshold) {
 
-                uint256 _feePrep = wmul(feeDerivative, wdiv(_depositAmount, wmul(_weight, _newSum)));
+                uint256 _feePrep = wmul(feeDerivative, wdiv(
+                    sub(_newBalance, _feeThreshold),
+                    wmul(_weight, _newSum)
+                ));
+
                 shellsToMint_ = add(shellsToMint_, wmul(_depositAmount, WAD - _feePrep));
 
             } else {
@@ -405,121 +454,74 @@ contract Loihi is LoihiRoot {
 
     }
 
-    function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
+    function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
 
         ( uint256[] memory _balances,
-          uint256[] memory _deposits,
+          uint256[] memory _withdrawals,
           uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
 
-        uint256 shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
+        uint256 shellsBurned_ = calculateShellsToBurn(_balances, _withdrawals, _weights);
 
-        for (uint i = 0; i < _flavors.length; i++) {
-            if (_amounts[i] == 0) continue;
-            dIntakeNumeraire(flavors[_flavors[i]].adapter, _amounts[i]);
-        }
+        // for (uint i = 0; i < _flavors.length; i++) dOutputNumeraire(flavors[_flavors[i]].adapter, msg.sender, _amounts[i]);
 
-        _mint(msg.sender, shellsToMint_);
+        _burn(msg.sender, shellsBurned_);
 
-        return shellsToMint_;
+        return shellsBurned_;
 
     }
 
+    function calculateShellsToBurn (uint256[] memory _balances, uint256[] memory _withdrawals, uint256[] memory _weights) internal returns (uint256) {
 
-    function getBalancesTokenAmountsAndWeights (address[] memory _flavors, uint256[] memory _amounts) internal returns (uint256[] memory, uint256[] memory, uint256[] memory) {
-
-        uint256[] memory balances = new uint256[](reserves.length);
-        uint256[] memory tokenAmounts = new uint256[](reserves.length);
-        uint256[] memory weights = new uint[](reserves.length);
-
-        for (uint i = 0; i < _flavors.length; i++) {
-            Flavor memory f = flavors[_flavors[i]]; // withdrawing adapter + weight
-            for (uint j = 0; j < reserves.length; j++) {
-                if (reserves[j] == f.reserve) {
-                    if (balances[j] == 0) {
-                        balances[j] = dGetNumeraireBalance(f.adapter);
-                        tokenAmounts[j] = dGetNumeraireAmount(f.adapter, _amounts[i]);
-                        weights[j] = f.weight;
-                        break;
-                    } else {
-                        tokenAmounts[j] += dGetNumeraireAmount(f.adapter, _amounts[i]);
-                        break;
-                    }
-                }
-            }
+        uint256 _newSum;
+        uint256 _oldSum;
+        for (uint i = 0; i < _balances.length; i++) {
+            _oldSum = add(_oldSum, _balances[i]);
+            _newSum = add(_newSum, sub(_balances[i], _withdrawals[i]));
         }
 
-        return (balances, tokenAmounts, weights);
-
-    }
-
-    function calculateShellsToBurn (uint256[] memory balances, uint256[] memory tokenAmounts, uint256[] memory weights) internal returns (uint256) {
-
-        uint256 newSum;
-        uint256 oldSum;
-        for (uint i = 0; i < balances.length; i++) {
-            oldSum = add(oldSum, balances[i]);
-            newSum = add(newSum, sub(balances[i], tokenAmounts[i]));
-        }
-
-        uint256 numeraireShellsToBurn;
+        uint256 _numeraireShellsToBurn;
 
         for (uint i = 0; i < reserves.length; i++) {
-            if (tokenAmounts[i] == 0) continue;
-            uint256 withdrawAmount = tokenAmounts[i];
-            uint256 weight = weights[i];
-            uint256 oldBalance = balances[i];
-            uint256 newBalance = sub(oldBalance, withdrawAmount);
+            if (_withdrawals[i] == 0) continue;
+            uint256 _withdrawal = _withdrawals[i];
+            uint256 _weight = _weights[i];
+            uint256 _oldBal = _balances[i];
+            uint256 _newBal = sub(_oldBal, _withdrawal);
 
-            require(newBalance >= wmul(weight, wmul(newSum, WAD - alpha)), "withdraw halt check");
+            require(_newBal >= wmul(_weight, wmul(_newSum, WAD - alpha)), "withdraw halt check");
 
-            uint256 feeThreshold = wmul(weight, wmul(newSum, WAD - beta));
+            uint256 _feeThreshold = wmul(_weight, wmul(_newSum, WAD - beta));
 
-            if (newBalance >= feeThreshold) {
+            if (_newBal >= _feeThreshold) {
 
-                numeraireShellsToBurn += wmul(withdrawAmount, WAD + feeBase);
+                _numeraireShellsToBurn += wmul(_withdrawal, WAD + feeBase);
 
-            } else if (oldBalance < feeThreshold) {
+            } else if (_oldBal < _feeThreshold) {
 
-                uint256 feePrep = wdiv(withdrawAmount, wmul(weight, newSum));
-                feePrep = wmul(feePrep, feeDerivative);
+                uint256 _feePrep = wdiv(sub(_feeThreshold, _newBal), wmul(_weight, _newSum));
 
-                numeraireShellsToBurn += wmul(
-                    wmul(withdrawAmount, WAD + feePrep),
-                    WAD + feeBase
-                );
+                _feePrep = wmul(_feePrep, feeDerivative);
+
+                _numeraireShellsToBurn += wmul(wmul(_withdrawal, WAD + _feePrep), WAD + feeBase);
 
             } else {
 
-                uint256 feePrep = wdiv(sub(feeThreshold, newBalance), wmul(weight, newSum));
-                feePrep = wmul(feeDerivative, feePrep);
+                uint256 _feePrep = wdiv(sub(_feeThreshold, _newBal), wmul(_weight, _newSum));
 
-                numeraireShellsToBurn += wmul(add(
-                    sub(oldBalance, feeThreshold),
-                    wmul(sub(feeThreshold, newBalance), WAD + feePrep)
+                _feePrep = wmul(feeDerivative, _feePrep);
+
+                _numeraireShellsToBurn += wmul(add(
+                    sub(_oldBal, _feeThreshold),
+                    wmul(sub(_feeThreshold, _newBal), WAD + _feePrep)
                 ), WAD + feeBase);
 
             }
         }
 
-        return wmul(numeraireShellsToBurn, wdiv(oldSum, totalSupply()));
+        return wmul(_numeraireShellsToBurn, wdiv(_oldSum, totalSupply()));
 
     }
 
-    function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256) {
-
-        ( uint256[] memory balances,
-          uint256[] memory withdrawals,
-          uint256[] memory weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
-
-        uint256 shellsBurned = calculateShellsToBurn(balances, withdrawals, weights);
-
-        // for (uint i = 0; i < _flavors.length; i++) dOutputNumeraire(flavors[_flavors[i]].adapter, msg.sender, _amounts[i]);
-
-        _burn(msg.sender, shellsBurned);
-
-        return shellsBurned;
-
-    }
 
     function proportionalDeposit (uint256 totalDeposit) public returns (uint256) {
 

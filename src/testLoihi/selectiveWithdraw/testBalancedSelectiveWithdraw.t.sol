@@ -74,10 +74,8 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[1] = usdc; amounts[1] = 0;
         tokens[2] = usdt; amounts[2] = 0;
 
-        emit log_named_address("loihi", address(l));
-        // emit log_named_address("me", )
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
-        assertEq(newShells, 10005000000000000000);
+        assertEq(newShells, 10004999999999999990);
     }
 
     function testBalancedSelectiveWithdraw10x15y0z () public {
@@ -89,7 +87,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[2] = usdt; amounts[2] = 0;
 
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
-        assertEq(newShells, 25012500000000000000);
+        assertEq(newShells, 25012499999999999975);
     }
 
     function testBalancedSelectiveWithdraw10x15y20z () public {
@@ -101,7 +99,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[2] = usdt; amounts[2] = WAD * 20;
 
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
-        assertEq(newShells, 45022500000000000000);
+        assertEq(newShells, 45022499999999999955);
     }
 
     function testBalancedSelectiveWithdraw33333333333333x0y0z () public {
@@ -113,7 +111,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[2] = usdt; amounts[2] = 0;
 
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
-        assertEq(newShells, 33350000000000000000);
+        assertEq(newShells, 33349999999999999967);
     }
 
     function testBalancedSelectiveWithdraw45x0y0z () public {
@@ -125,7 +123,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[2] = usdt; amounts[2] = 0;
 
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
-        assertEq(newShells, 45112618566176470592);
+        assertEq(newShells, 45112618566176470547);
 
     }
 
@@ -138,7 +136,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[2] = usdt; amounts[2] = 0;
 
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
-        assertEq(newShells, 60529209897743485963);
+        assertEq(newShells, 60529209897743485902);
 
     }
 
@@ -163,7 +161,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[2] = usdt; amounts[2] = 50 * WAD;
 
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
-        assertEq(newShells, 60155062500000000000);
+        assertEq(newShells, 60155062499999999940);
     }
 
     function testBalancedSelectiveWithdraw75x75y5z () public {
@@ -175,7 +173,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[2] = usdt; amounts[2] = 5 * WAD;
 
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
-        assertEq(newShells, 155601468749999999994);
+        assertEq(newShells, 155601468749999999838);
     }
 
     function testFailBalancedSelectiveWithdraw10x10y90z () public {

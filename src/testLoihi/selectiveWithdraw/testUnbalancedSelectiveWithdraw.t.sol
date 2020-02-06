@@ -84,7 +84,7 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[2] = usdt; amounts[2] = 0;
 
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
-        assertEq(newShells, 15112815789473684208);
+        assertEq(newShells, 15125980263157894739);
     }
 
     function testUnbalancedSelectiveWithdraw0x10y10z () public {
@@ -108,7 +108,7 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         tokens[2] = usdt; amounts[2] = WAD * 5;
 
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
-        assertEq(newShells, 15112815789473684208);
+        assertEq(newShells, 15125980263157894739);
     }
 
     function testFailUnbalancedSelectiveWithdraw0x0y100z () public {
@@ -121,7 +121,5 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
         uint256 newShells = l.selectiveWithdraw(tokens, amounts);
     }
-
-
 
 }
