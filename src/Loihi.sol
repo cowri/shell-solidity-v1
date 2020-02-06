@@ -114,9 +114,6 @@ contract Loihi is LoihiRoot {
     event log_address(bytes32, address);
     event log_uint(bytes32, uint256);
 
-
-
-
     function executeOriginTrade (address _origin, address _target, uint256 _oAmt, uint256 _minTargetAmount, uint256 _deadline, address _recipient) public returns (uint256) {
 
         Flavor memory _o = flavors[_origin]; // origin adapter + weight
@@ -130,7 +127,7 @@ contract Loihi is LoihiRoot {
 
         _oNAmt = calculateOriginTradeOriginAmount(_o.weight, _oPool, _oNAmt, _grossLiq);
         _tNAmt = _oNAmt;
-        uint256 tNAmt_ = calculateOriginTradeOriginAmount(_t.weight, _tPool, _tNAmt, _grossLiq);
+        uint256 tNAmt_ = calculateOriginTradeTargetAmount(_t.weight, _tPool, _tNAmt, _grossLiq);
 
         // dIntakeRaw(o.adapter, oAmt);
         // dOutputNumeraire(t.adapter, recipient, tNAmt);
@@ -150,8 +147,8 @@ contract Loihi is LoihiRoot {
             if (reserves[i] == _o.reserve) {
                 oNAmt_ = dGetNumeraireAmount(_o.adapter, _oAmt);
                 oPool_ = dGetNumeraireBalance(_o.adapter);
-                oPool_ = add(oPool_, oNAmt_);
                 grossLiq_ += oPool_;
+                oPool_ = add(oPool_, oNAmt_);
             } else if (reserves[i] == _t.reserve) {
                 tPool_ = dGetNumeraireBalance(_t.adapter);
                 grossLiq_ += tPool_;
@@ -230,6 +227,7 @@ contract Loihi is LoihiRoot {
                 sub(_tPool, _feeThreshold),
                 wmul(sub(_feeThreshold, sub(_tPool, _tNAmt)), WAD - _fee)
             ), WAD - feeBase);
+
         }
 
         return tNAmt_;
@@ -273,8 +271,8 @@ contract Loihi is LoihiRoot {
             } else if (reserves[i] == _t.reserve) {
                 tNAmt_ = dGetNumeraireAmount(_t.adapter, _tAmt);
                 tPool_ = dGetNumeraireBalance(_t.adapter);
-                tPool_ = sub(tPool_, tNAmt_);
                 grossLiq_ += tPool_;
+                tPool_ = sub(tPool_, tNAmt_);
             } else grossLiq_ += dGetNumeraireBalance(reserves[i]);
         }
 
