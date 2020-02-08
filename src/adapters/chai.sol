@@ -25,35 +25,35 @@ contract ChaiAdapter is LoihiRoot {
     // takes raw chai amount
     // transfers it into our balance
     function intakeRaw (uint256 amount) public {
-        chai.transferFrom(msg.sender, address(this), amount);
+        uint256 daiAmt = dai.balanceOf(address(this));
+        chai.exit(msg.sender, amount);
+        daiAmt = dai.balanceOf(address(this)) - daiAmt;
+        dai.approve(address(cdai), daiAmt);
+        cdai.mint(daiAmt);
     }
 
 
     // takes numeraire amount
     // transfers corresponding chai into our balance;
     function intakeNumeraire (uint256 amount) public returns (uint256) {
-        uint256 bal = chai.balanceOf(address(this));
-        chai.move(msg.sender, address(this), amount);
-        return sub(chai.balanceOf(address(this)), bal);
+        chai.draw(msg.sender, amount);
+        cdai.mint(amount);
+        return amount;
     }
-
-    event log_uint(bytes32, uint256);
-    event log_addr(bytes32, address);
-    event log(bytes32);
 
     // takes numeraire amount
     // transfers corresponding chai to destination address
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        uint256 bal = chai.balanceOf(address(this));
-        chai.move(address(this), dst, amount);
-        bal = chai.balanceOf(address(this)) - bal;
-        return bal;
+        cdai.redeemUnderlying(amount);
+        uint256 chaiBal = chai.balanceOf(address(this));
+        dai.approve(address(this), amount);
+        chai.join(dst, amount);
+        chaiBal = chaiBal - chai.balanceOf(address(this));
+        return chaiBal;
     }
 
-    // takes raw chai amount
     // transfers corresponding chai to destination address
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
-        chai.transfer(dst, amount);
         return amount;
     }
 
@@ -66,7 +66,7 @@ contract ChaiAdapter is LoihiRoot {
 
     // tells numeraire balance
     function getNumeraireBalance () public returns (uint256) {
-        return chai.dai(address(this));
+        return cdai.balanceOfUnderlying(address(this));
     }
 
 }

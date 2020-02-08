@@ -5,7 +5,7 @@ import "openzeppelin-contracts/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "ds-math/math.sol";
 
-contract cUsdcMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
+contract cDaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
     ERC20 underlying;
     constructor(address _underlying, string memory _name, string memory _symbols, uint8 _decimals, uint256 _amount)
     ERC20Detailed(_name, _symbols, _decimals) public {
@@ -36,12 +36,7 @@ contract cUsdcMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
     }
 
     function exchangeRateCurrent () external view returns (uint) {
-        return WAD / 2;
-    }
-
-    function balanceOfUnderlying (address account) public view returns (uint256) {
-        uint256 balance = balanceOf(account);
-        return balance * 2;
+        return wdiv(WAD, 2);
     }
 
 }

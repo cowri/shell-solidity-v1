@@ -18,6 +18,8 @@ contract Loihi is LoihiRoot {
     ERC20I usdc;
     IERC20 usdt;
 
+    event log_address(bytes32, address);
+
     constructor (address _chai, address _cdai, address _dai, address _pot, address _cusdc, address _usdc, address _usdt) public {
         chai = ChaiI(_chai);
         cdai = CTokenI(_cdai);
@@ -26,6 +28,10 @@ contract Loihi is LoihiRoot {
         cusdc = CTokenI(_cusdc);
         usdc = ERC20I(_usdc);
         usdt = IERC20(_usdt);
+
+        emit log_address("_cdai", _cdai);
+        emit log_address("address(cdai)", address(cdai));
+
     }
 
     function supportsInterface (bytes4 interfaceID) external view returns (bool) {
@@ -115,6 +121,8 @@ contract Loihi is LoihiRoot {
         return executeOriginTrade(origin, target, originAmount, minTargetAmount, deadline, recipient);
     }
 
+    event log_uint(bytes32, uint256);
+
     /// @notice given an origin amount this function will find the corresponding target amount according to the contracts state and make the swap between the two
     /// @param _origin the address of the origin flavor
     /// @param _target the address of the target flavor
@@ -133,6 +141,11 @@ contract Loihi is LoihiRoot {
           uint256 _tBal,
           uint256 _tNAmt,
           uint256 _grossLiq ) = getOriginTradeVariables(_o, _t, _oAmt);
+
+          emit log_uint("_oNAmt 1", _oNAmt);
+          emit log_uint("_o.weight", _o.weight);
+          emit log_uint("_oBal", _oBal);
+          emit log_uint("grossLiq", _grossLiq);
 
         _oNAmt = calculateOriginTradeOriginAmount(_o.weight, _oBal, _oNAmt, _grossLiq);
         _tNAmt = _oNAmt;
@@ -170,7 +183,9 @@ contract Loihi is LoihiRoot {
             } else if (reserves[i] == _t.reserve) {
                 tBal_ = dGetNumeraireBalance(_t.adapter);
                 grossLiq_ += tBal_;
-            } else grossLiq_ += dGetNumeraireBalance(reserves[i]);
+            } else {
+                grossLiq_ += dGetNumeraireBalance(reserves[i]);
+            }
         }
 
         return (oNAmt_, oBal_, tBal_, tNAmt_, grossLiq_);

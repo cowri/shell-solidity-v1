@@ -38,13 +38,13 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
         uint256 weight = WAD / 3;
 
-        l.includeNumeraireAndReserve(dai, chaiAdapter);
+        l.includeNumeraireAndReserve(dai, cdaiAdapter);
         l.includeNumeraireAndReserve(usdc, cusdcAdapter);
         l.includeNumeraireAndReserve(usdt, usdtAdapter);
 
-        l.includeAdapter(chai, chaiAdapter, chaiAdapter, weight);
-        l.includeAdapter(dai, daiAdapter, chaiAdapter, weight);
-        l.includeAdapter(cdai, cdaiAdapter, chaiAdapter, weight);
+        l.includeAdapter(chai, chaiAdapter, cdaiAdapter, weight);
+        l.includeAdapter(dai, daiAdapter, cdaiAdapter, weight);
+        l.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, weight);
         l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
@@ -55,14 +55,6 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         l.setFeeBase(500000000000000);
 
         uint256 shells = l.proportionalDeposit(300 * (10 ** 18));
-
-        // emit log_named_address("chai", chai);
-        // emit log_named_address("chaiAdapter", chaiAdapter);
-        // emit log_named_address("dai", dai);
-        // emit log_named_address("daiAdapter", daiAdapter);
-        // emit log_named_address("usdc", usdc);
-        // emit log_named_address("usdcAdapter", usdcAdapter);
-        // emit log_named_address("usdt", usdt);
 
     }
 

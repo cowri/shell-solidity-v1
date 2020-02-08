@@ -38,24 +38,16 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
 
         uint256 weight = WAD / 3;
 
-        l.includeNumeraireAndReserve(dai, chaiAdapter);
+        l.includeNumeraireAndReserve(dai, cdaiAdapter);
         l.includeNumeraireAndReserve(usdc, cusdcAdapter);
         l.includeNumeraireAndReserve(usdt, usdtAdapter);
 
-        l.includeAdapter(chai, chaiAdapter, chaiAdapter, weight);
-        l.includeAdapter(dai, daiAdapter, chaiAdapter, weight);
-        l.includeAdapter(cdai, cdaiAdapter, chaiAdapter, weight);
+        l.includeAdapter(chai, chaiAdapter, cdaiAdapter, weight);
+        l.includeAdapter(dai, daiAdapter, cdaiAdapter, weight);
+        l.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, weight);
         l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
-
-        emit log_named_uint("allowance to l for chai", ERC20I(chai).allowance(address(this), address(l)));
-        emit log_named_uint("dai", ChaiI(chai).dai(address(this)));
-        emit log_named_address("chai", address(chai));
-        emit log_named_address("chai adapter", chaiAdapter);
-        emit log_named_address("cusdc adapter", cusdcAdapter);
-        emit log_named_address("usdt adapter", usdtAdapter);
-
 
     }
 

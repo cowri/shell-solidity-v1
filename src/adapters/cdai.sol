@@ -10,7 +10,7 @@ import "../PotI.sol";
 import "../LoihiRoot.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract cDaiAdapter is DSMath {
+contract cDaiAdapter is LoihiRoot {
 
     ChaiI chai;
     CTokenI cdai;
@@ -27,20 +27,12 @@ contract cDaiAdapter is DSMath {
     // deposits dai amount in chai
     function intakeRaw (uint256 amount) public {
         cdai.transferFrom(msg.sender, address(this), amount);
-        uint256 bal = dai.balanceOf(address(this));
-        cdai.redeem(amount);
-        bal = sub(dai.balanceOf(address(this)), bal);
-        dai.approve(address(chai), bal);
-        chai.join(address(this), bal);
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         uint256 rate = cdai.exchangeRateCurrent();
         uint256 cdaiAmount = wmul(rate, amount);
         cdai.transferFrom(msg.sender, address(this), cdaiAmount);
-        cdai.redeemUnderlying(amount);
-        dai.approve(address(chai), amount);
-        chai.join(address(this), amount);
         return cdaiAmount;
     }
 
@@ -48,36 +40,23 @@ contract cDaiAdapter is DSMath {
     // wraps it into cdai amount
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        chai.draw(address(this), amount);
-        dai.approve(address(cdai), amount);
-        uint256 bal = cdai.balanceOf(address(this));
-        cdai.mint(amount);
-        bal = sub(cdai.balanceOf(address(this)), bal);
-        cdai.transfer(dst, bal);
-        return bal;
+        uint rate = cdai.exchangeRateCurrent();
+        uint cdaiAmount = wmul(amount, rate);
+        cdai.transfer(dst, cdaiAmount);
+        return cdaiAmount;
     }
 
-    // takes raw cdai amount
-    // gets numeraire dai amount
-    // unwraps dai amount of chai
-    // wraps dai into cdai and sends to destination
-    function outputRaw (address dst, uint256 amount) public returns (uint256) {
-        uint256 numeraire = getNumeraireAmount(amount);
-        chai.draw(address(this), numeraire);
-        cdai.mint(numeraire);
-        cdai.transfer(dst, numeraire);
-        return numeraire;
-    }
-
-    
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
         uint256 rate = cdai.exchangeRateCurrent();
         return wdiv(amount, rate);
     }
 
+    event log_address(bytes32, address);
+
     function getNumeraireBalance () public returns (uint256) {
-        return chai.dai(address(this));
+        emit log_address("cdai", address(cdai));
+        return cdai.balanceOfUnderlying(address(this));
     }
 
 }

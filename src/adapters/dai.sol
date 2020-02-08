@@ -26,34 +26,30 @@ contract DaiAdapter is LoihiRoot {
     // wraps it in chai
     function intakeRaw (uint256 amount) public {
         dai.transferFrom(msg.sender, address(this), amount);
-        dai.approve(address(chai), amount);
-        chai.join(address(this), amount);
+        dai.approve(address(cdai), amount);
+        cdai.mint(amount);
     }
 
     // transfers dai in
     // wraps it in chai
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         dai.transferFrom(msg.sender, address(this), amount);
-        dai.approve(address(chai), amount);
-        uint256 bal = chai.balanceOf(address(this));
-        chai.join(address(this), amount);
-        bal = chai.balanceOf(address(this));
+        dai.approve(address(cdai), amount);
+        cdai.mint(amount);
         return amount;
     }
-    event log_uint(bytes32, uint256);
 
     // unwraps chai
     // transfers out dai
-    function outputRaw (address dst, uint256 amount) public returns (uint256) {
-        chai.draw(address(this), amount);
+    function outputRaw (address dst, uint256 amount) public {
+        cdai.redeemUnderlying(amount);
         dai.transfer(dst, amount);
-        return amount;
     }
 
-    function outputNumeraire (address dst, uint256 amount) public {
-        chai.draw(address(this), amount);
+    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+        cdai.redeemUnderlying(amount);
         dai.transfer(dst, amount);
-
+        return amount;
     }
 
     // returns amount, already in numeraire
@@ -63,7 +59,7 @@ contract DaiAdapter is LoihiRoot {
 
     // returns numeraire amount of chai balance
     function getNumeraireBalance () public returns (uint256) {
-        return chai.dai(address(this));
+        return cdai.balanceOfUnderlying(address(this));
     }
 
 }

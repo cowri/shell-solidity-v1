@@ -40,13 +40,13 @@ contract UnbalancedSelectiveDepositTest is AdaptersSetup, DSMath, DSTest {
 
         uint256 weight = WAD / 3;
 
-        l.includeNumeraireAndReserve(dai, chaiAdapter);
+        l.includeNumeraireAndReserve(dai, cdaiAdapter);
         l.includeNumeraireAndReserve(usdc, cusdcAdapter);
         l.includeNumeraireAndReserve(usdt, usdtAdapter);
 
-        l.includeAdapter(chai, chaiAdapter, chaiAdapter, weight);
-        l.includeAdapter(dai, daiAdapter, chaiAdapter, weight);
-        l.includeAdapter(cdai, cdaiAdapter, chaiAdapter, weight);
+        l.includeAdapter(chai, chaiAdapter, cdaiAdapter, weight);
+        l.includeAdapter(dai, daiAdapter, cdaiAdapter, weight);
+        l.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, weight);
         l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
@@ -56,7 +56,7 @@ contract UnbalancedSelectiveDepositTest is AdaptersSetup, DSMath, DSTest {
         l.setFeeDerivative(WAD / 10);
         l.setFeeBase(500000000000000);
 
-        ERC20I(chai).transfer(address(l), 35 * WAD);
+        ERC20I(cdai).transfer(address(l), 35 * WAD);
         ERC20I(cusdc).transfer(address(l), 50 * WAD);
         SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
 

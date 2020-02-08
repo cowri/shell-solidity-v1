@@ -14,4 +14,5 @@ interface CTokenI {
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
     function totalSupply() external view returns (uint256);
     function balanceOf(address account) external view returns (uint256);
+    function balanceOfUnderlying(address account) external view returns (uint256);
 }

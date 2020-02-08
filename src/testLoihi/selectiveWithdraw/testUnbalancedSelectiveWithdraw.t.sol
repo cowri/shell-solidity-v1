@@ -40,13 +40,13 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
         uint256 weight = WAD / 3;
 
-        l.includeNumeraireAndReserve(dai, chaiAdapter);
+        l.includeNumeraireAndReserve(dai, cdaiAdapter);
         l.includeNumeraireAndReserve(usdc, cusdcAdapter);
         l.includeNumeraireAndReserve(usdt, usdtAdapter);
 
-        l.includeAdapter(chai, chaiAdapter, chaiAdapter, weight);
-        l.includeAdapter(dai, daiAdapter, chaiAdapter, weight);
-        l.includeAdapter(cdai, cdaiAdapter, chaiAdapter, weight);
+        l.includeAdapter(chai, chaiAdapter, cdaiAdapter, weight);
+        l.includeAdapter(dai, daiAdapter, cdaiAdapter, weight);
+        l.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, weight);
         l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
@@ -58,20 +58,11 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
         // s = l.proportionalDeposit(210 * (10 ** 18));
 
-        ERC20I(chai).transfer(address(l), 35 * WAD);
+        ERC20I(cdai).transfer(address(l), 35 * WAD);
         ERC20I(cusdc).transfer(address(l), 50 * WAD);
         SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
 
         l.fakeMint(300*WAD);
-
-        // uint256[] memory amounts = new uint256[](3);
-        // address[] memory tokens = new address[](3);
-
-        // tokens[0] = dai; amounts[0] = 0;
-        // tokens[1] = usdc; amounts[1] = WAD * 30;
-        // tokens[2] = usdt; amounts[2] = WAD * 60;
-
-        // uint256 newShells = l.selectiveWithdraw(tokens, amounts);
 
     }
 
