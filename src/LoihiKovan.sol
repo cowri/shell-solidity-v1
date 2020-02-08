@@ -17,7 +17,7 @@ contract LoihiKovan is LoihiRoot {
     PotI constant internal pot = PotI(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb);
     CTokenI constant internal cusdc = CTokenI(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35);
     IERC20 constant internal usdc = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF);
-    IERC20 constant internal usdt = IERC20(address(0));
+    IERC20 constant internal usdt = IERC20(0x20F7963EF38AC716A85ed18fb683f064db944648);
 
     constructor () public { }
 

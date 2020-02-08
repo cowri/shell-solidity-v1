@@ -10,6 +10,7 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract Loihi is LoihiRoot {
 
+    // Local
     ChaiI chai;
     CTokenI cdai;
     ERC20I dai;
@@ -17,6 +18,25 @@ contract Loihi is LoihiRoot {
     CTokenI cusdc;
     ERC20I usdc;
     IERC20 usdt;
+
+    // KOVAN
+    // ChaiI constant public chai = ChaiI(0xB641957b6c29310926110848dB2d464C8C3c3f38);
+    // CTokenI constant public cdai = CTokenI(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
+    // IERC20 constant public dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
+    // PotI constant public pot = PotI(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb);
+    // CTokenI constant public cusdc = CTokenI(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35);
+    // IERC20 constant public usdc = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF);
+    // IERC20 constant public usdt = IERC20(0x20F7963EF38AC716A85ed18fb683f064db944648);
+
+
+    // // MAINNET
+    // ChaiI constant internal chai = ChaiI(0x06AF07097C9Eeb7fD685c692751D5C66dB49c215);
+    // CTokenI constant internal cdai = CTokenI(0x5d3a536e4d6dbd6114cc1ead35777bab948e3643);
+    // ERC20I constant internal dai = ERC20I(0x6b175474e89094c44da98b954eedeac495271d0f);
+    // PotI constant internal pot = PotI(0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
+    // CTokenI constant internal cusdc = CTokenI(0x39aa39c021dfbae8fac545936693ac917d5e7563);
+    // ERC20I constant internal usdc = ERC20I(0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48);
+    // IERC20 constant internal usdt = ERC20I(0xdac17f958d2ee523a2206206994597c13d831ec7);
 
     event log_address(bytes32, address);
 
@@ -28,10 +48,6 @@ contract Loihi is LoihiRoot {
         cusdc = CTokenI(_cusdc);
         usdc = ERC20I(_usdc);
         usdt = IERC20(_usdt);
-
-        emit log_address("_cdai", _cdai);
-        emit log_address("address(cdai)", address(cdai));
-
     }
 
     function supportsInterface (bytes4 interfaceID) external view returns (bool) {
@@ -614,8 +630,9 @@ contract Loihi is LoihiRoot {
 
     }
 
-
     function proportionalDeposit (uint256 totalDeposit) public returns (uint256) {
+
+        emit log_address("msg.sender", msg.sender);
 
         uint256 totalBalance;
         uint256 _totalSupply = totalSupply();
