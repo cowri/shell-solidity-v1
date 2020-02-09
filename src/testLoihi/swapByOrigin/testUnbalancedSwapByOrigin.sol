@@ -41,14 +41,11 @@ contract UnbalancedSwapByOriginTest is AdaptersSetup, DSMath, DSTest {
         l.setFeeDerivative(WAD / 10);
         l.setFeeBase(500000000000000);
 
-        IERC20(cdai).transfer(address(l), 35 * WAD);
-        IERC20(cusdc).transfer(address(l), 50 * WAD);
-        SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
+        // IERC20(cdai).transfer(address(l), 35 * WAD);
+        // IERC20(cusdc).transfer(address(l), 50 * WAD);
+        // SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
 
         l.fakeMint(300 * WAD);
-
-        uint256 cdaiBal = IERC20(cdai).balanceOf(address(l));
-        emit log_named_uint("cdaiBal", cdaiBal);
 
     }
 
@@ -58,7 +55,7 @@ contract UnbalancedSwapByOriginTest is AdaptersSetup, DSMath, DSTest {
     // }
 
     // function testUnbalancedOriginSwapYtoX () public {
-    //     uint256 targetAmount = l.swapByOrigin(usdc, 10 * WAD, dai, 5 * WAD, now);
+    //     uint256 targetAmount = l.swapByOrigin(usdc, 10 * (WAD / 10 ** 12), dai, 5 * WAD, now);
     //     assertEq(targetAmount, 9845075000000000000);
     // }
 

@@ -48,7 +48,7 @@ contract KovanUsdcAdapter {
 
     // is already numeraire amount
     function getNumeraireAmount (uint256 amount) public pure returns (uint256) {
-        return amount;
+        return amount * 1000000000000;
     }
 
     // returns numeraire balance

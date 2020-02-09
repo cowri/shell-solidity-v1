@@ -98,24 +98,38 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
+    /// @dev this function delegate calls addr, which is an interface to the required functions for retrieving and transfering numeraire and raw values and vice versa
+    /// @param addr the address to the interface wrapper to be delegatecall'd
+    /// @param amount the numeraire amount to be transfered into the contract. will be adjusted to the raw amount before transfer
     function dIntakeRaw (address addr, uint256 amount) internal {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0xfa00102a, amount)); // encoded selector of "intakeRaw(uint256)";
         assert(success);
     }
 
+    /// @dev this function delegate calls addr, which is an interface to the required functions for retrieving and transfering numeraire and raw values and vice versa
+    /// @param addr the address to the interface wrapper to be delegatecall'd
+    /// @param amount the numeraire amount to be transfered into the contract. will be adjusted to the raw amount before transfer
     function dIntakeNumeraire (address addr, uint256 amount) internal returns (uint256) {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0x7695ab51, amount)); // encoded selector of "intakeNumeraire(uint256)";
         assert(success);
         return abi.decode(result, (uint256));
     }
 
+    /// @dev this function delegate calls addr, which is an interface to the required functions for retrieving and transfering numeraire and raw values and vice versa
+    /// @param addr the address of the interface wrapper to be delegatecall'd
+    /// @param dst the destination to which to send the raw amount
+    /// @param amount the raw amount of the asset to send
     function dOutputRaw (address addr, address dst, uint256 amount) internal returns (uint256) {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0x96439650, dst, amount)); // encoded selector of "outputRaw(address,uint256)";
         assert(success);
         return abi.decode(result, (uint256));
     }
 
-
+    /// @dev this function delegate calls addr, which is an interface to the required functions to retrieve the numeraire and raw values and vice versa
+    /// @param addr address of the interface wrapper
+    /// @param dst the destination to send the raw amount to
+    /// @param amount the numeraire amount of the asset to be sent. this will be adjusted to the corresponding raw amount
+    /// @return the raw amount of the asset that was transfered
     function dOutputNumeraire (address addr, address dst, uint256 amount) internal returns (uint256) {
         (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0xef40df22, dst, amount)); // encoded selector of "outputNumeraire(address,uint256)";
         assert(success);
@@ -137,6 +151,7 @@ contract Loihi is LoihiRoot {
 
     event log_uint(bytes32, uint256);
 
+    /// @author James Foley http://github.com/realisation
     /// @notice given an origin amount this function will find the corresponding target amount according to the contracts state and make the swap between the two
     /// @param _origin the address of the origin flavor
     /// @param _target the address of the target flavor
@@ -171,6 +186,7 @@ contract Loihi is LoihiRoot {
 
     }
 
+    /// @author James Foley http://github.com/realisation
     /// @notice builds the relevant variables for a target trade
     /// @param _o the record for the origin flavor containing the address of its adapter and its reserve
     /// @param _t the record for the target flavor containing the address of its adapter and its reserve
@@ -206,6 +222,7 @@ contract Loihi is LoihiRoot {
 
     }
 
+    /// @author James Foley http://github.com/realisation
     /// @notice calculates the origin amount in an origin trade including the fees
     /// @param _oWeight the balance weighting of the origin flavor
     /// @param _oBal the new numeraire balance of the origin reserve including the origin amount being swapped
@@ -214,17 +231,24 @@ contract Loihi is LoihiRoot {
     /// @return oNAmt_ the origin numeraire amount for the swap with fees applied
     function calculateOriginTradeOriginAmount (uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq) private returns (uint256) {
 
+        emit log_uint("ping",0);
+
         require(_oBal <= wmul(_oWeight, wmul(_grossLiq, alpha + WAD)), "origin swap origin halt check");
+        emit log_uint("ping",0);
 
         uint256 oNAmt_;
 
+        emit log_uint("ping",0);
         uint256 _feeThreshold = wmul(_oWeight, wmul(_grossLiq, beta + WAD));
+        emit log_uint("ping", _feeThreshold);
         if (_oBal < _feeThreshold) {
+        emit log_uint("ping",0);
 
             oNAmt_ = _oNAmt;
 
         } else if (sub(_oBal, _oNAmt) >= _feeThreshold) {
 
+        emit log_uint("ping",0);
             uint256 _fee = wdiv(
                 sub(_oBal, _feeThreshold),
                 wmul(_oWeight, _grossLiq)
@@ -233,6 +257,7 @@ contract Loihi is LoihiRoot {
             oNAmt_ = wmul(_oNAmt, WAD - _fee);
 
         } else {
+        emit log_uint("ping",0);
 
             uint256 _fee = wmul(feeDerivative, wdiv(
                 sub(_oBal, _feeThreshold),
@@ -249,6 +274,7 @@ contract Loihi is LoihiRoot {
 
     }
 
+    /// @author James Foley http://github.com/realisation
     /// @notice calculates the fees to apply to the target amount in an origin trade
     /// @param _tWeight the balance weighting of the target flavor
     /// @param _tBal the current balance of the target in the reserve
@@ -256,7 +282,7 @@ contract Loihi is LoihiRoot {
     /// @return tNAmt_ the target numeraire amount including any applied fees
     function calculateOriginTradeTargetAmount (uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq) private returns (uint256 tNAmt_) {
 
-        require(sub(_tBal, _tNAmt) >= wmul(_tWeight, wmul(_grossLiq, WAD - alpha)), "target swap halt check");
+        require(sub(_tBal, _tNAmt) >= wmul(_tWeight, wmul(_grossLiq, WAD - alpha)), "origin swap target halt check");
 
         uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - beta));
         if (sub(_tBal, _tNAmt) > _feeThreshold) {
@@ -290,6 +316,7 @@ contract Loihi is LoihiRoot {
 
     }
 
+    /// @author James Foley http://github.com/realisation
     /// @notice given an amount of the target currency this function will derive the corresponding origin amount according to the current state of the contract
     /// @param _origin the address of the origin stablecoin flavor
     /// @param _target the address of the target stablecoin flavor

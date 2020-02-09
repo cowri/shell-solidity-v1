@@ -45,9 +45,8 @@ contract KovanCUsdcAdapter {
 
     // returns numeraire amount of balance
     function getNumeraireBalance () public returns (uint256) {
-        return ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).balanceOfUnderlying(address(this));
+        return ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).balanceOfUnderlying(address(this)) * 1000000000000;
     }
-
 
     function add(uint x, uint y) internal pure returns (uint z) {
         require((z = x + y) >= x, "ds-math-add-overflow");

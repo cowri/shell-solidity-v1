@@ -46,8 +46,8 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
         uint256 mintedShells = l.proportionalDeposit(100 * (10 ** 18));
         emit log_named_uint("shells", mintedShells);
         assertEq(mintedShells, 100 * (10 ** 18));
-        uint256 cusdcBal = IERC20(cusdc).balanceOf(address(l)); // 165557372275
-        uint256 cdaiBal = IERC20(cdai).balanceOf(address(l)); // 163925889326
+        uint256 cusdcBal = IERC20(cusdc).balanceOf(address(l)); // 165557372275ish
+        uint256 cdaiBal = IERC20(cdai).balanceOf(address(l)); // 163925889326ish
         uint256 usdtBal = IERC20(usdt).balanceOf(address(l)); // 33333333333333333300
 
         uint256 usdtNumeraireAmount = new KovanUsdtAdapter().getNumeraireAmount(usdtBal);

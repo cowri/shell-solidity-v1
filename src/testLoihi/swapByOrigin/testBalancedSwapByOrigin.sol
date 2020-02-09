@@ -48,23 +48,25 @@ contract BalancedSwapByOriginTest is AdaptersSetup, DSMath, DSTest {
     }
 
     // function testSwap10Origin () public {
-        // uint256 targetAmount = l.swapByOrigin(dai, 10 * WAD, usdc, 9 * WAD, now);
-        // assertEq(targetAmount, 9995000000000000000);
+    //     uint256 targetAmount = l.swapByOrigin(dai, 10 * WAD, usdc, 9 * WAD, now);
+    //     assertEq(targetAmount, 9995000000000000000);
     // }
 
     // function testSwap25Origin () public {
     //     uint256 targetAmount = l.swapByOrigin(dai, 25 * WAD, cusdc, 9 * WAD, now);
-    //     assertEq(targetAmount, 24987500000000000000);
+    //     assertEq(targetAmount / 10 ** 4 + 1, 2498750000000000);
     // }
 
     // function testSwap40Origin () public {
     //     uint256 targetAmount = l.swapByOrigin(dai, 40 * WAD, cusdc, 9 * WAD, now);
-    //     assertEq(targetAmount, 39536921025312499999);
+    //     targetAmount /= 10000000000000;
+    //     assertEq(targetAmount, 3953692);
     // }
 
     // function testSwap50Origin () public {
-    //     uint256 targetAmount = l.swapByOrigin(dai, 50 * WAD - 200, usdc, 9 * WAD, now);
-    //     assertEq(targetAmount, 48756468945312499807);
+    //     uint256 targetAmount = l.swapByOrigin(dai, 50 * WAD - 1000000000000, usdc, 9 * WAD, now);
+    //     targetAmount /= 10000000000000;
+    //     assertEq(targetAmount, 4875646);
     // }
 
     // function testFailSwap80Origin () public {
