@@ -44,43 +44,18 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
     function testproportionalDeposit () public {
 
         uint256 mintedShells = l.proportionalDeposit(100 * (10 ** 18));
-        // uint256 balance = l.balanceOf(address(this));
-        // emit log_named_uint("minted shells", mintedShells);
-        // emit log_named_uint("balance", balance);
-        emit log_named_uint("cusdc", IERC20(cusdc).balanceOf(address(l))); // 165557372275
-        emit log_named_uint("cdai", IERC20(cdai).balanceOf(address(l))); // 163925889326
-        emit log_named_uint("usdt", IERC20(usdt).balanceOf(address(l))); // 33333333333333333300
+        emit log_named_uint("shells", mintedShells);
+        assertEq(mintedShells, 100 * (10 ** 18));
+        uint256 cusdcBal = IERC20(cusdc).balanceOf(address(l)); // 165557372275
+        uint256 cdaiBal = IERC20(cdai).balanceOf(address(l)); // 163925889326
+        uint256 usdtBal = IERC20(usdt).balanceOf(address(l)); // 33333333333333333300
 
-        new KovanCUsdcAdapter().getNumeraireAmount(165557372275);
-        new KovanCDaiAdapter().getNumeraireAmount(163925889326);
+        uint256 usdtNumeraireAmount = new KovanUsdtAdapter().getNumeraireAmount(usdtBal);
+        uint256 cusdcNumeraireAmount = new KovanCUsdcAdapter().getNumeraireAmount(cusdcBal);
+        uint256 cdaiNumeraireAmount = new KovanCDaiAdapter().getNumeraireAmount(cdaiBal);
 
-        // uint256 mintedShells2 = l.proportionalDeposit(50 * (10 ** 18));
-        // uint256 balance2 = l.balanceOf(address(this));
-        // // emit log_named_uint("mintedShells2", mintedShells2);
-        // // emit log_named_uint("balance2", balance2);
-
-        // uint256 mintedShells3 = l.proportionalDeposit(70 * (10 ** 18));
-        // uint256 balance3 = l.balanceOf(address(this));
-        // // emit log_named_uint("mintedShells2", mintedShells3);
-        // // emit log_named_uint("balance2", balance3);
-        // // assertTrue(false);
+        assertEq(usdtNumeraireAmount / (10 ** 10), 3333333333);
+        assertEq(cusdcNumeraireAmount / (10 ** 10), 3333333300);
+        assertEq(cdaiNumeraireAmount / (10 ** 10), 3333333333);
 
     }
-
-    // function testSelectiveDeposit () public {
-
-    //     uint256[] memory deposits = new uint256[](3);
-    //     deposits[0] = 250;
-    //     deposits[1] = 250;
-    //     deposits[2] = 500;
-
-    //     address[] memory flavors = new address[](3);
-    //     flavors[0] = chai;
-    //     flavors[1] = cusdc;
-    //     flavors[2] = usdt;
-
-    //     l.selectiveDeposit(flavors, deposits);
-
-    // }
-
-}
