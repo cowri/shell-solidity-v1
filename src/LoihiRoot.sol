@@ -22,7 +22,4 @@ contract LoihiRoot is ERC20, ERC20Mintable, ERC20Burnable, DSMath, Ownable {
     bytes4 constant internal ERC20ID = 0x36372b07;
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
 
-
-
-
 }

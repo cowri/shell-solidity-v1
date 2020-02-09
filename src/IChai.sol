@@ -1,6 +1,6 @@
 pragma solidity ^0.5.12;
 
-interface ChaiI {
+interface IChai {
     function draw(address src, uint wad) external;
     function exit(address src, uint wad) external;
     function join(address dst, uint wad) external;
