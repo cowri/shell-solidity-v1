@@ -41,36 +41,43 @@ contract UnbalancedSwapByOriginTest is AdaptersSetup, DSMath, DSTest {
         l.setFeeDerivative(WAD / 10);
         l.setFeeBase(500000000000000);
 
-        // IERC20(cdai).transfer(address(l), 35 * WAD);
-        // IERC20(cusdc).transfer(address(l), 50 * WAD);
-        // SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
+        l.proportionalDeposit(300 * (10 ** 18));
 
-        l.fakeMint(300 * WAD);
+        address[] memory addr = new address[](1);
+        uint256[] memory amt = new uint256[](1);
+        addr[0] = dai;
+        amt[0] = 30 * WAD;
+        uint256 burned = l.selectiveWithdraw(addr, amt);
+
+        addr[0] = usdt;
+        uint256 deposited = l.selectiveDeposit(addr, amt);
 
     }
 
-    // function testUnbalancedOriginSwapZtoY () public {
-    //     uint256 targetAmount = l.swapByOrigin(usdt, 10 * WAD, usdc, 5 * WAD, now);
-    //     assertEq(targetAmount, 9845075000000000000);
-    // }
+    function testUnbalancedOriginSwapZtoY () public {
+        uint256 targetAmount = l.swapByOrigin(usdt, 10 * WAD, usdc, 5 * (10 ** 12), now);
+        assertEq(targetAmount, 9849999);
+    }
 
-    // function testUnbalancedOriginSwapYtoX () public {
-    //     uint256 targetAmount = l.swapByOrigin(usdc, 10 * (WAD / 10 ** 12), dai, 5 * WAD, now);
-    //     assertEq(targetAmount, 9845075000000000000);
-    // }
+    function testUnbalancedOriginSwapYtoX () public {
+        uint256 targetAmount = l.swapByOrigin(usdc, 10 * (10 ** 6), dai, 5 * WAD, now);
+        targetAmount /= 10000000000;
+        assertEq(targetAmount, 984507500);
+    }
 
-    // function testUnbalancedOriginSwapZtoX () public {
-    //     uint256 targetAmount = l.swapByOrigin(usdt, 10 * WAD, dai, 5 * WAD, now);
-    //     assertEq(targetAmount, 9698875636250000000);
-    // }
+    function testUnbalancedOriginSwapZtoX () public {
+        uint256 targetAmount = l.swapByOrigin(usdt, 10 * WAD, dai, 5 * WAD, now);
+        targetAmount /= 10000000000;
+        assertEq(targetAmount, 969887563);
+    }
 
-    // function testUnbalancedOriginSwapXtoZ () public {
-    //     uint256 targetAmount = l.swapByOrigin(dai, 10 * WAD, usdt, 5 * WAD, now);
-    //     assertEq(targetAmount, 9995000000000000000);
-    // }
+    function testUnbalancedOriginSwapXtoZ () public {
+        uint256 targetAmount = l.swapByOrigin(dai, 10 * WAD, usdt, 5 * WAD, now);
+        assertEq(targetAmount, 9995000000000000000);
+    }
 
-    // function testFailUnbalancedOriginSwap () public {
-    //     uint256 targetAmount = l.swapByOrigin(dai, 80 * WAD, cusdc, 9 * WAD, now);
-    // }
+    function testFailUnbalancedOriginSwap () public {
+        uint256 targetAmount = l.swapByOrigin(dai, 80 * WAD, cusdc, 9 * WAD, now);
+    }
 
 }

@@ -5,6 +5,7 @@ import "ds-test/test.sol";
 import "ds-math/math.sol";
 import "../flavorsSetup.sol";
 import "../adaptersSetup.sol";
+import "../../IAdapter.sol";
 import "../../Loihi.sol";
 
 contract BalancedSwapByOriginTest is AdaptersSetup, DSMath, DSTest {
@@ -44,33 +45,34 @@ contract BalancedSwapByOriginTest is AdaptersSetup, DSMath, DSTest {
 
         l.proportionalDeposit(300 * (10 ** 18));
 
-
     }
 
-    // function testSwap10Origin () public {
-    //     uint256 targetAmount = l.swapByOrigin(dai, 10 * WAD, usdc, 9 * WAD, now);
-    //     assertEq(targetAmount, 9995000000000000000);
-    // }
+    function testSwap10Origin () public {
+        uint256 targetAmount = l.swapByOrigin(dai, 10 * WAD, usdc, 9 * WAD, now);
+        assertEq(targetAmount, 9995000);
+    }
 
-    // function testSwap25Origin () public {
-    //     uint256 targetAmount = l.swapByOrigin(dai, 25 * WAD, cusdc, 9 * WAD, now);
-    //     assertEq(targetAmount / 10 ** 4 + 1, 2498750000000000);
-    // }
+    function testSwap25Origin () public {
+        uint256 targetAmount = l.swapByOrigin(dai, 25 * WAD, cusdc, 9 * WAD, now);
+        uint256 numeraireAmount = IAdapter(cusdcAdapter).getNumeraireAmount(targetAmount);
+        numeraireAmount /= 10000000000;
+        assertEq(numeraireAmount, 2498749900);
+    }
 
-    // function testSwap40Origin () public {
-    //     uint256 targetAmount = l.swapByOrigin(dai, 40 * WAD, cusdc, 9 * WAD, now);
-    //     targetAmount /= 10000000000000;
-    //     assertEq(targetAmount, 3953692);
-    // }
+    function testSwap40Origin () public {
+        uint256 targetAmount = l.swapByOrigin(dai, 40 * WAD, cusdc, 9 * WAD, now);
+        uint256 numeraireAmount = IAdapter(cusdcAdapter).getNumeraireAmount(targetAmount);
+        numeraireAmount /= 10000000000;
+        assertEq(numeraireAmount, 3953692000);
+    }
 
-    // function testSwap50Origin () public {
-    //     uint256 targetAmount = l.swapByOrigin(dai, 50 * WAD - 1000000000000, usdc, 9 * WAD, now);
-    //     targetAmount /= 10000000000000;
-    //     assertEq(targetAmount, 4875646);
-    // }
+    function testSwap50Origin () public {
+        uint256 targetAmount = l.swapByOrigin(dai, 50 * WAD - 10000000000000, usdc, 9 * WAD, now);
+        assertEq(targetAmount, 48756459);
+    }
 
-    // function testFailSwap80Origin () public {
-    //     uint256 targetAmount = l.swapByOrigin(dai, 80 * WAD, cusdc, 9 * WAD, now);
-    // }
+    function testFailSwap80Origin () public {
+        uint256 targetAmount = l.swapByOrigin(dai, 80 * WAD, cusdc, 9 * WAD, now);
+    }
 
 }

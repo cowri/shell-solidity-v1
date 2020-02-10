@@ -38,7 +38,6 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
         l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
 
-
     }
 
     function testproportionalDeposit () public {
@@ -59,3 +58,4 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
         assertEq(cdaiNumeraireAmount / (10 ** 10), 3333333333);
 
     }
+}

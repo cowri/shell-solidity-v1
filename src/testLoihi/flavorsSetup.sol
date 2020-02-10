@@ -43,7 +43,7 @@ contract FlavorsSetup {
     function setupFlavorsKovan () public {
         chai = 0xB641957b6c29310926110848dB2d464C8C3c3f38;
         cdai = 0xe7bc397DBd069fC7d0109C0636d06888bb50668c;
-        dai = 0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa;
+        dai = 0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa; 
         pot = 0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb;
         cusdc = 0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35;
         usdc = 0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF;
@@ -53,12 +53,12 @@ contract FlavorsSetup {
 
 
     function approveFlavors (address addr) public {
-        IERC20(chai).approve(addr, 100000 * (10 ** 18));
-        IERC20(cdai).approve(addr, 100000 * (10 ** 18));
-        IERC20(dai).approve(addr, 100000 * (10 ** 18));
-        IERC20(cusdc).approve(addr, 100000 * (10 ** 18));
-        IERC20(usdc).approve(addr, 100000 * (10 ** 18));
-        IERC20(usdt).approve(addr, 100000 * (10 ** 18));
+        IERC20(chai).approve(addr, 1000000000 * (10 ** 18));
+        IERC20(cdai).approve(addr, 1000000000 * (10 ** 18));
+        IERC20(dai).approve(addr, 1000000000 * (10 ** 18));
+        IERC20(cusdc).approve(addr, 10000000000 * (10 ** 18));
+        IERC20(usdc).approve(addr, 1000000000 * (10 ** 18));
+        IERC20(usdt).approve(addr, 1000000000 * (10 ** 18));
     }
 
 }

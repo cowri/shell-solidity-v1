@@ -27,7 +27,7 @@ contract LocalCUsdcAdapter is LoihiRoot {
     // takes numeraire amount and transfers corresponding cusdc in
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         uint256 rate = cusdc.exchangeRateCurrent();
-        amount = wmul(amount, rate);
+        amount = wdiv(amount, rate);
         cusdc.transferFrom(msg.sender, address(this), amount);
         return amount;
     }
@@ -36,7 +36,7 @@ contract LocalCUsdcAdapter is LoihiRoot {
     // transfers corresponding cusdc to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         uint256 rate = cusdc.exchangeRateCurrent();
-        amount = wmul(amount / 10000000000, rate);
+        amount = wmul(amount / 1000000000000, rate);
         cusdc.transfer(dst, amount);
         return amount;
     }
@@ -52,14 +52,12 @@ contract LocalCUsdcAdapter is LoihiRoot {
     // returns corresponding numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
         uint256 rate = cusdc.exchangeRateCurrent();
-        return wmul(amount, rate);
+        return wmul(amount, rate) * 1000000000000;
     }
 
     // returns numeraire amount of balance
     function getNumeraireBalance () public returns (uint256) {
-        uint256 rate = cusdc.exchangeRateCurrent();
-        uint256 bal = cusdc.balanceOf(address(this));
-        return wdiv(bal, rate);
+        return cusdc.balanceOfUnderlying(address(this)) * 1000000000000;
     }
 
 }

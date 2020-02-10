@@ -25,8 +25,9 @@ contract KovanUsdtAdapter {
     }
 
     // transfers usdt to destination
-    function outputNumeraire (address dst, uint256 amount) public  {
+    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         safeTransfer(IERC20(0x20F7963EF38AC716A85ed18fb683f064db944648), dst, amount);
+        return amount;
     }
 
     // returns amount, is already numeraire amount
@@ -39,17 +40,20 @@ contract KovanUsdtAdapter {
         return IERC20(0x20F7963EF38AC716A85ed18fb683f064db944648).balanceOf(address(this));
     }
     
+    event log_bytes4(bytes32, bytes4);
     function safeTransfer(IERC20 token, address to, uint256 value) internal {
-        callOptionalReturn(address(token), abi.encodeWithSelector(token.transfer.selector, to, value));
+        emit log_bytes4("transfer selector", token.transfer.selector);
+        callOptionalReturn(address(token), abi.encodeWithSelector(0xa9059cbb, to, value));
     }
 
     function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
         callOptionalReturn(address(token), abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
     }
-
+    event log_bool(bytes32, bool);
     function callOptionalReturn(address token, bytes memory data) private {
 
         (bool success, bytes memory returndata) = token.call(data);
+        emit log_bool("successssss", success);
         require(success, "SafeERC20: low-level call failed");
 
     }

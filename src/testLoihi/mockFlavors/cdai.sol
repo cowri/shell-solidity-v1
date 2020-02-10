@@ -39,7 +39,7 @@ contract cDaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
         return wdiv(WAD, 2);
     }
 
-    function balanceOfUnderlying (address account) public view returns (uint256) {
+    function balanceOfUnderlying (address account) public returns (uint256) {
         uint256 balance = balanceOf(account);
         return balance * 2;
     }

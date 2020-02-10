@@ -10,17 +10,23 @@ import "../adapters/kovan/kovanCUsdcAdapter.sol";
 import "../adapters/kovan/kovanCDaiAdapter.sol";
 import "../adapters/kovan/kovanChaiAdapter.sol";
 
+interface I {
+    function outputRaw (address addr, uint256 amt) external;
+}
+
+
 contract SandboxTest is DSMath, DSTest {
     Sandbox sandbox;
+    event log_bytes(bytes32, bytes4);
 
     function setUp() public { sandbox = new Sandbox(); }
 
-    // function testERC () public {
+    function testERC () public {
+        I i;
 
-    //     KovanUsdtAdapter a = new UsdtAdapter();
+        emit log_bytes("output raw", i.outputRaw.selector);
 
-    //     uint256 balance = a.getNumeraireBalance(0xA600AdF7CB8C750482a828712849ee026446aA66);
 
-    // }
+    }
 
 }

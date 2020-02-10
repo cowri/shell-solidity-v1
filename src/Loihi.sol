@@ -8,7 +8,7 @@ import "./LoihiRoot.sol";
 
 contract Loihi is LoihiRoot {
 
-    // // Local
+    // Local
     // IChai chai;
     // ICToken cdai;
     // IERC20 dai;
@@ -18,13 +18,13 @@ contract Loihi is LoihiRoot {
     // IERC20 usdt;
 
     // KOVAN
-    IChai public chai = IChai(0xB641957b6c29310926110848dB2d464C8C3c3f38);
-    ICToken public cdai = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
-    IERC20 public dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
-    IPot public pot = IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb);
-    ICToken public cusdc = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35);
-    IERC20 public usdc = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF);
-    IERC20 public usdt = IERC20(0x20F7963EF38AC716A85ed18fb683f064db944648);
+    // IChai public chai = IChai(0xB641957b6c29310926110848dB2d464C8C3c3f38);
+    // ICToken public cdai = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
+    // IERC20 public dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
+    // IPot public pot = IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb);
+    // ICToken public cusdc = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35);
+    // IERC20 public usdc = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF);
+    // IERC20 public usdt = IERC20(0x20F7963EF38AC716A85ed18fb683f064db944648);
 
 
     // // MAINNET
@@ -39,13 +39,13 @@ contract Loihi is LoihiRoot {
     event log_address(bytes32, address);
 
     constructor (address _chai, address _cdai, address _dai, address _pot, address _cusdc, address _usdc, address _usdt) public {
-        chai = IChai(_chai);
-        cdai = ICToken(_cdai);
-        dai = IERC20(_dai);
-        pot = IPot(_pot);
-        cusdc = ICToken(_cusdc);
-        usdc = IERC20(_usdc);
-        usdt = IERC20(_usdt);
+        // chai = IChai(_chai);
+        // cdai = ICToken(_cdai);
+        // dai = IERC20(_dai);
+        // pot = IPot(_pot);
+        // cusdc = ICToken(_cusdc);
+        // usdc = IERC20(_usdc);
+        // usdt = IERC20(_usdt);
     }
 
     function supportsInterface (bytes4 interfaceID) external view returns (bool) {
@@ -119,10 +119,9 @@ contract Loihi is LoihiRoot {
     /// @param addr the address of the interface wrapper to be delegatecall'd
     /// @param dst the destination to which to send the raw amount
     /// @param amount the raw amount of the asset to send
-    function dOutputRaw (address addr, address dst, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0x96439650, dst, amount)); // encoded selector of "outputRaw(address,uint256)";
+    function dOutputRaw (address addr, address dst, uint256 amount) internal {
+        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0xf09a3fc3, dst, amount)); // encoded selector of "outputRaw(address,uint256)";
         assert(success);
-        return abi.decode(result, (uint256));
     }
 
     /// @dev this function delegate calls addr, which is an interface to the required functions to retrieve the numeraire and raw values and vice versa
@@ -171,18 +170,11 @@ contract Loihi is LoihiRoot {
           uint256 _tNAmt,
           uint256 _grossLiq ) = getOriginTradeVariables(_o, _t, _oAmt);
 
-          emit log_uint("_oNAmt 1", _oNAmt);
-          emit log_uint("_o.weight", _o.weight);
-          emit log_uint("_oBal", _oBal);
-          emit log_uint("grossLiq", _grossLiq);
-
         _oNAmt = calculateOriginTradeOriginAmount(_o.weight, _oBal, _oNAmt, _grossLiq);
-        _tNAmt = _oNAmt;
-        uint256 tNAmt_ = calculateOriginTradeTargetAmount(_t.weight, _tBal, _tNAmt, _grossLiq);
+        _tNAmt = calculateOriginTradeTargetAmount(_t.weight, _tBal, _oNAmt, _grossLiq);
 
-        // dIntakeRaw(o.adapter, oAmt);
-        // dOutputNumeraire(t.adapter, recipient, tNAmt);
-        return tNAmt_;
+        dIntakeNumeraire(_o.adapter, _oNAmt);
+        return dOutputNumeraire(_t.adapter, _recipient, _tNAmt);
 
     }
 
@@ -288,6 +280,7 @@ contract Loihi is LoihiRoot {
         if (sub(_tBal, _tNAmt) > _feeThreshold) {
 
             tNAmt_ = wmul(_tNAmt, WAD - feeBase);
+            emit log_uint("ping", tNAmt_);
 
         } else if (_tBal <= _feeThreshold) {
 
@@ -299,6 +292,7 @@ contract Loihi is LoihiRoot {
             _tNAmt = wmul(_tNAmt, WAD - _fee);
             tNAmt_ = wmul(_tNAmt, WAD - feeBase);
 
+            emit log_uint("zing", tNAmt_);
         } else {
 
             uint256 _fee = wmul(feeDerivative, wdiv(
@@ -309,6 +303,7 @@ contract Loihi is LoihiRoot {
                 sub(_tBal, _feeThreshold),
                 wmul(sub(_feeThreshold, sub(_tBal, _tNAmt)), WAD - _fee)
             ), WAD - feeBase);
+            emit log_uint("ring", tNAmt_);
 
         }
 
@@ -336,11 +331,12 @@ contract Loihi is LoihiRoot {
           uint256 _grossLiq ) = getTargetTradeVariables(_o, _t, _tAmt) ;
 
         _oNAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _tNAmt, _grossLiq);
-        uint256 oNAmt_ = calculateTargetTradeOriginAmount(_o.weight, _oBal, _oNAmt, _grossLiq);
+        emit log_uint("target", _oNAmt);
+        _oNAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _oNAmt, _grossLiq);
+        emit log_uint("origin", _oNAmt);
 
-        // dOutputNumeraire(_tAdapter, recipient, tNAmt);
-        // dIntakeNumeraire(_oAdapter, oNAmt);
-        return oNAmt_;
+        dOutputRaw(_t.adapter, _recipient, _tAmt);
+        return dIntakeNumeraire(_o.adapter, _oNAmt);
 
     }
 
@@ -479,16 +475,10 @@ contract Loihi is LoihiRoot {
         for (uint i = 0; i < _flavors.length; i++) {
             Flavor memory _f = flavors[_flavors[i]]; // withdrawing adapter + weight
             for (uint j = 0; j < reserves.length; j++) {
+                balances_[j] = dGetNumeraireBalance(reserves[j]);
                 if (reserves[j] == _f.reserve) {
-                    if (balances_[j] == 0) {
-                        balances_[j] = dGetNumeraireBalance(_f.adapter);
-                        tokenAmounts_[j] = dGetNumeraireAmount(_f.adapter, _amounts[i]);
-                        weights_[j] = _f.weight;
-                        break;
-                    } else {
-                        tokenAmounts_[j] += dGetNumeraireAmount(_f.adapter, _amounts[i]);
-                        break;
-                    }
+                    tokenAmounts_[j] += dGetNumeraireAmount(_f.adapter, _amounts[i]);
+                    weights_[j] = _f.weight;
                 }
             }
         }
@@ -496,6 +486,8 @@ contract Loihi is LoihiRoot {
         return (balances_, tokenAmounts_, weights_);
 
     }
+
+    event log_uints(bytes32, uint256[]);
 
     /// @author James Foley http://github.com/realisation
     /// @notice this function allows selective depositing of any supported stablecoin flavor into the contract in return for corresponding shell tokens
@@ -510,10 +502,7 @@ contract Loihi is LoihiRoot {
 
         shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
 
-        for (uint i = 0; i < _flavors.length; i++) {
-            if (_amounts[i] == 0) continue;
-            dIntakeNumeraire(flavors[_flavors[i]].adapter, _amounts[i]);
-        }
+        for (uint i = 0; i < _flavors.length; i++) dIntakeNumeraire(flavors[_flavors[i]].adapter, _amounts[i]);
 
         _mint(msg.sender, shellsToMint_);
 
@@ -536,6 +525,9 @@ contract Loihi is LoihiRoot {
             _newSum = add(_newSum, add(_balances[i], _deposits[i]));
         }
 
+        emit log_uint("newSum", _newSum);
+        emit log_uint("oldSum", _oldSum);
+
         uint256 shellsToMint_;
 
         for (uint i = 0; i < _balances.length; i++) {
@@ -544,6 +536,10 @@ contract Loihi is LoihiRoot {
             uint256 _weight = _weights[i];
             uint256 _oldBalance = _balances[i];
             uint256 _newBalance = add(_oldBalance, _depositAmount);
+
+
+            emit log_uint("newBalance", _newBalance);
+            emit log_uint("halt check", wmul(_weight, wmul(_newSum, alpha + WAD)));
 
             require(_newBalance <= wmul(_weight, wmul(_newSum, alpha + WAD)), "halt check deposit");
 
@@ -576,7 +572,7 @@ contract Loihi is LoihiRoot {
             }
         }
 
-        return wmul(shellsToMint_, wdiv(_oldSum, totalSupply()));
+        return wmul(totalSupply(), wdiv(shellsToMint_, _newSum));
 
     }
 
@@ -591,9 +587,13 @@ contract Loihi is LoihiRoot {
           uint256[] memory _withdrawals,
           uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
 
+          emit log_uints("balances", _balances);
+          emit log_uints("weights", _weights);
+          emit log_uints("withdrawals", _withdrawals);
+
         shellsBurned_ = calculateShellsToBurn(_balances, _withdrawals, _weights);
 
-        // for (uint i = 0; i < _flavors.length; i++) dOutputNumeraire(flavors[_flavors[i]].adapter, msg.sender, _amounts[i]);
+        for (uint i = 0; i < _flavors.length; i++) dOutputRaw(flavors[_flavors[i]].adapter, msg.sender, _amounts[i]);
 
         _burn(msg.sender, shellsBurned_);
 
@@ -616,6 +616,9 @@ contract Loihi is LoihiRoot {
             _newSum = add(_newSum, sub(_balances[i], _withdrawals[i]));
         }
 
+        emit log_uint("oldSum", _oldSum);
+        emit log_uint("newSum", _newSum);
+
         uint256 _numeraireShellsToBurn;
 
         for (uint i = 0; i < reserves.length; i++) {
@@ -631,7 +634,11 @@ contract Loihi is LoihiRoot {
 
             if (_newBal >= _feeThreshold) {
 
-                _numeraireShellsToBurn += wmul(_withdrawal, WAD + feeBase);
+                uint256 newShellsToBurn = wmul(_withdrawal, WAD + feeBase);
+
+                emit log_uint("newShellsToBurn", newShellsToBurn);
+
+                _numeraireShellsToBurn += newShellsToBurn;
 
             } else if (_oldBal < _feeThreshold) {
 
@@ -639,7 +646,9 @@ contract Loihi is LoihiRoot {
 
                 _feePrep = wmul(_feePrep, feeDerivative);
 
-                _numeraireShellsToBurn += wmul(wmul(_withdrawal, WAD + _feePrep), WAD + feeBase);
+                uint256 newShellsToBurn = wmul(wmul(_withdrawal, WAD + _feePrep), WAD + feeBase);
+
+                _numeraireShellsToBurn += newShellsToBurn;
 
             } else {
 
@@ -647,21 +656,21 @@ contract Loihi is LoihiRoot {
 
                 _feePrep = wmul(feeDerivative, _feePrep);
 
-                _numeraireShellsToBurn += wmul(add(
+                uint256 newShellsToBurn = wmul(add(
                     sub(_oldBal, _feeThreshold),
                     wmul(sub(_feeThreshold, _newBal), WAD + _feePrep)
                 ), WAD + feeBase);
 
+                _numeraireShellsToBurn += newShellsToBurn;
+
             }
         }
 
-        return wmul(_numeraireShellsToBurn, wdiv(_oldSum, totalSupply()));
+        return wmul(totalSupply(), wdiv(_numeraireShellsToBurn, _newSum));
 
     }
 
     function proportionalDeposit (uint256 totalDeposit) public returns (uint256) {
-
-        emit log_address("msg.sender", msg.sender);
 
         uint256 totalBalance;
         uint256 _totalSupply = totalSupply();
@@ -670,6 +679,8 @@ contract Loihi is LoihiRoot {
 
         for (uint i = 0; i < reserves.length; i++) {
             uint256 numeBalance = dGetNumeraireBalance(reserves[i]);
+            emit log_uint("numebal", numeBalance);
+            emit log_address("nuemraries[i]", numeraires[i]);
             totalBalance += numeBalance;
             Flavor memory d = flavors[numeraires[i]];
             amounts[i] = wmul(d.weight, totalDeposit);

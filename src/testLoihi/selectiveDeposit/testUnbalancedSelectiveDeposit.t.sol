@@ -14,16 +14,15 @@ contract UnbalancedSelectiveDepositTest is AdaptersSetup, DSMath, DSTest {
 
     function setUp() public {
 
-        setupFlavors();
-        setupAdapters();
-        l = new Loihi(chai, cdai, dai, pot, cusdc, usdc, usdt);
-        approveFlavors(address(l));
-        
         // setupFlavors();
         // setupAdapters();
-        // l = new Loihi(address(0), address(0), address(0), address(0), address(0), address(0), address(0));
+        // l = new Loihi(chai, cdai, dai, pot, cusdc, usdc, usdt);
         // approveFlavors(address(l));
-
+        
+        setupFlavors();
+        setupAdapters();
+        l = new Loihi(address(0), address(0), address(0), address(0), address(0), address(0), address(0));
+        approveFlavors(address(l));
 
         uint256 weight = WAD / 3;
 
@@ -43,61 +42,73 @@ contract UnbalancedSelectiveDepositTest is AdaptersSetup, DSMath, DSTest {
         l.setFeeDerivative(WAD / 10);
         l.setFeeBase(500000000000000);
 
-        IERC20(cdai).transfer(address(l), 35 * WAD);
-        IERC20(cusdc).transfer(address(l), 50 * WAD);
-        SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
+        l.proportionalDeposit(300 * (10 ** 18));
 
-        l.fakeMint(WAD * 300);
+        address[] memory addr = new address[](1);
+        uint256[] memory amt = new uint256[](1);
+        addr[0] = dai;
+        amt[0] = 30 * WAD;
+        uint256 burned = l.selectiveWithdraw(addr, amt);
+
+        addr[0] = usdt;
+        uint256 deposited = l.selectiveDeposit(addr, amt);
 
     }
 
-    function testSelectiveDeposit0x10y20z () public {
-        uint256[] memory amounts = new uint256[](3);
-        address[] memory tokens = new address[](3);
+    function testUnbalancedSelectiveDeposit0x10y20z () public {
+        uint256[] memory amounts = new uint256[](2);
+        address[] memory tokens = new address[](2);
 
-        tokens[0] = dai; amounts[0] = 0;
-        tokens[1] = usdc; amounts[1] = WAD * 10;
-        tokens[2] = usdt; amounts[2] = WAD * 20;
+        tokens[0] = usdc; amounts[0] = 10 * 1000000;
+        tokens[1] = usdt; amounts[1] = 20 * WAD;
+
+        uint256 shells = l.totalSupply();
+        emit log_named_uint("shells", shells);
 
         uint256 newShells = l.selectiveDeposit(tokens, amounts);
         assertEq(newShells, 29857954545454545448);
     }
 
-    function testSelectiveDeposit10x15y0z () public {
-        uint256[] memory amounts = new uint256[](3);
-        address[] memory tokens = new address[](3);
+    // function testUnbalancedSelectiveDeposit10x15y0z () public {
+    //     uint256[] memory amounts = new uint256[](2);
+    //     address[] memory tokens = new address[](2);
 
-        tokens[0] = dai; amounts[0] = WAD * 10;
-        tokens[1] = usdc; amounts[1] = WAD * 15;
-        tokens[2] = usdt; amounts[2] = 0;
+    //     tokens[0] = dai; amounts[0] = 10 * WAD;
+    //     tokens[1] = usdc; amounts[1] = 15 * 1000000;
 
-        uint256 newShells = l.selectiveDeposit(tokens, amounts);
-        assertEq(newShells, 25000000000000000000);
-    }
+    //     uint256 shells = l.totalSupply();
+    //     emit log_named_uint("shells", shells);
 
-    function testSelectiveDeposit10x15y25z () public {
-        uint256[] memory amounts = new uint256[](3);
-        address[] memory tokens = new address[](3);
+    //     uint256 newShells = l.selectiveDeposit(tokens, amounts);
+    //     assertEq(newShells, 25000000000000000000);
+    // }
 
-        tokens[0] = dai; amounts[0] = WAD * 10;
-        tokens[1] = usdc; amounts[1] = WAD * 15;
-        tokens[2] = usdt; amounts[2] = WAD * 25;
+    // function testUnbalancedSelectiveDeposit10x15y25z () public {
+    //     uint256[] memory amounts = new uint256[](3);
+    //     address[] memory tokens = new address[](3);
 
-        uint256 newShells = l.selectiveDeposit(tokens, amounts);
-        assertEq(newShells, 49927976190476190476);
-    }
+    //     uint256 shells = l.totalSupply();
+    //     emit log_named_uint("shells", shells);
 
-    function testFailSelectiveDeposit0x0y100z () public {
-        uint256[] memory amounts = new uint256[](3);
-        address[] memory tokens = new address[](3);
+    //     tokens[0] = dai; amounts[0] = 10 * WAD;
+    //     tokens[1] = usdc; amounts[1] = 15 * 1000000;
+    //     tokens[2] = usdt; amounts[2] = 25 * WAD;
 
-        tokens[0] = dai; amounts[0] = 0;
-        tokens[1] = usdc; amounts[1] = 0;
-        tokens[2] = usdt; amounts[2] = WAD * 100;
+    //     uint256 newShells = l.selectiveDeposit(tokens, amounts);
+    //     assertEq(newShells, 49927976190476190476);
+    // }
 
-        uint256 newShells = l.selectiveDeposit(tokens, amounts);
-    }
+    // function testFailUnbalancedSelectiveDeposit0x0y100z () public {
+    //     uint256[] memory amounts = new uint256[](2);
+    //     address[] memory tokens = new address[](2);
 
+    //     uint256 shells = l.totalSupply();
+    //     emit log_named_uint("shells", shells);
 
+    //     tokens[1] = usdc; amounts[1] = 0;
+    //     tokens[2] = usdt; amounts[2] = 100 * WAD;
+
+    //     uint256 newShells = l.selectiveDeposit(tokens, amounts);
+    // }
 
 }

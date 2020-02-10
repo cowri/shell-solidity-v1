@@ -11,38 +11,51 @@ contract KovanUsdcAdapter {
     // transfers usdc in
     // wraps it in csudc
     function intakeRaw (uint256 amount) public {
-        amount = amount / 1000000000000;
         IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).transferFrom(msg.sender, address(this), amount);
         IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).approve(address(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35), amount);
-        ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).mint(amount);
+        ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).mint(amount);
     }
 
     // transfers usdc in
     // wraps it in csudc
     function intakeNumeraire (uint256 amount) public returns (uint256) {
-        uint256 usdcDecimalAmount = amount / 1000000000000;
-        IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).transferFrom(msg.sender, address(this), usdcDecimalAmount);
-        IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).approve(address(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35), usdcDecimalAmount);
-        ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).mint(usdcDecimalAmount);
+        emit log_uint("amount", amount);
+        amount /= 1000000000000;
+        emit log_uint("amount", amount);
+        IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).transferFrom(msg.sender, address(this), amount);
+        IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).approve(address(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35), amount);
+        ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).mint(amount);
         return amount;
     }
     event log_uint(bytes32, uint256);
 
     // redeems numeraire amount from cusdc
     // transfers it to destination
-    function outputNumeraire (address dst, uint256 amount) public {
-        
-        ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).redeemUnderlying(amount);
-        IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).transfer(dst, amount);
+    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+        emit log_uint("amount1", amount);
+        amount /= 1000000000000;
+        emit log_uint("amount2", amount);
 
+        uint256 underlyingBal = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).balanceOfUnderlying(address(this));
+        uint256 bal = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).balanceOf(address(this));
+        emit log_uint("underlying bal", underlyingBal);
+        emit log_uint("bal", bal);
+        uint256 usdcBal = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).balanceOf(address(this));
+        ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).redeemUnderlying(amount);
+        uint256 usdcBalAfter = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).balanceOf(address(this));
+        emit log_uint("usdcBal", usdcBal);
+        emit log_uint("usdcBalAfter", usdcBalAfter);
+        IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).transfer(dst, amount);
+        return amount;
     }
 
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
-        amount = amount / 1000000000000;
         uint256 bal = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).balanceOf(address(this));
-        ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).redeemUnderlying(amount);
+        ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).redeemUnderlying(amount);
         bal = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).balanceOf(address(this)) - bal;
         IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).transfer(dst, amount);
+        emit log_uint("amount", amount);
+        emit log_uint("bal", bal);
         return bal;
     }
 

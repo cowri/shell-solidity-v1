@@ -28,6 +28,7 @@ contract LocalUsdcAdapter is LoihiRoot {
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
+        amount /= 1000000000000;
         usdc.transferFrom(msg.sender, address(this), amount);
         usdc.approve(address(cusdc), amount);
         cusdc.mint(amount);
@@ -37,13 +38,14 @@ contract LocalUsdcAdapter is LoihiRoot {
     // redeems numeraire amount from cusdc
     // transfers it to destination
     function outputNumeraire (address dst, uint256 amount) public {
+        amount /= 1000000000000;
         cusdc.redeemUnderlying(amount);
         usdc.transfer(dst, amount);
     }
 
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
         uint256 bal = usdc.balanceOf(address(this));
-        cusdc.redeem(amount);
+        cusdc.redeemUnderlying(amount);
         bal = usdc.balanceOf(address(this)) - bal;
         usdc.transfer(dst, amount);
         return bal;
@@ -51,13 +53,11 @@ contract LocalUsdcAdapter is LoihiRoot {
 
     // is already numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        return amount;
+        return amount * 1000000000000;
     }
 
     // returns numeraire balance
     function getNumeraireBalance () public returns (uint256) {
-        uint256 rate = cusdc.exchangeRateCurrent();
-        uint256 bal = cusdc.balanceOf(address(this));
-        return wdiv(bal, rate);
+        return cusdc.balanceOfUnderlying(address(this));
     }
 }

@@ -14,15 +14,15 @@ contract UnbalancedSwapByTargetTest is AdaptersSetup, DSMath, DSTest {
 
     function setUp() public {
 
-        setupFlavors();
-        setupAdapters();
-        l = new Loihi(chai, cdai, dai, pot, cusdc, usdc, usdt);
-        approveFlavors(address(l));
-        
         // setupFlavors();
         // setupAdapters();
-        // l = new Loihi(address(0), address(0), address(0), address(0), address(0), address(0), address(0));
+        // l = new Loihi(chai, cdai, dai, pot, cusdc, usdc, usdt);
         // approveFlavors(address(l));
+        
+        setupFlavors();
+        setupAdapters();
+        l = new Loihi(address(0), address(0), address(0), address(0), address(0), address(0), address(0));
+        approveFlavors(address(l));
 
         uint256 weight = WAD / 3;
 
@@ -42,40 +42,45 @@ contract UnbalancedSwapByTargetTest is AdaptersSetup, DSMath, DSTest {
         l.setFeeDerivative(WAD / 10);
         l.setFeeBase(500000000000000);
 
-        // l.proportionalDeposit(210 * (10 ** 18));
+        l.proportionalDeposit(300 * (10 ** 18));
 
-        IERC20(cdai).transfer(address(l), 35 * WAD);
-        IERC20(cusdc).transfer(address(l), 50 * WAD);
-        SafeERC20.safeTransfer(IERC20(usdt), address(l), 130 * WAD);
+        address[] memory addr = new address[](1);
+        uint256[] memory amt = new uint256[](1);
+        addr[0] = dai;
+        amt[0] = 30 * WAD;
+        uint256 burned = l.selectiveWithdraw(addr, amt);
 
-        l.fakeMint(300 * WAD);
+        addr[0] = usdt;
+        uint256 deposited = l.selectiveDeposit(addr, amt);
 
     }
 
     event log_uint_arr(bytes32, uint256[]);
 
-    function testBalancedTargetSwap10yToZ () public {
-        uint256 originAmount = l.swapByTarget(usdt, 20 * WAD, usdc, 10 * WAD, now);
-        assertEq(originAmount, 10155125025000000000);
+    function testUnbalancedTargetSwap10yToZ () public {
+        uint256 originAmount = l.swapByTarget(usdt, 20 * WAD, usdc, 10 * 1000000, now);
+        originAmount /= 1000000000000;
+        assertEq(originAmount, 10155125);
     }
 
-    function testBalancedTargetSwap10zToY () public {
+    function testUnbalancedTargetSwap10zToY () public {
         uint256 targetAmount = l.swapByTarget(usdc, 30 * WAD, usdt, 10 * WAD, now);
-        assertEq(targetAmount, 10005000000000000000);
+        assertEq(targetAmount, 10005000);
     }
 
-    function testBalancedTargetSwap10xToZ () public {
+    function testUnbalancedTargetSwap10xToZ () public {
         uint256 targetAmount = l.swapByTarget(usdt, 20 * WAD, dai, 10 * WAD, now);
-        assertEq(targetAmount, 10308975923255625000);
+        targetAmount /= 1000000000000;
+        assertEq(targetAmount, 10308975);
     }
 
-    function testBalancedTargetSwap10zToX () public {
+    function testUnbalancedTargetSwap10zToX () public {
         uint256 targetAmount = l.swapByTarget(dai, 20 * WAD, usdt, 10 * WAD, now);
         assertEq(targetAmount, 10005000000000000000);
     }
 
-    function testFailBalancedSwap51Target () public {
-        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 51 * WAD, now);
+    function testFailUnbalancedSwap51Target () public {
+        uint256 targetAmount = l.swapByTarget(dai, 9 * WAD, usdc, 51 * 1000000, now);
     }
 
 }

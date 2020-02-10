@@ -17,7 +17,6 @@ contract KovanDaiAdapter {
         ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).mint(amount);
         
     }
-    event log_uint(bytes32, uint256);
 
     // transfers dai in
     // wraps it in cdai
@@ -25,14 +24,7 @@ contract KovanDaiAdapter {
         
         IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).transferFrom(msg.sender, address(this), amount);
         IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).approve(address(0xe7bc397DBd069fC7d0109C0636d06888bb50668c), amount);
-        uint bal = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).balanceOf(address(this));
         ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).mint(amount);
-        bal = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).balanceOf(address(this)) - bal;
-        uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateCurrent();
-        emit log_uint("rate", rate);
-        emit log_uint("cDai contribution", bal);
-        emit log_uint("numeraireAmount", amount);
-        emit log_uint("amount/rate", amount/(rate/1000000000000000000));
         return amount;
         
     }
@@ -41,7 +33,9 @@ contract KovanDaiAdapter {
     // transfers out dai
     function outputRaw (address dst, uint256 amount) public {
         
+        uint256 bal = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).balanceOf(address(this));
         ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).redeemUnderlying(amount);
+        bal = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).balanceOf(address(this));
         IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).transfer(dst, amount);
         
     }
