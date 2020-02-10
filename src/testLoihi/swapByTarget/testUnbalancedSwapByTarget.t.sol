@@ -55,8 +55,6 @@ contract UnbalancedSwapByTargetTest is AdaptersSetup, DSMath, DSTest {
 
     }
 
-    event log_uint_arr(bytes32, uint256[]);
-
     function testUnbalancedTargetSwap10yToZ () public {
         uint256 originAmount = l.swapByTarget(usdt, 20 * WAD, usdc, 10 * 1000000, now);
         originAmount /= 1000000000000;

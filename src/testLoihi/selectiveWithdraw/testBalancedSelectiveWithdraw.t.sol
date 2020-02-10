@@ -89,7 +89,7 @@ contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
         uint256 shellsBurned = l.selectiveWithdraw(tokens, amounts);
         shellsBurned /= 1000000000000;
-        assertEq(shellsBurned, 33349999);
+        assertEq(shellsBurned, 33350000);
     }
 
     function testBalancedSelectiveWithdraw45x0y0z () public {

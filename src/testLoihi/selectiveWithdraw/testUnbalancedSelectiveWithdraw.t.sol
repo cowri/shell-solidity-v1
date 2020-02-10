@@ -42,7 +42,6 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
         l.setFeeDerivative(WAD / 10);
         l.setFeeBase(500000000000000);
 
-        emit log_named_address("me", address(this));
         l.proportionalDeposit(300 * (10 ** 18));
 
         address[] memory addr = new address[](1);

@@ -45,8 +45,6 @@ contract BalancedSwapByTargetTest is AdaptersSetup, DSMath, DSTest {
 
     }
 
-    // event log_uint_arr(bytes32, uint256[]);
-
     function testBalancedSwap15Target () public {
         uint256 targetAmount = l.swapByTarget(dai, 200 * WAD, usdc, 15 * 1000000, now);
         targetAmount /= 1000000000000;

@@ -98,6 +98,7 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
+    /// @author James Foley http://github.com/realisation
     /// @dev this function delegate calls addr, which is an interface to the required functions for retrieving and transfering numeraire and raw values and vice versa
     /// @param addr the address to the interface wrapper to be delegatecall'd
     /// @param amount the numeraire amount to be transfered into the contract. will be adjusted to the raw amount before transfer
@@ -106,6 +107,7 @@ contract Loihi is LoihiRoot {
         assert(success);
     }
 
+    /// @author James Foley http://github.com/realisation
     /// @dev this function delegate calls addr, which is an interface to the required functions for retrieving and transfering numeraire and raw values and vice versa
     /// @param addr the address to the interface wrapper to be delegatecall'd
     /// @param amount the numeraire amount to be transfered into the contract. will be adjusted to the raw amount before transfer
@@ -115,6 +117,7 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
+    /// @author James Foley http://github.com/realisation
     /// @dev this function delegate calls addr, which is an interface to the required functions for retrieving and transfering numeraire and raw values and vice versa
     /// @param addr the address of the interface wrapper to be delegatecall'd
     /// @param dst the destination to which to send the raw amount
@@ -124,6 +127,7 @@ contract Loihi is LoihiRoot {
         assert(success);
     }
 
+    /// @author James Foley http://github.com/realisation
     /// @dev this function delegate calls addr, which is an interface to the required functions to retrieve the numeraire and raw values and vice versa
     /// @param addr address of the interface wrapper
     /// @param dst the destination to send the raw amount to
@@ -173,7 +177,7 @@ contract Loihi is LoihiRoot {
         _oNAmt = calculateOriginTradeOriginAmount(_o.weight, _oBal, _oNAmt, _grossLiq);
         _tNAmt = calculateOriginTradeTargetAmount(_t.weight, _tBal, _oNAmt, _grossLiq);
 
-        dIntakeNumeraire(_o.adapter, _oNAmt);
+        dIntakeRaw(_o.adapter, _oNAmt);
         return dOutputNumeraire(_t.adapter, _recipient, _tNAmt);
 
     }
@@ -230,17 +234,13 @@ contract Loihi is LoihiRoot {
 
         uint256 oNAmt_;
 
-        emit log_uint("ping",0);
         uint256 _feeThreshold = wmul(_oWeight, wmul(_grossLiq, beta + WAD));
-        emit log_uint("ping", _feeThreshold);
         if (_oBal < _feeThreshold) {
-        emit log_uint("ping",0);
 
             oNAmt_ = _oNAmt;
 
         } else if (sub(_oBal, _oNAmt) >= _feeThreshold) {
 
-        emit log_uint("ping",0);
             uint256 _fee = wdiv(
                 sub(_oBal, _feeThreshold),
                 wmul(_oWeight, _grossLiq)
@@ -249,7 +249,6 @@ contract Loihi is LoihiRoot {
             oNAmt_ = wmul(_oNAmt, WAD - _fee);
 
         } else {
-        emit log_uint("ping",0);
 
             uint256 _fee = wmul(feeDerivative, wdiv(
                 sub(_oBal, _feeThreshold),
@@ -502,7 +501,7 @@ contract Loihi is LoihiRoot {
 
         shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
 
-        for (uint i = 0; i < _flavors.length; i++) dIntakeNumeraire(flavors[_flavors[i]].adapter, _amounts[i]);
+        for (uint i = 0; i < _flavors.length; i++) dIntakeRaw(flavors[_flavors[i]].adapter, _amounts[i]);
 
         _mint(msg.sender, shellsToMint_);
 
@@ -510,6 +509,7 @@ contract Loihi is LoihiRoot {
 
     }
 
+    /// @author James Foley http://github.com/realisation
     /// @notice this function calculates the amount of shells to mint by taking the balances, numeraire deposits and weights of the reserve tokens being deposited into
     /// @dev each array is the same length. each index in each array refers to the same reserve - index 0 is for the reserve token at index 0 in the reserves array, index 1 is for the reserve token at index 1 in the reserve array and so forth.
     /// @param _balances an array of current numeraire balances for each reserve
@@ -524,9 +524,6 @@ contract Loihi is LoihiRoot {
             _oldSum = add(_oldSum, _balances[i]);
             _newSum = add(_newSum, add(_balances[i], _deposits[i]));
         }
-
-        emit log_uint("newSum", _newSum);
-        emit log_uint("oldSum", _oldSum);
 
         uint256 shellsToMint_;
 
@@ -572,11 +569,12 @@ contract Loihi is LoihiRoot {
             }
         }
 
-        return wmul(totalSupply(), wdiv(shellsToMint_, _newSum));
+        return wmul(totalSupply(), wdiv(shellsToMint_, _oldSum));
 
     }
 
 
+    /// @author James Foley http://github.com/realisation
     /// @notice this function allows selective the withdrawal of any supported stablecoin flavor from the contract by burning a corresponding amount of shell tokens
     /// @param _flavors an array of flavors to withdraw from the reserves
     /// @param _amounts an array of amounts to withdraw that maps to _flavors
@@ -586,10 +584,6 @@ contract Loihi is LoihiRoot {
         ( uint256[] memory _balances,
           uint256[] memory _withdrawals,
           uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
-
-          emit log_uints("balances", _balances);
-          emit log_uints("weights", _weights);
-          emit log_uints("withdrawals", _withdrawals);
 
         shellsBurned_ = calculateShellsToBurn(_balances, _withdrawals, _weights);
 
@@ -601,6 +595,7 @@ contract Loihi is LoihiRoot {
 
     }
 
+    /// @author James Foley http://github.com/realisation
     /// @notice this function calculates the amount of shells to mint by taking the balances, numeraire deposits and weights of the reserve tokens being deposited into
     /// @dev each array is the same length. each index in each array refers to the same reserve - index 0 is for the reserve token at index 0 in the reserves array, index 1 is for the reserve token at index 1 in the reserve array and so forth.
     /// @param _balances an array of current numeraire balances for each reserve
@@ -615,9 +610,6 @@ contract Loihi is LoihiRoot {
             _oldSum = add(_oldSum, _balances[i]);
             _newSum = add(_newSum, sub(_balances[i], _withdrawals[i]));
         }
-
-        emit log_uint("oldSum", _oldSum);
-        emit log_uint("newSum", _newSum);
 
         uint256 _numeraireShellsToBurn;
 
@@ -634,11 +626,7 @@ contract Loihi is LoihiRoot {
 
             if (_newBal >= _feeThreshold) {
 
-                uint256 newShellsToBurn = wmul(_withdrawal, WAD + feeBase);
-
-                emit log_uint("newShellsToBurn", newShellsToBurn);
-
-                _numeraireShellsToBurn += newShellsToBurn;
+                _numeraireShellsToBurn += wmul(_withdrawal, WAD + feeBase);
 
             } else if (_oldBal < _feeThreshold) {
 
@@ -646,9 +634,7 @@ contract Loihi is LoihiRoot {
 
                 _feePrep = wmul(_feePrep, feeDerivative);
 
-                uint256 newShellsToBurn = wmul(wmul(_withdrawal, WAD + _feePrep), WAD + feeBase);
-
-                _numeraireShellsToBurn += newShellsToBurn;
+                _numeraireShellsToBurn += wmul(wmul(_withdrawal, WAD + _feePrep), WAD + feeBase);
 
             } else {
 
@@ -656,77 +642,76 @@ contract Loihi is LoihiRoot {
 
                 _feePrep = wmul(feeDerivative, _feePrep);
 
-                uint256 newShellsToBurn = wmul(add(
+                _numeraireShellsToBurn += wmul(add(
                     sub(_oldBal, _feeThreshold),
                     wmul(sub(_feeThreshold, _newBal), WAD + _feePrep)
                 ), WAD + feeBase);
 
-                _numeraireShellsToBurn += newShellsToBurn;
-
             }
         }
 
-        return wmul(totalSupply(), wdiv(_numeraireShellsToBurn, _newSum));
+        return wmul(totalSupply(), wdiv(_numeraireShellsToBurn, _oldSum));
 
     }
 
-    function proportionalDeposit (uint256 totalDeposit) public returns (uint256) {
+    /// @author James Foley http://github.com/realisation
+    /// @notice this function takes a total amount to deposit into the pool with no slippage from the numeraire assets the pool supports
+    /// @param _deposit the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
+    /// @return shellsToMint_ the amount of shells you receive in return for your deposit
+    function proportionalDeposit (uint256 _deposit) public returns (uint256) {
 
-        uint256 totalBalance;
+        uint256 _totalBalance;
         uint256 _totalSupply = totalSupply();
 
-        uint256[] memory amounts = new uint256[](3);
+        uint256[] memory _amounts _= new uint256[](3);
 
         for (uint i = 0; i < reserves.length; i++) {
-            uint256 numeBalance = dGetNumeraireBalance(reserves[i]);
-            emit log_uint("numebal", numeBalance);
-            emit log_address("nuemraries[i]", numeraires[i]);
-            totalBalance += numeBalance;
-            Flavor memory d = flavors[numeraires[i]];
-            amounts[i] = wmul(d.weight, totalDeposit);
-        }
+            Flavor memory _f = flavors[numeraires[i]];
+            _amounts[i] = wmul(_f.weight, _deposit);
+            _totalBalance += dGetNumeraireBalance(reserves[i]);
 
         if (totalBalance == 0) {
-            totalBalance = WAD;
+            _totalBalance = WAD;
             _totalSupply = WAD;
         }
 
-        uint256 newShells = wmul(totalDeposit, wdiv(totalBalance, _totalSupply));
-        _mint(msg.sender, newShells);
+        uint256 shellsToMint_ = wmul(_deposit, wdiv(_totalBalance, _totalSupply));
+        _mint(msg.sender, shellsToMint_);
 
         for (uint i = 0; i < reserves.length; i++ ) {
             Flavor memory d = flavors[numeraires[i]];
-            dIntakeNumeraire(d.adapter, amounts[i]);
+            dIntakeNumeraire(d.adapter, _amounts[i]);
         }
 
-        return newShells;
+        return shellsToMint_;
 
     }
 
+    /// @author James Foley http://github.com/realisation
+    /// @notice this function takes a total amount to from the the pool with no slippage from the numeraire assets of the pool
+    /// @param _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
+    /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
+    function proportionalWithdraw (uint256 _withdrawal) public returns (uint256[] memory) {
 
-    function proportionalWithdraw (uint256 totalWithdrawal) public returns (uint256[] memory) {
+        uint256 _shellsToBurn = wmul(_withdrawal, WAD + feeBase);
 
-        uint256[] memory withdrawalAmounts = new uint256[](reserves.length);
-        uint256 shellsToBurn = wmul(totalWithdrawal, WAD + feeBase);
-
-        uint256 oldTotal;
-        for (uint i = 0; i < reserves.length; i++) {
-            withdrawalAmounts[i] = dGetNumeraireBalance(reserves[i]);
-            oldTotal += withdrawalAmounts[i];
+        uint256 _oldTotal;
+        uint256[] memory _amounts = new uint256[](reserves.length);
+        for (uint i = 0; i < reserves.length; i++) 
+            _amounts[i] = dGetNumeraireBalance(reserves[i]);
+            _oldTotal += _amounts[i];
         }
 
-
-        for (uint i = 0; i < reserves.length; i++) {
-            Flavor storage w = flavors[numeraires[i]];
-            uint256 numeraireToWithdraw = wmul(totalWithdrawal, wdiv(withdrawalAmounts[i], oldTotal));
-            // uint256 numeraireToWithdraw = wdiv(withdrawalAmounts[i], wmul(oldTotal, totalWithdrawal));
-            uint256 amountWithdrawn = dOutputNumeraire(w.adapter, msg.sender, numeraireToWithdraw);
-            withdrawalAmounts[i] = amountWithdrawn;
+        uint256[] memory withdrawalAmts_ = new uint256[](reserves.length);
+        for (uint i = 0; i < _reserves.length; i++) {
+            Flavor memory _f = flavors[numeraires[i]];
+            uint256 numeraireValue = dOutputNumeraire( _f.adapter, msg.sender, wdiv(amounts[i], wmul(_oldTotal, _withdrawal))
+            withdrawalAmts_[i] = numeraireValue;
         }
-
 
         _burnFrom(msg.sender, shellsToBurn);
-        return withdrawalAmounts;
+
+        return withdrawalAmts_;
 
     }
 
