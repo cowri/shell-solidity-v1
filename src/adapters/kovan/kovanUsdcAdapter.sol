@@ -42,9 +42,7 @@ contract KovanUsdcAdapter {
     }
 
     function viewRawAmount (uint256 amount) public view returns (uint256) {
-        amount /= 1000000000000;
-        uint256 rate = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).exchangeRateStored();
-        return wdiv(amount, rate);
+        return amount / 1000000000000;
     }
 
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {

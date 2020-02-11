@@ -254,7 +254,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
 
         _NAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
         _NAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
-
+        
         require(dViewRawAmount(_o.adapter, _NAmt) <= _maxOAmt, "origin amount is greater than max origin amount");
 
         dOutputRaw(_t.adapter, _recipient, _tAmt);

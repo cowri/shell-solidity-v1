@@ -15,15 +15,15 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
 
     function setUp() public {
 
-        setupFlavors();
-        setupAdapters();
-        l = new Loihi(chai, cdai, dai, pot, cusdc, usdc, usdt);
-        approveFlavors(address(l));
-        
         // setupFlavors();
         // setupAdapters();
-        // l = new Loihi(address(0), address(0), address(0), address(0), address(0), address(0), address(0));
+        // l = new Loihi(chai, cdai, dai, pot, cusdc, usdc, usdt);
         // approveFlavors(address(l));
+        
+        setupFlavors();
+        setupAdapters();
+        l = new Loihi(address(0), address(0), address(0), address(0), address(0), address(0), address(0));
+        approveFlavors(address(l));
 
         uint256 weight = WAD / 3;
 
@@ -58,4 +58,5 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
         assertEq(cdaiNumeraireAmount / (10 ** 10), 3333333333);
 
     }
+
 }
