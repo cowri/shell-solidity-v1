@@ -47,10 +47,10 @@ contract UnbalancedSwapByOriginTest is AdaptersSetup, DSMath, DSTest {
         uint256[] memory amt = new uint256[](1);
         addr[0] = dai;
         amt[0] = 30 * WAD;
-        uint256 burned = l.selectiveWithdraw(addr, amt);
+        uint256 burned = l.selectiveWithdraw(addr, amt, 500 * WAD, now + 500);
 
         addr[0] = usdt;
-        uint256 deposited = l.selectiveDeposit(addr, amt);
+        uint256 deposited = l.selectiveDeposit(addr, amt, 0, now + 500);
 
     }
 
