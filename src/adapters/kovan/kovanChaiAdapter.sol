@@ -35,7 +35,7 @@ contract KovanChaiAdapter {
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).redeemUnderlying(amount);
         uint256 chaiBal = IChai(0xB641957b6c29310926110848dB2d464C8C3c3f38).balanceOf(address(this));
-        IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).approve(address(this), amount);
+        IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).approve(0xB641957b6c29310926110848dB2d464C8C3c3f38, amount);
         IChai(0xB641957b6c29310926110848dB2d464C8C3c3f38).join(dst, amount);
         chaiBal = chaiBal - IChai(0xB641957b6c29310926110848dB2d464C8C3c3f38).balanceOf(address(this));
         return chaiBal;

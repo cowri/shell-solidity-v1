@@ -44,6 +44,8 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
         _oNAmt = calculateOriginTradeOriginAmount(_o.weight, _oBal, _oNAmt, _grossLiq);
         _tNAmt = calculateOriginTradeTargetAmount(_t.weight, _tBal, _oNAmt, _grossLiq);
 
+        require(dViewRawAmount(_t.adapter, _tNAmt) >= _minTAmt, "target amount is less than minimum target amount");
+
         dIntakeRaw(_o.adapter, _oNAmt);
         return dOutputNumeraire(_t.adapter, _recipient, _tNAmt);
 
@@ -240,6 +242,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
     /// @param _deadline the block number at which this transaction is no longer valid
     /// @param _recipient the address for where to send the target amount
     function executeTargetTrade (address _origin, address _target, uint256 _maxOAmt, uint256 _tAmt, uint256 _deadline, address _recipient) private returns (uint256) {
+        require(_deadline >= now, "deadline has passed for this trade");
 
         Flavor memory _o = flavors[_origin];
         Flavor memory _t = flavors[_target];
@@ -253,8 +256,10 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
         _tNAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _tNAmt, _grossLiq);
         _oNAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _tNAmt, _grossLiq);
 
+        require(dViewRawAmount(_o.adapter, _oNAmt) <= _maxOAmt, "origin amount is greater than max origin amount");
+
         dOutputRaw(_t.adapter, _recipient, _tAmt);
-        return dIntakeNumeraire(_o.adapter, _oNAmt);
+        return dIntakeNumeraire(_o.adapter, _oNAmt, _maxOAmt);
 
     }
 

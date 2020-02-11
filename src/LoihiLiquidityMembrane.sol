@@ -38,7 +38,8 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     /// @param _flavors an array containing the addresses of the flavors being deposited into
     /// @param _amounts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
-    function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256 shellsToMint_) {
+    function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts, uint256 _minShells, uint256 _deadline) external returns (uint256 shellsToMint_) {
+        require(_deadline >= now, "deadline has passed for this transaction");
 
         ( uint256[] memory _balances,
           uint256[] memory _deposits,
@@ -46,9 +47,11 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
 
         shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
 
-        for (uint i = 0; i < _flavors.length; i++) dIntakeRaw(flavors[_flavors[i]].adapter, _amounts[i]);
+        require(shellsToMint_ >= _minShells, "minted shells less than minimum shells");
 
         _mint(msg.sender, shellsToMint_);
+
+        for (uint i = 0; i < _flavors.length; i++) dIntakeRaw(flavors[_flavors[i]].adapter, _amounts[i]);
 
         return shellsToMint_;
 
@@ -119,13 +122,16 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     /// @param _flavors an array of flavors to withdraw from the reserves
     /// @param _amounts an array of amounts to withdraw that maps to _flavors
     /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
-    function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts) external returns (uint256 shellsBurned_) {
+    function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts, uint256 _maxShells, uint256 _deadline) external returns (uint256 shellsBurned_) {
+        require(_deadline >= now, "deadline has passed for this transaction");
 
         ( uint256[] memory _balances,
           uint256[] memory _withdrawals,
           uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
 
         shellsBurned_ = calculateShellsToBurn(_balances, _withdrawals, _weights);
+
+        require(shellsBurned_ <= _maxShells, "more shells burned than max shell limit");
 
         for (uint i = 0; i < _flavors.length; i++) dOutputRaw(flavors[_flavors[i]].adapter, msg.sender, _amounts[i]);
 
@@ -217,6 +223,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
         }
 
         uint256 shellsToMint_ = wmul(_deposit, wdiv(_totalBalance, _totalSupply));
+
         _mint(msg.sender, shellsToMint_);
 
         for (uint i = 0; i < reserves.length; i++) {
@@ -228,9 +235,6 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
 
     }
 
-    event log_uint(bytes32, uint256);
-    event log_uints(bytes32, uint256[]);
-
     /// @author james foley http://github.com/realisation
     /// @notice this function takes a total amount to from the the pool with no slippage from the numeraire assets of the pool
     /// @param _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
@@ -238,24 +242,16 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     function proportionalWithdraw (uint256 _withdrawal) public returns (uint256[] memory) {
 
         uint256 _withdrawMultiplier = wdiv(_withdrawal, totalSupply());
-        emit log_uint("withdraw multiplier", _withdrawMultiplier);
-        emit log_uint("_withdrawal", _withdrawal);
+
+        _burn(msg.sender, _withdrawal);
 
         uint256[] memory withdrawalAmts_ = new uint256[](reserves.length);
         for (uint i = 0; i < reserves.length; i++) {
             uint256 amount = dGetNumeraireBalance(reserves[i]);
-            emit log_uint("amount", amount);
             uint256 proportionateValue = wmul(wmul(amount, _withdrawMultiplier), WAD - feeBase);
-            emit log_uint("prop value", proportionateValue);
             Flavor memory _f = flavors[numeraires[i]];
-            uint256 withdrawnAmount = dOutputNumeraire(_f.adapter, msg.sender, proportionateValue);
-            emit log_uint("withdrawn amount", withdrawnAmount);
-            withdrawalAmts_[i] = withdrawnAmount;
+            withdrawalAmts_[i] = dOutputNumeraire(_f.adapter, msg.sender, proportionateValue);
         }
-
-        emit log_uints("withdrawals", withdrawalAmts_);
-
-        _burn(msg.sender, _withdrawal);
 
         return withdrawalAmts_;
 
