@@ -47,7 +47,7 @@ contract TestProportionalWithdraw is AdaptersSetup, DSMath, DSTest {
         assertEq(l.totalSupply(), 0);
         assertEq(withdrawals[0] / 10000000000, 9994999999);
         assertEq(withdrawals[1], 99949998);
-        assertEq(withdrawals[2], 99949999999999999900);
+        assertEq(withdrawals[2], 99949998);
 
     }
 
@@ -57,7 +57,7 @@ contract TestProportionalWithdraw is AdaptersSetup, DSMath, DSTest {
         assertEq(l.totalSupply(), 150000000000000000000);
         assertEq(withdrawals[0] / 10000000000, 4997499999);
         assertEq(withdrawals[1], 49974999);
-        assertEq(withdrawals[2], 49974999999999999950);
+        assertEq(withdrawals[2], 49974999);
 
     }
 

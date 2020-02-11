@@ -5,6 +5,8 @@ import "./LoihiRoot.sol";
 
 contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
 
+    event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
+
     function swapByTarget (address origin, address target, uint256 maxOriginAmount, uint256 targetAmount, uint256 deadline) public returns (uint256) {
         return executeTargetTrade(origin, target, maxOriginAmount, targetAmount, deadline, msg.sender);
     }
@@ -35,19 +37,22 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
         Flavor memory _o = flavors[_origin]; // origin adapter + weight
         Flavor memory _t = flavors[_target]; // target adapter + weight
 
-        ( uint256 _oNAmt,
+        ( uint256 _NAmt,
           uint256 _oBal,
           uint256 _tBal,
-          uint256 _tNAmt,
           uint256 _grossLiq ) = getOriginTradeVariables(_o, _t, _oAmt);
 
-        _oNAmt = calculateOriginTradeOriginAmount(_o.weight, _oBal, _oNAmt, _grossLiq);
-        _tNAmt = calculateOriginTradeTargetAmount(_t.weight, _tBal, _oNAmt, _grossLiq);
+        _NAmt = calculateOriginTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
+        _NAmt = calculateOriginTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
 
-        require(dViewRawAmount(_t.adapter, _tNAmt) >= _minTAmt, "target amount is less than minimum target amount");
+        require(dViewRawAmount(_t.adapter, _NAmt) >= _minTAmt, "target amount is less than minimum target amount");
 
-        dIntakeRaw(_o.adapter, _oNAmt);
-        return dOutputNumeraire(_t.adapter, _recipient, _tNAmt);
+        dIntakeRaw(_o.adapter, _oAmt);
+        uint256 tAmt_ = dOutputNumeraire(_t.adapter, _recipient, _NAmt);
+
+        emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
+
+        return tAmt_;
 
     }
 
@@ -56,25 +61,23 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
     /// @param _o the record for the origin flavor containing the address of its adapter and its reserve
     /// @param _t the record for the target flavor containing the address of its adapter and its reserve
     /// @param _oAmt the raw amount of the origin flavor to be converted into numeraire
-    /// @return oNAmt_ the numeraire amount of the origin flavor
+    /// @return NAmt_ the numeraire amount of the trade before origin and target fees are applied
     /// @return oBal_ the new origin numeraire balance including the origin numeraire amount
     /// @return tBal_ the current numereraire balance of the contracts reserve for the target
-    /// @return tNAmt_ empty value to be filled in when the target fee is calculated
     /// @return grossLiq_ total numeraire value across all reserves in the contract
-    function getOriginTradeVariables (Flavor memory _o, Flavor memory _t, uint256 _oAmt) private returns (uint, uint, uint, uint, uint) {
+    function getOriginTradeVariables (Flavor memory _o, Flavor memory _t, uint256 _oAmt) private returns (uint, uint, uint, uint) {
 
-        uint oNAmt_;
+        uint NAmt_;
         uint oBal_;
         uint tBal_;
-        uint tNAmt_;
         uint grossLiq_;
 
         for (uint i = 0; i < reserves.length; i++) {
             if (reserves[i] == _o.reserve) {
-                oNAmt_ = dGetNumeraireAmount(_o.adapter, _oAmt);
+                NAmt_ = dGetNumeraireAmount(_o.adapter, _oAmt);
                 oBal_ = dGetNumeraireBalance(_o.adapter);
                 grossLiq_ += oBal_;
-                oBal_ = add(oBal_, oNAmt_);
+                oBal_ = add(oBal_, NAmt_);
             } else if (reserves[i] == _t.reserve) {
                 tBal_ = dGetNumeraireBalance(_t.adapter);
                 grossLiq_ += tBal_;
@@ -83,7 +86,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
             }
         }
 
-        return (oNAmt_, oBal_, tBal_, tNAmt_, grossLiq_);
+        return (NAmt_, oBal_, tBal_, grossLiq_);
 
     }
 
@@ -184,16 +187,15 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
         Flavor memory _o = flavors[_origin]; // origin adapter + weight
         Flavor memory _t = flavors[_target]; // target adapter + weight
 
-        ( uint256 _oNAmt,
+        ( uint256 _NAmt,
           uint256 _oBal,
           uint256 _tBal,
-          uint256 _tNAmt,
           uint256 _grossLiq ) = getOriginViewVariables(_o, _t, _oAmt);
 
-        _oNAmt = calculateOriginTradeOriginAmount(_o.weight, _oBal, _oNAmt, _grossLiq);
-        _tNAmt = calculateOriginTradeTargetAmount(_t.weight, _tBal, _oNAmt, _grossLiq);
+        _NAmt = calculateOriginTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
+        _NAmt = calculateOriginTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
 
-        return dViewRawAmount(_t.adapter, _tNAmt);
+        return dViewRawAmount(_t.adapter, _NAmt);
 
     }
 
@@ -202,25 +204,23 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
     /// @param _o the record for the origin flavor containing the address of its adapter and its reserve
     /// @param _t the record for the target flavor containing the address of its adapter and its reserve
     /// @param _oAmt the raw amount of the origin flavor to be converted into numeraire
-    /// @return oNAmt_ the numeraire amount of the origin flavor
+    /// @return NAmt_ numeraire amount for trade before target and origin fees are applied
     /// @return oBal_ the new origin numeraire balance including the origin numeraire amount
     /// @return tBal_ the current numereraire balance of the contracts reserve for the target
-    /// @return tNAmt_ empty value to be filled in when the target fee is calculated
     /// @return grossLiq_ total numeraire value across all reserves in the contract
-    function getOriginViewVariables (Flavor memory _o, Flavor memory _t, uint256 _oAmt) private view returns (uint, uint, uint, uint, uint) {
+    function getOriginViewVariables (Flavor memory _o, Flavor memory _t, uint256 _oAmt) private view returns (uint, uint, uint, uint) {
 
-        uint oNAmt_;
+        uint NAmt_;
         uint oBal_;
         uint tBal_;
-        uint tNAmt_;
         uint grossLiq_;
 
         for (uint i = 0; i < reserves.length; i++) {
             if (reserves[i] == _o.reserve) {
-                oNAmt_ = dViewNumeraireAmount(_o.adapter, _oAmt);
+                NAmt_ = dViewNumeraireAmount(_o.adapter, _oAmt);
                 oBal_ = dViewNumeraireBalance(_o.adapter);
                 grossLiq_ += oBal_;
-                oBal_ = add(oBal_, oNAmt_);
+                oBal_ = add(oBal_, NAmt_);
             } else if (reserves[i] == _t.reserve) {
                 tBal_ = dViewNumeraireBalance(_t.adapter);
                 grossLiq_ += tBal_;
@@ -229,7 +229,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
             }
         }
 
-        return (oNAmt_, oBal_, tBal_, tNAmt_, grossLiq_);
+        return (NAmt_, oBal_, tBal_, grossLiq_);
 
     }
 
@@ -247,19 +247,22 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
         Flavor memory _o = flavors[_origin];
         Flavor memory _t = flavors[_target];
 
-        ( uint256 _oNAmt,
+        ( uint256 _NAmt,
           uint256 _oBal,
           uint256 _tBal,
-          uint256 _tNAmt,
           uint256 _grossLiq ) = getTargetTradeVariables(_o, _t, _tAmt) ;
 
-        _tNAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _tNAmt, _grossLiq);
-        _oNAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _tNAmt, _grossLiq);
+        _NAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
+        _NAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
 
-        require(dViewRawAmount(_o.adapter, _oNAmt) <= _maxOAmt, "origin amount is greater than max origin amount");
+        require(dViewRawAmount(_o.adapter, _NAmt) <= _maxOAmt, "origin amount is greater than max origin amount");
 
         dOutputRaw(_t.adapter, _recipient, _tAmt);
-        return dIntakeNumeraire(_o.adapter, _oNAmt, _maxOAmt);
+        uint256 oAmt_ = dIntakeNumeraire(_o.adapter, _NAmt);
+
+        emit Trade(msg.sender, _origin, _target, oAmt_, _tAmt);
+
+        return oAmt_;
 
     }
 
@@ -268,17 +271,15 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
     /// @param _o the record of the origin flavor containing its adapter and reserve address
     /// @param _t the record of the target flavor containing its adapter and reserve address
     /// @param _tAmt the raw target amount to be converted into numeraire amount
-    /// @return tNAmt_ the target numeraire amount
+    /// @return NAmt_ numeraire amount for trade before target and origin fees are applied
     /// @return tBal_ the new numeraire balance of the target
     /// @return oBal_ the numeraire balance of the origin
-    /// @return oNAmt_ empty uint to be filled in as target and origin fees are calculated
     /// @return grossLiq_ the total liquidity in all the reserves of the pool
-    function getTargetTradeVariables (Flavor memory _o, Flavor memory _t, uint256 _tAmt) private returns (uint, uint, uint, uint, uint) {
+    function getTargetTradeVariables (Flavor memory _o, Flavor memory _t, uint256 _tAmt) private returns (uint, uint, uint, uint) {
 
-        uint tNAmt_;
+        uint NAmt_;
         uint tBal_;
         uint oBal_;
-        uint oNAmt_;
         uint grossLiq_;
 
         for (uint i = 0; i < reserves.length; i++) {
@@ -286,14 +287,14 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
                 oBal_ = dGetNumeraireBalance(_o.adapter);
                 grossLiq_ += oBal_;
             } else if (reserves[i] == _t.reserve) {
-                tNAmt_ = dGetNumeraireAmount(_t.adapter, _tAmt);
+                NAmt_ = dGetNumeraireAmount(_t.adapter, _tAmt);
                 tBal_ = dGetNumeraireBalance(_t.adapter);
                 grossLiq_ += tBal_;
-                tBal_ = sub(tBal_, tNAmt_);
+                tBal_ = sub(tBal_, NAmt_);
             } else grossLiq_ += dGetNumeraireBalance(reserves[i]);
         }
 
-        return (oNAmt_, oBal_, tBal_, tNAmt_, grossLiq_);
+        return (NAmt_, oBal_, tBal_, grossLiq_);
 
     }
 
@@ -393,16 +394,15 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
         Flavor memory _o = flavors[_origin];
         Flavor memory _t = flavors[_target];
 
-        ( uint256 _oNAmt,
+        ( uint256 _NAmt,
           uint256 _oBal,
           uint256 _tBal,
-          uint256 _tNAmt,
           uint256 _grossLiq ) = getTargetViewVariables(_o, _t, _tAmt) ;
 
-        _oNAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _tNAmt, _grossLiq);
-        _oNAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _oNAmt, _grossLiq);
+        _NAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
+        _NAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
 
-        return dViewRawAmount(_o.adapter, _oNAmt);
+        return dViewRawAmount(_o.adapter, _NAmt);
 
     }
 
@@ -411,17 +411,15 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
     /// @param _o the record of the origin flavor containing its adapter and reserve address
     /// @param _t the record of the target flavor containing its adapter and reserve address
     /// @param _tAmt the raw target amount to be converted into numeraire amount
-    /// @return tNAmt_ the target numeraire amount
+    /// @return NAmt_ numeraire amount for trade before target and origin fees are applied
     /// @return tBal_ the new numeraire balance of the target
     /// @return oBal_ the numeraire balance of the origin
-    /// @return oNAmt_ empty uint to be filled in as target and origin fees are calculated
     /// @return grossLiq_ the total liquidity in all the reserves of the pool
-    function getTargetViewVariables (Flavor memory _o, Flavor memory _t, uint256 _tAmt) private view returns (uint, uint, uint, uint, uint) {
+    function getTargetViewVariables (Flavor memory _o, Flavor memory _t, uint256 _tAmt) private view returns (uint, uint, uint, uint) {
 
-        uint tNAmt_;
+        uint NAmt_;
         uint tBal_;
         uint oBal_;
-        uint oNAmt_;
         uint grossLiq_;
 
         for (uint i = 0; i < reserves.length; i++) {
@@ -429,14 +427,14 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
                 oBal_ = dViewNumeraireBalance(_o.adapter);
                 grossLiq_ += oBal_;
             } else if (reserves[i] == _t.reserve) {
-                tNAmt_ = dViewNumeraireAmount(_t.adapter, _tAmt);
+                NAmt_ = dViewNumeraireAmount(_t.adapter, _tAmt);
                 tBal_ = dViewNumeraireBalance(_t.adapter);
                 grossLiq_ += tBal_;
-                tBal_ = sub(tBal_, tNAmt_);
+                tBal_ = sub(tBal_, NAmt_);
             } else grossLiq_ += dViewNumeraireBalance(reserves[i]);
         }
 
-        return (oNAmt_, oBal_, tBal_, tNAmt_, grossLiq_);
+        return (NAmt_, oBal_, tBal_, grossLiq_);
 
     }
 

@@ -20,16 +20,11 @@ contract KovanCUsdcAdapter {
         return amount;
     }
 
-    event log_uint(bytes32, uint256);
-
     // takes numeraire amount
     // transfers corresponding cusdc to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         uint256 rate = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).exchangeRateCurrent();
-        emit log_uint("amount", amount);
-        emit log_uint("rate", rate);
         amount = wdiv(amount / 1000000000000, rate);
-        emit log_uint("raw", amount);
         ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).transfer(dst, amount);
         return amount;
     }

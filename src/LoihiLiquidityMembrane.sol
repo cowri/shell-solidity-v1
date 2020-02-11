@@ -6,6 +6,9 @@ import "./LoihiCallAdapters.sol";
 
 contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
 
+    event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
+    event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);
+
     /// @author james foley http://github.com/realisation
     /// @dev this function is used in selective deposits and selective withdraws
     /// @dev it finds the reserves corresponding to the flavors and attributes the amounts to these reserves
@@ -33,6 +36,8 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
 
     }
 
+    event log_uints(bytes32, uint256[]);
+
     /// @author james foley http://github.com/realisation
     /// @notice this function allows selective depositing of any supported stablecoin flavor into the contract in return for corresponding shell tokens
     /// @param _flavors an array containing the addresses of the flavors being deposited into
@@ -45,6 +50,10 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
           uint256[] memory _deposits,
           uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
 
+        emit log_uints("balances", _balances);
+        emit log_uints("deposits", _deposits);
+        emit log_uints("weights", _weights);
+
         shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
 
         require(shellsToMint_ >= _minShells, "minted shells less than minimum shells");
@@ -52,6 +61,8 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
         _mint(msg.sender, shellsToMint_);
 
         for (uint i = 0; i < _flavors.length; i++) dIntakeRaw(flavors[_flavors[i]].adapter, _amounts[i]);
+
+        emit ShellsMinted(msg.sender, shellsToMint_, _flavors, _amounts);
 
         return shellsToMint_;
 
@@ -136,6 +147,8 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
         for (uint i = 0; i < _flavors.length; i++) dOutputRaw(flavors[_flavors[i]].adapter, msg.sender, _amounts[i]);
 
         _burn(msg.sender, shellsBurned_);
+
+        emit ShellsBurned(msg.sender, shellsBurned_, _flavors, _amounts);
 
         return shellsBurned_;
 
@@ -228,8 +241,10 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
 
         for (uint i = 0; i < reserves.length; i++) {
             Flavor memory d = flavors[numeraires[i]];
-            dIntakeNumeraire(d.adapter, _amounts[i]);
+           _amounts[i] = dIntakeNumeraire(d.adapter, _amounts[i]);
         }
+
+        emit ShellsMinted(msg.sender, shellsToMint_, numeraires, _amounts);
 
         return shellsToMint_;
 
@@ -252,6 +267,8 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
             Flavor memory _f = flavors[numeraires[i]];
             withdrawalAmts_[i] = dOutputNumeraire(_f.adapter, msg.sender, proportionateValue);
         }
+
+        emit ShellsBurned(msg.sender, _withdrawal, numeraires, withdrawalAmts_);
 
         return withdrawalAmts_;
 

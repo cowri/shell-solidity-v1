@@ -53,7 +53,7 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
         uint256 cusdcNumeraireAmount = new KovanCUsdcAdapter().getNumeraireAmount(cusdcBal);
         uint256 cdaiNumeraireAmount = new KovanCDaiAdapter().getNumeraireAmount(cdaiBal);
 
-        assertEq(usdtNumeraireAmount / (10 ** 10), 3333333333);
+        assertEq(usdtNumeraireAmount / (10 ** 10), 3333333300);
         assertEq(cusdcNumeraireAmount / (10 ** 10), 3333333300);
         assertEq(cdaiNumeraireAmount / (10 ** 10), 3333333333);
 

@@ -39,44 +39,11 @@
 //     function testERC () public {
 //         KovanUsdcAdapter i;
 
-//         emit log_bytes("viewNumeraireBalance", i.viewNumeraireBalance.selector);
-//         emit log_bytes("viewNumeraireAmount", i.viewNumeraireAmount.selector);
-//         emit log_bytes("viewRawAmount", i.viewRawAmount.selector);
+//         (bool success, bytes memory result) = kusdt.delegatecall(abi.encodeWithSelector(0x10df6430)); // encoded selector of "getNumeraireBalance()";
+//         uint256 balance = abi.decode(result, (uint256));
+//         emit log_named_uint("balance", balance);
 
-//         (bool success, bytes memory result) = kcdai.delegatecall(abi.encodeWithSelector(0xac969a73, address(this)));
-//         uint256 kcdaiNB = abi.decode(result, (uint256));
-//         (success, result) = kcdai.delegatecall(abi.encodeWithSelector(0x049ca270, kcdaiNB));
-//         uint256 kcdaiB = abi.decode(result, (uint256));
-//         (success, result) = kcdai.delegatecall(abi.encodeWithSelector(0xf5e6c0ca, kcdaiB));
-//         uint256 daibalance = abi.decode(result, (uint256));
 
-//         (success, result) = kcusdc.delegatecall(abi.encodeWithSelector(0xac969a73, address(this)));
-//         uint256 kcusdcNB = abi.decode(result, (uint256));
-//         (success, result) = kcusdc.delegatecall(abi.encodeWithSelector(0x049ca270, kcusdcNB));
-//         uint256 kcusdcB = abi.decode(result, (uint256));
-//         (success, result) = kcusdc.delegatecall(abi.encodeWithSelector(0xf5e6c0ca, kcusdcB));
-//         uint256 usdcbalance = abi.decode(result, (uint256));
-
-//         (success, result) = kusdt.delegatecall(abi.encodeWithSelector(0xac969a73, address(this)));
-//         uint256 kusdtNB = abi.decode(result, (uint256));
-//         (success, result) = kusdt.delegatecall(abi.encodeWithSelector(0x049ca270, kusdtNB));
-//         uint256 kusdtB = abi.decode(result, (uint256));
-//         (success, result) = kusdt.delegatecall(abi.encodeWithSelector(0xf5e6c0ca, kusdtB));
-//         uint256 usdtbalance = abi.decode(result, (uint256));
-
-//         emit logs("----------------------------");
-//         emit log_named_uint("cusdc n bal", kcusdcNB);
-//         emit log_named_uint("cusdc bal  ", kcusdcB);
-//         emit log_named_uint("back usdc n", usdcbalance);
-//         emit logs("----------------------------");
-//         emit log_named_uint("cdai n bal", kcdaiNB);
-//         emit log_named_uint("cdai bal  ", kcdaiB);
-//         emit log_named_uint("back cdai n", daibalance);
-//         emit logs("----------------------------");
-//         emit log_named_uint("usdt n bal", kusdtNB);
-//         emit log_named_uint("usdt bal  ", kusdtB);
-//         emit log_named_uint("back usdt n", usdtbalance);
-//         emit logs("----------------------------");
 
 //     }
 
