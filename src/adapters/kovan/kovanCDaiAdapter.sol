@@ -1,4 +1,3 @@
-
 pragma solidity ^0.5.12;
 
 import "../../ICToken.sol";
@@ -29,6 +28,22 @@ contract KovanCDaiAdapter {
         uint cdaiAmount = wmul(amount, rate);
         ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).transfer(dst, cdaiAmount);
         return cdaiAmount;
+    }
+
+    function viewRawAmount (uint256 amount) public view returns (uint256) {
+        uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateStored();
+        return wmul(amount, rate);
+    }
+
+    function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+        uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateStored();
+        return wdiv(amount, rate);
+    }
+
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateStored();
+        uint256 balance = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).balanceOf(addr);
+        return wmul(balance, rate);
     }
 
     // takes raw amount and gives numeraire amount

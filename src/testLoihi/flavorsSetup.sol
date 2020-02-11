@@ -50,8 +50,6 @@ contract FlavorsSetup {
         usdt = 0x20F7963EF38AC716A85ed18fb683f064db944648;
     }
 
-
-
     function approveFlavors (address addr) public {
         IERC20(chai).approve(addr, 1000000000 * (10 ** 18));
         IERC20(cdai).approve(addr, 1000000000 * (10 ** 18));

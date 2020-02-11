@@ -41,6 +41,24 @@ contract KovanCUsdcAdapter {
         return amount;
     }
 
+    function viewRawAmount (uint256 amount) public view returns (uint256) {
+        amount /= 1000000000000;
+        uint256 rate = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).exchangeRateStored();
+        return wdiv(amount, rate);
+    }
+
+    function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+        uint256 rate = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).exchangeRateStored();
+        return wmul(amount, rate) * 1000000000000;
+
+    }
+
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        uint256 rate = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).exchangeRateStored();
+        uint256 balance = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).balanceOf(addr);
+        return wmul(balance, rate) * 1000000000000;
+    }
+
     // takes raw cusdc amount
     // returns corresponding numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {

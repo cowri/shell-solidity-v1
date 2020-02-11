@@ -30,6 +30,18 @@ contract KovanUsdtAdapter {
         return amount;
     }
 
+    function viewRawAmount (uint256 amount) public pure returns (uint256) {
+        return amount;
+    }
+
+    function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
+        return amount;
+    }
+
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        return IERC20(0x20F7963EF38AC716A85ed18fb683f064db944648).balanceOf(addr);
+    }
+
     // returns amount, is already numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
         return amount;

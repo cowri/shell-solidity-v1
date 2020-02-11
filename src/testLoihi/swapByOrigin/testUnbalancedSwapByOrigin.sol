@@ -55,29 +55,29 @@ contract UnbalancedSwapByOriginTest is AdaptersSetup, DSMath, DSTest {
     }
 
     function testUnbalancedOriginSwapZtoY () public {
-        uint256 targetAmount = l.swapByOrigin(usdt, 10 * WAD, usdc, 5 * (10 ** 12), now);
+        uint256 targetAmount = l.swapByOrigin(usdt, usdc, 10 * WAD, 5 * (10 ** 12), now);
         assertEq(targetAmount, 9849999);
     }
 
     function testUnbalancedOriginSwapYtoX () public {
-        uint256 targetAmount = l.swapByOrigin(usdc, 10 * (10 ** 6), dai, 5 * WAD, now);
+        uint256 targetAmount = l.swapByOrigin(usdc, dai, 10 * (10 ** 6), 5 * WAD, now);
         targetAmount /= 10000000000;
         assertEq(targetAmount, 984507500);
     }
 
     function testUnbalancedOriginSwapZtoX () public {
-        uint256 targetAmount = l.swapByOrigin(usdt, 10 * WAD, dai, 5 * WAD, now);
+        uint256 targetAmount = l.swapByOrigin(usdt, dai, 10 * WAD, 5 * WAD, now);
         targetAmount /= 10000000000;
         assertEq(targetAmount, 969887563);
     }
 
     function testUnbalancedOriginSwapXtoZ () public {
-        uint256 targetAmount = l.swapByOrigin(dai, 10 * WAD, usdt, 5 * WAD, now);
+        uint256 targetAmount = l.swapByOrigin(dai, usdt, 10 * WAD, 5 * WAD, now);
         assertEq(targetAmount, 9995000000000000000);
     }
 
     function testFailUnbalancedOriginSwap () public {
-        uint256 targetAmount = l.swapByOrigin(dai, 80 * WAD, cusdc, 9 * WAD, now);
+        uint256 targetAmount = l.swapByOrigin(dai, cusdc, 80 * WAD, 9 * WAD, now);
     }
 
 }

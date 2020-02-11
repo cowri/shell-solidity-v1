@@ -43,17 +43,34 @@ contract KovanChaiAdapter {
 
     // transfers corresponding chai to destination address
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
+        uint256 chi = IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb).chi();
         return amount;
+    }
+
+    function viewRawAmount (uint256 amount) public view returns (uint256) {
+        uint256 chi = IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb).chi();
+        return wmul(amount, chi);
+    }
+
+    function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+        uint256 chi = IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb).chi();
+        return wdiv(amount, chi);
+    }
+
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateStored();
+        uint256 balance = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).balanceOf(addr);
+        return wmul(balance, rate);
     }
 
     // takes chai amount
     // tells corresponding numeraire value
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        uint chi = (now > IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb).rho()) 
-          ? IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb).drip() 
+        uint chi = (now > IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb).rho())
+          ? IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb).drip()
           : IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb).chi();
         return wdiv(amount, chi);
-    }   
+    }
 
     // tells numeraire balance
     function getNumeraireBalance () public returns (uint256) {
@@ -66,6 +83,10 @@ contract KovanChaiAdapter {
 
     function mul(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
+    }
+
+    function wmul(uint x, uint y) internal pure returns (uint z) {
+        z = add(mul(x, y), 1000000000000000000 / 2) / 1000000000000000000;
     }
 
     function wdiv(uint x, uint y) internal pure returns (uint z) {

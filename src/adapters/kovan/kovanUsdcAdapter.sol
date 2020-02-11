@@ -11,6 +11,9 @@ contract KovanUsdcAdapter {
     // transfers usdc in
     // wraps it in csudc
     function intakeRaw (uint256 amount) public {
+        amount /= 1000000000000;
+        uint256 balance = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).balanceOf(msg.sender);
+        emit log_uint("balance", balance);
         IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).transferFrom(msg.sender, address(this), amount);
         IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).approve(address(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35), amount);
         ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).mint(amount);
@@ -57,6 +60,22 @@ contract KovanUsdcAdapter {
         emit log_uint("amount", amount);
         emit log_uint("bal", bal);
         return bal;
+    }
+
+    function viewRawAmount (uint256 amount) public view returns (uint256) {
+        amount /= 1000000000000;
+        uint256 rate = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).exchangeRateStored();
+        return wdiv(amount, rate);
+    }
+
+    function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
+        return amount * 1000000000000;
+    }
+
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        uint256 rate = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).exchangeRateStored();
+        uint256 balance = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).balanceOf(addr);
+        return wmul(balance, rate) * 1000000000000;
     }
 
     // is already numeraire amount
