@@ -99,7 +99,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
         uint256 oNAmt_;
 
         uint256 _feeThreshold = wmul(_oWeight, wmul(_grossLiq, beta + WAD));
-        if (_oBal < _feeThreshold) {
+        if (_oBal <= _feeThreshold) {
 
             oNAmt_ = _oNAmt;
 
@@ -140,7 +140,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
         require(sub(_tBal, _tNAmt) >= wmul(_tWeight, wmul(_grossLiq, WAD - alpha)), "origin swap target halt check");
 
         uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - beta));
-        if (sub(_tBal, _tNAmt) > _feeThreshold) {
+        if (sub(_tBal, _tNAmt) >= _feeThreshold) {
 
             tNAmt_ = wmul(_tNAmt, WAD - feeBase);
 
@@ -304,7 +304,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
         require(_tBal >= wmul(_tWeight, wmul(_grossLiq, WAD - alpha)), "target halt check for target trade");
 
         uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - beta));
-        if (_tBal > _feeThreshold) {
+        if (_tBal >= _feeThreshold) {
 
             tNAmt_ = wmul(_tNAmt, WAD + feeBase);
 

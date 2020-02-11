@@ -86,7 +86,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
 
                 shellsToMint_ += _depositAmount;
 
-            } else if (_oldBalance > _feeThreshold) {
+            } else if (_oldBalance >= _feeThreshold) {
 
                 uint256 _feePrep = wmul(feeDerivative, wdiv(
                     sub(_newBalance, _feeThreshold),
@@ -168,7 +168,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
 
                 _numeraireShellsToBurn += wmul(_withdrawal, WAD + feeBase);
 
-            } else if (_oldBal < _feeThreshold) {
+            } else if (_oldBal <= _feeThreshold) {
 
                 uint256 _feePrep = wdiv(sub(_feeThreshold, _newBal), wmul(_weight, _newSum));
 
@@ -219,7 +219,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
         uint256 shellsToMint_ = wmul(_deposit, wdiv(_totalBalance, _totalSupply));
         _mint(msg.sender, shellsToMint_);
 
-        for (uint i = 0; i < reserves.length; i++ ) {
+        for (uint i = 0; i < reserves.length; i++) {
             Flavor memory d = flavors[numeraires[i]];
             dIntakeNumeraire(d.adapter, _amounts[i]);
         }
@@ -228,29 +228,34 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
 
     }
 
+    event log_uint(bytes32, uint256);
+    event log_uints(bytes32, uint256[]);
+
     /// @author james foley http://github.com/realisation
     /// @notice this function takes a total amount to from the the pool with no slippage from the numeraire assets of the pool
     /// @param _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
     function proportionalWithdraw (uint256 _withdrawal) public returns (uint256[] memory) {
 
-        uint256 _shellsToBurn = wmul(_withdrawal, WAD + feeBase);
-
-        uint256 _oldTotal;
-        uint256[] memory _amounts = new uint256[](reserves.length);
-        for (uint i = 0; i < reserves.length; i++) {
-            _amounts[i] = dGetNumeraireBalance(reserves[i]);
-            _oldTotal += _amounts[i];
-        }
+        uint256 _withdrawMultiplier = wdiv(_withdrawal, totalSupply());
+        emit log_uint("withdraw multiplier", _withdrawMultiplier);
+        emit log_uint("_withdrawal", _withdrawal);
 
         uint256[] memory withdrawalAmts_ = new uint256[](reserves.length);
         for (uint i = 0; i < reserves.length; i++) {
+            uint256 amount = dGetNumeraireBalance(reserves[i]);
+            emit log_uint("amount", amount);
+            uint256 proportionateValue = wmul(wmul(amount, _withdrawMultiplier), WAD - feeBase);
+            emit log_uint("prop value", proportionateValue);
             Flavor memory _f = flavors[numeraires[i]];
-            uint256 proportionateValue = wdiv(_amounts[i], wmul(_oldTotal, _withdrawal));
-            withdrawalAmts_[i] = dOutputNumeraire(_f.adapter, msg.sender, proportionateValue);
+            uint256 withdrawnAmount = dOutputNumeraire(_f.adapter, msg.sender, proportionateValue);
+            emit log_uint("withdrawn amount", withdrawnAmount);
+            withdrawalAmts_[i] = withdrawnAmount;
         }
 
-        _burnFrom(msg.sender, _shellsToBurn);
+        emit log_uints("withdrawals", withdrawalAmts_);
+
+        _burn(msg.sender, _withdrawal);
 
         return withdrawalAmts_;
 

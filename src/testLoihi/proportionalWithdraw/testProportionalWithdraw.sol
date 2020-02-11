@@ -7,8 +7,10 @@ import "../flavorsSetup.sol";
 import "../adaptersSetup.sol";
 import "../../Loihi.sol";
 
-contract LoihiTest is AdaptersSetup, DSMath, DSTest {
+contract TestProportionalWithdraw is AdaptersSetup, DSMath, DSTest {
     Loihi l;
+
+    event log_uints(bytes32, uint256[]);
 
     function setUp() public {
 
@@ -35,20 +37,27 @@ contract LoihiTest is AdaptersSetup, DSMath, DSTest {
         l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
         l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
 
-
         l.proportionalDeposit(300 * (10 ** 18));
 
     }
 
-    event log_uint_arr(bytes32, uint256[]);
+    function testproportionalWithdraw300 () public {
 
-    function testproportionalWithdraw () public {
+        uint256[] memory withdrawals = l.proportionalWithdraw(300 * WAD);
+        assertEq(l.totalSupply(), 0);
+        assertEq(withdrawals[0] / 10000000000, 9994999999);
+        assertEq(withdrawals[1], 99949998);
+        assertEq(withdrawals[2], 99949999999999999900);
 
-        uint256[] memory withdrawnTokens = l.proportionalWithdraw(90 * (10 ** 18));
-        uint256 balance = l.balanceOf(address(this));
-        emit log_uint_arr("withdrawn tokens", withdrawnTokens);
-        emit log_named_uint("balance", balance);
+    }
 
+    function testProportionalWithdraw150 () public {
+
+        uint256[] memory withdrawals = l.proportionalWithdraw(150 * WAD);
+        assertEq(l.totalSupply(), 150000000000000000000);
+        assertEq(withdrawals[0] / 10000000000, 4997499999);
+        assertEq(withdrawals[1], 49974999);
+        assertEq(withdrawals[2], 49974999999999999950);
 
     }
 
