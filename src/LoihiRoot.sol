@@ -1,11 +1,11 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-contracts/contracts/ownership/Ownable.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Mintable.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Burnable.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Detailed.sol";
-import "ds-math/math.sol";
+import "./libz/openzeppelin/Ownable.sol";
+import "./libz/openzeppelin/ERC20.sol";
+import "./libz/openzeppelin/ERC20Mintable.sol";
+import "./libz/openzeppelin/ERC20Burnable.sol";
+import "./libz/openzeppelin/ERC20Detailed.sol";
+import "./libz/math/math.sol";
 
 contract LoihiRoot is ERC20, ERC20Mintable, ERC20Burnable, DSMath, Ownable {
 
@@ -25,6 +25,13 @@ contract LoihiRoot is ERC20, ERC20Mintable, ERC20Burnable, DSMath, Ownable {
     function supportsInterface (bytes4 interfaceID) external view returns (bool) {
         return interfaceID == ERC20ID
             || interfaceID == ERC165ID;
+    }
+
+    modifier nonReentrant() {
+        require(_notEntered, "re-entered");
+        _notEntered = false;
+        _;
+        _notEntered = true;
     }
 
 }

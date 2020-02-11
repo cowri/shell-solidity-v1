@@ -43,7 +43,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     /// @param _flavors an array containing the addresses of the flavors being deposited into
     /// @param _amounts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
-    function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts, uint256 _minShells, uint256 _deadline) external returns (uint256 shellsToMint_) {
+    function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts, uint256 _minShells, uint256 _deadline) external nonReentrant returns (uint256 shellsToMint_) {
         require(_deadline >= now, "deadline has passed for this transaction");
 
         ( uint256[] memory _balances,
@@ -133,7 +133,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     /// @param _flavors an array of flavors to withdraw from the reserves
     /// @param _amounts an array of amounts to withdraw that maps to _flavors
     /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
-    function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts, uint256 _maxShells, uint256 _deadline) external returns (uint256 shellsBurned_) {
+    function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts, uint256 _maxShells, uint256 _deadline) external nonReentrant returns (uint256 shellsBurned_) {
         require(_deadline >= now, "deadline has passed for this transaction");
 
         ( uint256[] memory _balances,
@@ -217,7 +217,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     /// @notice this function takes a total amount to deposit into the pool with no slippage from the numeraire assets the pool supports
     /// @param _deposit the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
     /// @return shellsToMint_ the amount of shells you receive in return for your deposit
-    function proportionalDeposit (uint256 _deposit) public returns (uint256) {
+    function proportionalDeposit (uint256 _deposit) public nonReentrant returns (uint256) {
 
         uint256 _totalBalance;
         uint256 _totalSupply = totalSupply();
@@ -254,7 +254,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     /// @notice this function takes a total amount to from the the pool with no slippage from the numeraire assets of the pool
     /// @param _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
-    function proportionalWithdraw (uint256 _withdrawal) public returns (uint256[] memory) {
+    function proportionalWithdraw (uint256 _withdrawal) public nonReentrant returns (uint256[] memory) {
 
         uint256 _withdrawMultiplier = wdiv(_withdrawal, totalSupply());
 

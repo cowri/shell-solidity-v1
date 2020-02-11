@@ -7,19 +7,19 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
 
     event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
 
-    function swapByTarget (address origin, address target, uint256 maxOriginAmount, uint256 targetAmount, uint256 deadline) public returns (uint256) {
+    function swapByTarget (address origin, address target, uint256 maxOriginAmount, uint256 targetAmount, uint256 deadline) public nonReentrant returns (uint256) {
         return executeTargetTrade(origin, target, maxOriginAmount, targetAmount, deadline, msg.sender);
     }
 
-    function transferByTarget (address origin, address target, uint256 maxOriginAmount, uint256 targetAmount, uint256 deadline, address recipient) public returns (uint256) {
+    function transferByTarget (address origin, address target, uint256 maxOriginAmount, uint256 targetAmount, uint256 deadline, address recipient) public nonReentrant returns (uint256) {
         return executeTargetTrade(origin, target, maxOriginAmount, targetAmount, deadline, recipient);
     }
     
-    function swapByOrigin (address origin, address target, uint256 originAmount, uint256 minTargetAmount, uint256 deadline) public returns (uint256) {
+    function swapByOrigin (address origin, address target, uint256 originAmount, uint256 minTargetAmount, uint256 deadline) public nonReentrant returns (uint256) {
         return executeOriginTrade(origin, target, originAmount, minTargetAmount, deadline, msg.sender);
     }
 
-    function transferByOrigin (address origin, address target, uint256 originAmount, uint256 minTargetAmount, uint256 deadline, address recipient) public returns (uint256) {
+    function transferByOrigin (address origin, address target, uint256 originAmount, uint256 minTargetAmount, uint256 deadline, address recipient) public nonReentrant returns (uint256) {
         return executeOriginTrade(origin, target, originAmount, minTargetAmount, deadline, recipient);
     }
 
