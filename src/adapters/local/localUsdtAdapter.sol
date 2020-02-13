@@ -9,14 +9,6 @@ import "../../LoihiRoot.sol";
 
 contract LocalUsdtAdapter is LoihiRoot {
 
-    IChai chai;
-    ICToken cdai;
-    IERC20 dai;
-    IPot pot;
-    ICToken cusdc;
-    IERC20 usdc;
-    IERC20 usdt;
-
     constructor () public { }
 
     // transfers usdt in

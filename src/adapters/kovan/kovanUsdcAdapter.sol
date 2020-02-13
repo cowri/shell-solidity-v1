@@ -28,7 +28,6 @@ contract KovanUsdcAdapter {
     }
 
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
-        amount /= 1000000000000;
         ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).redeemUnderlying(amount);
         IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).transfer(dst, amount);
         return amount;

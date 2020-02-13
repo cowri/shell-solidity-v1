@@ -9,14 +9,6 @@ import "../../LoihiRoot.sol";
 
 contract LocalUsdcAdapter is LoihiRoot {
 
-    IChai chai;
-    ICToken cdai;
-    IERC20 dai;
-    IPot pot;
-    ICToken cusdc;
-    IERC20 usdc;
-    IERC20 usdt;
-
     constructor () public { }
 
     // transfers usdc in
@@ -35,20 +27,30 @@ contract LocalUsdcAdapter is LoihiRoot {
         return amount;
     }
 
-    // redeems numeraire amount from cusdc
-    // transfers it to destination
+    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+        cusdc.redeemUnderlying(amount);
+        usdc.transfer(dst, amount);
+        return amount;
+    }
+
     function outputNumeraire (address dst, uint256 amount) public {
         amount /= 1000000000000;
         cusdc.redeemUnderlying(amount);
         usdc.transfer(dst, amount);
     }
 
-    function outputRaw (address dst, uint256 amount) public returns (uint256) {
-        uint256 bal = usdc.balanceOf(address(this));
-        cusdc.redeemUnderlying(amount);
-        bal = usdc.balanceOf(address(this)) - bal;
-        usdc.transfer(dst, amount);
-        return bal;
+    function viewRawAmount (uint256 amount) public view returns (uint256) {
+        return amount / 1000000000000;
+    }
+
+    function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
+        return amount * 1000000000000;
+    }
+
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        uint256 rate = cusdc.exchangeRateStored();
+        uint256 balance = cusdc.balanceOf(addr);
+        return wmul(balance, rate) * 1000000000000;
     }
 
     // is already numeraire amount
@@ -58,6 +60,6 @@ contract LocalUsdcAdapter is LoihiRoot {
 
     // returns numeraire balance
     function getNumeraireBalance () public returns (uint256) {
-        return cusdc.balanceOfUnderlying(address(this));
+        return cusdc.balanceOfUnderlying(address(this)) * 1000000000000;   
     }
 }

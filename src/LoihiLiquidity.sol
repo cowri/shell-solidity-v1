@@ -2,12 +2,9 @@
 pragma solidity ^0.5.12;
 
 import "./LoihiRoot.sol";
-import "./LoihiCallAdapters.sol";
+import "./LoihiDelegators.sol";
 
-contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
-
-    event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
-    event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);
+contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     /// @author james foley http://github.com/realisation
     /// @dev this function is used in selective deposits and selective withdraws
@@ -15,7 +12,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     /// @param _flavors the addresses of the stablecoin flavor
     /// @param _amounts the specified amount of each stablecoin flavor
     /// @return three arrays each the length of the number of reserves containing the balances, token amounts and weights for each reserve
-    function getBalancesTokenAmountsAndWeights (address[] memory _flavors, uint256[] memory _amounts) internal returns (uint256[] memory, uint256[] memory, uint256[] memory) {
+    function getBalancesTokenAmountsAndWeights (address[] memory _flavors, uint256[] memory _amounts) private returns (uint256[] memory, uint256[] memory, uint256[] memory) {
 
         uint256[] memory balances_ = new uint256[](reserves.length);
         uint256[] memory tokenAmounts_ = new uint256[](reserves.length);
@@ -58,7 +55,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
 
         require(shellsToMint_ >= _minShells, "minted shells less than minimum shells");
 
-        _mint(msg.sender, shellsToMint_);
+        // _mint(msg.sender, shellsToMint_);
 
         for (uint i = 0; i < _flavors.length; i++) dIntakeRaw(flavors[_flavors[i]].adapter, _amounts[i]);
 
@@ -75,7 +72,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     /// @param _deposits an array of numeraire amounts to deposit into each reserve
     /// @param _weights an array of the balance weights for each of the reserves
     /// @return shellsToMint_ the amount of shell tokens to mint according to the dynamic fee relative to the balance of each reserve deposited into
-    function calculateShellsToMint (uint256[] memory _balances, uint256[] memory _deposits, uint256[] memory _weights) public returns (uint256) {
+    function calculateShellsToMint (uint256[] memory _balances, uint256[] memory _deposits, uint256[] memory _weights) private returns (uint256) {
 
         uint256 _newSum;
         uint256 _oldSum;
@@ -124,7 +121,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
             }
         }
 
-        return wmul(totalSupply(), wdiv(shellsToMint_, _oldSum));
+        return wmul(totalSupply, wdiv(shellsToMint_, _oldSum));
 
     }
 
@@ -209,7 +206,7 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
             }
         }
 
-        return wmul(totalSupply(), wdiv(_numeraireShellsToBurn, _oldSum));
+        return wmul(totalSupply, wdiv(_numeraireShellsToBurn, _oldSum));
 
     }
 
@@ -217,10 +214,10 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     /// @notice this function takes a total amount to deposit into the pool with no slippage from the numeraire assets the pool supports
     /// @param _deposit the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
     /// @return shellsToMint_ the amount of shells you receive in return for your deposit
-    function proportionalDeposit (uint256 _deposit) public nonReentrant returns (uint256) {
+    function proportionalDeposit (uint256 _deposit) public returns (uint256) {
 
         uint256 _totalBalance;
-        uint256 _totalSupply = totalSupply();
+        uint256 _totalSupply = totalSupply;
 
         uint256[] memory _amounts = new uint256[](3);
 
@@ -256,9 +253,10 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
     function proportionalWithdraw (uint256 _withdrawal) public nonReentrant returns (uint256[] memory) {
 
-        uint256 _withdrawMultiplier = wdiv(_withdrawal, totalSupply());
+        uint256 _withdrawMultiplier = wdiv(_withdrawal, totalSupply);
 
         _burn(msg.sender, _withdrawal);
+        emit ShellsBurned(msg.sender, _withdrawal);
 
         uint256[] memory withdrawalAmts_ = new uint256[](reserves.length);
         for (uint i = 0; i < reserves.length; i++) {
@@ -272,6 +270,18 @@ contract LoihiLiquidityMembrane is LoihiRoot, LoihiCallAdapters {
 
         return withdrawalAmts_;
 
+    }
+
+    function _burn(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: burn from the zero address");
+        balances[account] = sub(balances[account], amount);
+        totalSupply = sub(totalSupply, amount);
+    }
+
+    function _mint(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: mint to the zero address");
+        totalSupply = add(totalSupply, amount);
+        balances[account] = add(balances[account], amount);
     }
 
 }

@@ -9,14 +9,6 @@ import "../../LoihiRoot.sol";
 
 contract LocalCUsdcAdapter is LoihiRoot {
 
-    IChai chai;
-    ICToken cdai;
-    IERC20 dai;
-    IPot pot;
-    ICToken cusdc;
-    IERC20 usdc;
-    IERC20 usdt;
-
     constructor () public { }
 
     // takes raw cusdc amount and transfers it in
@@ -36,7 +28,7 @@ contract LocalCUsdcAdapter is LoihiRoot {
     // transfers corresponding cusdc to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         uint256 rate = cusdc.exchangeRateCurrent();
-        amount = wmul(amount / 1000000000000, rate);
+        amount = wdiv(amount / 1000000000000, rate);
         cusdc.transfer(dst, amount);
         return amount;
     }
@@ -46,6 +38,24 @@ contract LocalCUsdcAdapter is LoihiRoot {
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
         cusdc.transfer(dst, amount);
         return amount;
+    }
+
+    function viewRawAmount (uint256 amount) public view returns (uint256) {
+        amount /= 1000000000000;
+        uint256 rate = cusdc.exchangeRateStored();
+        return wdiv(amount, rate);
+    }
+
+    function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+        uint256 rate = cusdc.exchangeRateStored();
+        return wmul(amount, rate) * 1000000000000;
+
+    }
+
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        uint256 rate = cusdc.exchangeRateStored();
+        uint256 balance = cusdc.balanceOf(addr);
+        return wmul(balance, rate) * 1000000000000;
     }
 
     // takes raw cusdc amount

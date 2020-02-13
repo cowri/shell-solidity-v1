@@ -33,9 +33,7 @@ contract KovanDaiAdapter {
     // transfers out dai
     function outputRaw (address dst, uint256 amount) public {
         
-        uint256 bal = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).balanceOf(address(this));
         ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).redeemUnderlying(amount);
-        bal = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).balanceOf(address(this));
         IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).transfer(dst, amount);
         
     }

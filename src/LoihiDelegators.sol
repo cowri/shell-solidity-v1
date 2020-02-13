@@ -1,42 +1,7 @@
 pragma solidity ^0.5.12;
 
-import "./LoihiRoot.sol";
+contract LoihiDelegators {
 
-contract LoihiCallAdapters is LoihiRoot {
-
-    function supportsInterface (bytes4 interfaceID) external view returns (bool) {
-        return interfaceID == ERC20ID
-            || interfaceID == ERC165ID;
-    }
-
-    function setAlpha (uint256 _alpha) public onlyOwner {
-        alpha = _alpha;
-    }
-
-    function setBeta (uint256 _beta) public onlyOwner {
-        beta = _beta;
-    }
-
-    function setFeeDerivative (uint256 _feeDerivative) public onlyOwner {
-        feeDerivative = _feeDerivative;
-    }
-
-    function setFeeBase (uint256 _feeBase) public onlyOwner {
-        feeBase = _feeBase;
-    }
-
-    function includeNumeraireAndReserve (address numeraire, address reserve) public onlyOwner {
-        numeraires.push(numeraire);
-        reserves.push(reserve);
-    }
-
-    function includeAdapter (address flavor, address adapter, address reserve, uint256 weight) public {
-        flavors[flavor] = Flavor(adapter, reserve, weight);
-    }
-
-    function excludeAdapter (address flavor) public {
-        delete flavors[flavor];
-    }
 
     function dViewRawAmount (address addr, uint256 amount) internal view returns (uint256) {
         (bool success, bytes memory result) = addr.staticcall(abi.encodeWithSelector(0x049ca270, amount)); // encoded selector of "getNumeraireAmount(uint256");

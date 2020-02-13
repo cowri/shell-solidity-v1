@@ -9,14 +9,6 @@ import "../../LoihiRoot.sol";
 
 contract LocalDaiAdapter is LoihiRoot {
 
-    IChai chai;
-    ICToken cdai;
-    IERC20 dai;
-    IPot pot;
-    ICToken cusdc;
-    IERC20 usdc;
-    IERC20 usdt;
-
     constructor () public { }
 
     // transfers dai in
@@ -47,6 +39,20 @@ contract LocalDaiAdapter is LoihiRoot {
         cdai.redeemUnderlying(amount);
         dai.transfer(dst, amount);
         return amount;
+    }
+
+    function viewRawAmount (uint256 amount) public pure returns (uint256) {
+        return amount;
+    }
+
+    function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
+        return amount;
+    }
+
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        uint256 rate = cdai.exchangeRateStored();
+        uint256 balance = cdai.balanceOf(addr);
+        return wmul(balance, rate);
     }
 
     // returns amount, already in numeraire

@@ -1,27 +1,9 @@
 pragma solidity ^0.5.12;
 
-import "./LoihiCallAdapters.sol";
 import "./LoihiRoot.sol";
+import "./LoihiDelegators.sol";
 
-contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
-
-    event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
-
-    function swapByTarget (address origin, address target, uint256 maxOriginAmount, uint256 targetAmount, uint256 deadline) public nonReentrant returns (uint256) {
-        return executeTargetTrade(origin, target, maxOriginAmount, targetAmount, deadline, msg.sender);
-    }
-
-    function transferByTarget (address origin, address target, uint256 maxOriginAmount, uint256 targetAmount, uint256 deadline, address recipient) public nonReentrant returns (uint256) {
-        return executeTargetTrade(origin, target, maxOriginAmount, targetAmount, deadline, recipient);
-    }
-    
-    function swapByOrigin (address origin, address target, uint256 originAmount, uint256 minTargetAmount, uint256 deadline) public nonReentrant returns (uint256) {
-        return executeOriginTrade(origin, target, originAmount, minTargetAmount, deadline, msg.sender);
-    }
-
-    function transferByOrigin (address origin, address target, uint256 originAmount, uint256 minTargetAmount, uint256 deadline, address recipient) public nonReentrant returns (uint256) {
-        return executeOriginTrade(origin, target, originAmount, minTargetAmount, deadline, recipient);
-    }
+contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
     /// @author james foley http://github.com/realisation
     /// @notice given an origin amount this function will find the corresponding target amount according to the contracts state and make the swap between the two
@@ -32,7 +14,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
     /// @param _deadline the block by which this transaction is no longer valid
     /// @param _recipient the address for where to send the resultant target amount
     /// @return tNAmt_ the target numeraire amount
-    function executeOriginTrade (address _origin, address _target, uint256 _oAmt, uint256 _minTAmt, uint256 _deadline, address _recipient) public returns (uint256) {
+    function executeOriginTrade (address _origin, address _target, uint256 _oAmt, uint256 _minTAmt, uint256 _deadline, address _recipient) external returns (uint256) {
 
         Flavor memory _o = flavors[_origin]; // origin adapter + weight
         Flavor memory _t = flavors[_target]; // target adapter + weight
@@ -182,7 +164,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
     /// @param _target the address of the target flavor
     /// @param _oAmt the raw amount of the origin flavor - will be converted to numeraire amount
     /// @return tNAmt_ the target numeraire amount
-    function viewOriginTrade (address _origin, address _target, uint256 _oAmt) public view returns (uint256) {
+    function viewOriginTrade (address _origin, address _target, uint256 _oAmt) external view returns (uint256) {
 
         Flavor memory _o = flavors[_origin]; // origin adapter + weight
         Flavor memory _t = flavors[_target]; // target adapter + weight
@@ -241,7 +223,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
     /// @param _tAmt the raw amount of the target stablecoin flavor to be converted into numeraire amount
     /// @param _deadline the block number at which this transaction is no longer valid
     /// @param _recipient the address for where to send the target amount
-    function executeTargetTrade (address _origin, address _target, uint256 _maxOAmt, uint256 _tAmt, uint256 _deadline, address _recipient) private returns (uint256) {
+    function executeTargetTrade (address _origin, address _target, uint256 _maxOAmt, uint256 _tAmt, uint256 _deadline, address _recipient) external returns (uint256) {
         require(_deadline >= now, "deadline has passed for this trade");
 
         Flavor memory _o = flavors[_origin];
@@ -389,7 +371,7 @@ contract LoihiExchangeExecution is LoihiRoot, LoihiCallAdapters {
     /// @param _origin the address of the origin stablecoin flavor
     /// @param _target the address of the target stablecoin flavor
     /// @param _tAmt the raw amount of the target stablecoin flavor to be converted into numeraire amount
-    function viewTargetTrade (address _origin, address _target, uint256 _tAmt) public view returns (uint256) {
+    function viewTargetTrade (address _origin, address _target, uint256 _tAmt) external view returns (uint256) {
 
         Flavor memory _o = flavors[_origin];
         Flavor memory _t = flavors[_target];
