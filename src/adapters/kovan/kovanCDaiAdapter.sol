@@ -32,18 +32,24 @@ contract KovanCDaiAdapter {
 
     function viewRawAmount (uint256 amount) public view returns (uint256) {
         uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateStored();
-        return wmul(amount, rate);
+        return wdiv(amount, rate);
     }
 
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
         uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateStored();
-        return wdiv(amount, rate);
+        return wmul(amount, rate);
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
         uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateStored();
         uint256 balance = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).balanceOf(addr);
         return wmul(balance, rate);
+    }
+
+    // takes raw amount and gives numeraire amount
+    function getRawAmount (uint256 amount) public returns (uint256) {
+        uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateCurrent();
+        return wdiv(amount, rate);
     }
 
     // takes raw amount and gives numeraire amount
@@ -55,9 +61,15 @@ contract KovanCDaiAdapter {
     function getNumeraireBalance () public returns (uint256) {
         return ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).balanceOfUnderlying(address(this));
     }
+
+    uint constant WAD = 10 ** 18;
     
     function add(uint x, uint y) internal pure returns (uint z) {
         require((z = x + y) >= x, "ds-math-add-overflow");
+    }
+
+    function sub(uint x, uint y) internal pure returns (uint z) {
+        require((z = x - y) <= x);
     }
 
     function mul(uint x, uint y) internal pure returns (uint z) {
@@ -65,11 +77,17 @@ contract KovanCDaiAdapter {
     }
 
     function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), 1000000000000000000 / 2) / 1000000000000000000;
+        z = add(mul(x, y), WAD) / WAD;
     }
 
     function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, 1000000000000000000), y / 2) / y;
+        z = add(mul(x, WAD), y / 2) / y;
     }
+
+    function wdivup(uint x, uint y) internal pure returns (uint z) {
+        // always rounds up
+        z = add(mul(x, WAD), sub(y, 1)) / y;
+    }
+
 
 }

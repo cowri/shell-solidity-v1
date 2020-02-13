@@ -60,6 +60,10 @@ contract KovanDaiAdapter {
         return wmul(balance, rate);
     }
 
+    function getRawAmount (uint256 amount) public pure returns (uint256) {
+        return amount;
+    }
+
     // returns amount, already in numeraire
     function getNumeraireAmount (uint256 amount) public pure returns (uint256) {
         return amount;

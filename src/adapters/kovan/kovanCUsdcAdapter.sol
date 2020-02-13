@@ -56,6 +56,13 @@ contract KovanCUsdcAdapter {
 
     // takes raw cusdc amount
     // returns corresponding numeraire amount
+    function getRawAmount (uint256 amount) public returns (uint256) {
+        uint256 rate = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).exchangeRateCurrent();
+        return wdiv(amount /1000000000000 , rate);
+    }
+
+    // takes raw cusdc amount
+    // returns corresponding numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
         uint256 rate = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).exchangeRateCurrent();
         return wmul(amount, rate) * 1000000000000;

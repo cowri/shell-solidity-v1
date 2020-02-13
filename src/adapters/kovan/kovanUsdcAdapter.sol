@@ -54,6 +54,10 @@ contract KovanUsdcAdapter {
         return wmul(balance, rate) * 1000000000000;
     }
 
+    function getRawAmount (uint256 amount) public pure returns (uint256) {
+        return amount / 1000000000000;
+    }
+
     // is already numeraire amount
     function getNumeraireAmount (uint256 amount) public pure returns (uint256) {
         return amount * 1000000000000;
