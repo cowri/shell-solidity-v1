@@ -2,24 +2,14 @@ pragma solidity ^0.5.6;
 
 import "ds-test/test.sol";
 import "ds-math/math.sol";
-import "../flavorsSetup.sol";
-import "../adaptersSetup.sol";
-import "../../Loihi.sol";
+import "../loihiSetup.sol";
 
-contract LoihiERC165Test is AdaptersSetup, DSMath, DSTest {
-    Loihi l;
+contract LoihiERC165Test is LoihiSetup, DSMath, DSTest {
 
     function setUp() public {
         setupFlavors();
         setupAdapters();
-
-        address pot = address(new PotMock());
-        l = new Loihi(
-            chai, cdai, dai, pot,
-            cusdc, usdc,
-            usdt
-        );
-
+        setupLoihi();
     }
 
     function testSupportsERC165 () public {

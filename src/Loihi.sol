@@ -111,10 +111,10 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
-    function proportionalWithdraw (uint256 _total) external returns (uint256) {
+    function proportionalWithdraw (uint256 _total) external returns (uint256[] memory) {
         (bool success, bytes memory result) = liquidity.delegatecall(abi.encodeWithSelector(0xf2a23b6c, _total));
         require(success, "proportional withdraw failed");
-        return abi.decode(result, (uint256));
+        return abi.decode(result, (uint256[]));
     }
 
     function transfer (address recipient, uint256 amount) public returns (bool) {

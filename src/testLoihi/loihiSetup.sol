@@ -9,7 +9,7 @@ contract LoihiSetup is AdaptersSetup {
 
     function setupLoihi () public {
 
-        l = Loihi(0x29FbbA20fbE1a21aAD92B016dcDce4A352a2c8B6);
+        l = Loihi(0xcdfd8db300f379b73abe5394fafcc38daf95697c);
 
         uint256 WAD = 10 ** 18;
         uint256 weight = WAD / 3;
