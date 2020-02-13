@@ -1,14 +1,14 @@
 pragma solidity ^0.5.0;
 
-interface LoihiI {
+interface ILoihi {
 
-    function getOriginPrice (
+    function viewOriginTrade (
         address origin,
         address target,
         uint256 originAmount
     ) external view returns (uint256);
 
-    function getTargetPrice (
+    function viewTargetTrade (
         address origin,
         address target,
         uint256 originAmount

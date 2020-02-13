@@ -5,18 +5,8 @@ import "./LoihiRoot.sol";
 contract Loihi is LoihiRoot {
 
     constructor () public {
-    // constructor (address _erc20, address _exchange, address _liquidity, address _chai, address _cdai, address _dai, address _pot, address _cusdc, address _usdc, address _usdt) public {
-    //     erc20 = _erc20;
-    //     exchange = _exchange;
-    //     liquidity = _liquidity;
-    //     chai = IChai(_chai);
-    //     cdai = ICToken(_cdai);
-    //     dai = IERC20(_dai);
-    //     pot = IPot(_pot);
-    //     cusdc = ICToken(_cusdc);
-    //     usdc = IERC20(_usdc);
-    //     usdt = IERC20(_usdt);
-    }
+        owner = msg.sender;
+     }
 
     function supportsInterface (bytes4 interfaceID) external view returns (bool) {
         return interfaceID == ERC20ID || interfaceID == ERC165ID;
@@ -27,6 +17,11 @@ contract Loihi is LoihiRoot {
         notEntered = false;
         _;
         notEntered = true;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Ownable: caller is not the owner");
+        _;
     }
 
     function setAlpha (uint256 _alpha) public {
@@ -101,11 +96,13 @@ contract Loihi is LoihiRoot {
 
     }
 
+    event log_address(bytes32, address);
+
     function proportionalDeposit (uint256 _total) external returns (uint256) {
+        emit log_address("liquidity", liquidity);
         (bool success, bytes memory result) = liquidity.delegatecall(abi.encodeWithSelector(0xdef9dfb6, _total));
         require(success, "proportional deposit failed");
         return abi.decode(result, (uint256));
-
     }
 
     function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _dline) external returns (uint256) {

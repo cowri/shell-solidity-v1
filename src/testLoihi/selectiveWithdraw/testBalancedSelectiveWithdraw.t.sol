@@ -1,45 +1,18 @@
 pragma solidity ^0.5.6;
 
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "ds-test/test.sol";
 import "ds-math/math.sol";
-import "../flavorsSetup.sol";
-import "../adaptersSetup.sol";
-import "../../Loihi.sol";
+import "../loihiSetup.sol";
 
 
-contract BalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
-    Loihi l;
+contract BalancedSelectiveWithdrawTest is LoihiSetup, DSMath, DSTest {
 
     function setUp() public {
 
-        // setupFlavors();
-        // setupAdapters();
-        // l = new Loihi(chai, cdai, dai, pot, cusdc, usdc, usdt);
-        // approveFlavors(address(l));
-        
         setupFlavors();
         setupAdapters();
-        l = new Loihi(address(0), address(0), address(0), address(0), address(0), address(0), address(0));
+        setupLoihi();
         approveFlavors(address(l));
-
-        uint256 weight = WAD / 3;
-
-        l.includeNumeraireAndReserve(dai, cdaiAdapter);
-        l.includeNumeraireAndReserve(usdc, cusdcAdapter);
-        l.includeNumeraireAndReserve(usdt, usdtAdapter);
-
-        l.includeAdapter(chai, chaiAdapter, cdaiAdapter, weight);
-        l.includeAdapter(dai, daiAdapter, cdaiAdapter, weight);
-        l.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, weight);
-        l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, weight);
-        l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
-        l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
-
-        l.setAlpha((5 * WAD) / 10);
-        l.setBeta((25 * WAD) / 100);
-        l.setFeeDerivative(WAD / 10);
-        l.setFeeBase(500000000000000);
 
         uint256 shells = l.proportionalDeposit(300 * (10 ** 18));
 

@@ -1,37 +1,19 @@
 pragma solidity ^0.5.6;
 
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "ds-test/test.sol";
 import "ds-math/math.sol";
-import "../flavorsSetup.sol";
-import "../adaptersSetup.sol";
-import "../../Loihi.sol";
+import "../loihiSetup.sol";
 import "../../adapters/kovan/kovanCUsdcAdapter.sol";
 import "../../adapters/kovan/kovanCDaiAdapter.sol";
 import "../../adapters/kovan/kovanUsdtAdapter.sol";
-import "../../adapters/local/localCUsdcAdapter.sol";
-import "../../adapters/local/localCDaiAdapter.sol";
-import "../../adapters/local/localUsdtAdapter.sol";
-import "../../LoihiLiquidity.sol";
-import "../../LoihiExchange.sol";
-import "../../LoihiERC20.sol";
 
-contract LoihiTest is AdaptersSetup, DSMath, DSTest {
-    Loihi l;
+contract LoihiTest is LoihiSetup, DSMath, DSTest {
 
     function setUp() public {
 
-        // setupFlavors();
-        // setupAdapters();
-        // address exchange = address(new LoihiExchange());
-        // address liquidity = address(new LoihiLiquidity());
-        // address erc20 = address(new LoihiERC20());
-        // l = new Loihi(erc20, exchange, liquidity, chai, cdai, dai, pot, cusdc, usdc, usdt);
-        // approveFlavors(address(l));
-        
         setupFlavors();
         setupAdapters();
-        l = new Loihi();
+        setupLoihi();
         approveFlavors(address(l));
 
         uint256 weight = WAD / 3;

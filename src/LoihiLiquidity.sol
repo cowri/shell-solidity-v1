@@ -33,6 +33,8 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
+    event log_uint(bytes32, uint256);
+
     event log_uints(bytes32, uint256[]);
 
     /// @author james foley http://github.com/realisation
@@ -53,9 +55,11 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
         shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
 
+        emit log_uint("shells to mint", shellsToMint_);
+
         require(shellsToMint_ >= _minShells, "minted shells less than minimum shells");
 
-        // _mint(msg.sender, shellsToMint_);
+        _mint(msg.sender, shellsToMint_);
 
         for (uint i = 0; i < _flavors.length; i++) dIntakeRaw(flavors[_flavors[i]].adapter, _amounts[i]);
 
@@ -96,6 +100,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             if (_newBalance <= _feeThreshold) {
 
                 shellsToMint_ += _depositAmount;
+                emit log_uint("shells to mint no fee", shellsToMint_);
 
             } else if (_oldBalance >= _feeThreshold) {
 
@@ -105,6 +110,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
                 ));
 
                 shellsToMint_ = add(shellsToMint_, wmul(_depositAmount, WAD - _feePrep));
+                emit log_uint("shells to mint all fee", shellsToMint_);
 
             } else {
 
@@ -118,10 +124,15 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
                     wmul(sub(_newBalance, _feeThreshold), WAD - _feePrep)
                 );
 
+                emit log_uint("shells to mint all fee", shellsToMint_);
+
             }
         }
-
-        return wmul(totalSupply, wdiv(shellsToMint_, _oldSum));
+        emit log_uint("After", shellsToMint_);
+        emit log_uint("total supply", totalSupply);
+        uint256 adjusted = wmul(totalSupply, wdiv(shellsToMint_, _oldSum));
+        emit log_uint("adjusted shells 2 mint", adjusted);
+        return adjusted;
 
     }
 

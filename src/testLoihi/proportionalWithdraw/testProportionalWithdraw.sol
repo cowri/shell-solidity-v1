@@ -21,7 +21,7 @@ contract TestProportionalWithdraw is AdaptersSetup, DSMath, DSTest {
         
         setupFlavors();
         setupAdapters();
-        l = new Loihi(address(0), address(0), address(0), address(0), address(0), address(0), address(0));
+        l = new Loihi();
         approveFlavors(address(l));
 
         uint256 weight = WAD / 3;

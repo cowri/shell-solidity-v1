@@ -1,46 +1,17 @@
 pragma solidity ^0.5.6;
 
-import "openzeppelin-contracts/contracts/token/ERC20/SafeERC20.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "ds-test/test.sol";
 import "ds-math/math.sol";
-import "../flavorsSetup.sol";
-import "../adaptersSetup.sol";
-import "../../Loihi.sol";
+import "../loihiSetup.sol";
 
-
-contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
-    Loihi l;
+contract UnbalancedSelectiveWithdrawTest is LoihiSetup, DSMath, DSTest {
 
     function setUp() public {
 
-        // setupFlavors();
-        // setupAdapters();
-        // l = new Loihi(chai, cdai, dai, pot, cusdc, usdc, usdt);
-        // approveFlavors(address(l));
-        
         setupFlavors();
         setupAdapters();
-        l = new Loihi(address(0), address(0), address(0), address(0), address(0), address(0), address(0));
+        setupLoihi();
         approveFlavors(address(l));
-
-        uint256 weight = WAD / 3;
-
-        l.includeNumeraireAndReserve(dai, cdaiAdapter);
-        l.includeNumeraireAndReserve(usdc, cusdcAdapter);
-        l.includeNumeraireAndReserve(usdt, usdtAdapter);
-
-        l.includeAdapter(chai, chaiAdapter, cdaiAdapter, weight);
-        l.includeAdapter(dai, daiAdapter, cdaiAdapter, weight);
-        l.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, weight);
-        l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, weight);
-        l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
-        l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
-
-        l.setAlpha((5 * WAD) / 10);
-        l.setBeta((25 * WAD) / 100);
-        l.setFeeDerivative(WAD / 10);
-        l.setFeeBase(500000000000000);
 
         l.proportionalDeposit(300 * (10 ** 18));
 
@@ -65,7 +36,7 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
         uint256 shellsBurned = l.selectiveWithdraw(tokens, amounts, WAD * 500, now + 500);
         shellsBurned /= 10000000000;
-        assertEq(shellsBurned, 1512791323);
+        assertEq(shellsBurned, 1512387964);
     }
 
     function testUnbalancedSelectiveWithdraw0x10y10z () public {
@@ -77,7 +48,7 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
         uint256 shellsBurned = l.selectiveWithdraw(tokens, amounts, WAD * 500, now + 500);
         shellsBurned /= 10000000000;
-        assertEq(shellsBurned, 2001255711);
+        assertEq(shellsBurned, 2000722112);
     }
 
     function testUnbalancedSelectiveWithdraw10x0y5z () public {
@@ -89,7 +60,7 @@ contract UnbalancedSelectiveWithdrawTest is AdaptersSetup, DSMath, DSTest {
 
         uint256 shellsBurned = l.selectiveWithdraw(tokens, amounts, WAD * 500, now + 500);
         shellsBurned /= 10000000000;
-        assertEq(shellsBurned, 1512791323);
+        assertEq(shellsBurned, 1512387964);
     }
 
     function testFailUnbalancedSelectiveWithdraw0x0y100z () public {
