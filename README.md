@@ -3,4 +3,4 @@ Lo'ihi is a stablecoin automated market maker designed to have no slippage beyon
 
 It can take any groupings of stablecoins into the pool and can facilitate trading between any flavor of stablecoin derivatives.
 
-It is named Lo'ihi after the submarine volcano destined to be the sixth island of the same name.
+It is named Lo'ihi after the submarine volcano of the same name destined to be the sixth Hawaiian island.
