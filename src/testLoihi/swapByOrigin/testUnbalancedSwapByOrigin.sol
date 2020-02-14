@@ -3,8 +3,11 @@ pragma solidity ^0.5.6;
 import "ds-test/test.sol";
 import "ds-math/math.sol";
 import "../loihiSetup.sol";
+import "../../adapters/kovan/kovanCUsdcAdapter.sol";
+import "../../IAdapter.sol";
 
 contract UnbalancedSwapByOriginTest is LoihiSetup, DSMath, DSTest {
+    uint256 CUsdcNM10;
 
     function setUp() public {
 
@@ -25,6 +28,8 @@ contract UnbalancedSwapByOriginTest is LoihiSetup, DSMath, DSTest {
         amt[0] = 30 * 1000000;
         uint256 deposited = l.selectiveDeposit(addr, amt, 0, now + 500);
 
+        CUsdcNM10 = IAdapter(cusdcAdapter).viewRawAmount(10*(10**18));
+
     }
 
     function testUnbalancedOriginSwapZtoY () public {
@@ -32,10 +37,29 @@ contract UnbalancedSwapByOriginTest is LoihiSetup, DSMath, DSTest {
         assertEq(targetAmount, 9845074);
     }
 
+    function testUnbalancedOriginSwapCUsdcToCDai () public {
+        emit log_named_uint("cusdc amt for 10nm", CUsdcNM10);
+        uint256 targetAmount = l.swapByOrigin(cusdc, cdai, CUsdcNM10, 5 * (10 ** 8), now);
+        emit log_named_uint("target amount before", targetAmount);
+        targetAmount = IAdapter(cdaiAdapter).getNumeraireAmount(targetAmount);
+        assertEq(targetAmount / (10**13), 984507);
+    }
+
+    function testUnbalancedOriginSwapCUsdcToChai () public {
+        uint256 targetAmount = l.swapByOrigin(cusdc, chai, CUsdcNM10, 5 * (10 ** 8), now);
+        targetAmount = IAdapter(chaiAdapter).getNumeraireAmount(targetAmount);
+        assertEq(targetAmount/(10**13), 984507);
+    }
+
+    function testUnbalancedOriginSwapCUsdcToDai () public {
+        uint256 targetAmount = l.swapByOrigin(cusdc, dai, CUsdcNM10, 5 * (10 ** 8), now);
+        assertEq(targetAmount / (10**13), 984507);
+    }
+
     function testUnbalancedOriginSwapYtoX () public {
         uint256 targetAmount = l.swapByOrigin(usdc, dai, 10 * (10 ** 6), 5 * WAD, now);
-        targetAmount /= 10000000000;
-        assertEq(targetAmount, 984507500);
+        targetAmount /= (10**13);
+        assertEq(targetAmount, 984507);
     }
 
     function testUnbalancedOriginSwapZtoX () public {

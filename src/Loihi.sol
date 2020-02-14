@@ -4,8 +4,12 @@ import "./LoihiRoot.sol";
 
 contract Loihi is LoihiRoot {
 
-    constructor () public {
+    constructor (address _exchange, address _liquidity, address _erc20) public {
+        exchange = _exchange;
+        liquidity = _liquidity;
+        erc20 = _erc20;
         owner = msg.sender;
+        emit OwnershipTransferred(address(0), msg.sender);
      }
 
     function supportsInterface (bytes4 interfaceID) external view returns (bool) {
@@ -24,32 +28,38 @@ contract Loihi is LoihiRoot {
         _;
     }
 
-    function setAlpha (uint256 _alpha) public {
+    function transferOwnership (address newOwner) public {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
+    }
+
+    function setAlpha (uint256 _alpha) public onlyOwner {
         alpha = _alpha;
     }
 
-    function setBeta (uint256 _beta) public {
+    function setBeta (uint256 _beta) public onlyOwner {
         beta = _beta;
     }
 
-    function setFeeDerivative (uint256 _feeDerivative) public {
+    function setFeeDerivative (uint256 _feeDerivative) public onlyOwner {
         feeDerivative = _feeDerivative;
     }
 
-    function setFeeBase (uint256 _feeBase) public {
+    function setFeeBase (uint256 _feeBase) public onlyOwner {
         feeBase = _feeBase;
     }
 
-    function includeNumeraireAndReserve (address numeraire, address reserve) public {
+    function includeNumeraireAndReserve (address numeraire, address reserve) public onlyOwner {
         numeraires.push(numeraire);
         reserves.push(reserve);
     }
 
-    function includeAdapter (address flavor, address adapter, address reserve, uint256 weight) public {
+    function includeAdapter (address flavor, address adapter, address reserve, uint256 weight) public onlyOwner {
         flavors[flavor] = Flavor(adapter, reserve, weight);
     }
 
-    function excludeAdapter (address flavor) public {
+    function excludeAdapter (address flavor) public onlyOwner {
         delete flavors[flavor];
     }
 
@@ -96,10 +106,7 @@ contract Loihi is LoihiRoot {
 
     }
 
-    event log_address(bytes32, address);
-
     function proportionalDeposit (uint256 _total) external returns (uint256) {
-        emit log_address("liquidity", liquidity);
         (bool success, bytes memory result) = liquidity.delegatecall(abi.encodeWithSelector(0xdef9dfb6, _total));
         require(success, "proportional deposit failed");
         return abi.decode(result, (uint256));

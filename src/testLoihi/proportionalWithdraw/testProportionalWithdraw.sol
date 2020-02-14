@@ -3,25 +3,17 @@ pragma solidity ^0.5.6;
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "ds-test/test.sol";
 import "ds-math/math.sol";
-import "../flavorsSetup.sol";
-import "../adaptersSetup.sol";
-import "../../Loihi.sol";
+import "../loihiSetup.sol";
 
-contract TestProportionalWithdraw is AdaptersSetup, DSMath, DSTest {
-    Loihi l;
+contract TestProportionalWithdraw is LoihiSetup, DSMath, DSTest {
 
     event log_uints(bytes32, uint256[]);
 
     function setUp() public {
-
-        // setupFlavors();
-        // setupAdapters();
-        // l = new Loihi(chai, cdai, dai, pot, cusdc, usdc, usdt);
-        // approveFlavors(address(l));
         
         setupFlavors();
         setupAdapters();
-        l = new Loihi();
+        setupLoihi();
         approveFlavors(address(l));
 
         uint256 weight = WAD / 3;

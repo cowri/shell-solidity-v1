@@ -20,12 +20,16 @@ contract KovanCDaiAdapter {
         return cdaiAmount;
     }
 
+    function outputRaw (address dst, uint256 amount) public {
+        ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).transfer(msg.sender, amount);
+    }
+
     // unwraps numeraire amount of dai from chai
     // wraps it into cdai amount
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         uint rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateCurrent();
-        uint cdaiAmount = wmul(amount, rate);
+        uint cdaiAmount = wdiv(amount, rate);
         ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).transfer(dst, cdaiAmount);
         return cdaiAmount;
     }

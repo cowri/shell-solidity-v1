@@ -106,8 +106,8 @@ contract BalancedSelectiveWithdrawTest is LoihiSetup, DSMath, DSTest {
         tokens[1] = usdt; amounts[1] = 50 * 1000000;
 
         uint256 shellsBurned = l.selectiveWithdraw(tokens, amounts, WAD * 500, now + 500);
-        shellsBurned /= 1000000000000;
-        assertEq(shellsBurned, 60155062);
+        shellsBurned /= 10000000000000;
+        assertEq(shellsBurned, 6015506);
 
     }
 
@@ -120,8 +120,8 @@ contract BalancedSelectiveWithdrawTest is LoihiSetup, DSMath, DSTest {
         tokens[2] = usdt; amounts[2] = 5 * 1000000;
 
         uint256 shellsBurned = l.selectiveWithdraw(tokens, amounts, WAD * 500, now + 500);
-        shellsBurned /= 10000000000000;
-        assertEq(shellsBurned, 15560146);
+        shellsBurned /= 100000000000000;
+        assertEq(shellsBurned, 1556014);
     }
 
     function testFailBalancedSelectiveWithdraw10x10y90z () public {

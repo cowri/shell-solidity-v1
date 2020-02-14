@@ -4,15 +4,26 @@ pragma solidity ^0.5.6;
 import "./adaptersSetup.sol";
 import "../Loihi.sol";
 
+import "../LoihiLiquidity.sol";
+import "../LoihiExchange.sol";
+import "../LoihiERC20.sol";
+
 contract LoihiSetup is AdaptersSetup {
     Loihi l;
 
+    event log_named_address(bytes32, address);
     function setupLoihi () public {
 
-        l = Loihi(0xcdfd8db300f379b73abe5394fafcc38daf95697c);
+        l = new Loihi(
+            address(new LoihiExchange()),
+            address(new LoihiLiquidity()),
+            address(new LoihiERC20())
+        );
 
         uint256 WAD = 10 ** 18;
         uint256 weight = WAD / 3;
+
+        emit log_named_address("me", address(this));
 
         l.includeNumeraireAndReserve(dai, cdaiAdapter);
         l.includeNumeraireAndReserve(usdc, cusdcAdapter);

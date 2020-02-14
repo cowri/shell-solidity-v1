@@ -44,6 +44,10 @@ contract KovanUsdtAdapter {
         return IERC20(0x1886b2763b26C45c8DE3e4ccc2bbD02578f9e62D).balanceOf(addr) * 1000000000000;
     }
 
+    function getRawAmount (uint256 amount) public pure returns (uint256) {
+        return amount / 1000000000000;
+    }
+
     // returns amount, is already numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
         return amount * 1000000000000;

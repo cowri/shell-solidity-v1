@@ -15,7 +15,7 @@ contract KovanCUsdcAdapter {
     // takes numeraire amount and transfers corresponding cusdc in
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         uint256 rate = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).exchangeRateCurrent();
-        amount = wdiv(amount, rate);
+        amount = wdiv(amount / 1000000000000, rate);
         ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).transferFrom(msg.sender, address(this), amount);
         return amount;
     }

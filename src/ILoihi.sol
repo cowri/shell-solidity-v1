@@ -68,4 +68,10 @@ interface ILoihi {
         uint256 deadline
     ) external returns (uint256[] memory);
 
+    function transferOwnership (
+        address newOwner
+    ) external;
+
+    function owner () external view returns (address);
+
 }

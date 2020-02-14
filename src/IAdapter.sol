@@ -6,5 +6,9 @@ interface IAdapter {
     function outputNumeraire (address dst, uint256 amount) external returns (uint256);
     function outputRaw (address dst, uint256 amount) external;
     function getNumeraireAmount (uint256) external returns (uint256);
+    function getRawAmount (uint256) external returns (uint256);
     function getNumeraireBalance (uint256) external returns (uint256);
+    function viewRawAmount (uint256) external view returns (uint256);
+    function viewNumeraireAmount (uint256) external view returns (uint256);
+    function viewNumeraireBalance (address addr) external view returns (uint256);
 }
