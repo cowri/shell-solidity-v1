@@ -11,7 +11,6 @@ contract KovanUsdcAdapter {
     // transfers usdc in
     // wraps it in csudc
     function intakeRaw (uint256 amount) public {
-        amount /= 1000000000000;
         IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).transferFrom(msg.sender, address(this), amount);
         IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF).approve(address(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35), amount);
         ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35).mint(amount);
