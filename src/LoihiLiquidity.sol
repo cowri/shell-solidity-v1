@@ -49,13 +49,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
           uint256[] memory _deposits,
           uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
 
-        emit log_uints("balances", _balances);
-        emit log_uints("deposits", _deposits);
-        emit log_uints("weights", _weights);
-
         shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
-
-        emit log_uint("shells to mint", shellsToMint_);
 
         require(shellsToMint_ >= _minShells, "minted shells less than minimum shells");
 
@@ -100,7 +94,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             if (_newBalance <= _feeThreshold) {
 
                 shellsToMint_ += _depositAmount;
-                emit log_uint("shells to mint no fee", shellsToMint_);
 
             } else if (_oldBalance >= _feeThreshold) {
 
@@ -110,7 +103,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
                 ));
 
                 shellsToMint_ = add(shellsToMint_, wmul(_depositAmount, WAD - _feePrep));
-                emit log_uint("shells to mint all fee", shellsToMint_);
 
             } else {
 
@@ -124,14 +116,10 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
                     wmul(sub(_newBalance, _feeThreshold), WAD - _feePrep)
                 );
 
-                emit log_uint("shells to mint all fee", shellsToMint_);
-
             }
         }
-        emit log_uint("After", shellsToMint_);
-        emit log_uint("total supply", totalSupply);
+
         uint256 adjusted = wmul(totalSupply, wdiv(shellsToMint_, _oldSum));
-        emit log_uint("adjusted shells 2 mint", adjusted);
         return adjusted;
 
     }
@@ -232,29 +220,40 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
         uint256[] memory _amounts = new uint256[](3);
 
-        for (uint i = 0; i < reserves.length; i++) {
-            Flavor memory _f = flavors[numeraires[i]];
-            _amounts[i] = wmul(_f.weight, _deposit);
-            _totalBalance += dGetNumeraireBalance(reserves[i]);
+        if (_totalSupply == 0) {
+
+            for (uint i = 0; i < reserves.length; i++) {
+                Flavor memory _f = flavors[numeraires[i]];
+                _amounts[i] = dIntakeNumeraire(_f.adapter, wmul(_f.weight, _deposit));
+            }
+
+            emit ShellsMinted(msg.sender, _deposit, numeraires, _amounts);
+
+            _mint(msg.sender, _deposit);
+
+            return _deposit;
+
+        } else {
+
+            for (uint i = 0; i < reserves.length; i++) {
+                Flavor memory _f = flavors[numeraires[i]];
+                _amounts[i] = wmul(_f.weight, _deposit);
+                _totalBalance += dGetNumeraireBalance(reserves[i]);
+            }
+
+            uint256 shellsToMint_ = wmul(_deposit, wdiv(_totalBalance, _totalSupply));
+
+            _mint(msg.sender, shellsToMint_);
+
+            for (uint i = 0; i < reserves.length; i++) {
+                Flavor memory d = flavors[numeraires[i]];
+                _amounts[i] = dIntakeNumeraire(d.adapter, _amounts[i]);
+            }
+
+            emit ShellsMinted(msg.sender, shellsToMint_, numeraires, _amounts);
+
+            return shellsToMint_;
         }
-
-        if (_totalBalance == 0) {
-            _totalBalance = WAD;
-            _totalSupply = WAD;
-        }
-
-        uint256 shellsToMint_ = wmul(_deposit, wdiv(_totalBalance, _totalSupply));
-
-        _mint(msg.sender, shellsToMint_);
-
-        for (uint i = 0; i < reserves.length; i++) {
-            Flavor memory d = flavors[numeraires[i]];
-           _amounts[i] = dIntakeNumeraire(d.adapter, _amounts[i]);
-        }
-
-        emit ShellsMinted(msg.sender, shellsToMint_, numeraires, _amounts);
-
-        return shellsToMint_;
 
     }
 
@@ -267,7 +266,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         uint256 _withdrawMultiplier = wdiv(_withdrawal, totalSupply);
 
         _burn(msg.sender, _withdrawal);
-        emit ShellsBurned(msg.sender, _withdrawal);
 
         uint256[] memory withdrawalAmts_ = new uint256[](reserves.length);
         for (uint i = 0; i < reserves.length; i++) {
@@ -281,6 +279,17 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
         return withdrawalAmts_;
 
+    }
+
+
+    function totalReserves () external view returns (uint256, uint256[] memory) {
+        uint256[] memory balances = new uint256[](numeraires.length);
+        uint256 totalBalance;
+        for (uint i = 0; i < numeraires.length; i++) {
+            balances[i] = dViewNumeraireBalance(numeraires[i]);
+            totalBalance += balances[i];
+        }
+        return (totalBalance, balances);
     }
 
     function _burn(address account, uint256 amount) internal {
