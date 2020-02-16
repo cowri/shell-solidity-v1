@@ -17,7 +17,7 @@ contract LoihiSetup is AdaptersSetup {
 
         l = new Loihi(
             // address(new LoihiExchange()),
-            // address(new LoihiViews()),
+            address(new LoihiViews())
             // address(new LoihiLiquidity())
             // address(new LoihiERC20())
         );
