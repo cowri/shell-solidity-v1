@@ -15,9 +15,9 @@ contract LoihiSetup is AdaptersSetup {
     function setupLoihi () public {
 
         l = new Loihi(
-            address(new LoihiExchange()),
-            address(new LoihiLiquidity()),
-            address(new LoihiERC20())
+            // address(new LoihiExchange()),
+            // address(new LoihiLiquidity()),
+            // address(new LoihiERC20())
         );
 
         uint256 WAD = 10 ** 18;

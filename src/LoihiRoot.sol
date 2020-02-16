@@ -34,13 +34,13 @@ contract LoihiRoot is DSMath {
     bytes4 constant internal ERC20ID = 0x36372b07;
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
 
-    address internal exchange;
-    address internal liquidity;
-    address internal erc20;
+    // address internal exchange;
+    // address internal liquidity;
+    // address internal erc20;
 
-    // address internal constant exchange = 0x5a419E52bF8AfA1aC68E3373bCFAB9259506aed6;
-    // address internal constant liquidity = 0xe21DA9e54706Dfe2362ACA4585aF7c3A721866EB;
-    // address internal constant erc20 = 0x7D5041D6c2abf155785604b3dBc0459e315dD301;
+    address internal constant exchange = 0xD645FDeB248690F3C8d4478DbE1D2D65f1903943;
+    address internal constant liquidity = 0x5D4784FBDC33D0ea441BB504F1a6CaF4c006fe7f;
+    address internal constant erc20 = 0xf00558eE9bfd7749FaF63bbFd1DA1b9AD60b441c;
 
     // IChai chai;
     // ICToken cdai;

@@ -4,12 +4,65 @@ import "./LoihiRoot.sol";
 
 contract Loihi is LoihiRoot {
 
-    constructor (address _exchange, address _liquidity, address _erc20) public {
-        exchange = _exchange;
-        liquidity = _liquidity;
-        erc20 = _erc20;
+    constructor () public {
+    // constructor (address _exchange, address _liquidity, address _erc20) public {
+        // exchange = _exchange;
+        // liquidity = _liquidity;
+        // erc20 = _erc20;
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
+
+
+
+
+        numeraires = [
+            0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa,
+            0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF,
+            0x1886b2763b26C45c8DE3e4ccc2bbD02578f9e62D
+        ];
+
+        reserves = [
+            0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
+            0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
+            0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67
+        ];
+
+        flavors[0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa] = Flavor(
+            0x766CD84c9ee817C61e9769CA567C4Fc8B2Fa901c,
+            0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
+            333333333333333333
+        );
+
+        flavors[0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF] = Flavor(
+            0x0CCb2Df4109140Afd8BaeBa7f9AeD3795EfEb0eC,
+            0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
+            333333333333333333
+        );
+
+        flavors[0x1886b2763b26C45c8DE3e4ccc2bbD02578f9e62D] = Flavor(
+            0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67,
+            0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67,
+            333333333333333333
+        );
+
+        flavors[0xB641957b6c29310926110848dB2d464C8C3c3f38] = Flavor(
+            0x73562E7B8bfB32131D6ee346f23FBA5055Ac5139,
+            0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
+            333333333333333333
+        );
+
+        flavors[0xe7bc397DBd069fC7d0109C0636d06888bb50668c] = Flavor(
+            0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
+            0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
+            333333333333333333
+        );
+
+        flavors[0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35] = Flavor(
+            0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
+            0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
+            333333333333333333
+        );
+
      }
 
     function supportsInterface (bytes4 interfaceID) external view returns (bool) {
@@ -121,7 +174,7 @@ contract Loihi is LoihiRoot {
     function proportionalWithdraw (uint256 _total) external returns (uint256[] memory) {
         (bool success, bytes memory result) = liquidity.delegatecall(abi.encodeWithSelector(0xf2a23b6c, _total));
         require(success, "proportional withdraw failed");
-        return abi.decode(result, (uint256[]));
+        return abi.decode(result, (uint256[] memory));
     }
 
     function transfer (address recipient, uint256 amount) public returns (bool) {
@@ -140,6 +193,31 @@ contract Loihi is LoihiRoot {
         (bool success, bytes memory result) = erc20.delegatecall(abi.encodeWithSelector(0x095ea7b3, spender, amount));
         require(success, "transfer operation failed");
         return abi.decode(result, (bool));
+    }
+
+    function balanceOf (address account) public view returns (uint256) {
+        return balances[account];
+    }
+
+    function allowance (address owner, address spender) public view returns (uint256) {
+        return allowances[owner][spender];
+    }
+
+    function getNumeraires () public view returns (address[] memory) {
+        return numeraires;
+    }
+
+    function getReserves () public view returns (address[] memory) {
+        return reserves;
+    }
+
+    function getAdapter (address flavor) public view returns (address[] memory) {
+        Flavor memory f = flavors[flavor];
+        address[] memory retval = new address[](3);
+        retval[0] = flavor;
+        retval[1] = f.adapter;
+        retval[2] = f.reserve;
+        return retval;
     }
 
 }

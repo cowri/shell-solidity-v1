@@ -48,7 +48,7 @@ contract BalancedSwapByTargetTest is LoihiSetup, DSMath, DSTest {
         assertEq(targetAmount, 15007500);
     }
 
-    function testBalancedSwap25Target () public {
+    function testBalancedSwap25TargetCusdcCdai () public {
         uint256 targetAmount = l.swapByTarget(cusdc, cdai, 300 * WAD, CDaiNM25, now);
         targetAmount = IAdapter(cusdcAdapter).viewNumeraireAmount(targetAmount);
         assertEq(targetAmount / (10**12), 25012500);
