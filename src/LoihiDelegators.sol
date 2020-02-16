@@ -9,14 +9,16 @@ contract LoihiDelegators {
         return abi.decode(result, (uint256));
     }
 
-    function dViewNumeraireAmount (address addr, uint256 amount) internal view returns (uint256) {
-        (bool success, bytes memory result) = addr.staticcall(abi.encodeWithSelector(0xf5e6c0ca, amount)); // encoded selector of "getNumeraireAmount(uint256");
+    function dViewNumeraireAmount (address addr, uint256 amount) internal returns (uint256) {
+        (bool success, bytes memory result) = addr.call(abi.encodeWithSelector(0xf5e6c0ca, amount)); // encoded selector of "getNumeraireAmount(uint256");
         assert(success);
         return abi.decode(result, (uint256));
     }
 
-    function dViewNumeraireBalance (address addr) internal view returns (uint256) {
-        (bool success, bytes memory result) = addr.staticcall(abi.encodeWithSelector(0xac969a73, addr)); // encoded selector of "getNumeraireAmount(uint256");
+    event log_address(bytes32, address);
+    function dViewNumeraireBalance (address addr, address _this) internal returns (uint256) {
+        emit log_address("addr", addr);
+        (bool success, bytes memory result) = addr.call(abi.encodeWithSelector(0xac969a73, _this)); // encoded selector of "getNumeraireAmount(uint256");
         assert(success);
         return abi.decode(result, (uint256));
     }

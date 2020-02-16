@@ -159,63 +159,6 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     }
 
     /// @author james foley http://github.com/realisation
-    /// @notice given an origin amount this function will find the corresponding target amount according to the contracts state and make the swap between the two
-    /// @param _origin the address of the origin flavor
-    /// @param _target the address of the target flavor
-    /// @param _oAmt the raw amount of the origin flavor - will be converted to numeraire amount
-    /// @return tNAmt_ the target numeraire amount
-    function viewOriginTrade (address _origin, address _target, uint256 _oAmt) external view returns (uint256) {
-
-        Flavor memory _o = flavors[_origin]; // origin adapter + weight
-        Flavor memory _t = flavors[_target]; // target adapter + weight
-
-        ( uint256 _NAmt,
-          uint256 _oBal,
-          uint256 _tBal,
-          uint256 _grossLiq ) = getOriginViewVariables(_o, _t, _oAmt);
-
-        _NAmt = calculateOriginTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
-        _NAmt = calculateOriginTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
-
-        return dViewRawAmount(_t.adapter, _NAmt);
-
-    }
-
-    /// @author james foley http://github.com/realisation
-    /// @notice builds the relevant variables for viewing the origin price
-    /// @param _o the record for the origin flavor containing the address of its adapter and its reserve
-    /// @param _t the record for the target flavor containing the address of its adapter and its reserve
-    /// @param _oAmt the raw amount of the origin flavor to be converted into numeraire
-    /// @return NAmt_ numeraire amount for trade before target and origin fees are applied
-    /// @return oBal_ the new origin numeraire balance including the origin numeraire amount
-    /// @return tBal_ the current numereraire balance of the contracts reserve for the target
-    /// @return grossLiq_ total numeraire value across all reserves in the contract
-    function getOriginViewVariables (Flavor memory _o, Flavor memory _t, uint256 _oAmt) private view returns (uint, uint, uint, uint) {
-
-        uint NAmt_;
-        uint oBal_;
-        uint tBal_;
-        uint grossLiq_;
-
-        for (uint i = 0; i < reserves.length; i++) {
-            if (reserves[i] == _o.reserve) {
-                NAmt_ = dViewNumeraireAmount(_o.adapter, _oAmt);
-                oBal_ = dViewNumeraireBalance(_o.adapter);
-                grossLiq_ += oBal_;
-                oBal_ = add(oBal_, NAmt_);
-            } else if (reserves[i] == _t.reserve) {
-                tBal_ = dViewNumeraireBalance(_t.adapter);
-                grossLiq_ += tBal_;
-            } else {
-                grossLiq_ += dViewNumeraireBalance(reserves[i]);
-            }
-        }
-
-        return (NAmt_, oBal_, tBal_, grossLiq_);
-
-    }
-
-    /// @author james foley http://github.com/realisation
     /// @notice given an amount of the target currency this function will derive the corresponding origin amount according to the current state of the contract
     /// @param _origin the address of the origin stablecoin flavor
     /// @param _target the address of the target stablecoin flavor
@@ -365,60 +308,5 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         return oNAmt_;
 
     }
-
-    /// @author james foley http://github.com/realisation
-    /// @notice given an amount of the target currency this function will view the origin amount that would procure
-    /// @param _origin the address of the origin stablecoin flavor
-    /// @param _target the address of the target stablecoin flavor
-    /// @param _tAmt the raw amount of the target stablecoin flavor to be converted into numeraire amount
-    function viewTargetTrade (address _origin, address _target, uint256 _tAmt) external view returns (uint256) {
-
-        Flavor memory _o = flavors[_origin];
-        Flavor memory _t = flavors[_target];
-
-        ( uint256 _NAmt,
-          uint256 _oBal,
-          uint256 _tBal,
-          uint256 _grossLiq ) = getTargetViewVariables(_o, _t, _tAmt) ;
-
-        _NAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
-        _NAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
-
-        return dViewRawAmount(_o.adapter, _NAmt);
-
-    }
-
-    /// @author james foley http://github.com/realisation
-    /// @notice builds the relevant variables for the target trade. total liquidity, numeraire amounts and new balances
-    /// @param _o the record of the origin flavor containing its adapter and reserve address
-    /// @param _t the record of the target flavor containing its adapter and reserve address
-    /// @param _tAmt the raw target amount to be converted into numeraire amount
-    /// @return NAmt_ numeraire amount for trade before target and origin fees are applied
-    /// @return tBal_ the new numeraire balance of the target
-    /// @return oBal_ the numeraire balance of the origin
-    /// @return grossLiq_ the total liquidity in all the reserves of the pool
-    function getTargetViewVariables (Flavor memory _o, Flavor memory _t, uint256 _tAmt) private view returns (uint, uint, uint, uint) {
-
-        uint NAmt_;
-        uint tBal_;
-        uint oBal_;
-        uint grossLiq_;
-
-        for (uint i = 0; i < reserves.length; i++) {
-            if (reserves[i] == _o.reserve) {
-                oBal_ = dViewNumeraireBalance(_o.adapter);
-                grossLiq_ += oBal_;
-            } else if (reserves[i] == _t.reserve) {
-                NAmt_ = dViewNumeraireAmount(_t.adapter, _tAmt);
-                tBal_ = dViewNumeraireBalance(_t.adapter);
-                grossLiq_ += tBal_;
-                tBal_ = sub(tBal_, NAmt_);
-            } else grossLiq_ += dViewNumeraireBalance(reserves[i]);
-        }
-
-        return (NAmt_, oBal_, tBal_, grossLiq_);
-
-    }
-
 
 }

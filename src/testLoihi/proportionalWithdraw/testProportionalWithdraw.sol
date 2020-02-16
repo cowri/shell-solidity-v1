@@ -16,19 +16,6 @@ contract TestProportionalWithdraw is LoihiSetup, DSMath, DSTest {
         setupLoihi();
         approveFlavors(address(l));
 
-        uint256 weight = WAD / 3;
-
-        l.includeNumeraireAndReserve(dai, cdaiAdapter);
-        l.includeNumeraireAndReserve(usdc, cusdcAdapter);
-        l.includeNumeraireAndReserve(usdt, usdtAdapter);
-
-        l.includeAdapter(chai, chaiAdapter, cdaiAdapter, weight);
-        l.includeAdapter(dai, daiAdapter, cdaiAdapter, weight);
-        l.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, weight);
-        l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, weight);
-        l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, weight);
-        l.includeAdapter(usdt, usdtAdapter, usdtAdapter, weight);
-
         l.proportionalDeposit(300 * (10 ** 18));
 
     }
@@ -39,7 +26,7 @@ contract TestProportionalWithdraw is LoihiSetup, DSMath, DSTest {
         assertEq(l.totalSupply(), 0);
         assertEq(withdrawals[0] / 10000000000, 9994999999);
         assertEq(withdrawals[1], 99949998);
-        assertEq(withdrawals[2], 99949998);
+        assertEq(withdrawals[2], 99949999);
 
     }
 
