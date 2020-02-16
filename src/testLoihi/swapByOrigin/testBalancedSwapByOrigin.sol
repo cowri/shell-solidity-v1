@@ -31,7 +31,7 @@ contract BalancedSwapByOriginTest is LoihiSetup, DSMath, DSTest {
 
     function testSwap10OriginChaiUsdc () public {
         uint256 projectedAmount = l.viewOriginTrade(chai, usdc, ChaiNM10);
-        // uint256 targetAmount = l.swapByOrigin(chai, usdc, ChaiNM10, 0, now);
+        uint256 targetAmount = l.swapByOrigin(chai, usdc, ChaiNM10, 0, now);
         assertEq(projectedAmount, 9995000);
         assertEq(targetAmount, 9995000);
         assertEq(projectedAmount, targetAmount);

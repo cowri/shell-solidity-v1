@@ -4,14 +4,14 @@ import "./LoihiRoot.sol";
 
 contract Loihi is LoihiRoot {
 
-    // constructor () public {
+    constructor () public {
     // constructor (address _liquidity) public {
-    constructor (address _views) public {
+    // constructor (address _views) public {
     // constructor (address _exchange, address _liquidity) public {
     // constructor (address _exchange, address _views, address _liquidity) public {
     // constructor (address _exchange, address _liquidity, address _erc20) public {
         // exchange = _exchange;
-        views = _views;
+        // views = _views;
         // liquidity = _liquidity;
         // erc20 = _erc20;
         owner = msg.sender;
@@ -94,19 +94,10 @@ contract Loihi is LoihiRoot {
         owner = newOwner;
     }
 
-    function setAlpha (uint256 _alpha) public onlyOwner {
+    function setParams (uint256 _alpha, uint256 _beta, uint256 _feeDerivative, uint256 _feeBase) public onlyOwner {
         alpha = _alpha;
-    }
-
-    function setBeta (uint256 _beta) public onlyOwner {
         beta = _beta;
-    }
-
-    function setFeeDerivative (uint256 _feeDerivative) public onlyOwner {
         feeDerivative = _feeDerivative;
-    }
-
-    function setFeeBase (uint256 _feeBase) public onlyOwner {
         feeBase = _feeBase;
     }
 
