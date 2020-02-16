@@ -5,6 +5,7 @@ import "ds-test/test.sol";
 import "ds-math/math.sol";
 import "../loihiSetup.sol";
 import "../../IAdapter.sol";
+import "../../LoihiViews.sol";
 
 contract BalancedSwapByTargetTest is LoihiSetup, DSMath, DSTest {
     uint ChaiNM15;
@@ -27,9 +28,14 @@ contract BalancedSwapByTargetTest is LoihiSetup, DSMath, DSTest {
 
     }
 
+    event log_bytes4(bytes32, bytes4);
+
     function testBalancedSwap15TargetCUsdcUSDT () public {
+        uint256 projectedAmount = l.viewTargetTrade(usdt, cusdc, CUsdcNM15);
         uint256 targetAmount = l.swapByTarget(usdt, cusdc, 200 * WAD, CUsdcNM15, now);
+        assertEq(projectedAmount, 15007500);
         assertEq(targetAmount, 15007500);
+        assertEq(targetAmount, projectedAmount);
     }
 
     function testBalancedSwap15TargetCDai () public {

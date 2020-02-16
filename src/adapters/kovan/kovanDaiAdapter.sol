@@ -53,10 +53,11 @@ contract KovanDaiAdapter {
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
         return amount;
     }
-
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    event log_uint(bytes32, uint256);
+    function viewNumeraireBalance (address addr) public returns (uint256) {
         uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateStored();
         uint256 balance = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).balanceOf(addr);
+        emit log_uint("balance of cdai", balance);
         return wmul(balance, rate);
     }
 

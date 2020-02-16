@@ -5,15 +5,17 @@ import "./LoihiRoot.sol";
 contract Loihi is LoihiRoot {
 
     constructor () public {
+    // constructor (address _liquidity) public {
+    // constructor (address _views) public {
+    // constructor (address _exchange, address _liquidity) public {
+    // constructor (address _exchange, address _views, address _liquidity) public {
     // constructor (address _exchange, address _liquidity, address _erc20) public {
         // exchange = _exchange;
+        // views = _views;
         // liquidity = _liquidity;
         // erc20 = _erc20;
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
-
-
-
 
         numeraires = [
             0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa,
@@ -28,7 +30,7 @@ contract Loihi is LoihiRoot {
         ];
 
         flavors[0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa] = Flavor(
-            0x766CD84c9ee817C61e9769CA567C4Fc8B2Fa901c,
+            0x55979667e641e4D87326AfAf5B9BF073e940729f, // 0x766CD84c9ee817C61e9769CA567C4Fc8B2Fa901c,
             0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
             333333333333333333
         );
@@ -63,6 +65,11 @@ contract Loihi is LoihiRoot {
             333333333333333333
         );
 
+        alpha = (5 * WAD) / 10;
+        beta = (25 * WAD) / 100;
+        feeDerivative = WAD / 10;
+        feeBase = 500000000000000;
+
      }
 
     function supportsInterface (bytes4 interfaceID) external view returns (bool) {
@@ -87,19 +94,10 @@ contract Loihi is LoihiRoot {
         owner = newOwner;
     }
 
-    function setAlpha (uint256 _alpha) public onlyOwner {
+    function setParams (uint256 _alpha, uint256 _beta, uint256 _feeDerivative, uint256 _feeBase) public onlyOwner {
         alpha = _alpha;
-    }
-
-    function setBeta (uint256 _beta) public onlyOwner {
         beta = _beta;
-    }
-
-    function setFeeDerivative (uint256 _feeDerivative) public onlyOwner {
         feeDerivative = _feeDerivative;
-    }
-
-    function setFeeBase (uint256 _feeBase) public onlyOwner {
         feeBase = _feeBase;
     }
 
@@ -128,11 +126,50 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
 
-    function viewOriginTrade (address _o, address _t, uint256 _amt) public view returns (uint256) {
-        (bool success, bytes memory result) = exchange.staticcall(abi.encodeWithSelector(0x6980ae1e, address(this), _o, _t, _amt));
-        require(success, "view origin trade failed");
-        return abi.decode(result, (uint256));
+    function viewOriginTrade (address _o, address _t, uint256 _amt) external view returns (uint256) {
+        Flavor storage _fo = flavors[_o];
+        Flavor storage _ft = flavors[_t];
+        
+        (bool success, bytes memory result) = views.staticcall(abi.encodeWithSelector(0xb25e6987, address(this), reserves, _fo.adapter, _fo.reserve, _ft.adapter, _ft.reserve, _amt));
+        ( uint256[] memory viewVars ) = abi.decode(result, (uint256[]));
+
+        (success, result) = views.staticcall(abi.encodeWithSignature("calculateOriginTradeOriginAmount(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)", 
+            _fo.weight, viewVars[1], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));
+        viewVars[0] = abi.decode(result, (uint256));
+
+        (success, result) = views.staticcall(abi.encodeWithSignature("calculateOriginTradeTargetAmount(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)", 
+            _ft.adapter, _ft.weight, viewVars[2], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));
+        viewVars[0] = abi.decode(result, (uint256));
+
+        return viewVars[0];
+
     }
+
+    event log_uint(bytes32, uint256);
+    event log_uints(bytes32, uint256[]);
+
+    function viewTargetTrade (address _o, address _t, uint256 _amt) external view returns (uint256) {
+        Flavor storage _fo = flavors[_o];
+        Flavor storage _ft = flavors[_t];
+
+        (bool success, bytes memory result) = views.staticcall(abi.encodeWithSelector(0xaab4b962,
+            address(this), reserves, _fo.adapter, _fo.reserve, _ft.adapter, _ft.reserve, _amt));
+        ( uint256[] memory viewVars ) = abi.decode(result, (uint256[]));
+
+        (success, result) = views.staticcall(abi.encodeWithSignature("calculateTargetTradeTargetAmount(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
+            _ft.weight, viewVars[1], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));
+        ( viewVars[0] ) = abi.decode(result, (uint256));
+
+        (success, result) = views.staticcall(abi.encodeWithSignature("calculateTargetTradeOriginAmount(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
+            _fo.adapter, _fo.weight, viewVars[2], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));
+        ( viewVars[0] ) = abi.decode(result, (uint256));
+
+        return viewVars[0];
+
+    }
+
+
+    
 
     function swapByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) external nonReentrant returns (uint256) {
         (bool success, bytes memory result) = exchange.delegatecall(abi.encodeWithSelector(0xeb85f014, _o, _t, _mOAmt, _tAmt, _dline, msg.sender));
@@ -146,12 +183,6 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (uint256));
     }
     
-    function viewTargetTrade (address _o, address _t, uint256 _amt) public view returns (uint256) {
-        (bool success, bytes memory result) = exchange.staticcall(abi.encodeWithSelector(0x52f151f3, address(this), _o, _t, _amt));
-        require(success, "view origin trade failed");
-        return abi.decode(result, (uint256));
-    }
-
     function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external returns (uint256) {
         (bool success, bytes memory result) = liquidity.delegatecall(abi.encodeWithSelector(0x51dbb2a7, _flvrs, _amts, _minShells, _dline));
         require(success, "selective deposit failed");
@@ -174,7 +205,7 @@ contract Loihi is LoihiRoot {
     function proportionalWithdraw (uint256 _total) external returns (uint256[] memory) {
         (bool success, bytes memory result) = liquidity.delegatecall(abi.encodeWithSelector(0xf2a23b6c, _total));
         require(success, "proportional withdraw failed");
-        return abi.decode(result, (uint256[] memory));
+        return abi.decode(result, (uint256[]));
     }
 
     function transfer (address recipient, uint256 amount) public returns (bool) {
@@ -218,6 +249,12 @@ contract Loihi is LoihiRoot {
         retval[1] = f.adapter;
         retval[2] = f.reserve;
         return retval;
+    }
+
+    function totalReserves () external view returns (uint256, uint256[] memory) {
+        (bool success, bytes memory result) = liquidity.staticcall(abi.encodeWithSelector(0x8f840ddd));
+        require(success, "view origin trade failed");
+        return abi.decode(result, (uint256, uint256[]));
     }
 
 }
