@@ -4,66 +4,74 @@ import "./LoihiRoot.sol";
 
 contract Loihi is LoihiRoot {
 
-    constructor () public {
+    // constructor () public {
     // constructor (address _liquidity) public {
     // constructor (address _views) public {
     // constructor (address _exchange, address _liquidity) public {
     // constructor (address _exchange, address _views, address _liquidity) public {
-    // constructor (address _exchange, address _liquidity, address _erc20) public {
-        // exchange = _exchange;
-        // views = _views;
-        // liquidity = _liquidity;
-        // erc20 = _erc20;
+    constructor (address _exchange, address _views, address _liquidity, address _erc20) public {
+        exchange = _exchange;
+        views = _views;
+        liquidity = _liquidity;
+        erc20 = _erc20;
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
 
-        numeraires = [
-            0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa,
-            0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF,
-            0x1886b2763b26C45c8DE3e4ccc2bbD02578f9e62D
-        ];
+        // numeraires = [
+        //     0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa,
+        //     0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF,
+        //     0x1886b2763b26C45c8DE3e4ccc2bbD02578f9e62D,
+        //     0x83Ced423459B419793aa1CE2C9e6fE61BB575cFd
+        // ];
 
-        reserves = [
-            0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
-            0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
-            0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67
-        ];
+        // reserves = [
+        //     0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
+        //     0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
+        //     0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67,
+        //     0xB87C9063594785CDa41C3c8e412E6dbba40f337a
+        // ];
 
-        flavors[0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa] = Flavor(
-            0x55979667e641e4D87326AfAf5B9BF073e940729f, // 0x766CD84c9ee817C61e9769CA567C4Fc8B2Fa901c,
-            0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
-            333333333333333333
-        );
+        // flavors[0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa] = Flavor(
+        //     0x55979667e641e4D87326AfAf5B9BF073e940729f, // 0x766CD84c9ee817C61e9769CA567C4Fc8B2Fa901c,
+        //     0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
+        //     333333333333333333
+        // );
 
-        flavors[0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF] = Flavor(
-            0x0CCb2Df4109140Afd8BaeBa7f9AeD3795EfEb0eC,
-            0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
-            333333333333333333
-        );
+        // flavors[0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF] = Flavor(
+        //     0x0CCb2Df4109140Afd8BaeBa7f9AeD3795EfEb0eC,
+        //     0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
+        //     333333333333333333
+        // );
 
-        flavors[0x1886b2763b26C45c8DE3e4ccc2bbD02578f9e62D] = Flavor(
-            0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67,
-            0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67,
-            333333333333333333
-        );
+        // flavors[0x1886b2763b26C45c8DE3e4ccc2bbD02578f9e62D] = Flavor(
+        //     0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67,
+        //     0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67,
+        //     333333333333333333
+        // );
 
-        flavors[0xB641957b6c29310926110848dB2d464C8C3c3f38] = Flavor(
-            0x73562E7B8bfB32131D6ee346f23FBA5055Ac5139,
-            0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
-            333333333333333333
-        );
+        // flavors[0xB641957b6c29310926110848dB2d464C8C3c3f38] = Flavor(
+        //     0x73562E7B8bfB32131D6ee346f23FBA5055Ac5139,
+        //     0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
+        //     300000000000000000
+        // );
 
-        flavors[0xe7bc397DBd069fC7d0109C0636d06888bb50668c] = Flavor(
-            0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
-            0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
-            333333333333333333
-        );
+        // flavors[0xe7bc397DBd069fC7d0109C0636d06888bb50668c] = Flavor(
+        //     0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
+        //     0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
+        //     300000000000000000
+        // );
 
-        flavors[0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35] = Flavor(
-            0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
-            0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
-            333333333333333333
-        );
+        // flavors[0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35] = Flavor(
+        //     0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
+        //     0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
+        //     300000000000000000 
+        // );
+
+        // flavors[0x83Ced423459B419793aa1CE2C9e6fE61BB575cFd] = Flavor(
+        //     0xB87C9063594785CDa41C3c8e412E6dbba40f337a,
+        //     0xB87C9063594785CDa41C3c8e412E6dbba40f337a,
+        //     100000000000000000
+        // );
 
         alpha = (5 * WAD) / 10;
         beta = (25 * WAD) / 100;
