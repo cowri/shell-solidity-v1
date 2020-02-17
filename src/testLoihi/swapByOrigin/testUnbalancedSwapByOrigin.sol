@@ -3,7 +3,6 @@ pragma solidity ^0.5.6;
 import "ds-test/test.sol";
 import "ds-math/math.sol";
 import "../loihiSetup.sol";
-import "../../adapters/kovan/kovanCUsdcAdapter.sol";
 import "../../IAdapter.sol";
 
 contract UnbalancedSwapByOriginTest is LoihiSetup, DSMath, DSTest {
@@ -15,6 +14,7 @@ contract UnbalancedSwapByOriginTest is LoihiSetup, DSMath, DSTest {
         setupAdapters();
         setupLoihi();
         approveFlavors(address(l));
+        includeAdapters(address(l), 1);
 
         l.proportionalDeposit(300 * (10 ** 18));
 

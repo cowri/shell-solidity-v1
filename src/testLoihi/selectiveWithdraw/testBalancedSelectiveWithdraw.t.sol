@@ -13,6 +13,7 @@ contract BalancedSelectiveWithdrawTest is LoihiSetup, DSMath, DSTest {
         setupAdapters();
         setupLoihi();
         approveFlavors(address(l));
+        includeAdapters(address(l), 1);
 
         uint256 shells = l.proportionalDeposit(300 * (10 ** 18));
 

@@ -1,41 +1,36 @@
-// pragma solidity ^0.5.6;
+pragma solidity ^0.5.6;
 
-// import "ds-test/test.sol";
-// import "ds-math/math.sol";
-// import "../loihiSetup.sol";
-// import "../../adapters/kovan/kovanCUsdcAdapter.sol";
-// import "../../IChai.sol";
-// import "../../IPot.sol";
+import "ds-test/test.sol";
+import "ds-math/math.sol";
+import "../loihiSetup.sol";
+import "../../IAdapter.sol";
 
-// contract CUsdcAdapterTest is LoihiSetup, DSMath, DSTest {
+contract CUsdcAdapterTest is LoihiSetup, DSMath, DSTest {
 
-//     KovanCUsdcAdapter cusdcAdptr;
+    function setUp() public {
+        setupFlavors();
+    }
 
-//     function setUp() public {
-//         setupFlavors();
-//         cusdcAdptr = new KovanCUsdcAdapter();
-//     }
+    function testGetRawAndNumeraireAmount () public {
+        uint256 cusdcBalance = ICToken(cusdc).balanceOf(address(this));
+        uint256 usdcBalance = ICToken(cusdc).balanceOfUnderlying(address(this));
 
-//     function testGetRawAndNumeraireAmount () public {
-//         uint256 cusdcBalance = ICToken(cusdc).balanceOf(address(this));
-//         uint256 usdcBalance = ICToken(cusdc).balanceOfUnderlying(address(this));
+        uint256 adptrUsdcAmt = IAdapter(cusdc).getNumeraireAmount(cusdcBalance);
+        uint256 adptrCUsdcAmt = IAdapter(cusdc).getRawAmount(adptrUsdcAmt);
 
-//         uint256 adptrUsdcAmt = cusdcAdptr.getNumeraireAmount(cusdcBalance);
-//         uint256 adptrCUsdcAmt = cusdcAdptr.getRawAmount(adptrUsdcAmt);
+        assertEq(usdcBalance / 10, adptrUsdcAmt / (10 ** 13));
+        assertEq(adptrCUsdcAmt / 10000, cusdcBalance / 10000);
+    }
 
-//         assertEq(usdcBalance / 10, adptrUsdcAmt / (10 ** 13));
-//         assertEq(adptrCUsdcAmt / 10000, cusdcBalance / 10000);
-//     }
+    function testViewRawAndNumeraireAmount () public {
+        uint256 cusdcBalance = ICToken(cusdc).balanceOf(address(this));
+        uint256 usdcBalance = ICToken(cusdc).balanceOfUnderlying(address(this));
 
-//     function testViewRawAndNumeraireAmount () public {
-//         uint256 cusdcBalance = ICToken(cusdc).balanceOf(address(this));
-//         uint256 usdcBalance = ICToken(cusdc).balanceOfUnderlying(address(this));
+        uint256 adptrUsdcAmt = IAdapter(cusdcAdapter).viewNumeraireAmount(cusdcBalance);
+        uint256 adptrCUsdcAmt = IAdapter(cusdcAdapter).viewRawAmount(adptrUsdcAmt);
 
-//         uint256 adptrUsdcAmt = cusdcAdptr.viewNumeraireAmount(cusdcBalance);
-//         uint256 adptrCUsdcAmt = cusdcAdptr.viewRawAmount(adptrUsdcAmt);
+        assertEq(usdcBalance / 10, adptrUsdcAmt / (10 ** 13));
+        assertEq(adptrCUsdcAmt / 10000, cusdcBalance / 10000);
+    }
 
-//         assertEq(usdcBalance / 10, adptrUsdcAmt / (10 ** 13));
-//         assertEq(adptrCUsdcAmt / 10000, cusdcBalance / 10000);
-//     }
-
-// }
+}

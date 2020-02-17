@@ -3,9 +3,7 @@ pragma solidity ^0.5.6;
 import "ds-test/test.sol";
 import "ds-math/math.sol";
 import "../loihiSetup.sol";
-import "../../adapters/kovan/kovanChaiAdapter.sol";
-import "../../adapters/kovan/kovanCUsdcAdapter.sol";
-import "../../adapters/kovan/kovanCDaiAdapter.sol";
+import "../../IAdapter.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract UnbalancedSelectiveDepositTest is LoihiSetup, DSMath, DSTest {
@@ -16,6 +14,7 @@ contract UnbalancedSelectiveDepositTest is LoihiSetup, DSMath, DSTest {
         setupAdapters();
         setupLoihi();
         approveFlavors(address(l));
+        includeAdapters(address(l), 1);
 
         l.proportionalDeposit(300 * (10 ** 18));
 
@@ -59,11 +58,11 @@ contract UnbalancedSelectiveDepositTest is LoihiSetup, DSMath, DSTest {
         uint256[] memory amounts = new uint256[](2);
         address[] memory tokens = new address[](2);
 
-        uint256 cdaiAmt = new KovanCDaiAdapter().viewRawAmount(10*(10**18));
+        uint256 cdaiAmt = IAdapter(cdaiAdapter).viewRawAmount(10*(10**18));
         emit log_named_uint("cdai amt", cdaiAmt);
         tokens[0] = cdai; amounts[0] = cdaiAmt;
 
-        uint256 cusdcAmt = new KovanCUsdcAdapter().viewRawAmount(15*(10**18));
+        uint256 cusdcAmt = IAdapter(cusdcAdapter).viewRawAmount(15*(10**18));
         tokens[1] = cusdc; amounts[1] = cusdcAmt;
 
         uint256 newShells = l.selectiveDeposit(tokens, amounts, 0, now + 500);
@@ -76,10 +75,10 @@ contract UnbalancedSelectiveDepositTest is LoihiSetup, DSMath, DSTest {
         uint256[] memory amounts = new uint256[](2);
         address[] memory tokens = new address[](2);
 
-        uint256 chaiAmt = new KovanChaiAdapter().viewRawAmount(10*(10**18));
+        uint256 chaiAmt = IAdapter(chaiAdapter).viewRawAmount(10*(10**18));
         tokens[0] = chai; amounts[0] = chaiAmt;
 
-        uint256 cusdcAmt = new KovanCUsdcAdapter().viewRawAmount(15*(10**18));
+        uint256 cusdcAmt = IAdapter(cusdcAdapter).viewRawAmount(15*(10**18));
         tokens[1] = cusdc; amounts[1] = cusdcAmt;
 
         uint256 newShells = l.selectiveDeposit(tokens, amounts, 0, now + 500);
@@ -92,10 +91,10 @@ contract UnbalancedSelectiveDepositTest is LoihiSetup, DSMath, DSTest {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
-        uint256 chaiAmt = new KovanChaiAdapter().viewRawAmount(10*(10**18));
+        uint256 chaiAmt = IAdapter(chaiAdapter).viewRawAmount(10*(10**18));
         tokens[0] = chai; amounts[0] = chaiAmt;
 
-        uint256 cusdcAmt = new KovanCUsdcAdapter().viewRawAmount(15*(10**18));
+        uint256 cusdcAmt = IAdapter(cusdcAdapter).viewRawAmount(15*(10**18));
         tokens[1] = cusdc; amounts[1] = cusdcAmt;
 
         tokens[2] = usdt; amounts[2] = 25 * 1000000;
@@ -109,7 +108,7 @@ contract UnbalancedSelectiveDepositTest is LoihiSetup, DSMath, DSTest {
         uint256[] memory amounts = new uint256[](3);
         address[] memory tokens = new address[](3);
 
-        uint256 cdaiAmt = new KovanCDaiAdapter().viewRawAmount(10*(10**18));
+        uint256 cdaiAmt = IAdapter(cdaiAdapter).viewRawAmount(10*(10**18));
         tokens[0] = cdai; amounts[0] = cdaiAmt;
         tokens[1] = usdc; amounts[1] = 15 * 1000000;
         tokens[2] = usdt; amounts[2] = 25 * 1000000;

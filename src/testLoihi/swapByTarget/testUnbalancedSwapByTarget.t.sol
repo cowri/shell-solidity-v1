@@ -13,6 +13,7 @@ contract UnbalancedSwapByTargetTest is LoihiSetup, DSMath, DSTest {
         setupAdapters();
         setupLoihi();
         approveFlavors(address(l));
+        includeAdapters(address(l), 1);
 
         l.proportionalDeposit(300 * (10 ** 18));
 

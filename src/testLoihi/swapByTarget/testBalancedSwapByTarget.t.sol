@@ -19,6 +19,8 @@ contract BalancedSwapByTargetTest is LoihiSetup, DSMath, DSTest {
         setupAdapters();
         setupLoihi();
         approveFlavors(address(l));
+        includeAdapters(address(l), 1);
+        
         l.proportionalDeposit(300 * (10 ** 18));
 
         ChaiNM15 = IAdapter(chaiAdapter).viewRawAmount(15*WAD);

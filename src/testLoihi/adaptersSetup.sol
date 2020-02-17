@@ -44,9 +44,9 @@ contract AdaptersSetup is FlavorsSetup {
         asusdAdapter = address(new KovanASUsdAdapter());
     }
 
-    function includeAdapters (address _loihi) public {
-        // includeAdaptersFourTokens30_30_30_10(_loihi);
-        includeAdaptersThreeTokens33_33_33(_loihi);
+    function includeAdapters (address _loihi, uint256 test) public {
+        if (test == 0) includeAdaptersFourTokens30_30_30_10(_loihi);
+        else if (test == 1) includeAdaptersThreeTokens33_33_33(_loihi);
     }
 
     function includeAdaptersFourTokens30_30_30_10 (address _loihi) public {
