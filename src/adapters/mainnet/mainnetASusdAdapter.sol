@@ -5,29 +5,49 @@ import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../aaveResources/ILendingPool.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract KovanASUsdAdapter {
+contract MainnetASusdAdapter {
 
-    address constant susd = 0xD868790F57B39C9B2B51b12de046975f986675f9;
-    address constant asusd = 0xb9c1434aB6d5811D1D0E92E8266A37Ae8328e901;
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
+    // address constant susd = 0x57Ab1E02fEE23774580C119740129eAC7081e9D3;
+    address constant susd = 0x57Ab1ec28D129707052df4dF418D58a2D46d5f51;
+    address constant asusd = 0x625aE63000f46200499120B906716420bd059240;
+    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
     event log_addr(bytes32, address);
     event log_uint(bytes32, uint256);
 
     constructor () public { }
 
-    function getAToken () public returns (IAToken) {
+    function getData () public {
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(susd);
-        return IAToken(aTokenAddress);
+        emit log_addr("pool", address(pool));
+        
+        (   uint256 totalLiquidity,
+            uint256 availableLiquidity,
+            uint256 totalBorrowsStable,
+            uint256 totalBorrowsVariable,
+            uint256 liquidityRate,
+            uint256 variableBorrowRate,
+            uint256 stableBorrowRate,
+            uint256 averageStableBorrowRate,
+            uint256 utilizationRate,
+            uint256 liquidityIndex,
+            uint256 variableBorrowIndex,
+            address aTokenAddress,
+            uint40 lastUpdateTimestamp ) = pool.getReserveData(susd);
+
+            emit log_addr("aTokenAddress", aTokenAddress);
+            emit log_addr("asusd", asusd);
+            emit log_uint("avail liq", availableLiquidity);
+
+
+
+
     }
 
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
     function intakeRaw (uint256 amount) public {
-        // ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        // getAToken().transferFrom(msg.sender, address(this), amount);
         IAToken(asusd).transferFrom(msg.sender, address(this), amount);
     }
 
@@ -38,9 +58,6 @@ contract KovanASUsdAdapter {
     }
 
     function outputRaw (address dst, uint256 amount) public {
-        uint256 bal = IAToken(asusd).balanceOf(address(this));
-        emit log_uint("BAL", bal);
-        emit log_uint("amount", amount);
         IAToken(asusd).transfer(dst, amount);
     }
 
@@ -61,8 +78,8 @@ contract KovanASUsdAdapter {
         return amount * 1000000000000;
     }
 
-    function viewNumeraireBalance (address addr) public returns (uint256) {
-        return IAToken(asusd).balanceOf(addr);
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        return IAToken(asusd).balanceOf(address(this));
     }
 
     // takes raw amount and gives numeraire amount
