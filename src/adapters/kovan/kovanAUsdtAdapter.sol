@@ -8,54 +8,31 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 contract KovanAUsdtAdapter {
 
     address constant usdt = 0x13512979ADE267AB5100878E2e0f485B568328a4;
-    address constant ausdt = 0xA01bA9fB493b851F4Ac5093A324CB081A909C34B;
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
-
-    event log_addr(bytes32, address);
-    event log_uint(bytes32, uint256);
 
     constructor () public { }
 
-    function getData () public {
+    function getAUsdt () private view returns (IAToken) {
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        emit log_addr("pool", address(pool));
-        
-        (   uint256 totalLiquidity,
-            uint256 availableLiquidity,
-            uint256 totalBorrowsStable,
-            uint256 totalBorrowsVariable,
-            uint256 liquidityRate,
-            uint256 variableBorrowRate,
-            uint256 stableBorrowRate,
-            uint256 averageStableBorrowRate,
-            uint256 utilizationRate,
-            uint256 liquidityIndex,
-            uint256 variableBorrowIndex,
-            address aTokenAddress,
-            uint40 lastUpdateTimestamp ) = pool.getReserveData(usdt);
-
-            emit log_addr("aTokenAddress", aTokenAddress);
-            emit log_addr("ausdt", ausdt);
-            emit log_uint("avail liq", availableLiquidity);
-
-
+        (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(usdt);
+        return IAToken(aTokenAddress);
     }
 
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
     function intakeRaw (uint256 amount) public {
-        IAToken(ausdt).transferFrom(msg.sender, address(this), amount);
+        getAUsdt().transferFrom(msg.sender, address(this), amount);
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         amount /= 1000000000000;
-        IAToken(ausdt).transferFrom(msg.sender, address(this), amount);
+        getAUsdt().transferFrom(msg.sender, address(this), amount);
         return amount;
     }
 
     function outputRaw (address dst, uint256 amount) public {
-        IAToken(ausdt).transfer(dst, amount);
+        getAUsdt().transfer(dst, amount);
     }
 
     // unwraps numeraire amount of dai from chai
@@ -63,7 +40,7 @@ contract KovanAUsdtAdapter {
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         amount /= 1000000000000;
-        IAToken(ausdt).transfer(dst, amount);
+        getAUsdt().transfer(dst, amount);
         return amount;
     }
 
@@ -76,7 +53,7 @@ contract KovanAUsdtAdapter {
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
-        return IAToken(ausdt).balanceOf(address(addr));
+        return getAUsdt().balanceOf(address(addr));
     }
 
     // takes raw amount and gives numeraire amount
@@ -90,7 +67,7 @@ contract KovanAUsdtAdapter {
     }
 
     function getNumeraireBalance () public returns (uint256) {
-        return IAToken(ausdt).balanceOf(address(this));
+        return getAUsdt().balanceOf(address(this)) * 1000000000000;
     }
 
     uint constant WAD = 10 ** 18;

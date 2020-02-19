@@ -11,7 +11,12 @@ contract KovanUsdtAdapter {
 
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
     IERC20 constant usdt = IERC20(0x13512979ADE267AB5100878E2e0f485B568328a4);
-    IAToken constant ausdt = IAToken(0xA01bA9fB493b851F4Ac5093A324CB081A909C34B);
+
+    function getAUsdt () public view returns (IAToken) {
+        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
+        (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(address(usdt));
+        return IAToken(aTokenAddress);
+    }
 
     event log_uint(bytes32, uint256);
     // transfers usdt in
@@ -19,10 +24,7 @@ contract KovanUsdtAdapter {
         safeTransferFrom(usdt, msg.sender, address(this), amount);
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-
-        address poolCore = lpProvider.getLendingPoolCore();
-        usdt.approve(address(poolCore), amount * 2);
-
+        usdt.approve(lpProvider.getLendingPoolCore(), amount * 2);
         pool.deposit(address(usdt), amount, 0);
 
         return amount;
@@ -35,8 +37,7 @@ contract KovanUsdtAdapter {
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
-        address poolCore = lpProvider.getLendingPoolCore();
-        usdt.approve(address(poolCore), amount * 2);
+        usdt.approve(lpProvider.getLendingPoolCore(), amount * 2);
 
         pool.deposit(address(usdt), amount, 0);
         return amount;
@@ -44,15 +45,19 @@ contract KovanUsdtAdapter {
 
     // transfers usdt out of our balance
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
-        ausdt.redeem(amount);
+        getAUsdt().redeem(amount);
         safeTransfer(usdt, dst, amount);
         return amount;
     }
 
+    event log_uint(bytes32, address);
+
     // transfers usdt to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+        emit log_uint("amount", amount);
         amount /= 1000000000000;
-        ausdt.redeem(amount);
+        emit log_uint("amount after chop", amount);
+        getAUsdt().redeem(amount);
         safeTransfer(usdt, dst, amount);
         return amount;
     }
@@ -66,7 +71,7 @@ contract KovanUsdtAdapter {
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
-        return ausdt.balanceOf(addr) * 1000000000000;
+        return getAUsdt().balanceOf(addr) * 1000000000000;
     }
 
     function getRawAmount (uint256 amount) public pure returns (uint256) {
@@ -80,7 +85,7 @@ contract KovanUsdtAdapter {
 
     // returns balance
     function getNumeraireBalance () public returns (uint256) {
-        return ausdt.balanceOf(address(this)) * 1000000000000;
+        return getAUsdt().balanceOf(address(this)) * 1000000000000;
     }
     
     function safeTransfer(IERC20 token, address to, uint256 value) internal {

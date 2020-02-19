@@ -8,13 +8,16 @@ contract KovanDaiAdapter {
 
     constructor () public { }
 
+    ICToken constant cdai = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
+    IERC20 constant dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
+
     // transfers dai in
     // wraps it in chai
     function intakeRaw (uint256 amount) public {
         
-        IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).transferFrom(msg.sender, address(this), amount);
-        IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).approve(address(0xe7bc397DBd069fC7d0109C0636d06888bb50668c), amount);
-        ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).mint(amount);
+        dai.transferFrom(msg.sender, address(this), amount);
+        dai.approve(address(cdai), amount);
+        cdai.mint(amount);
         
     }
 
@@ -22,9 +25,9 @@ contract KovanDaiAdapter {
     // wraps it in cdai
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         
-        IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).transferFrom(msg.sender, address(this), amount);
-        IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).approve(address(0xe7bc397DBd069fC7d0109C0636d06888bb50668c), amount);
-        ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).mint(amount);
+        dai.transferFrom(msg.sender, address(this), amount);
+        dai.approve(address(0xe7bc397DBd069fC7d0109C0636d06888bb50668c), amount);
+        cdai.mint(amount);
         return amount;
         
     }
@@ -33,15 +36,15 @@ contract KovanDaiAdapter {
     // transfers out dai
     function outputRaw (address dst, uint256 amount) public {
         
-        ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).redeemUnderlying(amount);
-        IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).transfer(dst, amount);
+        cdai.redeemUnderlying(amount);
+        dai.transfer(dst, amount);
         
     }
 
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         
-        ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).redeemUnderlying(amount);
-        IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa).transfer(dst, amount);
+        cdai.redeemUnderlying(amount);
+        dai.transfer(dst, amount);
         return amount;
         
     }
@@ -53,11 +56,10 @@ contract KovanDaiAdapter {
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
         return amount;
     }
-    event log_uint(bytes32, uint256);
-    function viewNumeraireBalance (address addr) public returns (uint256) {
-        uint256 rate = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).exchangeRateStored();
-        uint256 balance = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).balanceOf(addr);
-        emit log_uint("balance of cdai", balance);
+
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        uint256 rate = cdai.exchangeRateStored();
+        uint256 balance = cdai.balanceOf(addr);
         return wmul(balance, rate);
     }
 
@@ -73,7 +75,7 @@ contract KovanDaiAdapter {
     // returns numeraire amount of chai balance
     function getNumeraireBalance () public returns (uint256) {
         
-        return ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c).balanceOfUnderlying(address(this));
+        return cdai.balanceOfUnderlying(address(this));
         
     }
 
