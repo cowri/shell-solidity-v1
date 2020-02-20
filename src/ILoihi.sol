@@ -11,7 +11,7 @@ interface ILoihi {
     function viewTargetTrade (
         address origin,
         address target,
-        uint256 originAmount
+        uint256 targetAmount
     ) external view returns (uint256);
 
     function swapByOrigin (
@@ -57,11 +57,13 @@ interface ILoihi {
 
     function selectiveWithdraw (
         address[] calldata _flavors,
-        uint256[] calldata _amounts
+        uint256[] calldata _amounts,
+        uint256 _maxShells,
+        uint256 _deadline
     ) external returns (uint256);
 
     function proportionalDeposit (
-        uint256 shellTokens
+        uint256 totalStablecoins
     ) external returns (uint256[] memory);
 
     function proportionalWithdraw (
@@ -77,17 +79,12 @@ interface ILoihi {
     function includeNumeraireAndReserve (address numeraire, address reserve) external;
     function includeAdapter (address flavor, address adapter, address reserve, uint256 weight) external;
     function excludeAdapter (address flavor) external;
-    function setAlpha (uint256 _alpha) external;
-    function setBeta (uint256 _beta) external;
-    function setFeeDerivative (uint256 _feeDerivative) external;
-    function setFeeBase (uint256 _feeBase) external;
+    function setParams (uint256 alpha, uint256 beta, uint256 feeDerivative, uint256 feeBase) external;
     function totalSupply() external view returns (uint256);
     function decimals() external view returns (uint256);
     function balanceOf(address account) external view returns (uint256);
-    function balances(address account) external view returns (uint256);
     function transfer(address recipient, uint256 amount) external returns (bool);
     function allowance(address owner, address spender) external view returns (uint256);
-    function allowances(address owner, address spender) external view returns (uint256);
     function approve(address spender, uint256 amount) external returns (bool);
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
     function totalReserves () external view returns (uint256, uint256[] memory);

@@ -17,7 +17,6 @@
 
 //         uint256 mintedShells = l.proportionalDeposit(100 * (10 ** 18));
 
-//         emit log_named_uint("mintedShells", mintedShells);
 //         uint256 cusdcBal = IERC20(cusdc).balanceOf(address(l)); // 165557372275ish
 //         uint256 cdaiBal = IERC20(cdai).balanceOf(address(l)); // 163925889326ish
 //         uint256 usdtBal = IERC20(usdt).balanceOf(address(l)); // 33333333333333333300

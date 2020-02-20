@@ -19,6 +19,8 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         Flavor memory _o = flavors[_origin]; // origin adapter + weight
         Flavor memory _t = flavors[_target]; // target adapter + weight
 
+        require(_o.adapter != address(0) && _t.adapter != address(0), "flavor not supported");
+
         ( uint256 _NAmt,
           uint256 _oBal,
           uint256 _tBal,
@@ -49,26 +51,19 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     /// @return grossLiq_ total numeraire value across all reserves in the contract
     function getOriginTradeVariables (Flavor memory _o, Flavor memory _t, uint256 _oAmt) private returns (uint, uint, uint, uint) {
 
-        uint NAmt_;
-        uint oBal_;
-        uint tBal_;
-        uint grossLiq_;
+        uint oNAmt_ = dGetNumeraireAmount(_o.adapter, _oAmt);
+        uint oBal_ = dGetNumeraireBalance(_o.adapter);
+        uint tBal_ = dGetNumeraireBalance(_t.adapter);
+        uint grossLiq_ = add(oBal_, tBal_);
+        oBal_ += oNAmt_;
 
         for (uint i = 0; i < reserves.length; i++) {
-            if (reserves[i] == _o.reserve) {
-                NAmt_ = dGetNumeraireAmount(_o.adapter, _oAmt);
-                oBal_ = dGetNumeraireBalance(_o.adapter);
-                grossLiq_ += oBal_;
-                oBal_ = add(oBal_, NAmt_);
-            } else if (reserves[i] == _t.reserve) {
-                tBal_ = dGetNumeraireBalance(_t.adapter);
-                grossLiq_ += tBal_;
-            } else {
+            if (reserves[i] != _o.reserve && reserves[i] != _t.reserve){
                 grossLiq_ += dGetNumeraireBalance(reserves[i]);
             }
         }
 
-        return (NAmt_, oBal_, tBal_, grossLiq_);
+        return (oNAmt_, oBal_, tBal_, grossLiq_);
 
     }
 
@@ -159,6 +154,8 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
     }
 
+    event log_uint(bytes32, uint256);
+
     /// @author james foley http://github.com/realisation
     /// @notice given an amount of the target currency this function will derive the corresponding origin amount according to the current state of the contract
     /// @param _origin the address of the origin stablecoin flavor
@@ -173,13 +170,22 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         Flavor memory _o = flavors[_origin];
         Flavor memory _t = flavors[_target];
 
+        require(_o.adapter != address(0) && _t.adapter != address(0), "flavor not supported");
+
         ( uint256 _NAmt,
           uint256 _oBal,
           uint256 _tBal,
           uint256 _grossLiq ) = getTargetTradeVariables(_o, _t, _tAmt) ;
+          emit log_uint("NAMT", _NAmt);
+          emit log_uint("_oBAL", _oBal);
+          emit log_uint("_tBal", _tBal);
+          emit log_uint("_grossLiq", _grossLiq);
+
 
         _NAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
+        emit log_uint("_after target fee", _NAmt);
         _NAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
+        emit log_uint("after origin fee", _NAmt);
         
         require(dViewRawAmount(_o.adapter, _NAmt) <= _maxOAmt, "origin amount is greater than max origin amount");
 
@@ -192,6 +198,8 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
     }
 
+    event log_address(bytes32, address);
+
     /// @author james foley http://github.com/realisation
     /// @notice builds the relevant variables for the target trade. total liquidity, numeraire amounts and new balances
     /// @param _o the record of the origin flavor containing its adapter and reserve address
@@ -203,24 +211,22 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     /// @return grossLiq_ the total liquidity in all the reserves of the pool
     function getTargetTradeVariables (Flavor memory _o, Flavor memory _t, uint256 _tAmt) private returns (uint, uint, uint, uint) {
 
-        uint NAmt_;
-        uint tBal_;
-        uint oBal_;
-        uint grossLiq_;
+        uint tNAmt_ = dGetNumeraireAmount(_t.adapter, _tAmt);
+        uint tBal_ = dGetNumeraireBalance(_t.adapter);
+        uint oBal_ = dGetNumeraireBalance(_o.adapter);
+        uint grossLiq_ = add(tBal_, oBal_);
+        tBal_ -= tNAmt_;
 
         for (uint i = 0; i < reserves.length; i++) {
-            if (reserves[i] == _o.reserve) {
-                oBal_ = dGetNumeraireBalance(_o.adapter);
-                grossLiq_ += oBal_;
-            } else if (reserves[i] == _t.reserve) {
-                NAmt_ = dGetNumeraireAmount(_t.adapter, _tAmt);
-                tBal_ = dGetNumeraireBalance(_t.adapter);
-                grossLiq_ += tBal_;
-                tBal_ = sub(tBal_, NAmt_);
-            } else grossLiq_ += dGetNumeraireBalance(reserves[i]);
+            if (reserves[i] != _o.reserve && reserves[i] != _t.reserve) {
+                uint256 numebal = dGetNumeraireBalance(reserves[i]);
+                emit log_uint("numebal", numebal);
+                emit log_address("reserve", reserves[i]);
+                grossLiq_ += numebal;
+            }
         }
 
-        return (NAmt_, oBal_, tBal_, grossLiq_);
+        return (tNAmt_, oBal_, tBal_, grossLiq_);
 
     }
 

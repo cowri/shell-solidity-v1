@@ -19,7 +19,10 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         uint256[] memory weights_ = new uint[](reserves.length);
 
         for (uint i = 0; i < _flavors.length; i++) {
+
             Flavor memory _f = flavors[_flavors[i]]; // withdrawing adapter + weight
+            require(_f.adapter != address(0), "flavor not supported");
+
             for (uint j = 0; j < reserves.length; j++) {
                 balances_[j] = dGetNumeraireBalance(reserves[j]);
                 if (reserves[j] == _f.reserve) {
@@ -27,6 +30,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
                     weights_[j] = _f.weight;
                 }
             }
+
         }
 
         return (balances_, tokenAmounts_, weights_);
@@ -39,15 +43,18 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     /// @author james foley http://github.com/realisation
     /// @notice this function allows selective depositing of any supported stablecoin flavor into the contract in return for corresponding shell tokens
-    /// @param _flavors an array containing the addresses of the flavors being deposited into
-    /// @param _amounts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
+    /// @param _flvrs an array containing the addresses of the flavors being deposited into
+    /// @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
-    function selectiveDeposit (address[] calldata _flavors, uint256[] calldata _amounts, uint256 _minShells, uint256 _deadline) external nonReentrant returns (uint256 shellsToMint_) {
+    function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _deadline) external nonReentrant returns (uint256 shellsToMint_) {
         require(_deadline >= now, "deadline has passed for this transaction");
 
         ( uint256[] memory _balances,
           uint256[] memory _deposits,
-          uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
+          uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flvrs, _amts);
+          emit log_uints("balances", _balances);
+          emit log_uints("deposits", _deposits);
+          emit log_uints("weights", _weights);
 
         shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
 
@@ -55,9 +62,9 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
         _mint(msg.sender, shellsToMint_);
 
-        for (uint i = 0; i < _flavors.length; i++) dIntakeRaw(flavors[_flavors[i]].adapter, _amounts[i]);
+        for (uint i = 0; i < _flvrs.length; i++) if (_amts[i] > 0) dIntakeRaw(flavors[_flvrs[i]].adapter, _amts[i]);
 
-        emit ShellsMinted(msg.sender, shellsToMint_, _flavors, _amounts);
+        emit ShellsMinted(msg.sender, shellsToMint_, _flvrs, _amts);
 
         return shellsToMint_;
 
@@ -126,25 +133,25 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     /// @author james foley http://github.com/realisation
     /// @notice this function allows selective the withdrawal of any supported stablecoin flavor from the contract by burning a corresponding amount of shell tokens
-    /// @param _flavors an array of flavors to withdraw from the reserves
-    /// @param _amounts an array of amounts to withdraw that maps to _flavors
+    /// @param _flvrs an array of flavors to withdraw from the reserves
+    /// @param _amts an array of amounts to withdraw that maps to _flavors
     /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
-    function selectiveWithdraw (address[] calldata _flavors, uint256[] calldata _amounts, uint256 _maxShells, uint256 _deadline) external nonReentrant returns (uint256 shellsBurned_) {
+    function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _deadline) external nonReentrant returns (uint256 shellsBurned_) {
         require(_deadline >= now, "deadline has passed for this transaction");
 
         ( uint256[] memory _balances,
           uint256[] memory _withdrawals,
-          uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
+          uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flvrs, _amts);
 
         shellsBurned_ = calculateShellsToBurn(_balances, _withdrawals, _weights);
 
         require(shellsBurned_ <= _maxShells, "more shells burned than max shell limit");
 
-        for (uint i = 0; i < _flavors.length; i++) dOutputRaw(flavors[_flavors[i]].adapter, msg.sender, _amounts[i]);
+        for (uint i = 0; i < _flvrs.length; i++) if (_amts[i] > 0) dOutputRaw(flavors[_flvrs[i]].adapter, msg.sender, _amts[i]);
 
         _burn(msg.sender, shellsBurned_);
 
-        emit ShellsBurned(msg.sender, shellsBurned_, _flavors, _amounts);
+        emit ShellsBurned(msg.sender, shellsBurned_, _flvrs, _amts);
 
         return shellsBurned_;
 
