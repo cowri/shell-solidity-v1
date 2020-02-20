@@ -38,9 +38,6 @@ contract FlavorsSetup {
     event log_address(bytes32, address);
     function approveFlavors (address addr) public {
 
-        emit log_address("addr", addr);
-        emit log_address("agentOne", addr);
-
         IERC20(dai).approve(addr, 1000000000 * (10 ** 18));
         IERC20(chai).approve(addr, 1000000000 * (10 ** 18));
         IERC20(cdai).approve(addr, 1000000000 * (10 ** 18));

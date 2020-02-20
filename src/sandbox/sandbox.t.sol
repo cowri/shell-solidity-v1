@@ -11,6 +11,7 @@ import "../adapters/kovan/kovanASUsdAdapter.sol";
 import "../adapters/kovan/kovanSUsdAdapter.sol";
 import "../adapters/mainnet/mainnetASusdAdapter.sol";
 import "../IAToken.sol";
+import "../ILoihi.sol";
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
@@ -71,8 +72,14 @@ contract TestProportionalWithdraw is DSTest, LoihiDelegators {
 
     function setUp() public {
         emit log_named_address("me",address(this));
-        delegator = new Delegator();
+        // delegator = new Delegator();
     }
+
+    // // event log_bytes4(bytes32, bytes4);
+    // function testMe () public {
+    //     ILoihi l;
+    //     emit log_bytes4("totalReserves", l.totalReserves.selector);
+    // }
 
     // function testDelegates () public {
 

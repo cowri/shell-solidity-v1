@@ -284,16 +284,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
     }
 
 
-    // function totalReserves () external view returns (uint256, uint256[] memory) {
-    //     uint256[] memory balances = new uint256[](numeraires.length);
-    //     uint256 totalBalance;
-    //     for (uint i = 0; i < numeraires.length; i++) {
-    //         balances[i] = dViewNumeraireBalance(numeraires[i]);
-    //         totalBalance += balances[i];
-    //     }
-    //     return (totalBalance, balances);
-    // }
-
     function _burn(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: burn from the zero address");
         balances[account] = sub(balances[account], amount);

@@ -10,10 +10,10 @@ contract Loihi is LoihiRoot {
     // constructor (address _exchange, address _liquidity) public {
     // constructor (address _exchange, address _views, address _liquidity) public {
     // constructor (address _exchange, address _views, address _liquidity, address _erc20) public {
-    //     exchange = _exchange;
-    //     views = _views;
-    //     liquidity = _liquidity;
-    //     erc20 = _erc20;
+        // exchange = _exchange;
+        // views = _views;
+        // liquidity = _liquidity;
+        // erc20 = _erc20;
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
 
@@ -281,9 +281,9 @@ contract Loihi is LoihiRoot {
         return retval;
     }
 
-    function totalReserves () external view returns (uint256, uint256[] memory) {
-        (bool success, bytes memory result) = liquidity.staticcall(abi.encodeWithSelector(0x8f840ddd));
-        require(success, "view origin trade failed");
+    function totalReserves () external returns (uint256, uint256[] memory) {
+        (bool success, bytes memory result) = views.call(abi.encodeWithSelector(0xb8152e53, reserves, address(this)));
+        require(success, "view total reserves failed");
         return abi.decode(result, (uint256, uint256[]));
     }
 

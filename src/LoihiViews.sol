@@ -230,4 +230,18 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
 
     }
 
+    event log_uint(bytes32, uint256);
+    function totalReserves (address[] calldata _reserves, address _addr) external returns (uint256, uint256[] memory) {
+        uint256 totalBalance;
+        uint256[] memory balances = new uint256[](_reserves.length);
+        for (uint i = 0; i < _reserves.length; i++) {
+            balances[i] = dViewNumeraireBalance(_reserves[i], _addr);
+            emit log_uint("balances i", balances[i]);
+            totalBalance += balances[i];
+            emit log_uint("total bal", totalBalance);
+        }
+        return (totalBalance, balances);
+    }
+
+
 }
