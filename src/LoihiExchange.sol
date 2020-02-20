@@ -154,8 +154,6 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
     }
 
-    event log_uint(bytes32, uint256);
-
     /// @author james foley http://github.com/realisation
     /// @notice given an amount of the target currency this function will derive the corresponding origin amount according to the current state of the contract
     /// @param _origin the address of the origin stablecoin flavor
@@ -176,16 +174,9 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
           uint256 _oBal,
           uint256 _tBal,
           uint256 _grossLiq ) = getTargetTradeVariables(_o, _t, _tAmt) ;
-          emit log_uint("NAMT", _NAmt);
-          emit log_uint("_oBAL", _oBal);
-          emit log_uint("_tBal", _tBal);
-          emit log_uint("_grossLiq", _grossLiq);
-
 
         _NAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
-        emit log_uint("_after target fee", _NAmt);
         _NAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
-        emit log_uint("after origin fee", _NAmt);
         
         require(dViewRawAmount(_o.adapter, _NAmt) <= _maxOAmt, "origin amount is greater than max origin amount");
 
@@ -197,8 +188,6 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         return oAmt_;
 
     }
-
-    event log_address(bytes32, address);
 
     /// @author james foley http://github.com/realisation
     /// @notice builds the relevant variables for the target trade. total liquidity, numeraire amounts and new balances
@@ -220,8 +209,6 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         for (uint i = 0; i < reserves.length; i++) {
             if (reserves[i] != _o.reserve && reserves[i] != _t.reserve) {
                 uint256 numebal = dGetNumeraireBalance(reserves[i]);
-                emit log_uint("numebal", numebal);
-                emit log_address("reserve", reserves[i]);
                 grossLiq_ += numebal;
             }
         }

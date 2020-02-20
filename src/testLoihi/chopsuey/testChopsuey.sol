@@ -87,7 +87,27 @@ contract LoihiChopSueyTest is LoihiSetup, DSMath, DSTest {
         emit log_named_uint("minted", mintedShells);
         assertEq(mintedShells, 99765663267213421115);
 
-        originAmount = l.swapByTarget(dai, usdc, 500 * WAD, 63000000, now + 500);
+        amounts[0] = 50 * WAD;
+        amounts[1] = 0;
+        amounts[2] = 0;
+        amounts[3] = 0;
+        uint256 burnedShells1 = l.selectiveWithdraw(coins, amounts, 500*WAD, now + 500);
+
+
+        amounts[0] = 0;
+        amounts[1] = 10 * (10 ** 6);
+        uint256 mintedShells1 = l.selectiveDeposit(coins, amounts, 0, now + 500);
+
+
+        uint256 target1 = l.swapByOrigin(asusd, usdt,  250000, 0, now + 500);
+
+        uint256 target2 = l.swapByOrigin(usdt, usdc, 75 * (10**6), 0, now + 500);
+
+        uint256 origin1 = l.swapByTarget(usdc, dai, 50*WAD, 1300000000000000000, now + 500);
+
+        uint256 origin2 = l.swapByTarget(dai, usdt, 500 * WAD, 75 * (10**6), now + 500);
+
+        originAmount = l.swapByTarget(dai, asusd, 500 * WAD, , now + 500);
 
     }
 
