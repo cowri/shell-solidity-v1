@@ -8,6 +8,7 @@ import "../../IAdapter.sol";
 contract CUsdcAdapterTest is LoihiSetup, DSMath, DSTest {
 
     function setUp() public {
+        setupAdapters();
         setupFlavors();
     }
 
@@ -15,8 +16,8 @@ contract CUsdcAdapterTest is LoihiSetup, DSMath, DSTest {
         uint256 cusdcBalance = ICToken(cusdc).balanceOf(address(this));
         uint256 usdcBalance = ICToken(cusdc).balanceOfUnderlying(address(this));
 
-        uint256 adptrUsdcAmt = IAdapter(cusdc).getNumeraireAmount(cusdcBalance);
-        uint256 adptrCUsdcAmt = IAdapter(cusdc).getRawAmount(adptrUsdcAmt);
+        uint256 adptrUsdcAmt = IAdapter(cusdcAdapter).getNumeraireAmount(cusdcBalance);
+        uint256 adptrCUsdcAmt = IAdapter(cusdcAdapter).getRawAmount(adptrUsdcAmt);
 
         assertEq(usdcBalance / 10, adptrUsdcAmt / (10 ** 13));
         assertEq(adptrCUsdcAmt / 10000, cusdcBalance / 10000);

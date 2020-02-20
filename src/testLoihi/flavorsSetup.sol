@@ -3,14 +3,20 @@ pragma solidity ^0.5.6;
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract FlavorsSetup {
-    address chai;
     address dai;
-    address cusdc;
-    address usdt;
-    address usdc;
+    address chai;
     address cdai;
-    address pot;
+
+    address usdc;
+    address cusdc;
+
+    address usdt;
+    address ausdt;
+
+    address susd;
     address asusd;
+
+    address pot;
 
     function setupFlavors() public {
 
@@ -24,19 +30,28 @@ contract FlavorsSetup {
         usdt = 0x13512979ADE267AB5100878E2e0f485B568328a4;
         ausdt = 0xA01bA9fB493b851F4Ac5093A324CB081A909C34B;
 
-        asusd = 0xb9c1434ab6d5811d1d0e92e8266a37ae8328e901;
         susd = 0xD868790F57B39C9B2B51b12de046975f986675f9;
+        asusd = 0xb9c1434aB6d5811D1D0E92E8266A37Ae8328e901;
+
     }
 
     event log_address(bytes32, address);
     function approveFlavors (address addr) public {
-        emit log_address("ADDR", addr);
+
+        emit log_address("addr", addr);
+        emit log_address("agentOne", addr);
+
+        IERC20(dai).approve(addr, 1000000000 * (10 ** 18));
         IERC20(chai).approve(addr, 1000000000 * (10 ** 18));
         IERC20(cdai).approve(addr, 1000000000 * (10 ** 18));
-        IERC20(dai).approve(addr, 1000000000 * (10 ** 18));
-        IERC20(cusdc).approve(addr, 10000000000 * (10 ** 18));
+
         IERC20(usdc).approve(addr, 1000000000 * (10 ** 18));
+        IERC20(cusdc).approve(addr, 10000000000 * (10 ** 18));
+
         IERC20(usdt).approve(addr, 1000000000 * (10 ** 18));
+        IERC20(ausdt).approve(addr, 1000000000 * (10**18));
+
+        IERC20(susd).approve(addr, 1000000000 * (10 ** 18));
         IERC20(asusd).approve(addr, 1000000000 * (10 ** 18));
     }
 

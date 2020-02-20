@@ -57,7 +57,7 @@ contract KovanASUsdAdapter {
     }
 
     function viewNumeraireBalance (address addr) public returns (uint256) {
-        return getASUsd().balanceOf(addr);
+        return getASUsd().balanceOf(addr) * 1000000000000;
     }
 
     // takes raw amount and gives numeraire amount

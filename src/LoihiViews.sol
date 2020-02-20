@@ -36,7 +36,7 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
     /// @return oNAmt_ the origin numeraire amount for the swap with fees applied
     function calculateOriginTradeOriginAmount (uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external view returns (uint256) {
 
-        require(_oBal <= wmul(_oWeight, wmul(_grossLiq, _alpha + WAD)), "origin swap origin halt check");
+        if (_oBal >= wmul(_oWeight, wmul(_grossLiq, _alpha + WAD))) return 0;
 
         uint256 oNAmt_;
 
@@ -82,9 +82,8 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
     /// @return tNAmt_ the target numeraire amount including any applied fees
     function calculateOriginTradeTargetAmount (address _tAdptr, uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external view returns (uint256 tNAmt_) {
 
-        require(sub(_tBal, _tNAmt) >= wmul(_tWeight, wmul(_grossLiq, WAD - _alpha)), "origin swap target halt check");
-
         uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - _beta));
+
         if (sub(_tBal, _tNAmt) >= _feeThreshold) {
 
             tNAmt_ = wmul(_tNAmt, WAD - _feeBase);
@@ -116,6 +115,8 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
             tNAmt_ = wmul(tNAmt_, WAD - _feeBase);
 
         }
+
+        if (sub(_tBal, tNAmt_) <= wmul(_tWeight, wmul(_grossLiq, WAD - _alpha))) return 0;
 
         return dViewRawAmount(_tAdptr, tNAmt_);
 
@@ -152,7 +153,7 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
     /// @return tNAmt_ the target numeraire amount after applying fees
     function calculateTargetTradeTargetAmount(uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external view returns (uint256 tNAmt_) {
 
-        require(_tBal >= wmul(_tWeight, wmul(_grossLiq, WAD - _alpha)), "target halt check for target trade");
+        if (_tBal <= wmul(_tWeight, wmul(_grossLiq, WAD - _alpha))) return 0;
 
         uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - _beta));
         if (_tBal >= _feeThreshold) {
@@ -195,8 +196,6 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
     /// @return oNAmt_ the origin numeraire amount after applying fees
     function calculateTargetTradeOriginAmount (address _oAdptr, uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external view returns (uint256 oNAmt_) {
 
-        require(add(_oBal, _oNAmt) <= wmul(_oWeight, wmul(_grossLiq, WAD + _alpha)), "origin halt check for target trade");
-
         uint256 _feeThreshold = wmul(_oWeight, wmul(_grossLiq, WAD + _beta));
         if (_oBal + _oNAmt <= _feeThreshold) {
 
@@ -224,6 +223,8 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
             );
 
         }
+
+        if (add(_oBal, oNAmt_) >= wmul(_oWeight, wmul(_grossLiq, WAD + _alpha))) return 0;
 
         return dViewRawAmount(_oAdptr, oNAmt_);
 

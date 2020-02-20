@@ -15,7 +15,6 @@ contract LoihiDelegators {
         return abi.decode(result, (uint256));
     }
 
-    event log_address(bytes32, address);
     function dViewNumeraireBalance (address addr, address _this) internal view returns (uint256) {
         (bool success, bytes memory result) = addr.staticcall(abi.encodeWithSelector(0xac969a73, _this)); // encoded selector of "getNumeraireAmount(uint256");
         assert(success);

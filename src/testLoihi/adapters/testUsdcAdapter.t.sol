@@ -9,6 +9,7 @@ import "../../IAdapter.sol";
 contract CUsdcAdapterTest is LoihiSetup, DSMath, DSTest {
 
     function setUp() public {
+        setupAdapters();
         setupFlavors();
     }
 

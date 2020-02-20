@@ -74,18 +74,18 @@ contract TestProportionalWithdraw is DSTest, LoihiDelegators {
         delegator = new Delegator();
     }
 
-    function testDelegates () public {
+    // function testDelegates () public {
 
         // KovanAUsdtAdapter adptr = new KovanAUsdtAdapter();
         // adptr.getData();
 
-        emit log_named_address("delegator", address(delegator));
-        emit log_named_address("me", address(this));
+        // emit log_named_address("delegator", address(delegator));
+        // emit log_named_address("me", address(this));
 
         // KovanAUsdtAdapter ausdtAdptr = new KovanAUsdtAdapter();
         // KovanUsdtAdapter usdtAdptr = new KovanUsdtAdapter();
-        KovanSUsdAdapter susdAdptr = new KovanSUsdAdapter();
-        KovanASUsdAdapter asusdAdptr = new KovanASUsdAdapter();
+        // KovanSUsdAdapter susdAdptr = new KovanSUsdAdapter();
+        // KovanASUsdAdapter asusdAdptr = new KovanASUsdAdapter();
 
         // uint256 ausdtBal = dViewNumeraireBalance(address(ausdtAdptr), address(this));
         // emit log_named_uint("ausdtBal", ausdtBal);
@@ -109,8 +109,8 @@ contract TestProportionalWithdraw is DSTest, LoihiDelegators {
         // ausdtBal = dViewNumeraireBalance(address(ausdtAdptr), address(this));
         // emit log_named_uint("ausdtbal me", ausdtBal);
 
-        IERC20(0xD868790F57B39C9B2B51b12de046975f986675f9).approve(address(delegator), 150 * (10**6)); // susd
-        IERC20(0xb9c1434aB6d5811D1D0E92E8266A37Ae8328e901 ).approve(address(delegator), 150 * (10**6)); // susd
+        // IERC20(0xD868790F57B39C9B2B51b12de046975f986675f9).approve(address(delegator), 150 * (10**6)); // susd
+        // IERC20(0xb9c1434aB6d5811D1D0E92E8266A37Ae8328e901 ).approve(address(delegator), 150 * (10**6)); // susd
 
         // uint256 susdBal = susdAdptr.viewNumeraireBalance(address(this));
         // uint256 erc20bal = IERC20(0xD868790F57B39C9B2B51b12de046975f986675f9).balanceOf(address(this));
@@ -129,12 +129,12 @@ contract TestProportionalWithdraw is DSTest, LoihiDelegators {
         // emit log_named_uint("erc20bal", erc20bal);
         // emit log_named_uint("erc20balafter", erc20balAfter);
 
-        delegator.intakeASUsd();
-        uint256 asusdBalAfter = asusdAdptr.viewNumeraireBalance(address(delegator));
-        emit log_named_uint("asusdBalAfter", asusdBalAfter);
-        delegator.outputASUsd();
+        // delegator.intakeASUsd();
+        // uint256 asusdBalAfter = asusdAdptr.viewNumeraireBalance(address(delegator));
+        // emit log_named_uint("asusdBalAfter", asusdBalAfter);
+        // delegator.outputASUsd();
         // susdBalAfter = susdAdptr.viewNumeraireBalance(address(delegator));
         // emit log_named_uint("susdBalAfter", susdBalAfter);
 
-    }
+    // }
 }

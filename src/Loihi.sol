@@ -4,74 +4,95 @@ import "./LoihiRoot.sol";
 
 contract Loihi is LoihiRoot {
 
-    // constructor () public {
+    constructor () public {
     // constructor (address _liquidity) public {
     // constructor (address _views) public {
     // constructor (address _exchange, address _liquidity) public {
     // constructor (address _exchange, address _views, address _liquidity) public {
-    constructor (address _exchange, address _views, address _liquidity, address _erc20) public {
-        exchange = _exchange;
-        views = _views;
-        liquidity = _liquidity;
-        erc20 = _erc20;
+    // constructor (address _exchange, address _views, address _liquidity, address _erc20) public {
+    //     exchange = _exchange;
+    //     views = _views;
+    //     liquidity = _liquidity;
+    //     erc20 = _erc20;
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
 
-        // numeraires = [
-        //     0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa,
-        //     0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF,
-        //     0x1886b2763b26C45c8DE3e4ccc2bbD02578f9e62D,
-        //     0x83Ced423459B419793aa1CE2C9e6fE61BB575cFd
-        // ];
+        numeraires = [
+            0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa, // dai
+            0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF, // usdc
+            0x13512979ADE267AB5100878E2e0f485B568328a4, // usdt
+            0xD868790F57B39C9B2B51b12de046975f986675f9 // susd
+        ];
 
-        // reserves = [
-        //     0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
-        //     0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
-        //     0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67,
-        //     0xB87C9063594785CDa41C3c8e412E6dbba40f337a
-        // ];
+        reserves = [
+            0x71AB605c2C7EF07dAF4f3052DcD7953D5423Dafd, // cdai adptr
+            0x23bF0abe17Ee2Fb81CF5Ae4A21473526cAD95f97, // cusdc adptr
+            0x45960908CFD852791EA821D88F9cE9C4c8a649B8, // ausdt adptr
+            0x0820ea95AbA96dEF58FF843DD1e26aecF4841674 // asusd adptr 
+        ];
+        
+        // dai
+        flavors[0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa] = Flavor(
+            0xa557bF50Eeb88978318B3eDEE60e1781C939Acfa, // dai adptr 
+            0x71AB605c2C7EF07dAF4f3052DcD7953D5423Dafd, // cdai adptr
+            300000000000000000
+        );
 
-        // flavors[0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa] = Flavor(
-        //     0x55979667e641e4D87326AfAf5B9BF073e940729f, // 0x766CD84c9ee817C61e9769CA567C4Fc8B2Fa901c,
-        //     0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
-        //     333333333333333333
-        // );
+        // cdai
+        flavors[0xe7bc397DBd069fC7d0109C0636d06888bb50668c] = Flavor(
+            0x71AB605c2C7EF07dAF4f3052DcD7953D5423Dafd, // cdai adptr
+            0x71AB605c2C7EF07dAF4f3052DcD7953D5423Dafd, // cdai adptr
+            300000000000000000
+        );
 
-        // flavors[0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF] = Flavor(
-        //     0x0CCb2Df4109140Afd8BaeBa7f9AeD3795EfEb0eC,
-        //     0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
-        //     333333333333333333
-        // );
+        // chai
+        flavors[0xB641957b6c29310926110848dB2d464C8C3c3f38] = Flavor(
+            0xe8E99291163839F28A2Cd195C50AE7B259272BFC, // chai adptr
+            0x71AB605c2C7EF07dAF4f3052DcD7953D5423Dafd, // cdai adptr
+            300000000000000000
+        );
 
-        // flavors[0x1886b2763b26C45c8DE3e4ccc2bbD02578f9e62D] = Flavor(
-        //     0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67,
-        //     0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67,
-        //     333333333333333333
-        // );
+        // usdc
+        flavors[0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF] = Flavor(
+            0xa23F24d8d18BE37f617148CD494a1a7e83F06dAC, // usdc adptr
+            0x23bF0abe17Ee2Fb81CF5Ae4A21473526cAD95f97, // cusdc adptr
+            300000000000000000
+        );
 
-        // flavors[0xB641957b6c29310926110848dB2d464C8C3c3f38] = Flavor(
-        //     0x73562E7B8bfB32131D6ee346f23FBA5055Ac5139,
-        //     0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
-        //     300000000000000000
-        // );
+        // cusdc
+        flavors[0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35] = Flavor(
+            0x23bF0abe17Ee2Fb81CF5Ae4A21473526cAD95f97, // cusdc adptr
+            0x23bF0abe17Ee2Fb81CF5Ae4A21473526cAD95f97, // cusdc adptr
+            300000000000000000
+        );
 
-        // flavors[0xe7bc397DBd069fC7d0109C0636d06888bb50668c] = Flavor(
-        //     0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
-        //     0x5FD4D707841B19Bc957cb109928BC387f1d6644f,
-        //     300000000000000000
-        // );
+        // usdt
+        flavors[0x13512979ADE267AB5100878E2e0f485B568328a4] = Flavor(
+            0x36647002Fce1b9100DF631078E9966D842959012, // usdt adptr
+            0x45960908CFD852791EA821D88F9cE9C4c8a649B8, // ausdt adptr
+            300000000000000000 
+        );
 
-        // flavors[0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35] = Flavor(
-        //     0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
-        //     0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b,
-        //     300000000000000000 
-        // );
+        // ausdt
+        flavors[0xA01bA9fB493b851F4Ac5093A324CB081A909C34B] = Flavor(
+            0x45960908CFD852791EA821D88F9cE9C4c8a649B8, // ausdt adptr
+            0x45960908CFD852791EA821D88F9cE9C4c8a649B8, // ausdt adptr
+            300000000000000000
+        );
 
-        // flavors[0x83Ced423459B419793aa1CE2C9e6fE61BB575cFd] = Flavor(
-        //     0xB87C9063594785CDa41C3c8e412E6dbba40f337a,
-        //     0xB87C9063594785CDa41C3c8e412E6dbba40f337a,
-        //     100000000000000000
-        // );
+        // susd
+        flavors[0xD868790F57B39C9B2B51b12de046975f986675f9] = Flavor(
+            0xC35DCbf5Ec963B3789C5Eb673281B90e82d95048, // susd adptr
+            0x0820ea95AbA96dEF58FF843DD1e26aecF4841674, // asusd adptr
+            100000000000000000
+        );
+        
+        // asusd
+        flavors[0xb9c1434aB6d5811D1D0E92E8266A37Ae8328e901] = Flavor(
+            0x0820ea95AbA96dEF58FF843DD1e26aecF4841674, // asusd adptr
+            0x0820ea95AbA96dEF58FF843DD1e26aecF4841674, // asusd adptr
+            100000000000000000
+        );
 
         alpha = (5 * WAD) / 10;
         beta = (25 * WAD) / 100;
@@ -145,6 +166,8 @@ contract Loihi is LoihiRoot {
             _fo.weight, viewVars[1], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));
         viewVars[0] = abi.decode(result, (uint256));
 
+        if (viewVars[0] == 0) return 0;
+
         (success, result) = views.staticcall(abi.encodeWithSignature("calculateOriginTradeTargetAmount(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)", 
             _ft.adapter, _ft.weight, viewVars[2], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));
         viewVars[0] = abi.decode(result, (uint256));
@@ -152,9 +175,6 @@ contract Loihi is LoihiRoot {
         return viewVars[0];
 
     }
-
-    event log_uint(bytes32, uint256);
-    event log_uints(bytes32, uint256[]);
 
     function viewTargetTrade (address _o, address _t, uint256 _amt) external view returns (uint256) {
         Flavor storage _fo = flavors[_o];
@@ -167,6 +187,8 @@ contract Loihi is LoihiRoot {
         (success, result) = views.staticcall(abi.encodeWithSignature("calculateTargetTradeTargetAmount(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
             _ft.weight, viewVars[1], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));
         ( viewVars[0] ) = abi.decode(result, (uint256));
+
+        if (viewVars[0] == 0) return viewVars[0];
 
         (success, result) = views.staticcall(abi.encodeWithSignature("calculateTargetTradeOriginAmount(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
             _fo.adapter, _fo.weight, viewVars[2], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));

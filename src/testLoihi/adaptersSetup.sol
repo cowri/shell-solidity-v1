@@ -4,43 +4,64 @@ import "./flavorsSetup.sol";
 import "../ILoihi.sol";
 
 import "../adapters/kovan/KovanUsdcAdapter.sol";
-import "../adapters/kovan/KovanUsdtAdapter.sol";
 import "../adapters/kovan/KovanCUsdcAdapter.sol";
+
 import "../adapters/kovan/KovanDaiAdapter.sol";
 import "../adapters/kovan/KovanCDaiAdapter.sol";
 import "../adapters/kovan/KovanChaiAdapter.sol";
+
+import "../adapters/kovan/KovanSUsdAdapter.sol";
 import "../adapters/kovan/KovanASUsdAdapter.sol";
 
+import "../adapters/kovan/KovanUsdtAdapter.sol";
+import "../adapters/kovan/KovanAUsdtAdapter.sol";
+
 contract AdaptersSetup is FlavorsSetup {
+    address daiAdapter;
     address chaiAdapter;
     address cdaiAdapter;
-    address cusdcAdapter;
-    address daiAdapter;
+
     address usdcAdapter;
+    address cusdcAdapter;
+
     address usdtAdapter;
+    address ausdtAdapter;
+
+    address susdAdapter;
     address asusdAdapter;
 
     function setupAdapters() public {
         setupAdaptersLocal();
+        // setupAdaptersKovan();
     }
 
     function setupAdaptersKovan () public {
-        usdcAdapter = 0x0CCb2Df4109140Afd8BaeBa7f9AeD3795EfEb0eC;
-        chaiAdapter = 0x73562E7B8bfB32131D6ee346f23FBA5055Ac5139;
-        cdaiAdapter = 0x5FD4D707841B19Bc957cb109928BC387f1d6644f;
-        cusdcAdapter = 0x7058f0fa65b4C7eD0E8cf5560823ceDF3893640b;
-        daiAdapter = 0x766CD84c9ee817C61e9769CA567C4Fc8B2Fa901c;
-        usdtAdapter = 0x24f0b5Ae5E1B2BbD5e07da8eDd08b0843815dD67;
-        asusdAdapter = 0x349D9cE7Ee7C43763d57ae365B03121a76CB7038;
+        usdcAdapter = 0xa23F24d8d18BE37f617148CD494a1a7e83F06dAC;
+        cusdcAdapter = 0x23bF0abe17Ee2Fb81CF5Ae4A21473526cAD95f97;
+
+        daiAdapter = 0xa557bF50Eeb88978318B3eDEE60e1781C939Acfa;
+        chaiAdapter = 0xe8E99291163839F28A2Cd195C50AE7B259272BFC;
+        cdaiAdapter = 0x71AB605c2C7EF07dAF4f3052DcD7953D5423Dafd;
+
+        usdtAdapter = 0x5b8066A3413990BC4979E2C5DFBA2B5F6FDCcA48;
+        ausdtAdapter = 0x8BF8F69832EC206B0Ea63890cE0A2ca7637A4378;
+
+        susdAdapter = 0x2b9C3E35Ccf89E69aC79472D17E355D88d95F26D;
+        asusdAdapter = 0x86EF85573Bb728434778c26f3F87B6103F0BD27b;
     }
 
     function setupAdaptersLocal () public {
         usdcAdapter = address(new KovanUsdcAdapter());
-        usdtAdapter = address(new KovanUsdtAdapter());
+        cusdcAdapter = address(new KovanCUsdcAdapter());
+
+        daiAdapter = address(new KovanDaiAdapter());
         cdaiAdapter = address(new KovanCDaiAdapter());
         chaiAdapter = address(new KovanChaiAdapter());
-        daiAdapter = address(new KovanDaiAdapter());
-        cusdcAdapter = address(new KovanCUsdcAdapter());
+
+        usdtAdapter = address(new KovanUsdtAdapter());
+        ausdtAdapter = address(new KovanAUsdtAdapter());
+
+        susdAdapter = address(new KovanSUsdAdapter());
         asusdAdapter = address(new KovanASUsdAdapter());
     }
 
@@ -85,7 +106,6 @@ contract AdaptersSetup is FlavorsSetup {
         l.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, 333333333333333333);
 
         l.includeAdapter(usdt, usdtAdapter, usdtAdapter, 333333333333333333);
-
 
     }
 }

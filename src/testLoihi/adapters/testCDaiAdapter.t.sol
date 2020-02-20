@@ -8,6 +8,7 @@ import "../../IAdapter.sol";
 contract CDaiAdapterTest is LoihiSetup, DSMath, DSTest {
 
     function setUp() public {
+        setupAdapters();
         setupFlavors();
     }
 

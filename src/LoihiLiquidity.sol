@@ -29,8 +29,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             }
         }
 
-        emit log_uint("zing", 0);
-
         return (balances_, tokenAmounts_, weights_);
 
     }
@@ -51,13 +49,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
           uint256[] memory _deposits,
           uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
 
-          emit log_uints("_balances", _balances);
-          emit log_uints("_deposits", _deposits);
-          emit log_uints("_weights", _weights);
-
         shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
-
-        emit log_uint("shells to mint", shellsToMint_);
 
         require(shellsToMint_ >= _minShells, "minted shells less than minimum shells");
 
@@ -87,13 +79,9 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             _newSum = add(_newSum, add(_balances[i], _deposits[i]));
         }
 
-        emit log_uint("oldSum", _oldSum);
-        emit log_uint("newSum", _newSum);
-
         uint256 shellsToMint_;
 
         for (uint i = 0; i < _balances.length; i++) {
-            emit log_uint("i", i);
             if (_deposits[i] == 0) continue;
             uint256 _depositAmount = _deposits[i];
             uint256 _weight = _weights[i];
@@ -105,9 +93,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             uint256 _feeThreshold = wmul(_weight, wmul(_newSum, beta + WAD));
             if (_newBalance <= _feeThreshold) {
 
-
                 shellsToMint_ += _depositAmount;
-                emit log_uint("ping", shellsToMint_);
 
             } else if (_oldBalance >= _feeThreshold) {
 
@@ -117,8 +103,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
                 ));
 
                 shellsToMint_ = add(shellsToMint_, wmul(_depositAmount, WAD - _feePrep));
-                
-                emit log_uint("ming", shellsToMint_);
 
             } else {
 
@@ -132,15 +116,11 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
                     wmul(sub(_newBalance, _feeThreshold), WAD - _feePrep)
                 );
 
-                emit log_uint("ring", shellsToMint_);
-
             }
         }
 
-        emit log_uint("zling", 0);
-        uint256 adjusted = wmul(totalSupply == 0 ? WAD : totalSupply, wdiv(shellsToMint_, _oldSum == 0 ? WAD : _oldSum));
-        emit log_uint("doesnt get here", 0);
-        return adjusted;
+        if (totalSupply == 0) return shellsToMint_;
+        else return wmul(totalSupply, wdiv(shellsToMint_, _oldSum));
 
     }
 
@@ -157,8 +137,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
           uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flavors, _amounts);
 
         shellsBurned_ = calculateShellsToBurn(_balances, _withdrawals, _weights);
-
-        emit log_uint("shellsToBurn", shellsBurned_);
 
         require(shellsBurned_ <= _maxShells, "more shells burned than max shell limit");
 
@@ -191,7 +169,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         uint256 _numeraireShellsToBurn;
 
         for (uint i = 0; i < reserves.length; i++) {
-            emit log_uint("i", i);
             if (_withdrawals[i] == 0) continue;
             uint256 _withdrawal = _withdrawals[i];
             uint256 _weight = _weights[i];
@@ -205,7 +182,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             if (_newBal >= _feeThreshold) {
 
                 _numeraireShellsToBurn += wmul(_withdrawal, WAD + feeBase);
-                emit log_uint("ping", _numeraireShellsToBurn);
 
             } else if (_oldBal <= _feeThreshold) {
 
@@ -214,7 +190,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
                 _feePrep = wmul(_feePrep, feeDerivative);
 
                 _numeraireShellsToBurn += wmul(wmul(_withdrawal, WAD + _feePrep), WAD + feeBase);
-                emit log_uint("zing", _numeraireShellsToBurn);
 
             } else {
 
@@ -226,7 +201,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
                     sub(_oldBal, _feeThreshold),
                     wmul(sub(_feeThreshold, _newBal), WAD + _feePrep)
                 ), WAD + feeBase);
-                emit log_uint("ming", _numeraireShellsToBurn);
 
             }
         }
@@ -267,10 +241,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
                 _totalBalance += dGetNumeraireBalance(reserves[i]);
             }
 
-            // uint256 shellsToMint_ = wmul(_deposit, wdiv(_totalBalance, _totalSupply));
             uint256 shellsToMint_ = wmul(_totalSupply, wdiv(_deposit, _totalBalance));
-
-        // uint256 adjusted = wmul(totalSupply == 0 ? WAD : totalSupply, wdiv(shellsToMint_, _oldSum == 0 ? WAD : _oldSum));
 
             _mint(msg.sender, shellsToMint_);
 
@@ -285,6 +256,8 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         }
 
     }
+
+    event log_unit(bytes32, uint256);
 
     /// @author james foley http://github.com/realisation
     /// @notice this function takes a total amount to from the the pool with no slippage from the numeraire assets of the pool

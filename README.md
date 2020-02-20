@@ -4,3 +4,33 @@ Lo'ihi is a stablecoin automated market maker designed to have no slippage beyon
 It can take any groupings of stablecoins into the pool and can facilitate trading between any flavor of stablecoin derivatives.
 
 It is named Lo'ihi after the submarine volcano of the same name destined to be the sixth Hawaiian island.
+
+loihi 0xA24fddB488c3602635B55915cA052E8fC7135616
+
+dai 0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa
+cdai 0xe7bc397dbd069fc7d0109c0636d06888bb50668c
+chai 0xb641957b6c29310926110848db2d464c8c3c3f38
+
+usdc 0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF
+cusdc 0xcfc9bb230f00bffdb560fce2428b4e05f3442e35
+
+usdt 0x13512979ADE267AB5100878E2e0f485B568328a4 
+ausdt 0xA01bA9fB493b851F4Ac5093A324CB081A909C34B
+
+susd 0xD868790F57B39C9B2B51b12de046975f986675f9
+asusd 0xb9c1434ab6d5811d1d0e92e8266a37ae8328e901
+
+dai adapter 0xa557bf50eeb88978318b3edee60e1781c939acfa
+cdai adapter 0x71ab605c2c7ef07daf4f3052dcd7953d5423dafd
+chai adapter 0xe8e99291163839f28a2cd195c50ae7b259272bfc
+
+usdc adapter 0xa23f24d8d18be37f617148cd494a1a7e83f06dac
+cusdc adapter 0x23bf0abe17ee2fb81cf5ae4a21473526cad95f97
+
+usdt adapter 0x36647002fce1b9100df631078e9966d842959012
+ausdt adapter 0x45960908cfd852791ea821d88f9ce9c4c8a649b8
+
+susd adapter 0xc35dcbf5ec963b3789c5eb673281b90e82d95048
+asusd adapter 0x0820ea95aba96def58ff843dd1e26aecf4841674
+
+

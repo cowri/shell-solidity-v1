@@ -9,6 +9,7 @@ import "../../IAdapter.sol";
 contract CUsdcAdapterTest is LoihiSetup, DSMath, DSTest {
 
     function setUp() public {
+        setupAdapters();
         setupFlavors();
     }
 
@@ -19,6 +20,7 @@ contract CUsdcAdapterTest is LoihiSetup, DSMath, DSTest {
         assertEq(adptrNumeraireAmt, daiBalance);
         assertEq(adptrRawAmt, daiBalance);
     }
+
     function testViewRawAndNumeraireAmount () public {
         uint256 daiBalance = IERC20(dai).balanceOf(address(this));
         uint256 adptrNumeraireAmt = IAdapter(daiAdapter).viewNumeraireAmount(daiBalance);
