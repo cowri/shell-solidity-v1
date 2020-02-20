@@ -9,24 +9,24 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
     /// @author james foley http://github.com/realisation
     /// @dev this function is used in selective deposits and selective withdraws
     /// @dev it finds the reserves corresponding to the flavors and attributes the amounts to these reserves
-    /// @param _flavors the addresses of the stablecoin flavor
-    /// @param _amounts the specified amount of each stablecoin flavor
+    /// @param _flvrs the addresses of the stablecoin flavor
+    /// @param _amts the specified amount of each stablecoin flavor
     /// @return three arrays each the length of the number of reserves containing the balances, token amounts and weights for each reserve
-    function getBalancesTokenAmountsAndWeights (address[] memory _flavors, uint256[] memory _amounts) private returns (uint256[] memory, uint256[] memory, uint256[] memory) {
+    function getBalancesTokenAmountsAndWeights (address[] memory _flvrs, uint256[] memory _amts) private returns (uint256[] memory, uint256[] memory, uint256[] memory) {
 
         uint256[] memory balances_ = new uint256[](reserves.length);
         uint256[] memory tokenAmounts_ = new uint256[](reserves.length);
         uint256[] memory weights_ = new uint[](reserves.length);
 
-        for (uint i = 0; i < _flavors.length; i++) {
+        for (uint i = 0; i < _flvrs.length; i++) {
 
-            Flavor memory _f = flavors[_flavors[i]]; // withdrawing adapter + weight
+            Flavor memory _f = flavors[_flvrs[i]]; // withdrawing adapter + weight
             require(_f.adapter != address(0), "flavor not supported");
 
             for (uint j = 0; j < reserves.length; j++) {
-                balances_[j] = dGetNumeraireBalance(reserves[j]);
-                if (reserves[j] == _f.reserve) {
-                    tokenAmounts_[j] += dGetNumeraireAmount(_f.adapter, _amounts[i]);
+                if (balances_[j] == 0) balances_[j] = dGetNumeraireBalance(reserves[j]);
+                if (reserves[j] == _f.reserve && _amts[i] > 0) {
+                    tokenAmounts_[j] += dGetNumeraireAmount(_f.adapter, _amts[i]);
                     weights_[j] = _f.weight;
                 }
             }
