@@ -37,10 +37,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
-    event log_uint(bytes32, uint256);
-
-    event log_uints(bytes32, uint256[]);
-
     /// @author james foley http://github.com/realisation
     /// @notice this function allows selective depositing of any supported stablecoin flavor into the contract in return for corresponding shell tokens
     /// @param _flvrs an array containing the addresses of the flavors being deposited into
@@ -52,9 +48,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         ( uint256[] memory _balances,
           uint256[] memory _deposits,
           uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flvrs, _amts);
-          emit log_uints("balances", _balances);
-          emit log_uints("deposits", _deposits);
-          emit log_uints("weights", _weights);
 
         shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
 
@@ -263,8 +256,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         }
 
     }
-
-    event log_unit(bytes32, uint256);
 
     /// @author james foley http://github.com/realisation
     /// @notice this function takes a total amount to from the the pool with no slippage from the numeraire assets of the pool

@@ -18,7 +18,6 @@ contract KovanUsdtAdapter {
         return IAToken(aTokenAddress);
     }
 
-    event log_uint(bytes32, uint256);
     // transfers usdt in
     function intakeRaw (uint256 amount) public returns (uint256) {
         safeTransferFrom(usdt, msg.sender, address(this), amount);
@@ -54,9 +53,7 @@ contract KovanUsdtAdapter {
 
     // transfers usdt to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        emit log_uint("amount", amount);
         amount /= 1000000000000;
-        emit log_uint("amount after chop", amount);
         getAUsdt().redeem(amount);
         safeTransfer(usdt, dst, amount);
         return amount;

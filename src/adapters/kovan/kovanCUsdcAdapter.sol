@@ -63,12 +63,9 @@ contract KovanCUsdcAdapter {
         return wdiv(amount /1000000000000 , rate);
     }
 
-    event log_uint(bytes32, uint256);
-
     // takes raw cusdc amount
     // returns corresponding numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        emit log_uint("amount", amount);
         uint256 rate = cusdc.exchangeRateCurrent();
         return wmul(amount, rate) * 1000000000000;
     }

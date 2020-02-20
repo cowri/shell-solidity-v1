@@ -35,7 +35,6 @@ contract FlavorsSetup {
 
     }
 
-    event log_address(bytes32, address);
     function approveFlavors (address addr) public {
 
         IERC20(dai).approve(addr, 1000000000 * (10 ** 18));

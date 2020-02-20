@@ -10,9 +10,6 @@ contract KovanASUsdAdapter {
     address constant susd = 0xD868790F57B39C9B2B51b12de046975f986675f9;
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
 
-    event log_addr(bytes32, address);
-    event log_uint(bytes32, uint256);
-
     constructor () public { }
 
     function getASUsd () public view returns (IAToken) {

@@ -12,14 +12,10 @@ contract MainnetASusdAdapter {
     address constant asusd = 0x625aE63000f46200499120B906716420bd059240;
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
-    event log_addr(bytes32, address);
-    event log_uint(bytes32, uint256);
-
     constructor () public { }
 
     function getData () public {
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        emit log_addr("pool", address(pool));
         
         (   uint256 totalLiquidity,
             uint256 availableLiquidity,
@@ -34,13 +30,6 @@ contract MainnetASusdAdapter {
             uint256 variableBorrowIndex,
             address aTokenAddress,
             uint40 lastUpdateTimestamp ) = pool.getReserveData(susd);
-
-            emit log_addr("aTokenAddress", aTokenAddress);
-            emit log_addr("asusd", asusd);
-            emit log_uint("avail liq", availableLiquidity);
-
-
-
 
     }
 

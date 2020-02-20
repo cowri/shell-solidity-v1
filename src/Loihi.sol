@@ -196,35 +196,29 @@ contract Loihi is LoihiRoot {
 
     }
 
-    event log_uints(bytes32, uint256[]);
-    event log_uint(bytes32, uint256);
-
     /// @author james foley http://github.com/realisation
     /// @notice see how much of the target you can get for an origin amount
     /// @param _o origin address
     /// @param _t target address
     /// @param _oAmt amount of origin
     /// @return _tAmt the amount of target for the origin amount
-    function viewTargetTrade (address _o, address _t, uint256 _oAmt) external returns (uint256) {
+    function viewTargetTrade (address _o, address _t, uint256 _oAmt) external view returns (uint256) {
         Flavor storage _fo = flavors[_o];
         Flavor storage _ft = flavors[_t];
 
-        (bool success, bytes memory result) = views.call(abi.encodeWithSelector(0xaab4b962,
+        (bool success, bytes memory result) = views.staticcall(abi.encodeWithSelector(0xaab4b962,
             address(this), reserves, _fo.adapter, _fo.reserve, _ft.adapter, _ft.reserve, _oAmt));
         ( uint256[] memory viewVars ) = abi.decode(result, (uint256[]));
-        emit log_uints("viewvars", viewVars);
 
-        (success, result) = views.call(abi.encodeWithSignature("calculateTargetTradeTargetAmount(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
+        (success, result) = views.staticcall(abi.encodeWithSignature("calculateTargetTradeTargetAmount(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
             _ft.weight, viewVars[1], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));
         ( viewVars[0] ) = abi.decode(result, (uint256));
-        emit log_uint("viewvari[0]", viewVars[0]);
 
         if (viewVars[0] == 0) return viewVars[0];
 
-        (success, result) = views.call(abi.encodeWithSignature("calculateTargetTradeOriginAmount(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
+        (success, result) = views.staticcall(abi.encodeWithSignature("calculateTargetTradeOriginAmount(address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)",
             _fo.adapter, _fo.weight, viewVars[2], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));
         ( viewVars[0] ) = abi.decode(result, (uint256));
-        emit log_uint("viewvari[0]", viewVars[0]);
 
         return viewVars[0];
 
@@ -336,7 +330,7 @@ contract Loihi is LoihiRoot {
         return reserves;
     }
 
-    function getAdapter (address flavor) public view returns (address[] memory) {
+    function getAdapter (address flavor) external view returns (address[] memory) {
         Flavor memory f = flavors[flavor];
         address[] memory retval = new address[](3);
         retval[0] = flavor;
@@ -345,8 +339,8 @@ contract Loihi is LoihiRoot {
         return retval;
     }
 
-    function totalReserves () external returns (uint256, uint256[] memory) {
-        (bool success, bytes memory result) = views.call(abi.encodeWithSelector(0xb8152e53, reserves, address(this)));
+    function totalReserves () external view returns (uint256, uint256[] memory) {
+        (bool success, bytes memory result) = views.staticcall(abi.encodeWithSelector(0xb8152e53, reserves, address(this)));
         require(success, "view total reserves failed");
         return abi.decode(result, (uint256, uint256[]));
     }

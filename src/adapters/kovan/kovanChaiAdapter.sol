@@ -77,9 +77,7 @@ contract KovanChaiAdapter {
     // takes chai amount
     // tells corresponding numeraire value
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        emit log_uint("amount", amount);
         uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
-        emit log_uint("chi", chi);
         return rmul(amount, chi);
     }
 

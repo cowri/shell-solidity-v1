@@ -16,33 +16,6 @@ contract MainnetAUsdtAdapter {
 
     constructor () public { }
 
-    function getData () public {
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        emit log_addr("pool", address(pool));
-        
-        // (   uint256 totalLiquidity,
-        //     uint256 availableLiquidity,
-        //     uint256 totalBorrowsStable,
-        //     uint256 totalBorrowsVariable,
-        //     uint256 liquidityRate,
-        //     uint256 variableBorrowRate,
-        //     uint256 stableBorrowRate,
-        //     uint256 averageStableBorrowRate,
-        //     uint256 utilizationRate,
-        //     uint256 liquidityIndex,
-        //     uint256 variableBorrowIndex,
-        //     address aTokenAddress,
-        //     uint40 lastUpdateTimestamp ) = pool.getReserveData(usdt);
-
-            // emit log_addr("aTokenAddress", aTokenAddress);
-            // emit log_addr("ausdt", ausdt);
-            // emit log_uint("avail liq", availableLiquidity);
-
-
-
-
-    }
-
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
