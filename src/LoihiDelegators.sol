@@ -12,21 +12,29 @@ contract LoihiDelegators {
         return returnData;
     }
 
+    function staticTo(address callee, bytes memory data) internal view returns (bytes memory) {
+        (bool success, bytes memory returnData) = callee.staticcall(data);
+        assembly {
+            if eq(success, 0) {
+                revert(add(returnData, 0x20), returndatasize)
+            }
+        }
+        return returnData;
+    }
+
+
     function dViewRawAmount (address addr, uint256 amount) internal view returns (uint256) {
-        (bool success, bytes memory result) = addr.staticcall(abi.encodeWithSelector(0x049ca270, amount)); // encoded selector of "getNumeraireAmount(uint256");
-        assert(success);
+        bytes memory result = staticTo(addr, abi.encodeWithSelector(0x049ca270, amount)); // encoded selector of "getNumeraireAmount(uint256");
         return abi.decode(result, (uint256));
     }
 
     function dViewNumeraireAmount (address addr, uint256 amount) internal view returns (uint256) {
-        (bool success, bytes memory result) = addr.staticcall(abi.encodeWithSelector(0xf5e6c0ca, amount)); // encoded selector of "getNumeraireAmount(uint256");
-        assert(success);
+        bytes memory result = staticTo(addr, abi.encodeWithSelector(0xf5e6c0ca, amount)); // encoded selector of "getNumeraireAmount(uint256");
         return abi.decode(result, (uint256));
     }
 
     function dViewNumeraireBalance (address addr, address _this) internal view returns (uint256) {
-        (bool success, bytes memory result) = addr.staticcall(abi.encodeWithSelector(0xac969a73, _this)); // encoded selector of "getNumeraireAmount(uint256");
-        assert(success);
+        bytes memory result = staticTo(addr, abi.encodeWithSelector(0xac969a73, _this)); // encoded selector of "getNumeraireAmount(uint256");
         return abi.decode(result, (uint256));
     }
 

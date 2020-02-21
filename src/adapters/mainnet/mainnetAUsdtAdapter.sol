@@ -7,28 +7,32 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract MainnetAUsdtAdapter {
 
-    address constant usdt = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
-    address constant ausdt = 0x71fc860F7D3A592A4a98740e39dB31d25db65ae8;
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
-
+    address constant usdt = 0x13512979ADE267AB5100878E2e0f485B568328a4;
+    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
 
     constructor () public { }
+
+    function getAUsdt () private view returns (IAToken) {
+        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
+        (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(usdt);
+        return IAToken(aTokenAddress);
+    }
 
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
     function intakeRaw (uint256 amount) public {
-        IAToken(ausdt).transferFrom(msg.sender, address(this), amount);
+        getAUsdt().transferFrom(msg.sender, address(this), amount);
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         amount /= 1000000000000;
-        IAToken(ausdt).transferFrom(msg.sender, address(this), amount);
+        getAUsdt().transferFrom(msg.sender, address(this), amount);
         return amount;
     }
 
     function outputRaw (address dst, uint256 amount) public {
-        IAToken(ausdt).transfer(dst, amount);
+        getAUsdt().transfer(dst, amount);
     }
 
     // unwraps numeraire amount of dai from chai
@@ -36,7 +40,7 @@ contract MainnetAUsdtAdapter {
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         amount /= 1000000000000;
-        IAToken(ausdt).transfer(dst, amount);
+        getAUsdt().transfer(dst, amount);
         return amount;
     }
 
@@ -49,7 +53,7 @@ contract MainnetAUsdtAdapter {
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
-        return IAToken(ausdt).balanceOf(address(this));
+        return getAUsdt().balanceOf(address(addr)) * 1000000000000;
     }
 
     // takes raw amount and gives numeraire amount
@@ -63,7 +67,7 @@ contract MainnetAUsdtAdapter {
     }
 
     function getNumeraireBalance () public returns (uint256) {
-        return IAToken(ausdt).balanceOf(address(this));
+        return getAUsdt().balanceOf(address(this)) * 1000000000000;
     }
 
     uint constant WAD = 10 ** 18;

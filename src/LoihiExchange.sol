@@ -56,7 +56,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         uint oBal_ = dGetNumeraireBalance(_o.adapter);
         uint tBal_ = dGetNumeraireBalance(_t.adapter);
         uint grossLiq_ = add(oBal_, tBal_);
-        oBal_ += oNAmt_;
+        oBal_ = add(oBal_, oNAmt_);
 
         for (uint i = 0; i < reserves.length; i++) {
             if (reserves[i] != _o.reserve && reserves[i] != _t.reserve){
@@ -101,6 +101,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
                 sub(_oBal, _feeThreshold),
                 wmul(_oWeight, _grossLiq)
             ));
+
             oNAmt_ = add(
                 sub(_feeThreshold, sub(_oBal, _oNAmt)),
                 wmul(sub(_oBal, _feeThreshold), WAD - _fee)
@@ -132,6 +133,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
                 sub(_feeThreshold, sub(_tBal, _tNAmt)),
                 wmul(_tWeight, _grossLiq)
             );
+
             _fee = wmul(_fee, feeDerivative);
             _tNAmt = wmul(_tNAmt, WAD - _fee);
             tNAmt_ = wmul(_tNAmt, WAD - feeBase);
@@ -206,12 +208,11 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         uint tBal_ = dGetNumeraireBalance(_t.adapter);
         uint oBal_ = dGetNumeraireBalance(_o.adapter);
         uint grossLiq_ = add(tBal_, oBal_);
-        tBal_ -= tNAmt_;
+        tBal_ = sub(tBal_, tNAmt_);
 
         for (uint i = 0; i < reserves.length; i++) {
             if (reserves[i] != _o.reserve && reserves[i] != _t.reserve) {
-                uint256 numebal = dGetNumeraireBalance(reserves[i]);
-                grossLiq_ += numebal;
+                grossLiq_ += dGetNumeraireBalance(reserves[i]);
             }
         }
 
@@ -231,6 +232,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         require(_tBal >= wmul(_tWeight, wmul(_grossLiq, WAD - alpha)), "target halt check for target trade");
 
         uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - beta));
+
         if (_tBal >= _feeThreshold) {
 
             tNAmt_ = wmul(_tNAmt, WAD + feeBase);

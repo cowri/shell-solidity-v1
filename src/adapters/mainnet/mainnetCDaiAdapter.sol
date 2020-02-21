@@ -1,74 +1,71 @@
 pragma solidity ^0.5.12;
 
-import "../../IAToken.sol";
-import "../aaveResources/ILendingPoolAddressesProvider.sol";
-import "../aaveResources/ILendingPool.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "../../ICToken.sol";
 
-contract MainnetASUsdAdapter {
-
-    address constant susd = 0xD868790F57B39C9B2B51b12de046975f986675f9;
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
+contract MainnetCDaiAdapter {
 
     constructor () public { }
 
-    function getASUsd () public view returns (IAToken) {
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(susd);
-        return IAToken(aTokenAddress);
-    }
+    ICToken constant cdai = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
 
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
     function intakeRaw (uint256 amount) public {
-        getASUsd().transferFrom(msg.sender, address(this), amount);
+        cdai.transferFrom(msg.sender, address(this), amount);
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
-        amount /= 1000000000000;
-        getASUsd().transferFrom(msg.sender, address(this), amount);
-        return amount;
+        uint256 rate = cdai.exchangeRateCurrent();
+        uint256 cdaiAmount = wmul(rate, amount);
+        cdai.transferFrom(msg.sender, address(this), cdaiAmount);
+        return cdaiAmount;
     }
 
     function outputRaw (address dst, uint256 amount) public {
-        IAToken asusd = getASUsd();
-        asusd.transfer(dst, amount);
+        cdai.transfer(msg.sender, amount);
     }
 
     // unwraps numeraire amount of dai from chai
     // wraps it into cdai amount
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        amount /= 1000000000000;
-        getASUsd().transfer(dst, amount);
-        return amount;
+        uint rate = cdai.exchangeRateCurrent();
+        uint cdaiAmount = wdiv(amount, rate);
+        cdai.transfer(dst, cdaiAmount);
+        return cdaiAmount;
     }
 
     function viewRawAmount (uint256 amount) public view returns (uint256) {
-        return amount / 1000000000000;
+        uint256 rate = cdai.exchangeRateStored();
+        return wdiv(amount, rate);
     }
 
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
-        return amount * 1000000000000;
+        uint256 rate = cdai.exchangeRateStored();
+        return wmul(amount, rate);
     }
 
-    function viewNumeraireBalance (address addr) public returns (uint256) {
-        return getASUsd().balanceOf(addr) * 1000000000000;
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
+        uint256 rate = cdai.exchangeRateStored();
+        uint256 balance = cdai.balanceOf(addr);
+        return wmul(balance, rate);
     }
 
     // takes raw amount and gives numeraire amount
     function getRawAmount (uint256 amount) public returns (uint256) {
-        return amount / 1000000000000;
+        uint256 rate = cdai.exchangeRateCurrent();
+        return wdiv(amount, rate);
     }
 
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        return amount * 1000000000000;
+        uint256 rate = cdai.exchangeRateCurrent();
+        return wmul(amount, rate);
     }
 
     function getNumeraireBalance () public returns (uint256) {
-        return getASUsd().balanceOf(address(this)) * 1000000000000;
+        return cdai.balanceOfUnderlying(address(this));
     }
 
     uint constant WAD = 10 ** 18;
@@ -97,6 +94,5 @@ contract MainnetASUsdAdapter {
         // always rounds up
         z = add(mul(x, WAD), sub(y, 1)) / y;
     }
-
 
 }
