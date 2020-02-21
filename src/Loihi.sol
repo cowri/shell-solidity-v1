@@ -5,11 +5,7 @@ import "./LoihiRoot.sol";
 contract Loihi is LoihiRoot {
 
     constructor () public {
-        //     constructor (address _exchange, address _views, address _liquidity, address _erc20) public {
-        // exchange = _exchange;
-        // views = _views;
-        // liquidity = _liquidity;
-        // erc20 = _erc20;
+
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
 
@@ -101,19 +97,11 @@ contract Loihi is LoihiRoot {
         return interfaceID == ERC20ID || interfaceID == ERC165ID;
     }
 
-    modifier nonReentrant() {
-        require(notEntered, "re-entered");
-        notEntered = false;
-        _;
-        notEntered = true;
+    function freeze (bool freeze) external onlyOwner {
+        frozen = freeze;
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Ownable: caller is not the owner");
-        _;
-    }
-
-    function transferOwnership (address newOwner) public {
+    function transferOwnership (address newOwner) public onlyOwner {
         require(newOwner != address(0), "Ownable: new owner is the zero address");
         emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
@@ -167,7 +155,7 @@ contract Loihi is LoihiRoot {
     /// @param _mTAmt the minimum target amount 
     /// @param _dline deadline in block number after which the trade will not execute
     /// @return tAmt_ the amount of target that has been swapped for the origin
-    function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) external nonReentrant returns (uint256 tAmt_) {
+    function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) external notFrozen nonReentrant returns (uint256 tAmt_) {
         bytes memory result = delegateTo(exchange, abi.encodeWithSelector(0x5a9b8dc3, _o, _t, _oAmt, _mTAmt, _dline, msg.sender));
         return abi.decode(result, (uint256));
     }
@@ -181,7 +169,7 @@ contract Loihi is LoihiRoot {
     /// @param _dline deadline in block number after which the trade will not execute
     /// @param _rcpnt the address of the recipient of the target
     /// @return tAmt_ the amount of target that has been swapped for the origin
-    function transferByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) external nonReentrant returns (uint256) {
+    function transferByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) external notFrozen nonReentrant returns (uint256) {
         bytes memory result = delegateTo(exchange, abi.encodeWithSelector(0x5a9b8dc3, _o, _t, _oAmt, _mTAmt, _dline, _rcpnt));
         return abi.decode(result, (uint256));
     }
@@ -192,7 +180,7 @@ contract Loihi is LoihiRoot {
     /// @param _t the address of the target
     /// @param _oAmt the origin amount
     /// @return tAmt_ the amount of target that has been swapped for the origin
-    function viewOriginTrade (address _o, address _t, uint256 _oAmt) external view returns (uint256) {
+    function viewOriginTrade (address _o, address _t, uint256 _oAmt) external notFrozen view returns (uint256) {
         Flavor storage _fo = flavors[_o];
         Flavor storage _ft = flavors[_t];
 
@@ -222,7 +210,7 @@ contract Loihi is LoihiRoot {
     /// @param _t target address
     /// @param _oAmt amount of origin
     /// @return _tAmt the amount of target for the origin amount
-    function viewTargetTrade (address _o, address _t, uint256 _oAmt) external view returns (uint256) {
+    function viewTargetTrade (address _o, address _t, uint256 _oAmt) external view notFrozen returns (uint256) {
         Flavor storage _fo = flavors[_o];
         Flavor storage _ft = flavors[_t];
 
@@ -255,7 +243,7 @@ contract Loihi is LoihiRoot {
     /// @param _tAmt the target amount 
     /// @param _dline deadline in block number after which the trade will not execute
     /// @return oAmt_ the amount of origin that has been swapped for the target
-    function swapByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) external nonReentrant returns (uint256) {
+    function swapByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
         bytes memory result = delegateTo(exchange, abi.encodeWithSelector(0xeb85f014, _o, _t, _mOAmt, _tAmt, _dline, msg.sender));
         return abi.decode(result, (uint256));
     }
@@ -269,7 +257,7 @@ contract Loihi is LoihiRoot {
     /// @param _dline deadline in block number after which the trade will not execute
     /// @param _rcpnt the address of the recipient of the target
     /// @return oAmt_ the amount of origin that has been swapped for the target
-    function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline, address _rcpnt) external nonReentrant returns (uint256) {
+    function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline, address _rcpnt) external notFrozen nonReentrant returns (uint256) {
         bytes memory result = delegateTo(exchange, abi.encodeWithSelector(0xeb85f014, _o, _t, _mOAmt, _tAmt, _dline, _rcpnt));
         return abi.decode(result, (uint256));
     }
@@ -279,7 +267,7 @@ contract Loihi is LoihiRoot {
     /// @param _flvrs an array containing the addresses of the flavors being deposited into
     /// @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
-    function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external returns (uint256) {
+    function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
         bytes memory result = delegateTo(liquidity, abi.encodeWithSelector(0x51dbb2a7, _flvrs, _amts, _minShells, _dline));
         return abi.decode(result, (uint256));
     }
@@ -288,7 +276,7 @@ contract Loihi is LoihiRoot {
     /// @notice deposit into the pool with no slippage from the numeraire assets the pool supports
     /// @param _totalTokens the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
     /// @return shellsToMint_ the amount of shells you receive in return for your deposit
-    function proportionalDeposit (uint256 _totalTokens) external returns (uint256) {
+    function proportionalDeposit (uint256 _totalTokens) external notFrozen nonReentrant returns (uint256) {
         bytes memory result = delegateTo(liquidity, abi.encodeWithSelector(0xdef9dfb6, _totalTokens));
         return abi.decode(result, (uint256));
     }
@@ -298,7 +286,7 @@ contract Loihi is LoihiRoot {
     /// @param _flvrs an array of flavors to withdraw from the reserves
     /// @param _amts an array of amounts to withdraw that maps to _flavors
     /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
-    function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _dline) external returns (uint256) {
+    function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
         bytes memory result = delegateTo(liquidity, abi.encodeWithSelector(0x546e0c9b, _flvrs, _amts, _maxShells, _dline));
         return abi.decode(result, (uint256));
     }
@@ -307,22 +295,22 @@ contract Loihi is LoihiRoot {
     /// @notice withdrawas amount of shell tokens from the the pool equally from the numeraire assets of the pool with no slippage
     /// @param _totalShells the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
-    function proportionalWithdraw (uint256 _totalShells) external returns (uint256[] memory) {
+    function proportionalWithdraw (uint256 _totalShells) external nonReentrant returns (uint256[] memory) {
         bytes memory result = delegateTo(liquidity, abi.encodeWithSelector(0xf2a23b6c, _totalShells));
         return abi.decode(result, (uint256[]));
     }
 
-    function transfer (address recipient, uint256 amount) public returns (bool) {
+    function transfer (address recipient, uint256 amount) public nonReentrant returns (bool) {
         bytes memory result = delegateTo(erc20, abi.encodeWithSelector(0xa9059cbb, recipient, amount));
         return abi.decode(result, (bool));
     }
 
-    function transferFrom (address sender, address recipient, uint256 amount) public returns (bool) {
+    function transferFrom (address sender, address recipient, uint256 amount) public nonReentrant returns (bool) {
         bytes memory result = delegateTo(erc20, abi.encodeWithSelector(0x23b872dd, sender, recipient, amount));
         return abi.decode(result, (bool));
     }
 
-    function approve (address spender, uint256 amount) public returns (bool) {
+    function approve (address spender, uint256 amount) public nonReentrant returns (bool) {
         bytes memory result = delegateTo(erc20, abi.encodeWithSelector(0x095ea7b3, spender, amount));
         return abi.decode(result, (bool));
     }

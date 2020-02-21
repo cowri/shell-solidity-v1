@@ -14,25 +14,20 @@ contract LoihiRoot is DSMath {
     struct Flavor { address adapter; address reserve; uint256 weight; }
 
     address public owner;
-
-    uint256 alpha = 950000000000000000; // 95%
-    uint256 beta = 475000000000000000; // half of 95%
-    uint256 feeBase = 500000000000000; // 5 bps
-    uint256 feeDerivative = 52631578940000000; // marginal fee will be 5% at alpha point
-
     bool internal notEntered = true;
+    bool internal frozen = false;
+
+    uint256 alpha;
+    uint256 beta;
+    uint256 feeBase;
+    uint256 feeDerivative;
 
     bytes4 constant internal ERC20ID = 0x36372b07;
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
 
-    address internal exchange;
-    address internal views;
-    address internal liquidity;
-    address internal erc20;
-
-    address internal constant exchange = 0x7F763137Fe652A1b05d1012053C91D5629b81dA;
+    address internal constant exchange = 0x179117cfD46D8D7e2EA873A63A113B0e0136C45D;
     address internal constant views = 0xdB264f3b85F838b1E1cAC5F160E9eb1dD8644BA7;
-    address internal constant liquidity = 0xe39E5864850DB2EC709cD11576589baa51f0fE35;
+    address internal constant liquidity = 0x171E8D3c38C32cC68ced95550BcF85844638B463;
     address internal constant erc20 = 0x2d5cBAB179Be33Ade692A1C95908AD5d556E2c65;
 
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
@@ -44,11 +39,21 @@ contract LoihiRoot is DSMath {
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Ownable: caller is not the owner");
+        _;
+    }
+
     modifier nonReentrant() {
         require(notEntered, "re-entered");
         notEntered = false;
         _;
         notEntered = true;
+    }
+
+    modifier notFrozen () {
+        require(!frozen, "swaps, selective deposits and selective withdraws have been frozen.");
+        _;
     }
 
 }
