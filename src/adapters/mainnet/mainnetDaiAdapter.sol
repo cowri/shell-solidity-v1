@@ -8,8 +8,9 @@ contract MainnetDaiAdapter {
 
     constructor () public { }
 
-    ICToken constant cdai = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
-    IERC20 constant dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
+    ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
+    IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    uint256 constant WAD = 10 ** 18;
 
     // transfers dai in
     // wraps it in chai
@@ -74,9 +75,7 @@ contract MainnetDaiAdapter {
 
     // returns numeraire amount of chai balance
     function getNumeraireBalance () public returns (uint256) {
-        
         return cdai.balanceOfUnderlying(address(this));
-        
     }
 
     function add(uint x, uint y) internal pure returns (uint z) {
@@ -88,11 +87,11 @@ contract MainnetDaiAdapter {
     }
 
     function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), 1000000000000000000 / 2) / 1000000000000000000;
+        z = add(mul(x, y), WAD / 2) / WAD;
     }
 
     function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, 1000000000000000000), y / 2) / y;
+        z = add(mul(x, WAD), y / 2) / y;
     }
 
 }

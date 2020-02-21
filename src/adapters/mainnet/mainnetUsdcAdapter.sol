@@ -8,8 +8,9 @@ contract MainnetUsdcAdapter {
 
     constructor () public { }
 
-    IERC20 constant usdc = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF);
-    ICToken constant cusdc = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35);
+    IERC20 constant usdc = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+    ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
+    uint256 constant WAD = 10 ** 18;
 
     // transfers usdc in
     // wraps it in csudc
@@ -80,10 +81,10 @@ contract MainnetUsdcAdapter {
     }
 
     function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), 1000000000000000000 / 2) / 1000000000000000000;
+        z = add(mul(x, y), WAD / 2) / WAD;
     }
 
     function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, 1000000000000000000), y / 2) / y;
+        z = add(mul(x, WAD), y / 2) / y;
     }
 }

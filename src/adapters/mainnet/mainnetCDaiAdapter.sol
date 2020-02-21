@@ -6,7 +6,7 @@ contract MainnetCDaiAdapter {
 
     constructor () public { }
 
-    ICToken constant cdai = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
+    ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
 
     // takes raw cdai amount
     // unwraps it into dai

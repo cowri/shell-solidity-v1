@@ -7,7 +7,7 @@ contract MainnetCUsdcAdapter {
 
     constructor () public { }
 
-    ICToken constant cusdc = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35);
+    ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
     
     // takes raw cusdc amount and transfers it in
     function intakeRaw (uint256 amount) public {
@@ -60,7 +60,7 @@ contract MainnetCUsdcAdapter {
     // returns corresponding numeraire amount
     function getRawAmount (uint256 amount) public returns (uint256) {
         uint256 rate = cusdc.exchangeRateCurrent();
-        return wdiv(amount /1000000000000 , rate);
+        return wdiv(amount / 1000000000000 , rate);
     }
 
     // takes raw cusdc amount

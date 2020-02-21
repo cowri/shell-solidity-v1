@@ -9,8 +9,8 @@ contract MainnetUsdtAdapter {
 
     constructor () public { }
 
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
-    IERC20 constant usdt = IERC20(0x13512979ADE267AB5100878E2e0f485B568328a4);
+    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
+    IERC20 constant usdt = IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7);
 
     function getAUsdt () public view returns (IAToken) {
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());

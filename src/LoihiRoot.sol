@@ -1,15 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-contracts/contracts/ownership/Ownable.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Mintable.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Burnable.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Detailed.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "ds-math/math.sol";
-import "./IChai.sol";
-import "./IPot.sol";
-import "./ICToken.sol";
 
 contract LoihiRoot is DSMath {
 
@@ -39,10 +30,10 @@ contract LoihiRoot is DSMath {
     address internal liquidity;
     address internal erc20;
 
-    // address internal constant exchange = 0x0AC8BB166a89a7dE80f6eBB055c374eC1395c912;
-    // address internal constant views = 0xa16BE24cDF18F3570b2aE0FE3C7f6920f48Ef994;
-    // address internal constant liquidity = 0x64563e8AF96fE3d6838A7BEA09374256737B0525;
-    // address internal constant erc20 = 0x4B634A4867bb87f60E500813E7056778c8e545ed;
+    address internal constant exchange = 0x7F763137Fe652A1b05d1012053C91D5629b81dA;
+    address internal constant views = 0xdB264f3b85F838b1E1cAC5F160E9eb1dD8644BA7;
+    address internal constant liquidity = 0xe39E5864850DB2EC709cD11576589baa51f0fE35;
+    address internal constant erc20 = 0x2d5cBAB179Be33Ade692A1C95908AD5d556E2c65;
 
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
     event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);

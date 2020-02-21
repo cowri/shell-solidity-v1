@@ -7,8 +7,8 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract MainnetASUsdAdapter {
 
-    address constant susd = 0xD868790F57B39C9B2B51b12de046975f986675f9;
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
+    address constant susd = 0x57Ab1ec28D129707052df4dF418D58a2D46d5f51;
+    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
     constructor () public { }
 
@@ -26,7 +26,6 @@ contract MainnetASUsdAdapter {
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
-        amount /= 1000000000000;
         getASUsd().transferFrom(msg.sender, address(this), amount);
         return amount;
     }
@@ -40,35 +39,34 @@ contract MainnetASUsdAdapter {
     // wraps it into cdai amount
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        amount /= 1000000000000;
         getASUsd().transfer(dst, amount);
         return amount;
     }
 
     function viewRawAmount (uint256 amount) public view returns (uint256) {
-        return amount / 1000000000000;
+        return amount;
     }
 
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
-        return amount * 1000000000000;
+        return amount;
     }
 
     function viewNumeraireBalance (address addr) public returns (uint256) {
-        return getASUsd().balanceOf(addr) * 1000000000000;
+        return getASUsd().balanceOf(addr);
     }
 
     // takes raw amount and gives numeraire amount
     function getRawAmount (uint256 amount) public returns (uint256) {
-        return amount / 1000000000000;
+        return amount;
     }
 
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        return amount * 1000000000000;
+        return amount;
     }
 
     function getNumeraireBalance () public returns (uint256) {
-        return getASUsd().balanceOf(address(this)) * 1000000000000;
+        return getASUsd().balanceOf(address(this));
     }
 
     uint constant WAD = 10 ** 18;

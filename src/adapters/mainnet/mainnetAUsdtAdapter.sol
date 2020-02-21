@@ -7,8 +7,8 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract MainnetAUsdtAdapter {
 
-    address constant usdt = 0x13512979ADE267AB5100878E2e0f485B568328a4;
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
+    address constant usdt = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
     constructor () public { }
 

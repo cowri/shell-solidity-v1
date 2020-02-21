@@ -9,8 +9,8 @@ contract MainnetSUsdAdapter {
 
     constructor () public { }
 
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
-    IERC20 constant susd = IERC20(0xD868790F57B39C9B2B51b12de046975f986675f9);
+    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
+    IERC20 constant susd = IERC20(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
 
     function getASUsd () public view returns (IAToken) {
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
@@ -32,7 +32,6 @@ contract MainnetSUsdAdapter {
     // transfers susd in
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
-        amount /= 1000000000000;
         safeTransferFrom(susd, msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         susd.approve(lpProvider.getLendingPoolCore(), amount);
@@ -53,7 +52,6 @@ contract MainnetSUsdAdapter {
     // transfers susd to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
-        amount /= 1000000000000;
         getASUsd().redeem(amount);
         safeTransfer(susd, dst, amount);
         return amount;
@@ -61,29 +59,29 @@ contract MainnetSUsdAdapter {
     }
 
     function viewRawAmount (uint256 amount) public pure returns (uint256) {
-        return amount / 1000000000000;
+        return amount;
     }
 
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
-        return amount * 1000000000000;
+        return amount;
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
-        return getASUsd().balanceOf(addr) * 1000000000000;
+        return getASUsd().balanceOf(addr);
     }
 
     function getRawAmount (uint256 amount) public pure returns (uint256) {
-        return amount / 1000000000000;
+        return amount;
     }
 
     // returns amount, is already numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        return amount * 1000000000000;
+        return amount;
     }
 
     // returns balance
     function getNumeraireBalance () public returns (uint256) {
-        return getASUsd().balanceOf(address(this)) * 1000000000000;
+        return getASUsd().balanceOf(address(this));
     }
     
     function safeTransfer(IERC20 token, address to, uint256 value) internal {
