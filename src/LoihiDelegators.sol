@@ -2,6 +2,15 @@ pragma solidity ^0.5.12;
 
 contract LoihiDelegators {
 
+    function delegateTo(address callee, bytes memory data) internal returns (bytes memory) {
+        (bool success, bytes memory returnData) = callee.delegatecall(data);
+        assembly {
+            if eq(success, 0) {
+                revert(add(returnData, 0x20), returndatasize)
+            }
+        }
+        return returnData;
+    }
 
     function dViewRawAmount (address addr, uint256 amount) internal view returns (uint256) {
         (bool success, bytes memory result) = addr.staticcall(abi.encodeWithSelector(0x049ca270, amount)); // encoded selector of "getNumeraireAmount(uint256");
@@ -22,14 +31,12 @@ contract LoihiDelegators {
     }
 
     function dGetNumeraireAmount (address addr, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0xb2e87f0f, amount)); // encoded selector of "getNumeraireAmount(uint256");
-        assert(success);
+        bytes memory result = delegateTo(addr, abi.encodeWithSelector(0xb2e87f0f, amount)); // encoded selector of "getNumeraireAmount(uint256");
         return abi.decode(result, (uint256));
     }
 
     function dGetNumeraireBalance (address addr) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0x10df6430)); // encoded selector of "getNumeraireBalance()";
-        assert(success);
+        bytes memory result = delegateTo(addr, abi.encodeWithSelector(0x10df6430)); // encoded selector of "getNumeraireBalance()";
         return abi.decode(result, (uint256));
     }
 
@@ -38,8 +45,7 @@ contract LoihiDelegators {
     /// @param addr the address to the interface wrapper to be delegatecall'd
     /// @param amount the numeraire amount to be transfered into the contract. will be adjusted to the raw amount before transfer
     function dIntakeRaw (address addr, uint256 amount) internal {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0xfa00102a, amount)); // encoded selector of "intakeRaw(uint256)";
-        assert(success);
+        bytes memory result = delegateTo(addr, abi.encodeWithSelector(0xfa00102a, amount)); // encoded selector of "intakeRaw(uint256)";
     }
 
     /// @author james foley http://github.com/realisation
@@ -47,8 +53,7 @@ contract LoihiDelegators {
     /// @param addr the address to the interface wrapper to be delegatecall'd
     /// @param amount the numeraire amount to be transfered into the contract. will be adjusted to the raw amount before transfer
     function dIntakeNumeraire (address addr, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0x7695ab51, amount)); // encoded selector of "intakeNumeraire(uint256)";
-        assert(success);
+        bytes memory result = delegateTo(addr, abi.encodeWithSelector(0x7695ab51, amount)); // encoded selector of "intakeNumeraire(uint256)";
         return abi.decode(result, (uint256));
     }
 
@@ -58,8 +63,7 @@ contract LoihiDelegators {
     /// @param dst the destination to which to send the raw amount
     /// @param amount the raw amount of the asset to send
     function dOutputRaw (address addr, address dst, uint256 amount) internal {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0xf09a3fc3, dst, amount)); // encoded selector of "outputRaw(address,uint256)";
-        assert(success);
+        bytes memory result = delegateTo(addr, abi.encodeWithSelector(0xf09a3fc3, dst, amount)); // encoded selector of "outputRaw(address,uint256)";
     }
 
     /// @author james foley http://github.com/realisation
@@ -69,8 +73,7 @@ contract LoihiDelegators {
     /// @param amount the numeraire amount of the asset to be sent. this will be adjusted to the corresponding raw amount
     /// @return the raw amount of the asset that was transfered
     function dOutputNumeraire (address addr, address dst, uint256 amount) internal returns (uint256) {
-        (bool success, bytes memory result) = addr.delegatecall(abi.encodeWithSelector(0xef40df22, dst, amount)); // encoded selector of "outputNumeraire(address,uint256)";
-        assert(success);
+        bytes memory result = delegateTo(addr, abi.encodeWithSelector(0xef40df22, dst, amount)); // encoded selector of "outputNumeraire(address,uint256)";
         return abi.decode(result, (uint256));
     }
 }

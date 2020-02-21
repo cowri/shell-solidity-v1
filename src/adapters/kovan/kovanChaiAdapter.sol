@@ -72,8 +72,6 @@ contract KovanChaiAdapter {
         return wmul(balance, rate);
     }
 
-    event log_uint(bytes32, uint256);
-
     // takes chai amount
     // tells corresponding numeraire value
     function getNumeraireAmount (uint256 amount) public returns (uint256) {

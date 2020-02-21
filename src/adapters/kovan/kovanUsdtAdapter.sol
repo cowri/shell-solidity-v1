@@ -49,8 +49,6 @@ contract KovanUsdtAdapter {
         return amount;
     }
 
-    event log_uint(bytes32, address);
-
     // transfers usdt to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         amount /= 1000000000000;

@@ -11,8 +11,6 @@ contract MainnetAUsdtAdapter {
     address constant ausdt = 0x71fc860F7D3A592A4a98740e39dB31d25db65ae8;
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
-    event log_addr(bytes32, address);
-    event log_uint(bytes32, uint256);
 
     constructor () public { }
 

@@ -19,7 +19,8 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         Flavor memory _o = flavors[_origin]; // origin adapter + weight
         Flavor memory _t = flavors[_target]; // target adapter + weight
 
-        require(_o.adapter != address(0) && _t.adapter != address(0), "flavor not supported");
+        require(_o.adapter != address(0), "origin flavor not supported");
+        require(_t.adapter != address(0), "target flavor not supported");
 
         ( uint256 _NAmt,
           uint256 _oBal,
@@ -168,7 +169,8 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         Flavor memory _o = flavors[_origin];
         Flavor memory _t = flavors[_target];
 
-        require(_o.adapter != address(0) && _t.adapter != address(0), "flavor not supported");
+        require(_o.adapter != address(0), "origin flavor not supported");
+        require(_t.adapter != address(0), "target flavor not supported");
 
         ( uint256 _NAmt,
           uint256 _oBal,

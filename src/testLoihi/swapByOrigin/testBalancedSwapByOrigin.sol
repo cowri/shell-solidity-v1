@@ -81,7 +81,7 @@
 //         assertEq(targetAmount, 48756459);
 //     }
 
-//     function testView80Origin () public {
+//     function testFailView80Origin () public {
 //         uint256 targetAmount = l.viewOriginTrade(dai, cusdc, 80 * WAD);
 //         assertEq(targetAmount, 0);
 //     }
