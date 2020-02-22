@@ -6,33 +6,81 @@ It can take any groupings of stablecoins into the pool and can facilitate tradin
 It is named Lo'ihi after the submarine volcano of the same name destined to be the sixth Hawaiian island.
 
 
+## Methods
 
-KOVAN:
-dai 0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa
-cdai 0xe7bc397dbd069fc7d0109c0636d06888bb50668c
-chai 0xb641957b6c29310926110848db2d464c8c3c3f38
+### swapByOrigin(address origin, address target, uint256 originAmount, uint256 minimumTargetAmount, uint256 deadline) returns (uint256 targetAmount)
 
-usdc 0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF
-cusdc 0xcfc9bb230f00bffdb560fce2428b4e05f3442e35
+Swap a given amount of the origin stablecoin for the target stablecoin.
+Limit the transaction by setting the minimum target amount and deadline for execution.
+Returns the target amount
 
-usdt 0x13512979ADE267AB5100878E2e0f485B568328a4 
-ausdt 0xA01bA9fB493b851F4Ac5093A324CB081A909C34B
+### transferByOrigin(address origin, address target, uint256 originAmount, uint256 minimumTargetAmount. uint256 deadline, address recipient) returns (uint256 targetAmount)
 
-susd 0xD868790F57B39C9B2B51b12de046975f986675f9
-asusd 0xb9c1434ab6d5811d1d0e92e8266a37ae8328e901
+Same as swapByOrigin except it sends target amount to specified recipient
 
-dai adapter 0xa557bf50eeb88978318b3edee60e1781c939acfa
-cdai adapter 0x71ab605c2c7ef07daf4f3052dcd7953d5423dafd
-chai adapter 0xe8e99291163839f28a2cd195c50ae7b259272bfc
+### viewOriginTrade(address origin, address target, uint256 originAmount) view returns (uint256 targetAmount)
 
-usdc adapter 0xa23f24d8d18be37f617148cd494a1a7e83f06dac
-cusdc adapter 0x23bf0abe17ee2fb81cf5ae4a21473526cad95f97
+Returns the target amount for the given origin amount
 
-usdt adapter 0x36647002fce1b9100df631078e9966d842959012
-ausdt adapter 0x45960908cfd852791ea821d88f9ce9c4c8a649b8
+### swapByTarget(address origin, address target, uint256 maximumOriginAmount, uint256 targetAmount, uint256 deadline) returns (uint256 originAmount)
 
-susd adapter 0xc35dcbf5ec963b3789c5eb673281b90e82d95048
-asusd adapter 0x0820ea95aba96def58ff843dd1e26aecf4841674
+Swap a given amount of the target stablecoin for the origin stablecoin
+Limit the transaction by setting the maximum origin amount and deadline for execution
+Returns the origin amount
+
+### transferByOrigin(address origin, address target, uint256 maximumOriginAmount, uint256 targetAmount, uint256 deadline, address recipient) returns (uint256 originAmount)
+
+Same as swapByTarget except it sends target amount to specified recipient
+
+
+### proportionalDeposit(uint256 totalStablecoins) returns (uint256 shellsMinted)
+
+Specify a total amount of stablecoins that will be divided according to the 
+weight of the given numeraire (dai, usdc, usdt, susd) and deposited into the 
+pool in return for the corresponding amount of shell tokens.
+
+For instance a deposit of 100 will deposit 30 Dai, 30 Usdc, 30 Usdt and 10 Susd 
+for a pool 30% Dai, 30% Usdc, 30% Usdt and 10% Susd as the numeraire assets.
+
+Returns the amount of shell tokens minted by the deposit.
+
+### selectiveDeposit(address[] flavors, uint256[] amounts, uint256 minimumShellTokens, uint256 deadline) returns (uint256 mintedShellTokens)
+
+Allows the deposit of an arbitrary number and type of stablecoins in return
+for shell tokens.
+
+The first argument is an array of stablecoin flavors to deposit. The second 
+argument is an array of uint256s whose indexes correspond to the indexes of 
+the first argument of an array of addresses.
+
+The function computes the amount of shell tokens the deposit mint, including
+any fees, and returns the amount of shell tokens minted to the users address.
+
+Is limited by minimum shell tokens and block number deadline.
+
+### proportionalWithdraw(uint256 totalShellTokensToBurn) returns (uint256[] withdrawnStablecoins)
+
+This function accepts a total amount of shell tokens to redeem for the underlying
+stableocins. It burns the shell tokens according to the current proportions
+of the reserves.
+
+The shell tokens to burn are denominated in raw shell tokens, not the numeraire
+value of the shell tokens. 
+
+### selectiveWithdraw(address[] flavors, uint256[] amounts, uint256 maxShellsToBurn, uint256 deadline) returns (uint256 burntShellTokens)
+
+Allows the withdrawal of arbitrary amounts of arbitrary stablecoins in the shell
+
+The first argument is an array of addresses. The second argument is an array of 
+uint256s whose indexes map to the addresses of the first argument of an array of
+stablecoin addresses.
+
+The amount of shell tokens burnt is computed using these inputs and is returned
+to the user after the corresponding tokens are transferred.
+
+Can be limited by maxShellsToBurn and the deadline of the block number.
+
+Returns the amount of shell tokens burned.
 
 MAINNET: 
 
