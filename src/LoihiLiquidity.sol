@@ -138,7 +138,8 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
         shellsBurned_ = calculateShellsToBurn(_balances, _withdrawals, _weights);
 
-        require(shellsBurned_ <= _maxShells, "more shells burned than max shell limit");
+        require(shellsBurned_ <= _maxShells, "withdrawal exceeds max shells limit");
+        require(shellsBurned_ <= balances[msg.sender], "withdrawal amount exceeds balance");
 
         for (uint i = 0; i < _flvrs.length; i++) if (_amts[i] > 0) dOutputRaw(flavors[_flvrs[i]].adapter, msg.sender, _amts[i]);
 
@@ -262,6 +263,8 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
     /// @param _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
     function proportionalWithdraw (uint256 _withdrawal) public returns (uint256[] memory) {
+
+        require(_withdrawal <= balances[msg.sender], "withdrawal amount exceeds your balance");
 
         uint256 _withdrawMultiplier = wdiv(_withdrawal, totalSupply);
 

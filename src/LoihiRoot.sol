@@ -27,7 +27,7 @@ contract LoihiRoot is DSMath {
 
     address internal constant exchange = 0x179117cfD46D8D7e2EA873A63A113B0e0136C45D;
     address internal constant views = 0xdB264f3b85F838b1E1cAC5F160E9eb1dD8644BA7;
-    address internal constant liquidity = 0x171E8D3c38C32cC68ced95550BcF85844638B463;
+    address internal constant liquidity = 0x1C0024bDeA446F82a2Eb3C6DC9241AAFe2Cbbc0B;
     address internal constant erc20 = 0x2d5cBAB179Be33Ade692A1C95908AD5d556E2c65;
 
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
