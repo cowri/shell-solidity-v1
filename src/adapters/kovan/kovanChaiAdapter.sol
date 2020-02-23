@@ -23,7 +23,6 @@ contract KovanChaiAdapter {
         uint256 daiAmt = dai.balanceOf(address(this));
         chai.exit(msg.sender, amount);
         daiAmt = dai.balanceOf(address(this)) - daiAmt;
-        dai.approve(address(cdai), daiAmt);
         cdai.mint(daiAmt);
     }
 
@@ -31,7 +30,6 @@ contract KovanChaiAdapter {
     // transfers corresponding chai into our balance;
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         chai.draw(msg.sender, amount);
-        dai.approve(address(cdai), amount);
         cdai.mint(amount);
         return amount;
     }
@@ -40,7 +38,6 @@ contract KovanChaiAdapter {
     // transfers corresponding chai to destination address
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         cdai.redeemUnderlying(amount);
-        dai.approve(address(chai), amount);
         uint256 chaiBal = chai.balanceOf(dst);
         chai.join(dst, amount);
         return chai.balanceOf(dst) - chaiBal;
@@ -50,7 +47,6 @@ contract KovanChaiAdapter {
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
         uint256 daiAmt = rmul(amount, pot.chi());
         cdai.redeemUnderlying(daiAmt);
-        dai.approve(address(chai), daiAmt);
         uint256 chaiAmt = chai.balanceOf(dst);
         chai.join(dst, daiAmt);
         return chai.balanceOf(dst) - chaiAmt;

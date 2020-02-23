@@ -25,6 +25,11 @@ contract LoihiRoot is DSMath {
     bytes4 constant internal ERC20ID = 0x36372b07;
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
 
+    // address internal exchange;
+    // address internal views;
+    // address internal liquidity;
+    // address internal erc20;
+
     address internal constant exchange = 0x179117cfD46D8D7e2EA873A63A113B0e0136C45D;
     address internal constant views = 0xdB264f3b85F838b1E1cAC5F160E9eb1dD8644BA7;
     address internal constant liquidity = 0x1C0024bDeA446F82a2Eb3C6DC9241AAFe2Cbbc0B;
@@ -32,9 +37,7 @@ contract LoihiRoot is DSMath {
 
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
     event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);
-
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-
     event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);

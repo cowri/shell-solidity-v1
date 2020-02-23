@@ -13,61 +13,83 @@ contract MainnetAUsdtAdapter {
     constructor () public { }
 
     function getAUsdt () private view returns (IAToken) {
+
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(usdt);
         return IAToken(aTokenAddress);
+
     }
 
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
     function intakeRaw (uint256 amount) public {
+
         getAUsdt().transferFrom(msg.sender, address(this), amount);
+
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
+
         amount /= 1000000000000;
         getAUsdt().transferFrom(msg.sender, address(this), amount);
         return amount;
+
     }
 
     function outputRaw (address dst, uint256 amount) public {
+
         getAUsdt().transfer(dst, amount);
+
     }
 
     // unwraps numeraire amount of dai from chai
     // wraps it into cdai amount
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+
         amount /= 1000000000000;
         getAUsdt().transfer(dst, amount);
         return amount;
+
     }
 
     function viewRawAmount (uint256 amount) public view returns (uint256) {
+
         return amount / 1000000000000;
+
     }
 
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+
         return amount * 1000000000000;
+
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
+
         return getAUsdt().balanceOf(address(addr)) * 1000000000000;
+
     }
 
     // takes raw amount and gives numeraire amount
     function getRawAmount (uint256 amount) public returns (uint256) {
+
         return amount / 1000000000000;
+
     }
 
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
+
         return amount * 1000000000000;
+
     }
 
     function getNumeraireBalance () public returns (uint256) {
+
         return getAUsdt().balanceOf(address(this)) * 1000000000000;
+
     }
 
     uint constant WAD = 10 ** 18;

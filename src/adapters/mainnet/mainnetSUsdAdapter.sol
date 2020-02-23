@@ -13,9 +13,11 @@ contract MainnetSUsdAdapter {
     IERC20 constant susd = IERC20(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
 
     function getASUsd () public view returns (IAToken) {
+
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(address(susd));
         return IAToken(aTokenAddress);
+
     }
 
     // transfers susd in
@@ -23,7 +25,6 @@ contract MainnetSUsdAdapter {
 
         susd.transferFrom(msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        susd.approve(lpProvider.getLendingPoolCore(), amount);
         pool.deposit(address(susd), amount, 0);
         return amount;
 
@@ -34,7 +35,6 @@ contract MainnetSUsdAdapter {
 
         safeTransferFrom(susd, msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        susd.approve(lpProvider.getLendingPoolCore(), amount);
         pool.deposit(address(susd), amount, 0);
         return amount;
 
@@ -59,37 +59,53 @@ contract MainnetSUsdAdapter {
     }
 
     function viewRawAmount (uint256 amount) public pure returns (uint256) {
+
         return amount;
+
     }
 
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
+
         return amount;
+
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
+
         return getASUsd().balanceOf(addr);
+
     }
 
     function getRawAmount (uint256 amount) public pure returns (uint256) {
+
         return amount;
+
     }
 
     // returns amount, is already numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
+
         return amount;
+
     }
 
     // returns balance
     function getNumeraireBalance () public returns (uint256) {
+
         return getASUsd().balanceOf(address(this));
+
     }
     
     function safeTransfer(IERC20 token, address to, uint256 value) internal {
+
         callOptionalReturn(address(token), abi.encodeWithSelector(0xa9059cbb, to, value));
+
     }
 
     function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
+
         callOptionalReturn(address(token), abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+
     }
 
     function callOptionalReturn(address token, bytes memory data) private {

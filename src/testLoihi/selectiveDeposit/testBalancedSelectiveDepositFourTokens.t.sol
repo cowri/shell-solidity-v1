@@ -12,14 +12,14 @@
 //         setupAdapters();
 //         setupLoihi();
 //         approveFlavors(address(l));
-//         executeLoihiApprovals(address(l));
-//         includeAdapters(address(l), 1);
+        // executeLoihiApprovals(address(l));
+//         includeAdapters(address(l), 0);
 
 //         uint256 shells = l.proportionalDeposit(300 * (10 ** 18));
 
 //     }
 
-//     function testSelectiveDeposit10x0y0z () public {
+//     function testSelectiveDeposit10x () public {
 //         uint256[] memory amounts = new uint256[](1);
 //         address[] memory tokens = new address[](1);
 

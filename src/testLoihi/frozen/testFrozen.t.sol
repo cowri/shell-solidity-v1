@@ -1,29 +1,29 @@
-pragma solidity ^0.5.6;
+// pragma solidity ^0.5.6;
 
 
-import "ds-test/test.sol";
-import "ds-math/math.sol";
-import "../loihiSetup.sol";
-import "../flavorsSetup.sol";
-import "../../IAdapter.sol";
+// import "ds-test/test.sol";
+// import "ds-math/math.sol";
+// import "../loihiSetup.sol";
+// import "../flavorsSetup.sol";
+// import "../../IAdapter.sol";
 
-contract LoihiTest is LoihiSetup, DSMath, DSTest {
+// contract LoihiTest is LoihiSetup, DSMath, DSTest {
 
-    function setUp() public {
+//     function setUp() public {
 
-        setupFlavors();
-        setupAdapters();
-        setupLoihi();
-        approveFlavors(address(l));
-        includeAdapters(address(l), 1);
+//         setupFlavors();
+//         setupAdapters();
+//         setupLoihi();
+//         approveFlavors(address(l));
+//         includeAdapters(address(l), 1);
 
-    }
+//     }
 
-    function testFailFrozen () public {
+//     function testFailFrozen () public {
 
-        l.freeze(true);
-        uint256 mintedShells = l.proportionalDeposit(100 * (10 ** 18));
+//         l.freeze(true);
+//         uint256 mintedShells = l.proportionalDeposit(100 * (10 ** 18));
 
-    }
+//     }
 
-}
+// }

@@ -23,7 +23,6 @@ contract KovanUsdtAdapter {
         safeTransferFrom(usdt, msg.sender, address(this), amount);
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        usdt.approve(lpProvider.getLendingPoolCore(), amount * 2);
         pool.deposit(address(usdt), amount, 0);
 
         return amount;
@@ -35,8 +34,6 @@ contract KovanUsdtAdapter {
         safeTransferFrom(usdt, msg.sender, address(this), amount);
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-
-        usdt.approve(lpProvider.getLendingPoolCore(), amount * 2);
 
         pool.deposit(address(usdt), amount, 0);
         return amount;

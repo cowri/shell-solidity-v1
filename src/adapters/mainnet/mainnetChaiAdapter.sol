@@ -20,75 +20,91 @@ contract MainnetChaiAdapter {
     // takes raw chai amount
     // transfers it into our balance
     function intakeRaw (uint256 amount) public {
+
         uint256 daiAmt = dai.balanceOf(address(this));
         chai.exit(msg.sender, amount);
         daiAmt = dai.balanceOf(address(this)) - daiAmt;
-        dai.approve(address(cdai), daiAmt);
         cdai.mint(daiAmt);
+
     }
 
     // takes numeraire amount
     // transfers corresponding chai into our balance;
     function intakeNumeraire (uint256 amount) public returns (uint256) {
+
         chai.draw(msg.sender, amount);
-        dai.approve(address(cdai), amount);
         cdai.mint(amount);
         return amount;
+
     }
 
     // takes numeraire amount
     // transfers corresponding chai to destination address
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+
         cdai.redeemUnderlying(amount);
-        dai.approve(address(chai), amount);
         uint256 chaiBal = chai.balanceOf(dst);
         chai.join(dst, amount);
         return chai.balanceOf(dst) - chaiBal;
+
     }
 
     // transfers corresponding chai to destination address
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
+
         uint256 daiAmt = rmul(amount, pot.chi());
         cdai.redeemUnderlying(daiAmt);
-        dai.approve(address(chai), daiAmt);
         uint256 chaiAmt = chai.balanceOf(dst);
         chai.join(dst, daiAmt);
         return chai.balanceOf(dst) - chaiAmt;
+
     }
     
     // pass it a numeraire and get the raw amount
     function viewRawAmount (uint256 amount) public view returns (uint256) {
+
         return rdivup(amount, pot.chi());
+
     }
 
     // pass it a raw amount and get the numeraire amount
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+
         return rmul(amount, pot.chi());
+
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
+
         uint256 rate = cdai.exchangeRateStored();
         uint256 balance = cdai.balanceOf(addr);
         return wmul(balance, rate);
+
     }
 
     // takes chai amount
     // tells corresponding numeraire value
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
+
         uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
         return rmul(amount, chi);
+
     }
 
     function getRawAmount (uint256 amount) public returns (uint256) {
+
         uint chi = (now > pot.rho())
           ? pot.drip()
           : pot.chi();
         return rdivup(amount, chi);
+
     }
 
     // tells numeraire balance
     function getNumeraireBalance () public returns (uint256) {
+
         return cdai.balanceOfUnderlying(address(this));
+
     }
     
     function add(uint x, uint y) internal pure returns (uint z) {

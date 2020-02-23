@@ -23,7 +23,6 @@ contract KovanSUsdAdapter {
 
         susd.transferFrom(msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        susd.approve(lpProvider.getLendingPoolCore(), amount);
         pool.deposit(address(susd), amount, 0);
         return amount;
 
@@ -35,7 +34,6 @@ contract KovanSUsdAdapter {
         amount /= 1000000000000;
         safeTransferFrom(susd, msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        susd.approve(lpProvider.getLendingPoolCore(), amount);
         pool.deposit(address(susd), amount, 0);
         return amount;
 

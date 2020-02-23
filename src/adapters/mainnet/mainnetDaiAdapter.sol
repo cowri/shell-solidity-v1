@@ -17,7 +17,6 @@ contract MainnetDaiAdapter {
     function intakeRaw (uint256 amount) public {
         
         dai.transferFrom(msg.sender, address(this), amount);
-        dai.approve(address(cdai), amount);
         cdai.mint(amount);
         
     }
@@ -27,7 +26,6 @@ contract MainnetDaiAdapter {
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         
         dai.transferFrom(msg.sender, address(this), amount);
-        dai.approve(address(0xe7bc397DBd069fC7d0109C0636d06888bb50668c), amount);
         cdai.mint(amount);
         return amount;
         
@@ -59,23 +57,31 @@ contract MainnetDaiAdapter {
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
+
         uint256 rate = cdai.exchangeRateStored();
         uint256 balance = cdai.balanceOf(addr);
         return wmul(balance, rate);
+
     }
 
     function getRawAmount (uint256 amount) public pure returns (uint256) {
+
         return amount;
+
     }
 
     // returns amount, already in numeraire
     function getNumeraireAmount (uint256 amount) public pure returns (uint256) {
+
         return amount;
+
     }
 
     // returns numeraire amount of chai balance
     function getNumeraireBalance () public returns (uint256) {
+
         return cdai.balanceOfUnderlying(address(this));
+
     }
 
     function add(uint x, uint y) internal pure returns (uint z) {

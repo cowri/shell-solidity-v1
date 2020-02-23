@@ -12,60 +12,80 @@ contract MainnetCDaiAdapter {
     // unwraps it into dai
     // deposits dai amount in chai
     function intakeRaw (uint256 amount) public {
+
         cdai.transferFrom(msg.sender, address(this), amount);
+
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
+
         uint256 rate = cdai.exchangeRateCurrent();
         uint256 cdaiAmount = wmul(rate, amount);
         cdai.transferFrom(msg.sender, address(this), cdaiAmount);
         return cdaiAmount;
+
     }
 
     function outputRaw (address dst, uint256 amount) public {
+
         cdai.transfer(msg.sender, amount);
+
     }
 
     // unwraps numeraire amount of dai from chai
     // wraps it into cdai amount
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+
         uint rate = cdai.exchangeRateCurrent();
         uint cdaiAmount = wdiv(amount, rate);
         cdai.transfer(dst, cdaiAmount);
         return cdaiAmount;
+
     }
 
     function viewRawAmount (uint256 amount) public view returns (uint256) {
+
         uint256 rate = cdai.exchangeRateStored();
         return wdiv(amount, rate);
+
     }
 
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+
         uint256 rate = cdai.exchangeRateStored();
         return wmul(amount, rate);
+
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
+
         uint256 rate = cdai.exchangeRateStored();
         uint256 balance = cdai.balanceOf(addr);
         return wmul(balance, rate);
+
     }
 
     // takes raw amount and gives numeraire amount
     function getRawAmount (uint256 amount) public returns (uint256) {
+
         uint256 rate = cdai.exchangeRateCurrent();
         return wdiv(amount, rate);
+
     }
 
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
+
         uint256 rate = cdai.exchangeRateCurrent();
         return wmul(amount, rate);
+
     }
 
     function getNumeraireBalance () public returns (uint256) {
+
         return cdai.balanceOfUnderlying(address(this));
+
     }
 
     uint constant WAD = 10 ** 18;

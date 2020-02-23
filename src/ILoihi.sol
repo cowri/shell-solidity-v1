@@ -91,6 +91,7 @@ interface ILoihi {
     function getNumeraires () external view returns (address[] memory);
     function getReserves () external view returns (address[] memory);
     function getAdapter (address flavor) external view returns (address[] memory);
+    function executeApprovals (address[] calldata targets, address[] calldata spenders) external;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);

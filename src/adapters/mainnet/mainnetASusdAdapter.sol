@@ -13,60 +13,82 @@ contract MainnetASUsdAdapter {
     constructor () public { }
 
     function getASUsd () public view returns (IAToken) {
+
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(susd);
         return IAToken(aTokenAddress);
+
     }
 
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
     function intakeRaw (uint256 amount) public {
+
         getASUsd().transferFrom(msg.sender, address(this), amount);
+
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
+
         getASUsd().transferFrom(msg.sender, address(this), amount);
         return amount;
+
     }
 
     function outputRaw (address dst, uint256 amount) public {
+
         IAToken asusd = getASUsd();
         asusd.transfer(dst, amount);
+
     }
 
     // unwraps numeraire amount of dai from chai
     // wraps it into cdai amount
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+
         getASUsd().transfer(dst, amount);
         return amount;
+
     }
 
     function viewRawAmount (uint256 amount) public view returns (uint256) {
+
         return amount;
+
     }
 
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+
         return amount;
+
     }
 
     function viewNumeraireBalance (address addr) public returns (uint256) {
+
         return getASUsd().balanceOf(addr);
+
     }
 
     // takes raw amount and gives numeraire amount
     function getRawAmount (uint256 amount) public returns (uint256) {
+
         return amount;
+
     }
 
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
+
         return amount;
+
     }
 
     function getNumeraireBalance () public returns (uint256) {
+
         return getASUsd().balanceOf(address(this));
+
     }
 
     uint constant WAD = 10 ** 18;

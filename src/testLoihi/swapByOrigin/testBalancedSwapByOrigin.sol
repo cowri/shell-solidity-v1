@@ -18,6 +18,7 @@
 //         setupAdapters();
 //         setupLoihi();
 //         approveFlavors(address(l));
+//         executeLoihiApprovals(address(l));
 //         includeAdapters(address(l), 1);
 
 //         l.proportionalDeposit(300 * (10 ** 18));
@@ -48,11 +49,24 @@
 //     }
 
 //     function testSwap25OriginCDaiCusdc () public {
+//         uint256 cdaiBal1 = IERC20(cdai).balanceOf(address(this));
+//         uint256 cusdcBal1 = IERC20(cusdc).balanceOf(address(this));
+//         // uint256 cusdcBal = IERC20(cusdc).balanceOf(address(this));
+//         // emit log_named_address("cdai", cdai);
+//         // emit log_named_address("cusdc", cusdc);
+//         // emit log_named_uint("cusdcBal", cusdcBal);
+//         // emit log_named_address("me", address(this));
 //         uint256 projectedAmount = l.viewOriginTrade(cdai, cusdc, CDaiNM25);
 //         uint256 targetAmount = l.swapByOrigin(cdai, cusdc, CDaiNM25, 0, now);
 //         assertEq(targetAmount, projectedAmount);
 //         uint256 numeraireAmount = IAdapter(cusdcAdapter).getNumeraireAmount(targetAmount);
 //         numeraireAmount /= 1000000000000000;
+//         uint256 cdaiBal2 = IERC20(cdai).balanceOf(address(this));
+//         uint256 cusdcBal2 = IERC20(cusdc).balanceOf(address(this));
+//         emit log_named_uint("cdaiBal1", cdaiBal1);
+//         emit log_named_uint("cdaiBal2", cdaiBal2);
+//         emit log_named_uint("cusdcBal1", cusdcBal1);
+//         emit log_named_uint("cusdcBal2", cusdcBal2);
 //         assertEq(numeraireAmount, 24987);
 //     }
 

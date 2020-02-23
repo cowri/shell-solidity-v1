@@ -15,61 +15,79 @@ contract MainnetUsdcAdapter {
     // transfers usdc in
     // wraps it in csudc
     function intakeRaw (uint256 amount) public {
+
         usdc.transferFrom(msg.sender, address(this), amount);
-        usdc.approve(address(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35), amount);
         cusdc.mint(amount);
+
     }
 
     // transfers usdc in
     // wraps it in csudc
     function intakeNumeraire (uint256 amount) public returns (uint256) {
+
         amount /= 1000000000000;
         usdc.transferFrom(msg.sender, address(this), amount);
-        usdc.approve(address(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35), amount);
         cusdc.mint(amount);
         return amount;
+
     }
 
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
+
         cusdc.redeemUnderlying(amount);
         usdc.transfer(dst, amount);
         return amount;
+
     }
 
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+
         amount /= 1000000000000;
         cusdc.redeemUnderlying(amount);
         usdc.transfer(dst, amount);
         return amount;
+
     }
 
     function viewRawAmount (uint256 amount) public view returns (uint256) {
+
         return amount / 1000000000000;
+
     }
 
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
+
         return amount * 1000000000000;
+
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
+
         uint256 rate = cusdc.exchangeRateStored();
         uint256 balance = cusdc.balanceOf(addr);
         return wmul(balance, rate) * 1000000000000;
+
     }
 
     function getRawAmount (uint256 amount) public pure returns (uint256) {
+
         return amount / 1000000000000;
+
     }
 
     // is already numeraire amount
     function getNumeraireAmount (uint256 amount) public pure returns (uint256) {
+
         return amount * 1000000000000;
+
     }
 
     // returns numeraire balance
     function getNumeraireBalance () public returns (uint256) {
+
         uint256 bal = cusdc.balanceOfUnderlying(address(this));
         return bal * 1000000000000;
+
     }
 
     function add(uint x, uint y) internal pure returns (uint z) {

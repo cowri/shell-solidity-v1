@@ -15,7 +15,6 @@ contract KovanUsdcAdapter {
     // wraps it in csudc
     function intakeRaw (uint256 amount) public {
         usdc.transferFrom(msg.sender, address(this), amount);
-        usdc.approve(address(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35), amount);
         cusdc.mint(amount);
     }
 
@@ -24,7 +23,6 @@ contract KovanUsdcAdapter {
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         amount /= 1000000000000;
         usdc.transferFrom(msg.sender, address(this), amount);
-        usdc.approve(address(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35), amount);
         cusdc.mint(amount);
         return amount;
     }

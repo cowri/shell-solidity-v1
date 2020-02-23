@@ -16,7 +16,6 @@ contract KovanDaiAdapter {
     function intakeRaw (uint256 amount) public {
         
         dai.transferFrom(msg.sender, address(this), amount);
-        dai.approve(address(cdai), amount);
         cdai.mint(amount);
         
     }
@@ -26,7 +25,6 @@ contract KovanDaiAdapter {
     function intakeNumeraire (uint256 amount) public returns (uint256) {
         
         dai.transferFrom(msg.sender, address(this), amount);
-        dai.approve(address(0xe7bc397DBd069fC7d0109C0636d06888bb50668c), amount);
         cdai.mint(amount);
         return amount;
         
