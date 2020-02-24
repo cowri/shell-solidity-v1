@@ -18,8 +18,8 @@
 //         setupAdapters();
 //         setupLoihi();
 //         approveFlavors(address(l));
-//         executeLoihiApprovals(address(l));
-//         includeAdapters(address(l), 1);
+//         // executeLoihiApprovals(address(l));
+//         // includeAdapters(address(l), 1);
 
 //         l.proportionalDeposit(300 * (10 ** 18));
 
