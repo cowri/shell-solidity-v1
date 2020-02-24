@@ -38,92 +38,31 @@ contract Loihi is LoihiRoot {
     address constant aaveLpCore = 0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3;
 
     constructor () public {
-    // constructor (address _exchange, address _views, address _liquidity, address _erc20) public {
-        // exchange = _exchange; 
-        // views = _views;
-        // liquidity = _liquidity;
-        // erc20 = _erc20;
-
         owner = msg.sender;
+
         emit OwnershipTransferred(address(0), msg.sender);
 
-        numeraires = [
-            dai, // dai
-            usdc, // usdc
-            usdt, // usdt
-            susd // susd
-        ];
+        numeraires = [ dai, usdc, usdt, susd ];
 
-        reserves = [
-            cdaiAdapter, // cdai adptr
-            cusdcAdapter, // cusdc adptr
-            ausdtAdapter, // ausdt adptr
-            asusdAdapter // asusd adptr 
-        ];
+        reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
         
-        // dai
-        flavors[dai] = Flavor(
-            daiAdapter, // dai adptr 
-            cdaiAdapter, // cdai adptr
-            300000000000000000
-        );
+        flavors[dai] = Flavor(daiAdapter, cdaiAdapter, 300000000000000000);
 
-        // chai
-        flavors[chai] = Flavor(
-            chaiAdapter, // chai adptr
-            cdaiAdapter, // cdai adptr
-            300000000000000000
-        );
+        flavors[chai] = Flavor(chaiAdapter, cdaiAdapter, 300000000000000000);
 
-        // cdai
-        flavors[cdai] = Flavor(
-            cdaiAdapter, // cdai adptr
-            cdaiAdapter, // cdai adptr
-            300000000000000000
-        );
+        flavors[cdai] = Flavor(cdaiAdapter, cdaiAdapter, 300000000000000000);
 
-        // usdc
-        flavors[usdc] = Flavor(
-            usdcAdapter, // usdc adptr
-            cusdcAdapter, // cusdc adptr
-            300000000000000000
-        );
+        flavors[usdc] = Flavor( usdcAdapter, cusdcAdapter, 300000000000000000);
 
-        // cusdc
-        flavors[cusdc] = Flavor(
-            cusdcAdapter, // cusdc adptr
-            cusdcAdapter, // cusdc adptr
-            300000000000000000
-        );
+        flavors[cusdc] = Flavor(cusdcAdapter, cusdcAdapter, 300000000000000000);
 
-        // usdt
-        flavors[usdt] = Flavor(
-            usdtAdapter, // usdt adptr
-            ausdtAdapter, // ausdt adptr
-            300000000000000000 
-        );
+        flavors[usdt] = Flavor(usdtAdapter, ausdtAdapter, 300000000000000000);
 
-        // ausdt
-        flavors[ausdt] = Flavor(
-            ausdtAdapter, // ausdt adptr
-            ausdtAdapter, // ausdt adptr
-            300000000000000000
-        );
+        flavors[ausdt] = Flavor(ausdtAdapter, ausdtAdapter, 300000000000000000);
 
-        // susd
-        flavors[susd] = Flavor(
-            susdAdapter, // susd adptr
-            asusdAdapter, // asusd adptr
-            100000000000000000
-        );
+        flavors[susd] = Flavor(susdAdapter, asusdAdapter, 100000000000000000);
         
-        // asusd
-        flavors[asusd] = Flavor(
-            asusdAdapter, // asusd adptr
-            asusdAdapter, // asusd adptr
-            100000000000000000
-        );
-
+        flavors[asusd] = Flavor(asusdAdapter, asusdAdapter, 100000000000000000);
 
         address[] memory targets = new address[](5);
         address[] memory spenders = new address[](5);
@@ -140,25 +79,10 @@ contract Loihi is LoihiRoot {
 
         executeApprovals(targets, spenders);
         
-        // address[] memory targets = new address[](5);
-        // address[] memory spenders = new address[](5);
-        // targets[0] = 0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa;
-        // spenders[0] = 0xB641957b6c29310926110848dB2d464C8C3c3f38;
-        // targets[1] = 0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa;
-        // spenders[1] = 0xe7bc397DBd069fC7d0109C0636d06888bb50668c;
-        // targets[2] = 0xD868790F57B39C9B2B51b12de046975f986675f9;
-        // spenders[2] = 0x95D1189Ed88B380E319dF73fF00E479fcc4CFa45;
-        // targets[3] = 0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF;
-        // spenders[3] = 0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35;
-        // targets[4] = 0x13512979ADE267AB5100878E2e0f485B568328a4;
-        // spenders[4] = 0x95D1189Ed88B380E319dF73fF00E479fcc4CFa45;
-
-        // executeApprovals(targets, spenders);
-
-        alpha = (5 * WAD) / 10;
-        beta = (25 * WAD) / 100;
-        feeDerivative = WAD / 10;
-        feeBase = 500000000000000;
+        alpha = 800000000000000000; // .8
+        beta = 400000000000000000; // .4
+        feeBase = 850000000000000; // 8.5 bps
+        feeDerivative = 100000000000000000; // .1
 
      }
 

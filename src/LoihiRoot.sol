@@ -5,8 +5,8 @@ import "ds-math/math.sol";
 contract LoihiRoot is DSMath {
 
 
-    string  public constant name     = "Shells";
-    string  public constant symbol   = "SHL";
+    string  public constant name = "Shells";
+    string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
 
     mapping (address => uint256) public balances;
@@ -29,11 +29,6 @@ contract LoihiRoot is DSMath {
 
     bytes4 constant internal ERC20ID = 0x36372b07;
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
-
-    // address internal exchange;
-    // address internal views;
-    // address internal liquidity;
-    // address internal erc20;
 
     address internal constant exchange = 0x179117cfD46D8D7e2EA873A63A113B0e0136C45D;
     address internal constant views = 0xdB264f3b85F838b1E1cAC5F160E9eb1dD8644BA7;

@@ -88,7 +88,6 @@ contract FlavorsSetup {
         approve(chai, addr);
         approve(cdai, addr);
 
-
         approve(usdc, addr);
         approve(cusdc, addr);
         approveBad(usdt, addr);
