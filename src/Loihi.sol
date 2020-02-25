@@ -42,65 +42,60 @@ contract Loihi is LoihiRoot {
     address constant usdcAdapter = 0x3746a4650d3f1DD8fbE05b8bdAE66ba262150206;
     address constant cusdcAdapter = 0x2dbD418b78CB66FbdD59675531BAF9D055EeAaE7;
 
-    address constant usdtAdapter = 0x9c18C64c1e7D876803b8d7e59329ACFA17E6B5A6;
-    address constant ausdtAdapter = 0xd8ced0d9ba8C51FA40419bC6A1Dbb92f0CBA5D41;
+    address constant usdtAdapter = 0x6d05E9E964eC858Ad239755C18D288315BaDfC10;
+    address constant ausdtAdapter = 0xDcE7E3AF11c3867327a7Ab786DEdFb05ef53beA5;
 
-    address constant susdAdapter = 0x93a406cd26CBd184f4301B055464C184b2566b64;
-    address constant asusdAdapter = 0x424B491eaB47fd95c60eBC83e6438D0791e2b142;
+    address constant susdAdapter = 0x7a06041ee5140Eaf6119ADA8fA0362dF1CED9d81;
+    address constant asusdAdapter = 0xE302a5E54c9e837CD1b5891F94eB6d6dF3464610;
 
     address constant aaveLpCore = 0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3;
 
-    // constructor () public {
-    constructor (address _x, address _v, address _l, address _e) public {
-        exchange = _x;
-        views = _v;
-        liquidity = _l;
-        erc20 = _e;
+    constructor () public {
 
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
 
-        // numeraires = [ dai, usdc, usdt, susd ];
+        numeraires = [ dai, usdc, usdt, susd ];
 
-        // reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
+        reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
         
-        // flavors[dai] = Flavor(daiAdapter, cdaiAdapter, 300000000000000000);
+        flavors[dai] = Flavor(daiAdapter, cdaiAdapter, 300000000000000000);
 
-        // flavors[chai] = Flavor(chaiAdapter, cdaiAdapter, 300000000000000000);
+        flavors[chai] = Flavor(chaiAdapter, cdaiAdapter, 300000000000000000);
 
-        // flavors[cdai] = Flavor(cdaiAdapter, cdaiAdapter, 300000000000000000);
+        flavors[cdai] = Flavor(cdaiAdapter, cdaiAdapter, 300000000000000000);
 
-        // flavors[usdc] = Flavor( usdcAdapter, cusdcAdapter, 300000000000000000);
+        flavors[usdc] = Flavor( usdcAdapter, cusdcAdapter, 300000000000000000);
 
-        // flavors[cusdc] = Flavor(cusdcAdapter, cusdcAdapter, 300000000000000000);
+        flavors[cusdc] = Flavor(cusdcAdapter, cusdcAdapter, 300000000000000000);
 
-        // flavors[usdt] = Flavor(usdtAdapter, ausdtAdapter, 300000000000000000);
+        flavors[usdt] = Flavor(usdtAdapter, ausdtAdapter, 300000000000000000);
 
-        // flavors[ausdt] = Flavor(ausdtAdapter, ausdtAdapter, 300000000000000000);
+        flavors[ausdt] = Flavor(ausdtAdapter, ausdtAdapter, 300000000000000000);
 
-        // flavors[susd] = Flavor(susdAdapter, asusdAdapter, 100000000000000000);
+        flavors[susd] = Flavor(susdAdapter, asusdAdapter, 100000000000000000);
         
-        // flavors[asusd] = Flavor(asusdAdapter, asusdAdapter, 100000000000000000);
+        flavors[asusd] = Flavor(asusdAdapter, asusdAdapter, 100000000000000000);
 
-        // address[] memory targets = new address[](5);
-        // address[] memory spenders = new address[](5);
-        // targets[0] = dai;
-        // spenders[0] = chai;
-        // targets[1] = dai;
-        // spenders[1] = cdai;
-        // targets[2] = susd;
-        // spenders[2] = aaveLpCore;
-        // targets[3] = usdc;
-        // spenders[3] = cusdc;
-        // targets[4] = usdt;
-        // spenders[4] = aaveLpCore;
+        address[] memory targets = new address[](5);
+        address[] memory spenders = new address[](5);
+        targets[0] = dai;
+        spenders[0] = chai;
+        targets[1] = dai;
+        spenders[1] = cdai;
+        targets[2] = susd;
+        spenders[2] = aaveLpCore;
+        targets[3] = usdc;
+        spenders[3] = cusdc;
+        targets[4] = usdt;
+        spenders[4] = aaveLpCore;
 
-        // executeApprovals(targets, spenders);
+        executeApprovals(targets, spenders);
         
-        // alpha = 800000000000000000; // .8
-        // beta = 400000000000000000; // .4
-        // feeBase = 850000000000000; // 8.5 bps
-        // feeDerivative = 100000000000000000; // .1
+        alpha = 800000000000000000; // .8
+        beta = 400000000000000000; // .4
+        feeBase = 850000000000000; // 8.5 bps
+        feeDerivative = 100000000000000000; // .1
 
      }
 

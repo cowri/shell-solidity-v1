@@ -82,31 +82,38 @@ Can be limited by maxShellsToBurn and the deadline of the block number.
 
 Returns the amount of shell tokens burned.
 
-MAINNET: 
+
+Mainnet deployment addresses: 
+
 
 DAI: 0x6B175474E89094C44Da98b954EedeAC495271d0F
-DAI Adapter: 0xc2Fb1212cD9E0fD03858097A007e24454AC76eaA
+[Dai adapter](https://etherscan.io/address/0xe3925debc22b49891542a5990e781e30e15a97a3#code)
 
 CHAI: 0x06AF07097C9Eeb7fD685c692751D5C66dB49c215
-CHAI Adapter: 0x54C5573FB64Dd900BfF4Ee264259Fc7B2c3c0746
+[Chai adapter](https://etherscan.io/address/0xc12b8e0ac01040633a935b5b13586a033000983d#code)
 
 CDAI: 0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643
-CDAI Adapter: 0x4185e3e9eA02446aa96fF56505A1870f6d055dBe
+[CDai adapter](https://etherscan.io/address/0x5152d6817952e66cb7a0422a2f5b944d45f08e1b#code)
 
 USDC: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
-USDC Adapter: 0x3746a4650d3f1DD8fbE05b8bdAE66ba262150206
+[Usdc adapter](https://etherscan.io/address/0xe14a8eb97731a9107c9e144026765bd65350eac7#code)
 
 CUSDC: 0x39AA39c021dfbaE8faC545936693aC917d5E7563
-CUSDC Adapter: 0x2dbD418b78CB66FbdD59675531BAF9D055EeAaE7
+[CUsdc adapter](https://etherscan.io/address/0xf643f7a20a18557e2aa9af413dfa6d3626e641f8#code)
 
 USDT: 0xdAC17F958D2ee523a2206206994597C13D831ec7
-USDT Adapter: 0x9c18C64c1e7D876803b8d7e59329ACFA17E6B5A6
+[Usdt adapter](https://etherscan.io/address/0x6d05e9e964ec858ad239755c18d288315badfc10#code)
 
 AUSDT: 0x71fc860F7D3A592A4a98740e39dB31d25db65ae8
-AUSDT Adapter: 0xd8ced0d9ba8C51FA40419bC6A1Dbb92f0CBA5D41
+[AUSdt adapter](https://etherscan.io/address/0xdce7e3af11c3867327a7ab786dedfb05ef53bea5#code)
 
 SUSD: 0x57Ab1ec28D129707052df4dF418D58a2D46d5f51
-SUSD Adapter: 0x93a406cd26CBd184f4301B055464C184b2566b64
+[SUsd adapter](https://etherscan.io/address/0x7a06041ee5140eaf6119ada8fa0362df1ced9d81#code)
 
 ASUSD: 0x625aE63000f46200499120B906716420bd059240
-ASUSD Adapter: 0x424B491eaB47fd95c60eBC83e6438D0791e2b142
+[ASUsd adapter](https://etherscan.io/address/0xe302a5e54c9e837cd1b5891f94eb6d6df3464610#code)
+
+[Loihi Exchange](https://etherscan.io/address/0xb40b60cd9687dae6fe7043e8c62bb8ec692632a3#code)
+[Loihi Views](https://etherscan.io/address/0x04a6cf4e770a9af7e6b6733462d72e238b8ab140#code)
+[Loihi Liqudity](https://etherscan.io/address/0x7db66490d3436717f90d4681bf8297a2f2b8774a#code)
+[Loihi ERC20](https://etherscan.io/address/0xffa473d58c9f15e97b86ad281f876d9dbf96241c#code)
