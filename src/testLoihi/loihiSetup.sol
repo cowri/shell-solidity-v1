@@ -1,5 +1,5 @@
 
-pragma solidity ^0.5.6;
+pragma solidity ^0.5.16;
 
 import "./adaptersSetup.sol";
 import "../Loihi.sol";
@@ -8,7 +8,6 @@ import "../LoihiLiquidity.sol";
 import "../LoihiExchange.sol";
 import "../LoihiERC20.sol";
 import "../LoihiViews.sol";
-import "../IUsdt.sol";
 
 contract LoihiSetup is AdaptersSetup {
     Loihi l;

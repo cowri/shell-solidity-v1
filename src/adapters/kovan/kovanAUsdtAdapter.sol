@@ -1,6 +1,6 @@
 pragma solidity ^0.5.12;
 
-import "../../IAToken.sol";
+import "../../interfaces/IAToken.sol";
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../aaveResources/ILendingPool.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";

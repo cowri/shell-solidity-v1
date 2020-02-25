@@ -1,4 +1,4 @@
-pragma solidity ^0.5.12;
+pragma solidity ^0.5.16;
 
 interface ICToken {
     function mint(uint mintAmount) external returns (uint);
