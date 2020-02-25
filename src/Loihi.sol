@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-pragma solidity ^0.5.16;
+pragma solidity ^0.5.15;
 
 import "./LoihiRoot.sol";
 
@@ -50,52 +50,57 @@ contract Loihi is LoihiRoot {
 
     address constant aaveLpCore = 0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3;
 
-    constructor () public {
-        owner = msg.sender;
+    // constructor () public {
+    constructor (address _x, address _v, address _l, address _e) public {
+        exchange = _x;
+        views = _v;
+        liquidity = _l;
+        erc20 = _e;
 
+        owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
 
-        numeraires = [ dai, usdc, usdt, susd ];
+        // numeraires = [ dai, usdc, usdt, susd ];
 
-        reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
+        // reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
         
-        flavors[dai] = Flavor(daiAdapter, cdaiAdapter, 300000000000000000);
+        // flavors[dai] = Flavor(daiAdapter, cdaiAdapter, 300000000000000000);
 
-        flavors[chai] = Flavor(chaiAdapter, cdaiAdapter, 300000000000000000);
+        // flavors[chai] = Flavor(chaiAdapter, cdaiAdapter, 300000000000000000);
 
-        flavors[cdai] = Flavor(cdaiAdapter, cdaiAdapter, 300000000000000000);
+        // flavors[cdai] = Flavor(cdaiAdapter, cdaiAdapter, 300000000000000000);
 
-        flavors[usdc] = Flavor( usdcAdapter, cusdcAdapter, 300000000000000000);
+        // flavors[usdc] = Flavor( usdcAdapter, cusdcAdapter, 300000000000000000);
 
-        flavors[cusdc] = Flavor(cusdcAdapter, cusdcAdapter, 300000000000000000);
+        // flavors[cusdc] = Flavor(cusdcAdapter, cusdcAdapter, 300000000000000000);
 
-        flavors[usdt] = Flavor(usdtAdapter, ausdtAdapter, 300000000000000000);
+        // flavors[usdt] = Flavor(usdtAdapter, ausdtAdapter, 300000000000000000);
 
-        flavors[ausdt] = Flavor(ausdtAdapter, ausdtAdapter, 300000000000000000);
+        // flavors[ausdt] = Flavor(ausdtAdapter, ausdtAdapter, 300000000000000000);
 
-        flavors[susd] = Flavor(susdAdapter, asusdAdapter, 100000000000000000);
+        // flavors[susd] = Flavor(susdAdapter, asusdAdapter, 100000000000000000);
         
-        flavors[asusd] = Flavor(asusdAdapter, asusdAdapter, 100000000000000000);
+        // flavors[asusd] = Flavor(asusdAdapter, asusdAdapter, 100000000000000000);
 
-        address[] memory targets = new address[](5);
-        address[] memory spenders = new address[](5);
-        targets[0] = dai;
-        spenders[0] = chai;
-        targets[1] = dai;
-        spenders[1] = cdai;
-        targets[2] = susd;
-        spenders[2] = aaveLpCore;
-        targets[3] = usdc;
-        spenders[3] = cusdc;
-        targets[4] = usdt;
-        spenders[4] = aaveLpCore;
+        // address[] memory targets = new address[](5);
+        // address[] memory spenders = new address[](5);
+        // targets[0] = dai;
+        // spenders[0] = chai;
+        // targets[1] = dai;
+        // spenders[1] = cdai;
+        // targets[2] = susd;
+        // spenders[2] = aaveLpCore;
+        // targets[3] = usdc;
+        // spenders[3] = cusdc;
+        // targets[4] = usdt;
+        // spenders[4] = aaveLpCore;
 
-        executeApprovals(targets, spenders);
+        // executeApprovals(targets, spenders);
         
-        alpha = 800000000000000000; // .8
-        beta = 400000000000000000; // .4
-        feeBase = 850000000000000; // 8.5 bps
-        feeDerivative = 100000000000000000; // .1
+        // alpha = 800000000000000000; // .8
+        // beta = 400000000000000000; // .4
+        // feeBase = 850000000000000; // 8.5 bps
+        // feeDerivative = 100000000000000000; // .1
 
      }
 

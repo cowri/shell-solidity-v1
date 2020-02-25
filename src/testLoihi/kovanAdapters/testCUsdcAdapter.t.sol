@@ -3,7 +3,7 @@
 // import "ds-test/test.sol";
 // import "ds-math/math.sol";
 // import "../loihiSetup.sol";
-// import "../../IAdapter.sol";
+// import "../../interfaces/IIntefaces/IAdapter.sol";
 
 // contract CUsdcAdapterTest is LoihiSetup, DSMath, DSTest {
 

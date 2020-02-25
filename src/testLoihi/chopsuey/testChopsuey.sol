@@ -1,9 +1,9 @@
-pragma solidity ^0.5.16;
+pragma solidity ^0.5.15;
 
 import "ds-test/test.sol";
 import "ds-math/math.sol";
 import "../loihiSetup.sol";
-import "../../IAdapter.sol";
+import "../../interfaces/IAdapter.sol";
 
 
 contract LoihiChopSueyTest is LoihiSetup, DSMath, DSTest {
@@ -16,8 +16,8 @@ contract LoihiChopSueyTest is LoihiSetup, DSMath, DSTest {
         setupAdapters();
         setupLoihi();
         approveFlavors(address(l));
-        // executeLoihiApprovals(address(l));
-        // includeAdapters(address(l), 0);
+        executeLoihiApprovals(address(l));
+        includeAdapters(address(l), 0);
 
         ChaiNM10 = IAdapter(chaiAdapter).viewRawAmount(10*WAD);
 

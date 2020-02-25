@@ -1,9 +1,9 @@
-// pragma solidity ^0.5.16;
+// pragma solidity ^0.5.15;
 
 // import "ds-test/test.sol";
 // import "ds-math/math.sol";
 // import "../loihiSetup.sol";
-// import "../../IAdapter.sol";
+// import "../../interfaces/IAdapter.sol";
 
 // contract UnbalancedSwapByOriginTest is LoihiSetup, DSMath, DSTest {
 //     uint256 CUsdcNM10;

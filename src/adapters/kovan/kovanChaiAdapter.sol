@@ -14,9 +14,9 @@
 pragma solidity ^0.5.12;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "../../ICToken.sol";
-import "../../IChai.sol";
-import "../../IPot.sol";
+import "../../interfaces/ICToken.sol";
+import "../../interfaces/IChai.sol";
+import "../../interfaces/IPot.sol";
 
 contract KovanChaiAdapter {
 

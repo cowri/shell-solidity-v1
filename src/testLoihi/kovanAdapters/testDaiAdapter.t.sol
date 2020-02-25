@@ -4,7 +4,7 @@
 // import "ds-math/math.sol";
 // import "../loihiSetup.sol";
 // import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-// import "../../IAdapter.sol";
+// import "../../interfaces/IIIntefaces/IAdapter.sol";
 
 // contract CUsdcAdapterTest is LoihiSetup, DSMath, DSTest {
 

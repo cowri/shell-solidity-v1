@@ -1,9 +1,9 @@
-pragma solidity ^0.5.16;
+pragma solidity ^0.5.15;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IBadERC20.sol";
 
-import "../ILoihi.sol";
+import "../interfaces/ILoihi.sol";
 
 contract FlavorsSetup {
     address dai;

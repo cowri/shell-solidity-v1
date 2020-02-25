@@ -3,8 +3,8 @@
 // import "ds-test/test.sol";
 // import "ds-math/math.sol";
 // import "../loihiSetup.sol";
-// import "../../IChai.sol";
-// import "../../IAdapter.sol";
+// import "../../interfaces/IIChai.sol";
+// import "../../interfaces/IIAdapter.sol";
 
 // contract ChaiAdapterTest is LoihiSetup, DSMath, DSTest {
 

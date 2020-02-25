@@ -3,7 +3,7 @@
 // import "ds-test/test.sol";
 // import "ds-math/math.sol";
 // import "../loihiSetup.sol";
-// import "../../IAdapter.sol";
+// import "../../interfaces/IAdapter.sol";
 // import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 // contract UnbalancedSelectiveDepositTest is LoihiSetup, DSMath, DSTest {

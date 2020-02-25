@@ -1,10 +1,10 @@
-// pragma solidity ^0.5.16;
+// pragma solidity ^0.5.15;
 
 // import "ds-test/test.sol";
 // import "ds-math/math.sol";
 // import "../loihiSetup.sol";
 // import "../flavorsSetup.sol";
-// import "../../IAdapter.sol";
+// import "../../interfaces/Intefaces/IAdapter.sol";
 // import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 // contract LoihiTest is LoihiSetup, DSMath, DSTest {

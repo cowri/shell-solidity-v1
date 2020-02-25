@@ -1,7 +1,7 @@
-pragma solidity ^0.5.16;
+pragma solidity ^0.5.15;
 
 import "./flavorsSetup.sol";
-import "../ILoihi.sol";
+import "../interfaces/ILoihi.sol";
 
 import "../adapters/kovan/KovanDaiAdapter.sol";
 import "../adapters/kovan/KovanCDaiAdapter.sol";
@@ -109,6 +109,13 @@ contract AdaptersSetup is FlavorsSetup {
         l.includeAdapter(asusd, asusdAdapter, asusdAdapter, 100000000000000000);
         l.includeAdapter(susd, susdAdapter, asusdAdapter, 100000000000000000);
 
+        l.setParams(
+            500000000000000000,
+            250000000000000000,
+            100000000000000000,
+            500000000000000
+        );
+
     }
 
     function includeAdaptersThreeTokens33_33_33 (address _loihi) public {
@@ -126,6 +133,13 @@ contract AdaptersSetup is FlavorsSetup {
         l.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, 333333333333333333);
 
         l.includeAdapter(usdt, usdtAdapter, usdtAdapter, 333333333333333333);
+
+        l.setParams(
+            500000000000000000,
+            250000000000000000,
+            100000000000000000,
+            500000000000000
+        );
 
     }
 }

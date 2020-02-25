@@ -12,7 +12,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-pragma solidity ^0.5.16;
+pragma solidity ^0.5.15;
 
 interface ILoihi {
 
