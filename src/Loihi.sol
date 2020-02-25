@@ -35,12 +35,12 @@ contract Loihi is LoihiRoot {
     address constant asusd = 0x625aE63000f46200499120B906716420bd059240;
 
 
-    address constant daiAdapter = 0xc2Fb1212cD9E0fD03858097A007e24454AC76eaA;
-    address constant cdaiAdapter = 0x4185e3e9eA02446aa96fF56505A1870f6d055dBe;
-    address constant chaiAdapter = 0x54C5573FB64Dd900BfF4Ee264259Fc7B2c3c0746;
+    address constant daiAdapter = 0xe3925DEBc22B49891542a5990e781e30E15a97A3;
+    address constant cdaiAdapter = 0x5152d6817952e66Cb7A0422A2F5b944d45F08e1b;
+    address constant chaiAdapter = 0xc12B8e0aC01040633A935b5b13586A033000983D;
 
-    address constant usdcAdapter = 0x3746a4650d3f1DD8fbE05b8bdAE66ba262150206;
-    address constant cusdcAdapter = 0x2dbD418b78CB66FbdD59675531BAF9D055EeAaE7;
+    address constant usdcAdapter = 0xE14A8eB97731a9107C9e144026765Bd65350EAC7;
+    address constant cusdcAdapter = 0xf643F7A20a18557e2Aa9AF413dFA6D3626E641F8;
 
     address constant usdtAdapter = 0x6d05E9E964eC858Ad239755C18D288315BaDfC10;
     address constant ausdtAdapter = 0xDcE7E3AF11c3867327a7Ab786DEdFb05ef53beA5;
@@ -162,7 +162,7 @@ contract Loihi is LoihiRoot {
     /// @param _dline deadline in block number after which the trade will not execute
     /// @return tAmt_ the amount of target that has been swapped for the origin
     function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) external notFrozen nonReentrant returns (uint256 tAmt_) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSelector(0x5a9b8dc3, _o, _t, _oAmt, _mTAmt, _dline, msg.sender));
+        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeOriginTrade(address,address,uint256,uint256,uint256,address)", _o, _t, _oAmt, _mTAmt, _dline, msg.sender));
         return abi.decode(result, (uint256));
     }
 
@@ -176,7 +176,7 @@ contract Loihi is LoihiRoot {
     /// @param _rcpnt the address of the recipient of the target
     /// @return tAmt_ the amount of target that has been swapped for the origin
     function transferByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSelector(0x5a9b8dc3, _o, _t, _oAmt, _mTAmt, _dline, _rcpnt));
+        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeOriginTrade(address,address,uint256,uint256,uint256,address)", _o, _t, _oAmt, _mTAmt, _dline, _rcpnt));
         return abi.decode(result, (uint256));
     }
 
@@ -193,7 +193,8 @@ contract Loihi is LoihiRoot {
         require(_fo.adapter != address(0), "origin flavor not supported");
         require(_ft.adapter != address(0), "target flavor not supported");
         
-        bytes memory result = staticTo(views, abi.encodeWithSelector(0xb25e6987, address(this), reserves, _fo.adapter, _fo.reserve, _ft.adapter, _ft.reserve, _oAmt));
+        bytes memory result = staticTo(views, abi.encodeWithSignature("getOriginViewVariables(address,address[],address,address,address,address,uint256)", 
+            address(this), reserves, _fo.adapter, _fo.reserve, _ft.adapter, _ft.reserve, _oAmt));
         ( uint256[] memory viewVars ) = abi.decode(result, (uint256[]));
 
         result = staticTo(views, abi.encodeWithSignature("calculateOriginTradeOriginAmount(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)", 
@@ -223,7 +224,7 @@ contract Loihi is LoihiRoot {
         require(_fo.adapter != address(0), "origin flavor not supported"); 
         require(_ft.adapter != address(0), "target flavor not supported");
 
-        bytes memory result = staticTo(views, abi.encodeWithSelector(0xaab4b962,
+        bytes memory result = staticTo(views, abi.encodeWithSignature("getTargetViewVariables(address,address[],address,address,address,address,uint256)",
             address(this), reserves, _fo.adapter, _fo.reserve, _ft.adapter, _ft.reserve, _oAmt));
         uint256[] memory viewVars = abi.decode(result, (uint256[]));
 
@@ -250,7 +251,7 @@ contract Loihi is LoihiRoot {
     /// @param _dline deadline in block number after which the trade will not execute
     /// @return oAmt_ the amount of origin that has been swapped for the target
     function swapByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSelector(0xeb85f014, _o, _t, _mOAmt, _tAmt, _dline, msg.sender));
+        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeTargetTrade(address,address,uint256,uint256,uint256,address)", _o, _t, _mOAmt, _tAmt, _dline, msg.sender));
         return abi.decode(result, (uint256));
     }
 
@@ -264,7 +265,7 @@ contract Loihi is LoihiRoot {
     /// @param _rcpnt the address of the recipient of the target
     /// @return oAmt_ the amount of origin that has been swapped for the target
     function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline, address _rcpnt) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSelector(0xeb85f014, _o, _t, _mOAmt, _tAmt, _dline, _rcpnt));
+        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeTargetTrade(address,address,uint256,uint256,uint256,address)", _o, _t, _mOAmt, _tAmt, _dline, _rcpnt));
         return abi.decode(result, (uint256));
     }
 
@@ -274,7 +275,7 @@ contract Loihi is LoihiRoot {
     /// @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(liquidity, abi.encodeWithSelector(0x51dbb2a7, _flvrs, _amts, _minShells, _dline));
+        bytes memory result = delegateTo(liquidity, abi.encodeWithSignature("selectiveDeposit(address[],uint256[],uint256,uint256)", _flvrs, _amts, _minShells, _dline));
         return abi.decode(result, (uint256));
     }
 
@@ -283,7 +284,7 @@ contract Loihi is LoihiRoot {
     /// @param _totalTokens the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
     /// @return shellsToMint_ the amount of shells you receive in return for your deposit
     function proportionalDeposit (uint256 _totalTokens) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(liquidity, abi.encodeWithSelector(0xdef9dfb6, _totalTokens));
+        bytes memory result = delegateTo(liquidity, abi.encodeWithSignature("proportionalDeposit(uint256)", _totalTokens));
         return abi.decode(result, (uint256));
     }
 
@@ -293,7 +294,7 @@ contract Loihi is LoihiRoot {
     /// @param _amts an array of amounts to withdraw that maps to _flavors
     /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(liquidity, abi.encodeWithSelector(0x546e0c9b, _flvrs, _amts, _maxShells, _dline));
+        bytes memory result = delegateTo(liquidity, abi.encodeWithSignature("selectiveWithdraw(address[],uint256[],uint256,uint256)", _flvrs, _amts, _maxShells, _dline));
         return abi.decode(result, (uint256));
     }
 
@@ -302,22 +303,22 @@ contract Loihi is LoihiRoot {
     /// @param _totalShells the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
     function proportionalWithdraw (uint256 _totalShells) external nonReentrant returns (uint256[] memory) {
-        bytes memory result = delegateTo(liquidity, abi.encodeWithSelector(0xf2a23b6c, _totalShells));
+        bytes memory result = delegateTo(liquidity, abi.encodeWithSignature("proportionalWithdraw(uint256)", _totalShells));
         return abi.decode(result, (uint256[]));
     }
 
     function transfer (address recipient, uint256 amount) public nonReentrant returns (bool) {
-        bytes memory result = delegateTo(erc20, abi.encodeWithSelector(0xa9059cbb, recipient, amount));
+        bytes memory result = delegateTo(erc20, abi.encodeWithSignature("transfer(address,uint256)", recipient, amount));
         return abi.decode(result, (bool));
     }
 
     function transferFrom (address sender, address recipient, uint256 amount) public nonReentrant returns (bool) {
-        bytes memory result = delegateTo(erc20, abi.encodeWithSelector(0x23b872dd, sender, recipient, amount));
+        bytes memory result = delegateTo(erc20, abi.encodeWithSignature("transferFrom(address,address,uint256)", sender, recipient, amount));
         return abi.decode(result, (bool));
     }
 
     function approve (address spender, uint256 amount) public nonReentrant returns (bool) {
-        bytes memory result = delegateTo(erc20, abi.encodeWithSelector(0x095ea7b3, spender, amount));
+        bytes memory result = delegateTo(erc20, abi.encodeWithSignature("approve(address,uint256)", spender, amount));
         return abi.decode(result, (bool));
     }
 
@@ -337,17 +338,8 @@ contract Loihi is LoihiRoot {
         return reserves;
     }
 
-    function getAdapter (address flavor) external view returns (address[] memory) {
-        Flavor memory f = flavors[flavor];
-        address[] memory retval = new address[](3);
-        retval[0] = flavor;
-        retval[1] = f.adapter;
-        retval[2] = f.reserve;
-        return retval;
-    }
-
     function totalReserves () external view returns (uint256, uint256[] memory) {
-        bytes memory result = staticTo(views, abi.encodeWithSelector(0xb8152e53, reserves, address(this)));
+        bytes memory result = staticTo(views, abi.encodeWithSignature("totalReserves(address[],address)", reserves, address(this)));
         return abi.decode(result, (uint256, uint256[]));
     }
 

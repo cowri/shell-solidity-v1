@@ -11,7 +11,7 @@ contract LoihiChopSueyTest is LoihiSetup, DSMath, DSTest {
     uint256 ChaiNM10;
 
     function setUp() public {
-
+// 
         setupFlavors();
         setupAdapters();
         setupLoihi();

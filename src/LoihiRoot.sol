@@ -17,7 +17,6 @@ import "ds-math/math.sol";
 
 contract LoihiRoot is DSMath {
 
-
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
