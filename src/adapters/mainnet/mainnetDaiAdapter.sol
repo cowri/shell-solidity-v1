@@ -26,10 +26,11 @@ contract MainnetDaiAdapter {
 
     // transfers dai in
     // wraps it in chai
-    function intakeRaw (uint256 amount) public {
+    function intakeRaw (uint256 amount) public returns (uint256) {
         
         dai.transferFrom(msg.sender, address(this), amount);
         cdai.mint(amount);
+        return amount;
         
     }
 
@@ -45,10 +46,11 @@ contract MainnetDaiAdapter {
 
     // unwraps chai
     // transfers out dai
-    function outputRaw (address dst, uint256 amount) public {
+    function outputRaw (address dst, uint256 amount) public returns (uint256) {
         
         cdai.redeemUnderlying(amount);
         dai.transfer(dst, amount);
+        return amount;
         
     }
 

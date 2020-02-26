@@ -35,6 +35,13 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         require(_o.adapter != address(0), "origin flavor not supported");
         require(_t.adapter != address(0), "target flavor not supported");
 
+        if (_o.reserve == _t.reserve) {
+            uint256 _oNAmt = dIntakeRaw(_o.adapter, _oAmt);
+            uint256 tAmt_ = dOutputNumeraire(_t.adapter, _recipient, _oNAmt);
+            emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
+            return tAmt_;
+        }
+
         ( uint256 _NAmt,
           uint256 _oBal,
           uint256 _tBal,
@@ -88,7 +95,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     /// @param _oNAmt the origin numeraire amount being swapped
     /// @param _grossLiq the numeraire amount across all stablecoin reserves in the contract
     /// @return oNAmt_ the origin numeraire amount for the swap with fees applied
-    function calculateOriginTradeOriginAmount (uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq) private view returns (uint256) {
+    function calculateOriginTradeOriginAmount (uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq) private returns (uint256) {
 
         require(_oBal <= wmul(_oWeight, wmul(_grossLiq, alpha + WAD)), "origin swap origin halt check");
 
@@ -132,7 +139,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     /// @param _tBal the current balance of the target in the reserve
     /// @param _grossLiq the current total balance across all the reserves in the contract
     /// @return tNAmt_ the target numeraire amount including any applied fees
-    function calculateOriginTradeTargetAmount (uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq) private view returns (uint256 tNAmt_) {
+    function calculateOriginTradeTargetAmount (uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq) private returns (uint256 tNAmt_) {
 
 
         uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - beta));
@@ -187,6 +194,13 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         require(_o.adapter != address(0), "origin flavor not supported");
         require(_t.adapter != address(0), "target flavor not supported");
 
+        if (_o.reserve == _t.reserve) {
+            uint256 _tNAmt = dOutputRaw(_t.adapter, _recipient, _tAmt);
+            uint256 oAmt_ = dIntakeNumeraire(_o.adapter, _tNAmt);
+            emit Trade(msg.sender, _origin, _target, oAmt_, _tAmt);
+            return oAmt_;
+        }
+
         ( uint256 _NAmt,
           uint256 _oBal,
           uint256 _tBal,
@@ -240,7 +254,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     /// @param _tNAmt the numeraire value of the target amount being traded
     /// @param _grossLiq the total numeraire value of all liquidity across all the reserves of the contract
     /// @return tNAmt_ the target numeraire amount after applying fees
-    function calculateTargetTradeTargetAmount(uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq) private view returns (uint256 tNAmt_) {
+    function calculateTargetTradeTargetAmount(uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq) private returns (uint256 tNAmt_) {
 
         require(_tBal >= wmul(_tWeight, wmul(_grossLiq, WAD - alpha)), "target halt check for target trade");
 
@@ -284,7 +298,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     /// @param _oNAmt the numeraire value for the origin amount being traded
     /// @param _grossLiq the total numeraire value of all liquidity across all the reserves of the contract
     /// @return oNAmt_ the origin numeraire amount after applying fees
-    function calculateTargetTradeOriginAmount (uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq) private view returns (uint256 oNAmt_) {
+    function calculateTargetTradeOriginAmount (uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq) private returns (uint256 oNAmt_) {
 
 
         uint256 _feeThreshold = wmul(_oWeight, wmul(_grossLiq, WAD + beta));

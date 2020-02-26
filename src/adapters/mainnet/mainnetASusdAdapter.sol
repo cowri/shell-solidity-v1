@@ -36,9 +36,10 @@ contract MainnetASUsdAdapter {
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
-    function intakeRaw (uint256 amount) public {
+    function intakeRaw (uint256 amount) public returns (uint256) {
 
         getASUsd().transferFrom(msg.sender, address(this), amount);
+        return amount * 1000000000000;
 
     }
 
@@ -49,10 +50,11 @@ contract MainnetASUsdAdapter {
 
     }
 
-    function outputRaw (address dst, uint256 amount) public {
+    function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         IAToken asusd = getASUsd();
         asusd.transfer(dst, amount);
+        return amount * 1000000000000;
 
     }
 

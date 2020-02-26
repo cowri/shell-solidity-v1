@@ -46,6 +46,11 @@ contract AdaptersSetup is FlavorsSetup {
     address susdAdapter;
     address asusdAdapter;
 
+    uint256 feeBase;
+    uint256 feeDerivative;
+    uint256 alpha;
+    uint256 beta;
+
     function setupAdapters() public {
         // setupAdaptersLocal();
         // setupAdaptersKovan();
@@ -109,12 +114,12 @@ contract AdaptersSetup is FlavorsSetup {
         l.includeAdapter(asusd, asusdAdapter, asusdAdapter, 100000000000000000);
         l.includeAdapter(susd, susdAdapter, asusdAdapter, 100000000000000000);
 
-        l.setParams(
-            500000000000000000,
-            250000000000000000,
-            100000000000000000,
-            500000000000000
-        );
+        alpha = 500000000000000000;
+        beta = 250000000000000000;
+        feeDerivative = 100000000000000000;
+        feeBase = 500000000000000;
+
+        l.setParams(alpha, beta, feeDerivative, feeBase);
 
     }
 
@@ -123,7 +128,7 @@ contract AdaptersSetup is FlavorsSetup {
 
         l.includeNumeraireAndReserve(dai, cdaiAdapter);
         l.includeNumeraireAndReserve(usdc, cusdcAdapter);
-        l.includeNumeraireAndReserve(usdt, usdtAdapter);
+        l.includeNumeraireAndReserve(usdt, ausdtAdapter);
 
         l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, 333333333333333333);
         l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, 333333333333333333);
@@ -132,14 +137,15 @@ contract AdaptersSetup is FlavorsSetup {
         l.includeAdapter(chai, chaiAdapter, cdaiAdapter, 333333333333333333);
         l.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, 333333333333333333);
 
-        l.includeAdapter(usdt, usdtAdapter, usdtAdapter, 333333333333333333);
+        l.includeAdapter(usdt, usdtAdapter, ausdtAdapter, 333333333333333333);
+        l.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter, 333333333333333333);
 
-        l.setParams(
-            500000000000000000,
-            250000000000000000,
-            100000000000000000,
-            500000000000000
-        );
+        alpha = 500000000000000000;
+        beta = 250000000000000000;
+        feeDerivative = 100000000000000000;
+        feeBase = 500000000000000;
+
+        l.setParams(alpha, beta, feeDerivative, feeBase);
 
     }
 }

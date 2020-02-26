@@ -65,8 +65,9 @@ contract LoihiDelegators {
     /// @dev this function delegate calls addr, which is an interface to the required functions for retrieving and transfering numeraire and raw values and vice versa
     /// @param addr the address to the interface wrapper to be delegatecall'd
     /// @param amount the numeraire amount to be transfered into the contract. will be adjusted to the raw amount before transfer
-    function dIntakeRaw (address addr, uint256 amount) internal {
+    function dIntakeRaw (address addr, uint256 amount) internal returns (uint256) {
         bytes memory result = delegateTo(addr, abi.encodeWithSignature("intakeRaw(uint256)", amount)); // encoded selector of "intakeRaw(uint256)";
+        return abi.decode(result, (uint256));
     }
 
     /// @author james foley http://github.com/realisation
@@ -83,8 +84,9 @@ contract LoihiDelegators {
     /// @param addr the address of the interface wrapper to be delegatecall'd
     /// @param dst the destination to which to send the raw amount
     /// @param amount the raw amount of the asset to send
-    function dOutputRaw (address addr, address dst, uint256 amount) internal {
+    function dOutputRaw (address addr, address dst, uint256 amount) internal returns (uint256) {
         bytes memory result = delegateTo(addr, abi.encodeWithSignature("outputRaw(address,uint256)", dst, amount)); // encoded selector of "outputRaw(address,uint256)";
+        return abi.decode(result, (uint256));
     }
 
     /// @author james foley http://github.com/realisation

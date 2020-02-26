@@ -24,24 +24,28 @@ contract MainnetCDaiAdapter {
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
-    function intakeRaw (uint256 amount) public {
+    function intakeRaw (uint256 amount) public returns (uint256) {
 
         cdai.transferFrom(msg.sender, address(this), amount);
+        uint256 rate = cdai.exchangeRateStored();
+        return wmul(amount, rate);
 
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
         uint256 rate = cdai.exchangeRateCurrent();
-        uint256 cdaiAmount = wmul(rate, amount);
+        uint256 cdaiAmount = wdiv(amount, rate);
         cdai.transferFrom(msg.sender, address(this), cdaiAmount);
         return cdaiAmount;
 
     }
 
-    function outputRaw (address dst, uint256 amount) public {
+    function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         cdai.transfer(msg.sender, amount);
+        uint256 rate = cdai.exchangeRateStored();
+        return wmul(amount, rate);
 
     }
 
@@ -90,8 +94,10 @@ contract MainnetCDaiAdapter {
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
 
+
         uint256 rate = cdai.exchangeRateCurrent();
-        return wmul(amount, rate);
+        uint256 numeraireAmount = wmul(amount, rate);
+        return numeraireAmount;
 
     }
 

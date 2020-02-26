@@ -13,7 +13,7 @@
 //         setupAdapters();
 //         setupLoihi();
 //         approveFlavors(address(l));
-        // executeLoihiApprovals(address(l));
+//         executeLoihiApprovals(address(l));
 //         includeAdapters(address(l), 1);
 
 //         uint256 mintedShells = l.proportionalDeposit(100 * (10 ** 18));

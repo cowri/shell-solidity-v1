@@ -26,10 +26,11 @@ contract MainnetUsdcAdapter {
 
     // transfers usdc in
     // wraps it in csudc
-    function intakeRaw (uint256 amount) public {
+    function intakeRaw (uint256 amount) public returns (uint256) {
 
         usdc.transferFrom(msg.sender, address(this), amount);
         cusdc.mint(amount);
+        return amount * 1000000000000;
 
     }
 
@@ -48,7 +49,7 @@ contract MainnetUsdcAdapter {
 
         cusdc.redeemUnderlying(amount);
         usdc.transfer(dst, amount);
-        return amount;
+        return amount * 1000000000000;
 
     }
 

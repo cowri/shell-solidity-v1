@@ -31,12 +31,13 @@ contract MainnetChaiAdapter {
 
     // takes raw chai amount
     // transfers it into our balance
-    function intakeRaw (uint256 amount) public {
+    function intakeRaw (uint256 amount) public returns (uint256) {
 
         uint256 daiAmt = dai.balanceOf(address(this));
         chai.exit(msg.sender, amount);
         daiAmt = dai.balanceOf(address(this)) - daiAmt;
         cdai.mint(daiAmt);
+        return daiAmt;
 
     }
 
@@ -44,9 +45,10 @@ contract MainnetChaiAdapter {
     // transfers corresponding chai into our balance;
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
+        uint256 chaiBal = chai.balanceOf(msg.sender);
         chai.draw(msg.sender, amount);
         cdai.mint(amount);
-        return amount;
+        return chaiBal - chai.balanceOf(msg.sender);
 
     }
 
@@ -66,9 +68,8 @@ contract MainnetChaiAdapter {
 
         uint256 daiAmt = rmul(amount, pot.chi());
         cdai.redeemUnderlying(daiAmt);
-        uint256 chaiAmt = chai.balanceOf(dst);
         chai.join(dst, daiAmt);
-        return chai.balanceOf(dst) - chaiAmt;
+        return daiAmt;
 
     }
     

@@ -22,8 +22,12 @@ contract MainnetCUsdcAdapter {
     ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
     
     // takes raw cusdc amount and transfers it in
-    function intakeRaw (uint256 amount) public {
+    function intakeRaw (uint256 amount) public returns (uint256) {
+
+        uint256 rate = cusdc.exchangeRateCurrent();
         cusdc.transferFrom(msg.sender, address(this), amount);
+        return wmul(amount, rate) * 1000000000000;
+
     }
     
     // takes numeraire amount and transfers corresponding cusdc in
@@ -52,7 +56,8 @@ contract MainnetCUsdcAdapter {
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         cusdc.transfer(dst, amount);
-        return amount;
+        uint256 rate = cusdc.exchangeRateStored();
+        return wmul(amount, rate) * 1000000000000;
 
     }
 

@@ -39,7 +39,7 @@ contract MainnetUsdtAdapter {
         safeTransferFrom(usdt, msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         pool.deposit(address(usdt), amount, 0);
-        return amount;
+        return amount * 1000000000000;
 
     }
 
@@ -59,7 +59,7 @@ contract MainnetUsdtAdapter {
 
         getAUsdt().redeem(amount);
         safeTransfer(usdt, dst, amount);
-        return amount;
+        return amount * 1000000000000;
 
     }
 
