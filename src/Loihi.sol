@@ -50,52 +50,57 @@ contract Loihi is LoihiRoot {
 
     address constant aaveLpCore = 0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3;
 
-    constructor () public {
+    // constructor () public {
+    constructor (address x, address v, address l, address e) public {
+        exchange = x;
+        views = v;
+        liquidity = l;
+        erc20 = e;
 
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
 
-        numeraires = [ dai, usdc, usdt, susd ];
+        // numeraires = [ dai, usdc, usdt, susd ];
 
-        reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
+        // reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
         
-        flavors[dai] = Flavor(daiAdapter, cdaiAdapter, 300000000000000000);
+        // flavors[dai] = Flavor(daiAdapter, cdaiAdapter, 300000000000000000);
 
-        flavors[chai] = Flavor(chaiAdapter, cdaiAdapter, 300000000000000000);
+        // flavors[chai] = Flavor(chaiAdapter, cdaiAdapter, 300000000000000000);
 
-        flavors[cdai] = Flavor(cdaiAdapter, cdaiAdapter, 300000000000000000);
+        // flavors[cdai] = Flavor(cdaiAdapter, cdaiAdapter, 300000000000000000);
 
-        flavors[usdc] = Flavor( usdcAdapter, cusdcAdapter, 300000000000000000);
+        // flavors[usdc] = Flavor( usdcAdapter, cusdcAdapter, 300000000000000000);
 
-        flavors[cusdc] = Flavor(cusdcAdapter, cusdcAdapter, 300000000000000000);
+        // flavors[cusdc] = Flavor(cusdcAdapter, cusdcAdapter, 300000000000000000);
 
-        flavors[usdt] = Flavor(usdtAdapter, ausdtAdapter, 300000000000000000);
+        // flavors[usdt] = Flavor(usdtAdapter, ausdtAdapter, 300000000000000000);
 
-        flavors[ausdt] = Flavor(ausdtAdapter, ausdtAdapter, 300000000000000000);
+        // flavors[ausdt] = Flavor(ausdtAdapter, ausdtAdapter, 300000000000000000);
 
-        flavors[susd] = Flavor(susdAdapter, asusdAdapter, 100000000000000000);
+        // flavors[susd] = Flavor(susdAdapter, asusdAdapter, 100000000000000000);
         
-        flavors[asusd] = Flavor(asusdAdapter, asusdAdapter, 100000000000000000);
+        // flavors[asusd] = Flavor(asusdAdapter, asusdAdapter, 100000000000000000);
 
-        address[] memory targets = new address[](5);
-        address[] memory spenders = new address[](5);
-        targets[0] = dai;
-        spenders[0] = chai;
-        targets[1] = dai;
-        spenders[1] = cdai;
-        targets[2] = susd;
-        spenders[2] = aaveLpCore;
-        targets[3] = usdc;
-        spenders[3] = cusdc;
-        targets[4] = usdt;
-        spenders[4] = aaveLpCore;
+        // address[] memory targets = new address[](5);
+        // address[] memory spenders = new address[](5);
+        // targets[0] = dai;
+        // spenders[0] = chai;
+        // targets[1] = dai;
+        // spenders[1] = cdai;
+        // targets[2] = susd;
+        // spenders[2] = aaveLpCore;
+        // targets[3] = usdc;
+        // spenders[3] = cusdc;
+        // targets[4] = usdt;
+        // spenders[4] = aaveLpCore;
 
-        executeApprovals(targets, spenders);
+        // executeApprovals(targets, spenders);
         
-        alpha = 800000000000000000; // .8
-        beta = 400000000000000000; // .4
-        feeBase = 850000000000000; // 8.5 bps
-        feeDerivative = 100000000000000000; // .1
+        // alpha = 800000000000000000; // .8
+        // beta = 400000000000000000; // .4
+        // feeBase = 850000000000000; // 8.5 bps
+        // feeDerivative = 100000000000000000; // .1
 
      }
 
@@ -120,9 +125,10 @@ contract Loihi is LoihiRoot {
         feeBase = _feeBase;
     }
 
-    function includeNumeraireAndReserve (address numeraire, address reserve) public onlyOwner {
+    function includeNumeraireReserveAndWeight (address numeraire, address reserve, uint256 weight) public onlyOwner {
         numeraires.push(numeraire);
         reserves.push(reserve);
+        weights.push(weight);
     }
 
     function includeAdapter (address flavor, address adapter, address reserve, uint256 weight) public onlyOwner {
@@ -152,7 +158,7 @@ contract Loihi is LoihiRoot {
         }
         return returnData;
     }
-
+    event log_uint(bytes32, uint256);
     /// @author james foley http://github.com/realisation
     /// @notice swap a given origin amount for a bounded minimum of the target
     /// @param _o the address of the origin
@@ -163,7 +169,9 @@ contract Loihi is LoihiRoot {
     /// @return tAmt_ the amount of target that has been swapped for the origin
     function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) external notFrozen nonReentrant returns (uint256 tAmt_) {
         bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeOriginTrade(address,address,uint256,uint256,uint256,address)", _o, _t, _oAmt, _mTAmt, _dline, msg.sender));
-        return abi.decode(result, (uint256));
+        uint256 _result = abi.decode(result, (uint256));
+        emit log_uint("what", _result);
+        return _result;
     }
 
     /// @author james foley http://github.com/realisation

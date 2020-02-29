@@ -21,12 +21,20 @@ contract MainnetCDaiAdapter {
 
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
 
+    event log_uint(bytes32, uint256 amount);
+
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
     function intakeRaw (uint256 amount) public returns (uint256) {
 
-        cdai.transferFrom(msg.sender, address(this), amount);
+        bool success = cdai.transferFrom(msg.sender, address(this), amount);
+
+        if (!success) {
+            if (cdai.balanceOf(msg.sender) < amount) revert("CDai/insufficient-balance");
+            else revert("CDai/transferFrom-failed");
+        }
+
         uint256 rate = cdai.exchangeRateStored();
         return wmul(amount, rate);
 
@@ -36,15 +44,29 @@ contract MainnetCDaiAdapter {
 
         uint256 rate = cdai.exchangeRateCurrent();
         uint256 cdaiAmount = wdiv(amount, rate);
-        cdai.transferFrom(msg.sender, address(this), cdaiAmount);
+
+        bool success = cdai.transferFrom(msg.sender, address(this), cdaiAmount);
+
+        if (!success) {
+            if (cdai.balanceOf(msg.sender) < cdaiAmount) revert("CDai/insufficient-balance");
+            else revert("CDai/transferFrom-failed");
+        }
+
         return cdaiAmount;
 
     }
 
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
-        cdai.transfer(msg.sender, amount);
+        bool success = cdai.transfer(msg.sender, amount);
+
+        if (!success) {
+            if (cdai.balanceOf(address(this)) < amount) revert("CDai/insufficient-balance");
+            else revert("CDai/transfer-failed");
+        }
+
         uint256 rate = cdai.exchangeRateStored();
+
         return wmul(amount, rate);
 
     }
@@ -56,7 +78,14 @@ contract MainnetCDaiAdapter {
 
         uint rate = cdai.exchangeRateCurrent();
         uint cdaiAmount = wdiv(amount, rate);
-        cdai.transfer(dst, cdaiAmount);
+
+        bool success = cdai.transfer(dst, cdaiAmount);
+
+        if (!success) {
+            if (cdai.balanceOf(address(this)) < cdaiAmount) revert("CDai/insufficient-balance");
+            else revert("CDai/transfer-failed");
+        }
+
         return cdaiAmount;
 
     }

@@ -33,12 +33,16 @@ contract MainnetSUsdAdapter {
 
     }
 
+    event log_uint(bytes32, uint256);
+
     // transfers susd in
     function intakeRaw (uint256 amount) public returns (uint256) {
 
         susd.transferFrom(msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         pool.deposit(address(susd), amount, 0);
+        uint256 bal = getASUsd().balanceOf(address(this));
+        emit log_uint("BAL AFTER", bal);
         return amount;
 
     }
@@ -49,6 +53,8 @@ contract MainnetSUsdAdapter {
         safeTransferFrom(susd, msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         pool.deposit(address(susd), amount, 0);
+        uint256 bal = getASUsd().balanceOf(address(this));
+        emit log_uint("BAL AFTER", bal);
         return amount;
 
     }
@@ -66,7 +72,9 @@ contract MainnetSUsdAdapter {
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
         getASUsd().redeem(amount);
+        uint256 susdbalbefore = susd.balanceOf(address(this));
         safeTransfer(susd, dst, amount);
+        uint256 susdbalafter = susd.balanceOf(address(this));
         return amount;
 
     }

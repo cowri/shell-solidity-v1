@@ -39,9 +39,12 @@ contract MainnetUsdtAdapter {
         safeTransferFrom(usdt, msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         pool.deposit(address(usdt), amount, 0);
+        uint256 bal = getAUsdt().balanceOf(address(this));
         return amount * 1000000000000;
 
     }
+
+    event log_uint(bytes32, uint256);
 
     // transfers usdt in
     function intakeNumeraire (uint256 amount) public returns (uint256) {
@@ -68,10 +71,15 @@ contract MainnetUsdtAdapter {
 
         amount /= 1000000000000;
         getAUsdt().redeem(amount);
+        uint256 usdtbalbefore = usdt.balanceOf(address(this));
         safeTransfer(usdt, dst, amount);
+        uint256 usdtbalafter = usdt.balanceOf(address(this));
+        emit log_uint("usdt bal before", usdtbalbefore);
+        emit log_uint("usdt bal after", usdtbalafter);
         return amount;
 
     }
+
 
     function viewRawAmount (uint256 amount) public pure returns (uint256) {
 

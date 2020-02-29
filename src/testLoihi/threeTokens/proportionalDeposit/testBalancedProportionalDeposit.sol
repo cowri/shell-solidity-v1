@@ -3,9 +3,9 @@
 
 // import "ds-test/test.sol";
 // import "ds-math/math.sol";
-// import "../loihiSetup.sol";
-// import "../flavorsSetup.sol";
-// import "../../interfaces/IAdapter.sol";
+// import "../../loihiSetup.sol";
+// import "../../flavorsSetup.sol";
+// import "../../../interfaces/IAdapter.sol";
 
 // contract LoihiTest is LoihiSetup, DSMath, DSTest {
 

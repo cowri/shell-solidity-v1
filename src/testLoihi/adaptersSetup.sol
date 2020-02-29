@@ -96,10 +96,10 @@ contract AdaptersSetup is FlavorsSetup {
     function includeAdaptersFourTokens30_30_30_10 (address _loihi) public {
         ILoihi l = ILoihi(_loihi);
 
-        l.includeNumeraireAndReserve(dai, cdaiAdapter);
-        l.includeNumeraireAndReserve(usdc, cusdcAdapter);
-        l.includeNumeraireAndReserve(usdt, ausdtAdapter);
-        l.includeNumeraireAndReserve(susd, asusdAdapter);
+        l.includeNumeraireReserveAndWeight(dai, cdaiAdapter, 300000000000000000);
+        l.includeNumeraireReserveAndWeight(usdc, cusdcAdapter, 300000000000000000);
+        l.includeNumeraireReserveAndWeight(usdt, ausdtAdapter, 300000000000000000);
+        l.includeNumeraireReserveAndWeight(susd, asusdAdapter, 100000000000000000);
 
         l.includeAdapter(dai, daiAdapter, cdaiAdapter, 300000000000000000);
         l.includeAdapter(chai, chaiAdapter, cdaiAdapter, 300000000000000000);
@@ -126,9 +126,9 @@ contract AdaptersSetup is FlavorsSetup {
     function includeAdaptersThreeTokens33_33_33 (address _loihi) public {
         ILoihi l = ILoihi(_loihi);
 
-        l.includeNumeraireAndReserve(dai, cdaiAdapter);
-        l.includeNumeraireAndReserve(usdc, cusdcAdapter);
-        l.includeNumeraireAndReserve(usdt, ausdtAdapter);
+        l.includeNumeraireReserveAndWeight(dai, cdaiAdapter, 333333333333333333);
+        l.includeNumeraireReserveAndWeight(usdc, cusdcAdapter, 333333333333333333);
+        l.includeNumeraireReserveAndWeight(usdt, ausdtAdapter, 333333333333333333);
 
         l.includeAdapter(usdc, usdcAdapter, cusdcAdapter, 333333333333333333);
         l.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, 333333333333333333);

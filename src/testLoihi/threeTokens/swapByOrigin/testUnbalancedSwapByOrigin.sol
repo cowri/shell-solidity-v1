@@ -2,8 +2,8 @@
 
 // import "ds-test/test.sol";
 // import "ds-math/math.sol";
-// import "../loihiSetup.sol";
-// import "../../interfaces/IAdapter.sol";
+// import "../../loihiSetup.sol";
+// import "../../../interfaces/IAdapter.sol";
 
 // contract UnbalancedSwapByOriginTest is LoihiSetup, DSMath, DSTest {
 //     uint256 CUsdcNM10;

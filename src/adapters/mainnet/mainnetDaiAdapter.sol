@@ -44,14 +44,21 @@ contract MainnetDaiAdapter {
         
     }
 
+    event log_uint(bytes32, uint256);
+
     // unwraps chai
     // transfers out dai
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
-        
+
+        uint256 daiBalBefore = dai.balanceOf(address(this));
         cdai.redeemUnderlying(amount);
+        uint256 daiBalAfter = dai.balanceOf(address(this));
         dai.transfer(dst, amount);
+        emit log_uint("AMOUNT", amount);
+        emit log_uint("daibalbefore", daiBalBefore);
+        emit log_uint("daibalafter", daiBalAfter);
         return amount;
-        
+
     }
 
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {

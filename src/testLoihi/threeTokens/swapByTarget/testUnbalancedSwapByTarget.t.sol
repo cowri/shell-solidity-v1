@@ -2,7 +2,7 @@
 
 // import "ds-test/test.sol";
 // import "ds-math/math.sol";
-// import "../loihiSetup.sol";
+// import "../../loihiSetup.sol";
 
 // contract UnbalancedSwapByTargetTest is LoihiSetup, DSMath, DSTest {
 

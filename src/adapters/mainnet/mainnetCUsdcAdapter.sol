@@ -20,12 +20,20 @@ contract MainnetCUsdcAdapter {
     constructor () public { }
 
     ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
+    event log_uint(bytes32, uint256);
+    event log_bool(bytes32, bool);
     
     // takes raw cusdc amount and transfers it in
     function intakeRaw (uint256 amount) public returns (uint256) {
 
+        bool success = cusdc.transferFrom(msg.sender, address(this), amount);
+
+        if (!success) {
+            if (cusdc.balanceOf(msg.sender) < amount) revert("CUsdc/insufficient-balance");
+            else revert("CUsdc/transferFrom-failed");
+        }
+
         uint256 rate = cusdc.exchangeRateCurrent();
-        cusdc.transferFrom(msg.sender, address(this), amount);
         return wmul(amount, rate) * 1000000000000;
 
     }
@@ -34,8 +42,15 @@ contract MainnetCUsdcAdapter {
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
         uint256 rate = cusdc.exchangeRateCurrent();
-        amount = wdiv(amount / 1000000000000, rate);
-        cusdc.transferFrom(msg.sender, address(this), amount);
+        uint256 cusdcAmount = wdiv(amount / 1000000000000, rate);
+
+        bool success = cusdc.transferFrom(msg.sender, address(this), cusdcAmount);
+
+        if (!success) {
+            if (cusdc.balanceOf(msg.sender) < cusdcAmount) revert("CUsdc/insufficient-balance");
+            else revert("CUsdc/transferFrom-failed");
+        }
+
         return amount;
 
     }
@@ -46,7 +61,14 @@ contract MainnetCUsdcAdapter {
 
         uint256 rate = cusdc.exchangeRateCurrent();
         amount = wdiv(amount / 1000000000000, rate);
-        cusdc.transfer(dst, amount);
+
+        bool success = cusdc.transfer(dst, amount);
+
+        if (!success) {
+            if (cusdc.balanceOf(msg.sender) < amount) revert("CUsdc/insufficient-balance");
+            else revert("CUsdc/transfer-failed");
+        }
+
         return amount;
 
     }
@@ -55,8 +77,15 @@ contract MainnetCUsdcAdapter {
     // transfers that amount to destination
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
-        cusdc.transfer(dst, amount);
+        bool success = cusdc.transfer(dst, amount);
+
+        if (!success) {
+            if (cusdc.balanceOf(msg.sender) < amount) revert("CUsdc/insufficient-balance");
+            else revert("CUsdc/transfer-failed");
+        }
+
         uint256 rate = cusdc.exchangeRateStored();
+
         return wmul(amount, rate) * 1000000000000;
 
     }

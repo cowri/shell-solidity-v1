@@ -30,17 +30,20 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         uint256[] memory tokenAmounts_ = new uint256[](reserves.length);
         uint256[] memory weights_ = new uint[](reserves.length);
 
+        emit log_uints("amts", _amts);
+        emit log_addrs("flvrs", _flvrs);
+
         for (uint i = 0; i < _flvrs.length; i++) {
 
             Flavor memory _f = flavors[_flvrs[i]]; // withdrawing adapter + weight
             require(_f.adapter != address(0), "flavor not supported");
 
             for (uint j = 0; j < reserves.length; j++) {
-                if (balances_[j] == 0) balances_[j] = dGetNumeraireBalance(reserves[j]);
-                if (reserves[j] == _f.reserve && _amts[i] > 0) {
-                    tokenAmounts_[j] += dGetNumeraireAmount(_f.adapter, _amts[i]);
-                    weights_[j] = _f.weight;
+                if (balances_[j] == 0) {
+                    balances_[j] = dGetNumeraireBalance(reserves[j]);
+                    weights_[j] = weights[j];
                 }
+                if (reserves[j] == _f.reserve && _amts[i] > 0) tokenAmounts_[j] += dGetNumeraireAmount(_f.adapter, _amts[i]);
             }
 
         }
@@ -48,6 +51,8 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         return (balances_, tokenAmounts_, weights_);
 
     }
+
+    event log_addrs(bytes32, address[]);
 
     /// @author james foley http://github.com/realisation
     /// @notice this function allows selective depositing of any supported stablecoin flavor into the contract in return for corresponding shell tokens
@@ -100,7 +105,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             uint256 _oldBalance = _balances[i];
             uint256 _newBalance = add(_oldBalance, _depositAmount);
 
-            require(_newBalance <= wmul(_weight, wmul(_newSum, alpha + WAD)), "halt check deposit");
+            require(_newBalance <= wmul(_weight, wmul(_newSum, alpha + WAD)), "deposit upper halt check");
 
             uint256 _feeThreshold = wmul(_weight, wmul(_newSum, beta + WAD));
             if (_newBalance <= _feeThreshold) {
@@ -131,7 +136,44 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             }
         }
 
+        for (uint i = 0; i < _balances.length; i++) {
+            uint256 _newBal = add(_balances[i], _deposits[i]);
+            uint256 _weight = _weights[i];
+
+            require(_newBal >= wmul(_weight, wmul(_newSum, WAD - alpha)), "deposit-lower-halt-check");
+
+            uint256 _newThreshold = wmul(_weight, wmul(_newSum, WAD - beta));
+            uint256 _oldThreshold = wmul(_weight, wmul(_oldSum, WAD - beta));
+            
+            if (_newBal < _oldThreshold) {
+
+                uint256 _feePrep = wmul(feeDerivative, wdiv(
+                    sub(_newThreshold, _oldThreshold),
+                    wmul(_weight, _newSum)
+                ));
+
+                shellsToMint_ = sub(
+                    shellsToMint_,
+                    wmul(_feePrep, sub(_newThreshold, _oldThreshold))
+                );
+
+            } else if (_newBal < _newThreshold) {
+
+                uint256 _feePrep = wmul(feeDerivative, wdiv(
+                    sub(_newThreshold, _newBal),
+                    wmul(_weight, _newSum)
+                ));
+
+                shellsToMint_ = sub(
+                    shellsToMint_,
+                    wmul(_feePrep, sub(_newThreshold, _newBal))
+                );
+
+            } else continue;
+        }
+
         if (totalSupply == 0) return shellsToMint_;
+
         else return wmul(totalSupply, wdiv(shellsToMint_, _oldSum));
 
     }
@@ -163,6 +205,9 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
+    event log_uints(bytes32, uint256[]);
+    event log_addr(bytes32, address);
+
     /// @author james foley http://github.com/realisation
     /// @notice this function calculates the amount of shells to mint by taking the balances, numeraire deposits and weights of the reserve tokens being deposited into
     /// @dev each array is the same length. each index in each array refers to the same reserve - index 0 is for the reserve token at index 0 in the reserves array, index 1 is for the reserve token at index 1 in the reserve array and so forth.
@@ -179,7 +224,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             _newSum = add(_newSum, sub(_balances[i], _withdrawals[i]));
         }
 
-        uint256 _numeraireShellsToBurn;
+        uint256 shellsToBurn_;
 
         for (uint i = 0; i < reserves.length; i++) {
             if (_withdrawals[i] == 0) continue;
@@ -194,7 +239,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
             if (_newBal >= _feeThreshold) {
 
-                _numeraireShellsToBurn += wmul(_withdrawal, WAD + feeBase);
+                shellsToBurn_ += wmul(_withdrawal, WAD + feeBase);
 
             } else if (_oldBal <= _feeThreshold) {
 
@@ -202,7 +247,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
                 _feePrep = wmul(_feePrep, feeDerivative);
 
-                _numeraireShellsToBurn += wmul(wmul(_withdrawal, WAD + _feePrep), WAD + feeBase);
+                shellsToBurn_ += wmul(wmul(_withdrawal, WAD + _feePrep), WAD + feeBase);
 
             } else {
 
@@ -210,7 +255,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
                 _feePrep = wmul(feeDerivative, _feePrep);
 
-                _numeraireShellsToBurn += wmul(add(
+                shellsToBurn_ += wmul(add(
                     sub(_oldBal, _feeThreshold),
                     wmul(sub(_feeThreshold, _newBal), WAD + _feePrep)
                 ), WAD + feeBase);
@@ -218,9 +263,49 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             }
         }
 
-        return wmul(totalSupply, wdiv(_numeraireShellsToBurn, _oldSum));
+        for (uint i = 0; i < _balances.length; i++) {
+            uint256 _newBal = sub(_balances[i], _withdrawals[i]);
+            uint256 _weight = _weights[i];
+
+            require(_newBal <= wmul(_weight, wmul(_newSum, WAD + alpha)), "withdraw-upper-halt-check");
+
+            uint256 _newThreshold = wmul(_weight, wmul(_newSum, WAD + beta));
+            uint256 _oldThreshold = wmul(_weight, wmul(_oldSum, WAD + beta));
+            
+            if (_newBal >= _oldThreshold) {
+
+                uint256 _feePrep = wmul(feeDerivative, wdiv(
+                    sub(_oldThreshold, _newThreshold),
+                    wmul(_weight, _newSum)
+                ));
+
+                shellsToBurn_ = add(
+                    shellsToBurn_,
+                    wmul(_feePrep, sub(_oldThreshold, _newThreshold))
+                );
+
+            } else if (_newBal >= _newThreshold) {
+
+                uint256 _feePrep = wmul(feeDerivative, wdiv(
+                    sub(_newBal, _newThreshold),
+                    wmul(_weight, _newSum)
+                ));
+
+                shellsToBurn_ = add(
+                    shellsToBurn_,
+                    wmul(_feePrep, sub(_newBal, _newThreshold))
+                );
+
+            } else continue;
+        }
+
+        emit log_uint("AFTER NEW", shellsToBurn_);
+
+        return wmul(totalSupply, wdiv(shellsToBurn_, _oldSum));
 
     }
+
+    event log_uint(bytes32, uint256);
 
     /// @author james foley http://github.com/realisation
     /// @notice this function takes a total amount to deposit into the pool with no slippage from the numeraire assets the pool supports
@@ -284,10 +369,12 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
         uint256[] memory withdrawalAmts_ = new uint256[](reserves.length);
         for (uint i = 0; i < reserves.length; i++) {
-            uint256 amount = dGetNumeraireBalance(reserves[i]);
-            uint256 proportionateValue = wmul(wmul(amount, _withdrawMultiplier), WAD - feeBase);
+            uint256 _proportionateValue = wmul(
+                wmul(dGetNumeraireBalance(reserves[i]), _withdrawMultiplier),
+                WAD - feeBase
+            );
             Flavor memory _f = flavors[numeraires[i]];
-            withdrawalAmts_[i] = dOutputNumeraire(_f.adapter, msg.sender, proportionateValue);
+            withdrawalAmts_[i] = dOutputNumeraire(_f.adapter, msg.sender, _proportionateValue);
         }
 
         emit ShellsBurned(msg.sender, _withdrawal, numeraires, withdrawalAmts_);

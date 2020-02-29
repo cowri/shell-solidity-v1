@@ -18,6 +18,8 @@ import "./LoihiDelegators.sol";
 
 contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
+    event log_addr(bytes32, address);
+
     /// @author james foley http://github.com/realisation
     /// @notice given an origin amount this function will find the corresponding target amount according to the contracts state and make the swap between the two
     /// @param _origin the address of the origin flavor
