@@ -14,14 +14,15 @@
 pragma solidity ^0.5.12;
 
 import "../../interfaces/ICToken.sol";
+import "../../LoihiRoot.sol";
 
-contract MainnetCDaiAdapter {
+contract LocalCDaiAdapter is LoihiRoot {
 
-    constructor () public { }
+    ICToken _cdai;
 
-    ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
-
-    event log_uint(bytes32, uint256 amount);
+    constructor (address __cdai) public {
+        _cdai = ICToken(__cdai);
+    }
 
     // takes raw cdai amount
     // unwraps it into dai
@@ -90,24 +91,24 @@ contract MainnetCDaiAdapter {
 
     }
 
-    function viewRawAmount (uint256 amount) public view returns (uint256) {
+    function viewRawAmount (uint256 amount) public returns (uint256) {
 
-        uint256 rate = cdai.exchangeRateStored();
+        uint256 rate = _cdai.exchangeRateStored();
         return wdiv(amount, rate);
 
     }
 
-    function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+    function viewNumeraireAmount (uint256 amount) public returns (uint256) {
 
-        uint256 rate = cdai.exchangeRateStored();
+        uint256 rate = _cdai.exchangeRateStored();
         return wmul(amount, rate);
 
     }
 
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance (address addr) public returns (uint256) {
 
-        uint256 rate = cdai.exchangeRateStored();
-        uint256 balance = cdai.balanceOf(addr);
+        uint256 rate = _cdai.exchangeRateStored();
+        uint256 balance = _cdai.balanceOf(addr);
         return wmul(balance, rate);
 
     }
@@ -123,6 +124,7 @@ contract MainnetCDaiAdapter {
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
 
+
         uint256 rate = cdai.exchangeRateCurrent();
         uint256 numeraireAmount = wmul(amount, rate);
         return numeraireAmount;
@@ -131,9 +133,16 @@ contract MainnetCDaiAdapter {
 
     function getNumeraireBalance () public returns (uint256) {
 
+        emit log_uint("hello", 0);
+        emit log_addr("me", address(this));
+        emit log_addr("cdai addr", address(cdai));
+
         return cdai.balanceOfUnderlying(address(this));
 
     }
+
+    event log_uint(bytes32, uint256);
+    event log_addr(bytes32, address);
 
     uint constant WAD = 10 ** 18;
     

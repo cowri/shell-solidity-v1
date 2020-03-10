@@ -17,20 +17,14 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../aaveResources/ILendingPool.sol";
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../../interfaces/IAToken.sol";
+import "../../LoihiRoot.sol";
 
-contract MainnetSUsdAdapter {
+contract LocalSUsdAdapter is LoihiRoot {
 
-    constructor () public { }
+    IAToken _asusd;
 
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
-    IERC20 constant susd = IERC20(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
-
-    function getASUsd () public view returns (IAToken) {
-
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(address(susd));
-        return IAToken(aTokenAddress);
-
+    constructor (address __asusd) public {
+        _asusd = IAToken(__asusd);
     }
 
     event log_uint(bytes32, uint256);
@@ -39,10 +33,7 @@ contract MainnetSUsdAdapter {
     function intakeRaw (uint256 amount) public returns (uint256) {
 
         susd.transferFrom(msg.sender, address(this), amount);
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        pool.deposit(address(susd), amount, 0);
-        uint256 bal = getASUsd().balanceOf(address(this));
-        emit log_uint("BAL AFTER", bal);
+        asusd.deposit(amount);
         return amount;
 
     }
@@ -51,10 +42,7 @@ contract MainnetSUsdAdapter {
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
         safeTransferFrom(susd, msg.sender, address(this), amount);
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        pool.deposit(address(susd), amount, 0);
-        uint256 bal = getASUsd().balanceOf(address(this));
-        emit log_uint("BAL AFTER", bal);
+        asusd.deposit(amount);
         return amount;
 
     }
@@ -62,7 +50,7 @@ contract MainnetSUsdAdapter {
     // transfers susd out of our balance
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
-        getASUsd().redeem(amount);
+        asusd.redeem(amount);
         safeTransfer(susd, dst, amount);
         return amount;
 
@@ -71,7 +59,7 @@ contract MainnetSUsdAdapter {
     // transfers susd to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
-        getASUsd().redeem(amount);
+        asusd.redeem(amount);
         safeTransfer(susd, dst, amount);
         return amount;
 
@@ -91,7 +79,7 @@ contract MainnetSUsdAdapter {
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
 
-        return getASUsd().balanceOf(addr);
+        return _asusd.balanceOf(addr);
 
     }
 
@@ -111,7 +99,7 @@ contract MainnetSUsdAdapter {
     // returns balance
     function getNumeraireBalance () public returns (uint256) {
 
-        return getASUsd().balanceOf(address(this));
+        return asusd.balanceOf(address(this));
 
     }
     

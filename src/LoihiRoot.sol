@@ -15,6 +15,12 @@ pragma solidity ^0.5.15;
 
 import "ds-math/math.sol";
 
+import "./interfaces/IAToken.sol";
+import "./interfaces/ICToken.sol";
+import "./interfaces/IChai.sol";
+import "./interfaces/IPot.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+
 contract LoihiRoot is DSMath {
 
     string  public constant name = "Shells";
@@ -40,6 +46,7 @@ contract LoihiRoot is DSMath {
     uint256 beta;
     uint256 feeBase;
     uint256 feeDerivative;
+    uint256 arbPiece;
 
     bytes4 constant internal ERC20ID = 0x36372b07;
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
@@ -48,6 +55,40 @@ contract LoihiRoot is DSMath {
     address views;
     address liquidity;
     address erc20;
+
+    IERC20 dai;
+    ICToken cdai;
+    IChai chai;
+    IPot pot;
+
+    IERC20 usdc;
+    ICToken cusdc;
+
+    IERC20 usdt;
+    IAToken ausdt;
+
+    IERC20 susd;
+    IAToken asusd;
+
+    event log_addr(bytes32, address);
+
+    function includeTestAdapterState(address _dai, address _cdai, address _chai, address _pot, address _usdc, address _cusdc, address _usdt, address _ausdt, address _susd, address _asusd) public {
+
+        dai = IERC20(_dai);
+        cdai = ICToken(_cdai);
+        chai = IChai(_chai);
+        pot = IPot(_pot);
+
+        usdc = IERC20(_usdc);
+        cusdc = ICToken(_cusdc);
+
+        usdt = IERC20(_usdt);
+        ausdt = IAToken(_ausdt);
+
+        susd = IERC20(_susd);
+        asusd = IAToken(_asusd);
+
+    }
 
     // address internal constant exchange = 0xb40B60cD9687DAe6FE7043e8C62bb8Ec692632A3;
     // address internal constant views = 0x04a6cf4E770a9aF7E6b6733462d72E238B8Ab140;

@@ -66,7 +66,11 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
           uint256[] memory _deposits,
           uint256[] memory _weights ) = getBalancesTokenAmountsAndWeights(_flvrs, _amts);
 
-        shellsToMint_ = calculateShellsToMint(_balances, _deposits, _weights);
+          emit log_uints("balances", _balances);
+          emit log_uints("deposits", _deposits);
+          emit log_uints("weights", _weights);
+
+        shellsToMint_ = calculateShellsToMint(_balances, _deposits);
 
         require(shellsToMint_ >= _minShells, "minted shells less than minimum shells");
 
@@ -85,9 +89,11 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
     /// @dev each array is the same length. each index in each array refers to the same reserve - index 0 is for the reserve token at index 0 in the reserves array, index 1 is for the reserve token at index 1 in the reserve array and so forth.
     /// @param _balances an array of current numeraire balances for each reserve
     /// @param _deposits an array of numeraire amounts to deposit into each reserve
-    /// @param _weights an array of the balance weights for each of the reserves
+    // / @param _weights an array of the balance weights for each of the reserves
     /// @return shellsToMint_ the amount of shell tokens to mint according to the dynamic fee relative to the balance of each reserve deposited into
-    function calculateShellsToMint (uint256[] memory _balances, uint256[] memory _deposits, uint256[] memory _weights) private returns (uint256) {
+    function calculateShellsToMint (uint256[] memory _balances, uint256[] memory _deposits) private returns (uint256) {
+
+        uint256 shellsToMint_;
 
         uint256 _newSum;
         uint256 _oldSum;
@@ -96,85 +102,71 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             _newSum = add(_newSum, add(_balances[i], _deposits[i]));
         }
 
-        uint256 shellsToMint_;
-
         for (uint i = 0; i < _balances.length; i++) {
-            if (_deposits[i] == 0) continue;
-            uint256 _depositAmount = _deposits[i];
-            uint256 _weight = _weights[i];
-            uint256 _oldBalance = _balances[i];
-            uint256 _newBalance = add(_oldBalance, _depositAmount);
+            uint256 _oBal = _balances[i];
+            uint256 _nBal = add(_oBal, _deposits[i]);
 
-            require(_newBalance <= wmul(_weight, wmul(_newSum, alpha + WAD)), "deposit upper halt check");
+            require(_nBal <= wmul(weights[i], wmul(_newSum, WAD + alpha)), "deposit upper halt check");
+            require(_nBal >= wmul(weights[i], wmul(_newSum, WAD - alpha)), "deposit lower halt check");
 
-            uint256 _feeThreshold = wmul(_weight, wmul(_newSum, beta + WAD));
-            if (_newBalance <= _feeThreshold) {
+            uint256 threshold;
+            uint256 _oFee;
+            uint256 _nFee;
 
-                shellsToMint_ += _depositAmount;
+            emit log_uint("~~~~~~~ i ~~~~~~~", i);
 
-            } else if (_oldBalance >= _feeThreshold) {
+            if (_oBal < (threshold = wmul(weights[i], wmul(_oldSum, WAD-beta)))) {
+                _oFee = wdiv(feeDerivative, wmul(_oldSum, weights[i]));
+                _oFee = wmul(_oFee, sub(threshold, _oBal));
+                _oFee = wmul(_oFee, sub(threshold, _oBal));
+                emit log_uint("dep old lower threshold fee", _oFee);
+            } else if (_oBal > (threshold = wmul(weights[i], wmul(_oldSum, WAD+beta)))) {
+                _oFee = wdiv(feeDerivative, wmul(_oldSum, weights[i]));
+                _oFee = wmul(_oFee, sub(_oBal, threshold));
+                _oFee = wmul(_oFee, sub(_oBal, threshold));
+                emit log_uint("dep old upper threshold fee", _oFee);
+            } else _oFee = 0;
 
-                uint256 _feePrep = wmul(feeDerivative, wdiv(
-                    sub(_newBalance, _feeThreshold),
-                    wmul(_weight, _newSum)
-                ));
+            if (_nBal < (threshold = wmul(weights[i], wmul(_newSum, WAD-beta)))) {
+                _nFee = wdiv(feeDerivative, wmul(_newSum, weights[i]));
+                _nFee = wmul(_nFee, sub(threshold, _nBal));
+                _nFee = wmul(_nFee, sub(threshold, _nBal));
+                emit log_uint("dep lower threshold fee", _nFee);
+            } else if (_nBal > (threshold = wmul(weights[i], wmul(_newSum, WAD+beta)))) {
+                _nFee = wdiv(feeDerivative, wmul(_newSum, weights[i]));
+                _nFee = wmul(_nFee, sub(_nBal, threshold));
+                _nFee = wmul(_nFee, sub(_nBal, threshold));
+                emit log_uint("dep upper threshold fee", _nFee);
+            } else _nFee = 0;
 
-                shellsToMint_ = add(shellsToMint_, wmul(_depositAmount, WAD - _feePrep));
-
-            } else {
-
-                uint256 _feePrep = wmul(feeDerivative, wdiv(
-                    sub(_newBalance, _feeThreshold),
-                    wmul(_weight, _newSum)
-                ));
-
-                shellsToMint_ += add(
-                    sub(_feeThreshold, _oldBalance),
-                    wmul(sub(_newBalance, _feeThreshold), WAD - _feePrep)
-                );
-
+            if (_oFee > _nFee) {
+                shellsToMint_ += add(_deposits[i], wmul(arbPiece, sub(_oFee, _nFee)));
+                emit log_uint("_oFee > _nFee", shellsToMint_);
+            } else if (_oFee + _deposits[i] > _nFee) {
+                shellsToMint_ += sub(add(_oFee, _deposits[i]), _nFee);
+                emit log_uint("_oFee + deposits > _nFee", shellsToMint_);
             }
+            else {
+                emit log_uint("_nFee", _nFee);
+                emit log_uint("_oFee", _oFee);
+                emit log_uint("deposits[i]", _deposits[i]);
+                uint256 assessed = sub(_nFee, add(_oFee, _deposits[i]));
+                shellsToMint_ = sub(shellsToMint_, assessed);
+                emit log_uint("else", shellsToMint_);
+            }
+
+            emit log_uint("_______ i _______", i);
+
+            // if (_oFee == _nFee) shellsToMint_ += _deposits[i];
+            // else if (_oFee > _nFee) shellsToMint_ += add(_deposits[i], wmul(arbPiece, sub(_oFee, _nFee)));
+            // else if (_nFee < _oFee + _deposits[i]) shellsToMint_ += sub(add(_deposits[i], _oFee), _nFee);
+            // else if (_nFee > _oFee + _deposits[i]) shellsToMint_ -= sub(_nFee, add(_deposits[i], _oFee));
+
         }
 
-        for (uint i = 0; i < _balances.length; i++) {
-            uint256 _newBal = add(_balances[i], _deposits[i]);
-            uint256 _weight = _weights[i];
-
-            require(_newBal >= wmul(_weight, wmul(_newSum, WAD - alpha)), "deposit-lower-halt-check");
-
-            uint256 _newThreshold = wmul(_weight, wmul(_newSum, WAD - beta));
-            uint256 _oldThreshold = wmul(_weight, wmul(_oldSum, WAD - beta));
-            
-            if (_newBal < _oldThreshold) {
-
-                uint256 _feePrep = wmul(feeDerivative, wdiv(
-                    sub(_newThreshold, _oldThreshold),
-                    wmul(_weight, _newSum)
-                ));
-
-                shellsToMint_ = sub(
-                    shellsToMint_,
-                    wmul(_feePrep, sub(_newThreshold, _oldThreshold))
-                );
-
-            } else if (_newBal < _newThreshold) {
-
-                uint256 _feePrep = wmul(feeDerivative, wdiv(
-                    sub(_newThreshold, _newBal),
-                    wmul(_weight, _newSum)
-                ));
-
-                shellsToMint_ = sub(
-                    shellsToMint_,
-                    wmul(_feePrep, sub(_newThreshold, _newBal))
-                );
-
-            } else continue;
-        }
-
-        if (totalSupply == 0) return shellsToMint_;
-
-        else return wmul(totalSupply, wdiv(shellsToMint_, _oldSum));
+        emit log_uint("Shells to mint", shellsToMint_);
+        
+        return shellsToMint_;
 
     }
 
@@ -226,83 +218,72 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
         uint256 shellsToBurn_;
 
-        for (uint i = 0; i < reserves.length; i++) {
-            if (_withdrawals[i] == 0) continue;
-            uint256 _withdrawal = _withdrawals[i];
-            uint256 _weight = _weights[i];
-            uint256 _oldBal = _balances[i];
-            uint256 _newBal = sub(_oldBal, _withdrawal);
-
-            require(_newBal >= wmul(_weight, wmul(_newSum, WAD - alpha)), "withdraw halt check");
-
-            uint256 _feeThreshold = wmul(_weight, wmul(_newSum, WAD - beta));
-
-            if (_newBal >= _feeThreshold) {
-
-                shellsToBurn_ += wmul(_withdrawal, WAD + feeBase);
-
-            } else if (_oldBal <= _feeThreshold) {
-
-                uint256 _feePrep = wdiv(sub(_feeThreshold, _newBal), wmul(_weight, _newSum));
-
-                _feePrep = wmul(_feePrep, feeDerivative);
-
-                shellsToBurn_ += wmul(wmul(_withdrawal, WAD + _feePrep), WAD + feeBase);
-
-            } else {
-
-                uint256 _feePrep = wdiv(sub(_feeThreshold, _newBal), wmul(_weight, _newSum));
-
-                _feePrep = wmul(feeDerivative, _feePrep);
-
-                shellsToBurn_ += wmul(add(
-                    sub(_oldBal, _feeThreshold),
-                    wmul(sub(_feeThreshold, _newBal), WAD + _feePrep)
-                ), WAD + feeBase);
-
-            }
-        }
-
         for (uint i = 0; i < _balances.length; i++) {
-            uint256 _newBal = sub(_balances[i], _withdrawals[i]);
-            uint256 _weight = _weights[i];
+            uint256 _oBal = _balances[i];
+            uint256 _nBal = sub(_oBal, _withdrawals[i]);
+            emit log_uint("~~~~~~ i ~~~~~~", i);
 
-            require(_newBal <= wmul(_weight, wmul(_newSum, WAD + alpha)), "withdraw-upper-halt-check");
+            emit log_uint("_oBal", _oBal);
+            emit log_uint("_nBal", _nBal);
 
-            uint256 _newThreshold = wmul(_weight, wmul(_newSum, WAD + beta));
-            uint256 _oldThreshold = wmul(_weight, wmul(_oldSum, WAD + beta));
-            
-            if (_newBal >= _oldThreshold) {
+            emit log_uint("upper halt", wmul(weights[i], wmul(_newSum, WAD + alpha)));
+            emit log_uint("lower halt", wmul(weights[i], wmul(_newSum, WAD - alpha)));
 
-                uint256 _feePrep = wmul(feeDerivative, wdiv(
-                    sub(_oldThreshold, _newThreshold),
-                    wmul(_weight, _newSum)
-                ));
+            require(_nBal <= wmul(weights[i], wmul(_newSum, WAD + alpha)), "withdraw upper halt check");
+            require(_nBal >= wmul(weights[i], wmul(_newSum, WAD - alpha)), "withdraw lower halt check");
 
-                shellsToBurn_ = add(
-                    shellsToBurn_,
-                    wmul(_feePrep, sub(_oldThreshold, _newThreshold))
-                );
+            uint256 threshold;
+            uint256 _oFee;
+            uint256 _nFee;
 
-            } else if (_newBal >= _newThreshold) {
+            if (_oBal < (threshold = wmul(weights[i], wmul(_oldSum, WAD-beta)))) {
+                _oFee = wdiv(feeDerivative, wmul(_oldSum, weights[i]));
+                _oFee = wmul(_oFee, sub(threshold, _oBal));
+                _oFee = wmul(_oFee, sub(threshold, _oBal));
+                emit log_uint("old lower threshold fee", _oFee);
+            } else if (_oBal > (threshold = wmul(weights[i], wmul(_oldSum, WAD+beta)))) {
+                _oFee = wdiv(feeDerivative, wmul(_oldSum, weights[i]));
+                _oFee = wmul(_oFee, sub(_oBal, threshold));
+                _oFee = wmul(_oFee, sub(_oBal, threshold));
+                emit log_uint("old upper threshold fee", _oFee);
+            } else _oFee = 0;
 
-                uint256 _feePrep = wmul(feeDerivative, wdiv(
-                    sub(_newBal, _newThreshold),
-                    wmul(_weight, _newSum)
-                ));
+            if (_nBal < (threshold = wmul(weights[i], wmul(_newSum, WAD-beta)))) {
+                _nFee = wdiv(feeDerivative, wmul(_newSum, weights[i]));
+                _nFee = wmul(_nFee, sub(threshold, _nBal));
+                _nFee = wmul(_nFee, sub(threshold, _nBal));
+                emit log_uint("new lower threshold fee", _nFee);
+            } else if (_nBal > (threshold = wmul(weights[i], wmul(_newSum, WAD+beta)))) {
+                _nFee = wdiv(feeDerivative, wmul(_newSum, weights[i]));
+                _nFee = wmul(_nFee, sub(_nBal, threshold));
+                _nFee = wmul(_nFee, sub(_nBal, threshold));
+                emit log_uint("new upper threshold fee", _nFee);
+            } else _nFee = 0;
 
-                shellsToBurn_ = add(
-                    shellsToBurn_,
-                    wmul(_feePrep, sub(_newBal, _newThreshold))
-                );
+            emit log_uint("_nFee", _nFee);
+            emit log_uint("_0Fee", _oFee);
 
-            } else continue;
+            if (_nFee > _oFee) {
+                shellsToBurn_ += add(_withdrawals[i], sub(_nFee, _oFee));
+                emit log_uint("burn _nFee > _oFee", shellsToBurn_);
+            } else {
+                shellsToBurn_ += add(_withdrawals[i], wmul(arbPiece, _nFee));
+                shellsToBurn_ -= wmul(_oFee, arbPiece);
+                emit log_uint("burn else", shellsToBurn_);
+            }
+
+            emit log_uint("_______ i ______", i);
+
+
         }
 
-        emit log_uint("AFTER NEW", shellsToBurn_);
+        emit log_uint("shellsToBurn)", shellsToBurn_);
+        return wmul(shellsToBurn_, WAD + feeBase);
 
-        return wmul(totalSupply, wdiv(shellsToBurn_, _oldSum));
+    }
 
+    function getFees (uint256 _bal, uint256 _sum, uint256 _weight) public returns (uint256 _oFee, uint256 _nFee) {
+        
     }
 
     event log_uint(bytes32, uint256);
@@ -313,45 +294,18 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
     /// @return shellsToMint_ the amount of shells you receive in return for your deposit
     function proportionalDeposit (uint256 _deposit) public returns (uint256) {
 
-        uint256 _totalBalance;
-        uint256 _totalSupply = totalSupply;
-
         uint256[] memory _amounts = new uint256[](numeraires.length);
 
-        if (_totalSupply == 0) {
-
-            for (uint i = 0; i < reserves.length; i++) {
-                Flavor memory _f = flavors[numeraires[i]];
-                _amounts[i] = dIntakeNumeraire(_f.adapter, wmul(_f.weight, _deposit));
-            }
-
-            emit ShellsMinted(msg.sender, _deposit, numeraires, _amounts);
-
-            _mint(msg.sender, _deposit);
-
-            return _deposit;
-
-        } else {
-
-            for (uint i = 0; i < reserves.length; i++) {
-                Flavor memory _f = flavors[numeraires[i]];
-                _amounts[i] = wmul(_f.weight, _deposit);
-                _totalBalance += dGetNumeraireBalance(reserves[i]);
-            }
-
-            uint256 shellsToMint_ = wmul(_totalSupply, wdiv(_deposit, _totalBalance));
-
-            _mint(msg.sender, shellsToMint_);
-
-            for (uint i = 0; i < reserves.length; i++) {
-                Flavor memory d = flavors[numeraires[i]];
-                _amounts[i] = dIntakeNumeraire(d.adapter, _amounts[i]);
-            }
-
-            emit ShellsMinted(msg.sender, shellsToMint_, numeraires, _amounts);
-
-            return shellsToMint_;
+        for (uint i = 0; i < reserves.length; i++) {
+            Flavor memory _f = flavors[numeraires[i]];
+            _amounts[i] = dIntakeNumeraire(_f.adapter, wmul(_f.weight, _deposit));
         }
+
+        emit ShellsMinted(msg.sender, _deposit, numeraires, _amounts);
+
+        _mint(msg.sender, _deposit);
+
+        return _deposit;
 
     }
 

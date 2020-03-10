@@ -18,7 +18,9 @@ import "./LoihiDelegators.sol";
 
 contract LoihiViews is LoihiRoot, LoihiDelegators {
 
-    function getOriginViewVariables (address _this, address[] calldata _rsrvs, address _oAdptr, address _oRsrv, address _tAdptr, address _tRsrv,  uint256 _oAmt) external view returns (uint256[] memory) {
+    event log_uint(bytes32, uint256);
+
+    function getOriginViewVariables (address _this, address[] calldata _rsrvs, address _oAdptr, address _oRsrv, address _tAdptr, address _tRsrv,  uint256 _oAmt) external returns (uint256[] memory) {
 
         uint256[] memory viewVars = new uint256[](4);
 
@@ -47,7 +49,16 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
     /// @param _oNAmt the origin numeraire amount being swapped
     /// @param _grossLiq the numeraire amount across all stablecoin reserves in the contract
     /// @return oNAmt_ the origin numeraire amount for the swap with fees applied
-    function calculateOriginTradeOriginAmount (uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external view returns (uint256) {
+    function calculateOriginTradeOriginAmount (uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external returns (uint256) {
+
+        emit log_uint("o weight", _oWeight);
+        emit log_uint("o bal", _oBal);
+        emit log_uint("o n amt", _oNAmt);
+        emit log_uint("alpha", _alpha);
+        emit log_uint("beta", _beta);
+        emit log_uint("feebase", _feeBase);
+        emit log_uint("fee deriv", _feeDerivative);
+        emit log_uint("halt check", wmul(_oWeight, wmul(_grossLiq, _alpha + WAD)));
 
         require(_oBal <= wmul(_oWeight, wmul(_grossLiq, _alpha + WAD)), "origin swap origin halt check");
 
@@ -93,7 +104,7 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
     /// @param _tBal the current balance of the target in the reserve
     /// @param _grossLiq the current total balance across all the reserves in the contract
     /// @return tNAmt_ the target numeraire amount including any applied fees
-    function calculateOriginTradeTargetAmount (address _tAdptr, uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external view returns (uint256 tNAmt_) {
+    function calculateOriginTradeTargetAmount (address _tAdptr, uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external returns (uint256 tNAmt_) {
 
         uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - _beta));
 
@@ -135,7 +146,7 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
 
     }
 
-    function getTargetViewVariables (address _this, address[] calldata _rsrvs, address _oAdptr, address _oRsrv, address _tAdptr, address _tRsrv, uint256 _tAmt) external view returns (uint256[] memory) {
+    function getTargetViewVariables (address _this, address[] calldata _rsrvs, address _oAdptr, address _oRsrv, address _tAdptr, address _tRsrv, uint256 _tAmt) external returns (uint256[] memory) {
 
         uint256[] memory viewVars = new uint256[](4);
 
@@ -164,7 +175,7 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
     /// @param _tNAmt the numeraire value of the target amount being traded
     /// @param _grossLiq the total numeraire value of all liquidity across all the reserves of the contract
     /// @return tNAmt_ the target numeraire amount after applying fees
-    function calculateTargetTradeTargetAmount(uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external view returns (uint256 tNAmt_) {
+    function calculateTargetTradeTargetAmount(uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external returns (uint256 tNAmt_) {
 
         require(_tBal >= wmul(_tWeight, wmul(_grossLiq, WAD - _alpha)), "target halt check for target trade");
 
@@ -207,7 +218,7 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
     /// @param _oNAmt the numeraire value for the origin amount being traded
     /// @param _grossLiq the total numeraire value of all liquidity across all the reserves of the contract
     /// @return oNAmt_ the origin numeraire amount after applying fees
-    function calculateTargetTradeOriginAmount (address _oAdptr, uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external view returns (uint256 oNAmt_) {
+    function calculateTargetTradeOriginAmount (address _oAdptr, uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq, uint256 _alpha, uint256 _beta, uint256 _feeBase, uint256 _feeDerivative) external returns (uint256 oNAmt_) {
 
         uint256 _feeThreshold = wmul(_oWeight, wmul(_grossLiq, WAD + _beta));
         if (_oBal + _oNAmt <= _feeThreshold) {
@@ -243,7 +254,7 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
 
     }
 
-    function totalReserves (address[] calldata _reserves, address _addr) external view returns (uint256, uint256[] memory) {
+    function totalReserves (address[] calldata _reserves, address _addr) external returns (uint256, uint256[] memory) {
         uint256 totalBalance;
         uint256[] memory balances = new uint256[](_reserves.length);
         for (uint i = 0; i < _reserves.length; i++) {

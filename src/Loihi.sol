@@ -104,7 +104,7 @@ contract Loihi is LoihiRoot {
 
      }
 
-    function supportsInterface (bytes4 interfaceID) external view returns (bool) {
+    function supportsInterface (bytes4 interfaceID) external returns (bool) {
         return interfaceID == ERC20ID || interfaceID == ERC165ID;
     }
 
@@ -118,11 +118,12 @@ contract Loihi is LoihiRoot {
         owner = newOwner;
     }
 
-    function setParams (uint256 _alpha, uint256 _beta, uint256 _feeDerivative, uint256 _feeBase) public onlyOwner {
+    function setParams (uint256 _alpha, uint256 _beta, uint256 _feeDerivative, uint256 _feeBase, uint256 _arbDerivative) public onlyOwner {
         alpha = _alpha;
         beta = _beta;
         feeDerivative = _feeDerivative;
         feeBase = _feeBase;
+        arbPiece = wdiv(_arbDerivative, _feeDerivative);
     }
 
     function includeNumeraireReserveAndWeight (address numeraire, address reserve, uint256 weight) public onlyOwner {
@@ -149,8 +150,8 @@ contract Loihi is LoihiRoot {
         return returnData;
     }
 
-    function staticTo(address callee, bytes memory data) internal view returns (bytes memory) {
-        (bool success, bytes memory returnData) = callee.staticcall(data);
+    function staticTo(address callee, bytes memory data) internal returns (bytes memory) {
+        (bool success, bytes memory returnData) = callee.call(data);
         assembly {
             if eq(success, 0) {
                 revert(add(returnData, 0x20), returndatasize)
@@ -168,10 +169,8 @@ contract Loihi is LoihiRoot {
     /// @param _dline deadline in block number after which the trade will not execute
     /// @return tAmt_ the amount of target that has been swapped for the origin
     function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) external notFrozen nonReentrant returns (uint256 tAmt_) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeOriginTrade(address,address,uint256,uint256,uint256,address)", _o, _t, _oAmt, _mTAmt, _dline, msg.sender));
-        uint256 _result = abi.decode(result, (uint256));
-        emit log_uint("what", _result);
-        return _result;
+        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeOriginTrade(uint256,uint256,address,address,address,uint256)", _dline, _mTAmt, msg.sender, _o, _t, _oAmt));
+        return abi.decode(result, (uint256));
     }
 
     /// @author james foley http://github.com/realisation
@@ -184,7 +183,7 @@ contract Loihi is LoihiRoot {
     /// @param _rcpnt the address of the recipient of the target
     /// @return tAmt_ the amount of target that has been swapped for the origin
     function transferByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeOriginTrade(address,address,uint256,uint256,uint256,address)", _o, _t, _oAmt, _mTAmt, _dline, _rcpnt));
+        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeOriginTrade(uint256,uint256,address,address,address,uint256)", _dline, _mTAmt, _rcpnt, _o, _t, _oAmt));
         return abi.decode(result, (uint256));
     }
 
@@ -194,7 +193,7 @@ contract Loihi is LoihiRoot {
     /// @param _t the address of the target
     /// @param _oAmt the origin amount
     /// @return tAmt_ the amount of target that has been swapped for the origin
-    function viewOriginTrade (address _o, address _t, uint256 _oAmt) external notFrozen view returns (uint256) {
+    function viewOriginTrade (address _o, address _t, uint256 _oAmt) external notFrozen returns (uint256) {
         Flavor storage _fo = flavors[_o];
         Flavor storage _ft = flavors[_t];
 
@@ -204,6 +203,11 @@ contract Loihi is LoihiRoot {
         bytes memory result = staticTo(views, abi.encodeWithSignature("getOriginViewVariables(address,address[],address,address,address,address,uint256)", 
             address(this), reserves, _fo.adapter, _fo.reserve, _ft.adapter, _ft.reserve, _oAmt));
         ( uint256[] memory viewVars ) = abi.decode(result, (uint256[]));
+
+        emit log_uint("origin amount", viewVars[0]);
+        emit log_uint("origin bal", viewVars[1]);
+        emit log_uint("target bal", viewVars[2]);
+        emit log_uint("gros liquidity", viewVars[3]);
 
         result = staticTo(views, abi.encodeWithSignature("calculateOriginTradeOriginAmount(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)", 
             _fo.weight, viewVars[1], viewVars[0], viewVars[3], alpha, beta, feeBase, feeDerivative));
@@ -225,7 +229,7 @@ contract Loihi is LoihiRoot {
     /// @param _t target address
     /// @param _oAmt amount of origin
     /// @return _tAmt the amount of target for the origin amount
-    function viewTargetTrade (address _o, address _t, uint256 _oAmt) external view notFrozen returns (uint256) {
+    function viewTargetTrade (address _o, address _t, uint256 _oAmt) external notFrozen returns (uint256) {
         Flavor storage _fo = flavors[_o];
         Flavor storage _ft = flavors[_t];
 
@@ -259,7 +263,7 @@ contract Loihi is LoihiRoot {
     /// @param _dline deadline in block number after which the trade will not execute
     /// @return oAmt_ the amount of origin that has been swapped for the target
     function swapByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeTargetTrade(address,address,uint256,uint256,uint256,address)", _o, _t, _mOAmt, _tAmt, _dline, msg.sender));
+        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeTargetTrade(uint256,address,address,uint256,uint256,address)", _dline, _o, _t, _mOAmt, _tAmt, msg.sender));
         return abi.decode(result, (uint256));
     }
 
@@ -273,7 +277,7 @@ contract Loihi is LoihiRoot {
     /// @param _rcpnt the address of the recipient of the target
     /// @return oAmt_ the amount of origin that has been swapped for the target
     function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline, address _rcpnt) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeTargetTrade(address,address,uint256,uint256,uint256,address)", _o, _t, _mOAmt, _tAmt, _dline, _rcpnt));
+        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("executeTargetTrade(uint256,address,address,uint256,uint256,address)", _dline, _o, _t, _mOAmt, _tAmt, _rcpnt));
         return abi.decode(result, (uint256));
     }
 
@@ -330,23 +334,23 @@ contract Loihi is LoihiRoot {
         return abi.decode(result, (bool));
     }
 
-    function balanceOf (address account) public view returns (uint256) {
+    function balanceOf (address account) public returns (uint256) {
         return balances[account];
     }
 
-    function allowance (address owner, address spender) public view returns (uint256) {
+    function allowance (address owner, address spender) public returns (uint256) {
         return allowances[owner][spender];
     }
 
-    function getNumeraires () public view returns (address[] memory) {
+    function getNumeraires () public returns (address[] memory) {
         return numeraires;
     }
 
-    function getReserves () public view returns (address[] memory) {
+    function getReserves () public returns (address[] memory) {
         return reserves;
     }
 
-    function totalReserves () external view returns (uint256, uint256[] memory) {
+    function totalReserves () external returns (uint256, uint256[] memory) {
         bytes memory result = staticTo(views, abi.encodeWithSignature("totalReserves(address[],address)", reserves, address(this)));
         return abi.decode(result, (uint256, uint256[]));
     }
@@ -362,5 +366,6 @@ contract Loihi is LoihiRoot {
         (bool success, bytes memory returndata) = address(token).call(abi.encodeWithSelector(token.approve.selector, spender, value));
         require(success, "SafeERC20: low-level call failed");
     }
+
 
 }

@@ -29,9 +29,9 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     /// @param _deadline the block by which this transaction is no longer valid
     /// @param _recipient the address for where to send the resultant target amount
     /// @return tNAmt_ the target numeraire amount
-    function executeOriginTrade (address _origin, address _target, uint256 _oAmt, uint256 _minTAmt, uint256 _deadline, address _recipient) external returns (uint256) {
+    function executeOriginTrade (uint256 _deadline, uint256 _minTAmt, address _recipient, address _origin, address _target, uint256 _oAmt) external returns (uint256) {
 
-        Flavor memory _o = flavors[_origin]; // origin adapter + weight
+        Flavor memory _o = flavors[_origin]; // origin adapter + reserve + weight
         Flavor memory _t = flavors[_target]; // target adapter + weight
 
         require(_o.adapter != address(0), "origin flavor not supported");
@@ -44,23 +44,116 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
             return tAmt_;
         }
 
-        ( uint256 _NAmt,
-          uint256 _oBal,
-          uint256 _tBal,
-          uint256 _grossLiq ) = getOriginTradeVariables(_o, _t, _oAmt);
+        uint256 _nAmt = dGetNumeraireAmount(_o.adapter, _oAmt);
 
-        _NAmt = calculateOriginTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
-        _NAmt = calculateOriginTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
+        (uint256 _oBal, uint256 _tBal, uint256 _grossLiq) = getBalancesAndGrossLiq(_o.reserve, _t.reserve);
 
-        require(dViewRawAmount(_t.adapter, _NAmt) >= _minTAmt, "target amount is less than minimum target amount");
+        (uint256 _oFee, uint256 _nFee) = getOriginFees(_oBal, _nAmt, _o.weight, _grossLiq);
+        // (uint256 _oFee, uint256 _nFee) = getFees(_oBal, _oBal + _nAmt, _o.weight, _grossLiq);
+        if (_oFee > _nFee) _nAmt = add(_nAmt, wmul(arbPiece, sub(_oFee, _nFee)));
+        else if (_nFee < _oFee + _nAmt) _nAmt = sub(add(_nAmt, _oFee), _nFee);
+
+        (_oFee, _nFee) = getTargetFees(_tBal, _nAmt, _t.weight, _grossLiq);
+        // (_oFee, _nFee) = getFees(_tBal, _tBal - _nAmt, _t.weight, _grossLiq);
+        if (_oFee > _nFee) _nAmt = add(_nAmt, wmul(arbPiece, sub(_oFee, _nFee)));
+        else if (_nFee < _nAmt - _oFee) _nAmt = sub(add(_nAmt, _oFee), _nFee);
+
+        emit log_uint("_nAmt before fee", _nAmt);
+        _nAmt = wmul(_nAmt, WAD - feeBase);
+        emit log_uint("_nAmt after fee", _nAmt);
+
+        require(dViewRawAmount(_t.adapter, _nAmt) >= _minTAmt, "target amount is less than minimum target amount");
 
         dIntakeRaw(_o.adapter, _oAmt);
-        uint256 tAmt_ = dOutputNumeraire(_t.adapter, _recipient, _NAmt);
-
+        uint256 tAmt_ = dOutputNumeraire(_t.adapter, _recipient, _nAmt);
         emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
-
         return tAmt_;
 
+    }
+
+    function getBalancesAndGrossLiq (address _oRsrv, address _tRsrv) private returns (uint256 oBal_, uint256 tBal_, uint256 grossLiq_) {
+        for (uint i = 0; i < reserves.length; i++) {
+            uint256 _bal = dGetNumeraireBalance(reserves[i]);
+            if (reserves[i] == _oRsrv) oBal_ = _bal;
+            if (reserves[i] == _tRsrv) tBal_ = _bal;
+            grossLiq_ += _bal;
+        }
+    }
+
+    function getOriginFees (uint256 _oBal, uint256 _nAmt, uint256 _weight, uint256 _grossLiq) private returns (uint256 oFee_, uint256 nFee_) {
+
+        uint256 threshold;
+
+        if (_oBal < (threshold = wmul(_weight, wmul(_grossLiq, WAD-beta)))) {
+            oFee_ = wdiv(feeDerivative, wmul(_grossLiq, _weight));
+            oFee_ = wmul(oFee_, sub(threshold, _oBal));
+            oFee_ = wmul(oFee_, sub(threshold, _oBal));
+        } else if (_oBal > (threshold = wmul(_weight, wmul(_grossLiq, WAD+beta)))) {
+            oFee_ = wdiv(feeDerivative, wmul(_grossLiq, _weight));
+            oFee_ = wmul(oFee_, sub(_oBal, threshold));
+            oFee_ = wmul(oFee_, sub(_oBal, threshold));
+        } else oFee_ = 0;
+
+        if (_oBal + _nAmt < (threshold = wmul(_weight, wmul(_grossLiq + _nAmt, WAD-beta)))) {
+            nFee_ = wdiv(feeDerivative, wmul(_grossLiq + _nAmt, _weight));
+            nFee_ = wmul(nFee_, sub(threshold, _oBal + _nAmt));
+            nFee_ = wmul(nFee_, sub(threshold, _oBal + _nAmt));
+        } else if (_oBal + _nAmt > (threshold = wmul(_weight, wmul(_grossLiq + _nAmt, WAD+beta)))) {
+            nFee_ = wdiv(feeDerivative, wmul(_grossLiq + _nAmt, _weight));
+            nFee_ = wmul(nFee_, sub(_oBal + _nAmt, threshold));
+            nFee_ = wmul(nFee_, sub(_oBal + _nAmt, threshold));
+        } else nFee_ = 0;
+        
+    }
+    function getTargetFees (uint256 _oBal, uint256 _nAmt, uint256 _weight, uint256 _grossLiq) private returns (uint256 oFee_, uint256 nFee_) {
+
+        uint256 threshold;
+
+        if (_oBal < (threshold = wmul(_weight, wmul(_grossLiq + _nAmt, WAD-beta)))) {
+            oFee_ = wdiv(feeDerivative, wmul(_grossLiq + _nAmt, _weight));
+            oFee_ = wmul(oFee_, sub(threshold, _oBal));
+            oFee_ = wmul(oFee_, sub(threshold, _oBal));
+        } else if (_oBal > (threshold = wmul(_weight, wmul(_grossLiq + _nAmt, WAD+beta)))) {
+            oFee_ = wdiv(feeDerivative, wmul(_grossLiq + _nAmt, _weight));
+            oFee_ = wmul(oFee_, sub(_oBal, threshold));
+            oFee_ = wmul(oFee_, sub(_oBal, threshold));
+        } else oFee_ = 0;
+
+        if (_oBal - _nAmt < (threshold = wmul(_weight, wmul(_grossLiq, WAD-beta)))) {
+            nFee_ = wdiv(feeDerivative, wmul(_grossLiq, _weight));
+            nFee_ = wmul(nFee_, sub(threshold, _oBal - _nAmt));
+            nFee_ = wmul(nFee_, sub(threshold, _oBal - _nAmt));
+        } else if (_oBal - _nAmt > (threshold = wmul(_weight, wmul(_grossLiq, WAD+beta)))) {
+            nFee_ = wdiv(feeDerivative, wmul(_grossLiq, _weight));
+            nFee_ = wmul(nFee_, sub(_oBal - _nAmt, threshold));
+            nFee_ = wmul(nFee_, sub(_oBal - _nAmt, threshold));
+        } else nFee_ = 0;
+        
+    }
+    function getFees (uint256 _oBal, uint256 _nBal, uint256 _weight, uint256 _grossLiq) private returns (uint256 oFee_, uint256 nFee_) {
+
+        uint256 threshold;
+
+        if (_oBal < (threshold = wmul(_weight, wmul(_grossLiq, WAD-beta)))) {
+            oFee_ = wdiv(feeDerivative, wmul(_grossLiq, _weight));
+            oFee_ = wmul(oFee_, sub(threshold, _oBal));
+            oFee_ = wmul(oFee_, sub(threshold, _oBal));
+        } else if (_oBal > (threshold = wmul(_weight, wmul(_grossLiq, WAD+beta)))) {
+            oFee_ = wdiv(feeDerivative, wmul(_grossLiq, _weight));
+            oFee_ = wmul(oFee_, sub(_oBal, threshold));
+            oFee_ = wmul(oFee_, sub(_oBal, threshold));
+        } else oFee_ = 0;
+
+        if (_nBal < (threshold = wmul(_weight, wmul(_grossLiq, WAD-beta)))) {
+            nFee_ = wdiv(feeDerivative, wmul(_grossLiq, _weight));
+            nFee_ = wmul(nFee_, sub(threshold, _nBal));
+            nFee_ = wmul(nFee_, sub(threshold, _nBal));
+        } else if (_nBal > (threshold = wmul(_weight, wmul(_grossLiq, WAD+beta)))) {
+            nFee_ = wdiv(feeDerivative, wmul(_grossLiq, _weight));
+            nFee_ = wmul(nFee_, sub(_nBal, threshold));
+            nFee_ = wmul(nFee_, sub(_nBal, threshold));
+        } else nFee_ = 0;
+        
     }
 
     /// @author james foley http://github.com/realisation
@@ -91,95 +184,6 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     }
 
     /// @author james foley http://github.com/realisation
-    /// @notice calculates the origin amount in an origin trade including the fees
-    /// @param _oWeight the balance weighting of the origin flavor
-    /// @param _oBal the new numeraire balance of the origin reserve including the origin amount being swapped
-    /// @param _oNAmt the origin numeraire amount being swapped
-    /// @param _grossLiq the numeraire amount across all stablecoin reserves in the contract
-    /// @return oNAmt_ the origin numeraire amount for the swap with fees applied
-    function calculateOriginTradeOriginAmount (uint256 _oWeight, uint256 _oBal, uint256 _oNAmt, uint256 _grossLiq) private returns (uint256) {
-
-        require(_oBal <= wmul(_oWeight, wmul(_grossLiq, alpha + WAD)), "origin swap origin halt check");
-
-        uint256 oNAmt_;
-
-        uint256 _feeThreshold = wmul(_oWeight, wmul(_grossLiq, beta + WAD));
-        if (_oBal <= _feeThreshold) {
-
-            oNAmt_ = _oNAmt;
-
-        } else if (sub(_oBal, _oNAmt) >= _feeThreshold) {
-
-            uint256 _fee = wdiv(
-                sub(_oBal, _feeThreshold),
-                wmul(_oWeight, _grossLiq)
-            );
-            _fee = wmul(_fee, feeDerivative);
-            oNAmt_ = wmul(_oNAmt, WAD - _fee);
-
-        } else {
-
-            uint256 _fee = wmul(feeDerivative, wdiv(
-                sub(_oBal, _feeThreshold),
-                wmul(_oWeight, _grossLiq)
-            ));
-
-            oNAmt_ = add(
-                sub(_feeThreshold, sub(_oBal, _oNAmt)),
-                wmul(sub(_oBal, _feeThreshold), WAD - _fee)
-            );
-
-        }
-
-        return oNAmt_;
-
-    }
-
-    /// @author james foley http://github.com/realisation
-    /// @notice calculates the fees to apply to the target amount in an origin trade
-    /// @param _tWeight the balance weighting of the target flavor
-    /// @param _tBal the current balance of the target in the reserve
-    /// @param _grossLiq the current total balance across all the reserves in the contract
-    /// @return tNAmt_ the target numeraire amount including any applied fees
-    function calculateOriginTradeTargetAmount (uint256 _tWeight, uint256 _tBal, uint256 _tNAmt, uint256 _grossLiq) private returns (uint256 tNAmt_) {
-
-
-        uint256 _feeThreshold = wmul(_tWeight, wmul(_grossLiq, WAD - beta));
-        if (sub(_tBal, _tNAmt) >= _feeThreshold) {
-
-            tNAmt_ = wmul(_tNAmt, WAD - feeBase);
-
-        } else if (_tBal <= _feeThreshold) {
-
-            uint256 _fee = wdiv(
-                sub(_feeThreshold, sub(_tBal, _tNAmt)),
-                wmul(_tWeight, _grossLiq)
-            );
-
-            _fee = wmul(_fee, feeDerivative);
-            _tNAmt = wmul(_tNAmt, WAD - _fee);
-            tNAmt_ = wmul(_tNAmt, WAD - feeBase);
-
-        } else {
-
-            uint256 _fee = wmul(feeDerivative, wdiv(
-                sub(_feeThreshold, sub(_tBal, _tNAmt)),
-                wmul(_tWeight, _grossLiq)
-            ));
-            tNAmt_ = wmul(add(
-                sub(_tBal, _feeThreshold),
-                wmul(sub(_feeThreshold, sub(_tBal, _tNAmt)), WAD - _fee)
-            ), WAD - feeBase);
-
-        }
-
-        require(sub(_tBal, tNAmt_) >= wmul(_tWeight, wmul(_grossLiq, WAD - alpha)), "origin swap target halt check");
-
-        return tNAmt_;
-
-    }
-
-    /// @author james foley http://github.com/realisation
     /// @notice given an amount of the target currency this function will derive the corresponding origin amount according to the current state of the contract
     /// @param _origin the address of the origin stablecoin flavor
     /// @param _target the address of the target stablecoin flavor
@@ -187,7 +191,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     /// @param _tAmt the raw amount of the target stablecoin flavor to be converted into numeraire amount
     /// @param _deadline the block number at which this transaction is no longer valid
     /// @param _recipient the address for where to send the target amount
-    function executeTargetTrade (address _origin, address _target, uint256 _maxOAmt, uint256 _tAmt, uint256 _deadline, address _recipient) external returns (uint256) {
+    function executeTargetTrade (uint256 _deadline, address _origin, address _target, uint256 _maxOAmt, uint256 _tAmt, address _recipient) external returns (uint256) {
         require(_deadline >= now, "deadline has passed for this trade");
 
         Flavor memory _o = flavors[_origin];
@@ -203,24 +207,34 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
             return oAmt_;
         }
 
-        ( uint256 _NAmt,
-          uint256 _oBal,
-          uint256 _tBal,
-          uint256 _grossLiq ) = getTargetTradeVariables(_o, _t, _tAmt) ;
+        uint256 _nAmt = dGetNumeraireAmount(_t.adapter, _tAmt);
+        emit log_uint("_nAmt before fee", _nAmt);
+        _nAmt = wmul(_nAmt, WAD + feeBase);
+        emit log_uint("_nAmt after fee", _nAmt);
 
-        _NAmt = calculateTargetTradeTargetAmount(_t.weight, _tBal, _NAmt, _grossLiq);
-        _NAmt = calculateTargetTradeOriginAmount(_o.weight, _oBal, _NAmt, _grossLiq);
+        (uint256 _oBal, uint256 _tBal, uint256 _grossLiq) = getBalancesAndGrossLiq(_o.reserve, _t.reserve);
+
+        (uint256 _oFee, uint256 _nFee) = getFees(_tBal, _tBal - _nAmt, _t.weight, _grossLiq);
+        if (_oFee > _nFee) _nAmt = sub(_nAmt, wmul(arbPiece, sub(_oFee, _nFee)));
+        else _nAmt = sub(add(_nAmt, _nFee), _oFee);
         
-        require(dViewRawAmount(_o.adapter, _NAmt) <= _maxOAmt, "origin amount is greater than max origin amount");
+        (_oFee, _nFee) = getFees(_oBal, _oBal + _nAmt, _o.weight, _grossLiq);
+        if (_oFee > _nFee) _nAmt = sub(_nAmt, wmul(arbPiece, sub(_oFee, _nFee)));
+        else _nAmt = sub(add(_nAmt, _nFee), _oFee);
+
+        require(dViewRawAmount(_o.adapter, _nAmt) <= _maxOAmt, "origin amount is greater than max origin amount");
 
         dOutputRaw(_t.adapter, _recipient, _tAmt);
-        uint256 oAmt_ = dIntakeNumeraire(_o.adapter, _NAmt);
+        uint256 oAmt_ = dIntakeNumeraire(_o.adapter, _nAmt);
+        emit log_uint("oAmt_", oAmt_);
 
-        emit Trade(msg.sender, _origin, _target, oAmt_, _tAmt);
+        // emit Trade(msg.sender, _origin, _target, oAmt_, _tAmt);
 
         return oAmt_;
 
     }
+
+    event log_uint(bytes32, uint256);
 
     /// @author james foley http://github.com/realisation
     /// @notice builds the relevant variables for the target trade. total liquidity, numeraire amounts and new balances

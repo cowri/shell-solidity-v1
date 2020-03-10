@@ -17,120 +17,114 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../aaveResources/ILendingPool.sol";
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../../interfaces/IAToken.sol";
+import "../../LoihiRoot.sol";
 
-contract MainnetSUsdAdapter {
+contract LocalUsdtAdapter is LoihiRoot {
 
-    constructor () public { }
+    IAToken _ausdt;
+    
 
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
-    IERC20 constant susd = IERC20(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
+    constructor (address __ausdt) public {
+        _ausdt = IAToken(__ausdt);
+    }
 
-    function getASUsd () public view returns (IAToken) {
-
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(address(susd));
-        return IAToken(aTokenAddress);
+    // transfers usdt in
+    function intakeRaw (uint256 amount) public returns (uint256) {
+        
+        safeTransferFrom(usdt, msg.sender, address(this), amount);
+        ausdt.deposit(amount);
+        return amount * 1000000000000;
 
     }
 
     event log_uint(bytes32, uint256);
 
-    // transfers susd in
-    function intakeRaw (uint256 amount) public returns (uint256) {
-
-        susd.transferFrom(msg.sender, address(this), amount);
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        pool.deposit(address(susd), amount, 0);
-        uint256 bal = getASUsd().balanceOf(address(this));
-        emit log_uint("BAL AFTER", bal);
-        return amount;
-
-    }
-
-    // transfers susd in
+    // transfers usdt in
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
-        safeTransferFrom(susd, msg.sender, address(this), amount);
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        pool.deposit(address(susd), amount, 0);
-        uint256 bal = getASUsd().balanceOf(address(this));
-        emit log_uint("BAL AFTER", bal);
+        amount /= 1000000000000;
+        safeTransferFrom(usdt, msg.sender, address(this), amount);
+        ausdt.deposit(amount);
         return amount;
 
     }
 
-    // transfers susd out of our balance
+    // transfers usdt out of our balance
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
-        getASUsd().redeem(amount);
-        safeTransfer(susd, dst, amount);
-        return amount;
+        ausdt.redeem(amount);
+        safeTransfer(usdt, dst, amount);
+        return amount * 1000000000000;
 
     }
 
-    // transfers susd to destination
+    // transfers usdt to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
-        getASUsd().redeem(amount);
-        safeTransfer(susd, dst, amount);
+        amount /= 1000000000000;
+        ausdt.redeem(amount);
+        safeTransfer(usdt, dst, amount);
         return amount;
 
     }
+
 
     function viewRawAmount (uint256 amount) public pure returns (uint256) {
 
-        return amount;
+        return amount / 1000000000000;
 
     }
 
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
 
-        return amount;
+        return amount * 1000000000000;
 
     }
 
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance (address addr) public returns (uint256) {
 
-        return getASUsd().balanceOf(addr);
+        return _ausdt.balanceOf(addr) * 1000000000000;
 
     }
 
     function getRawAmount (uint256 amount) public pure returns (uint256) {
 
-        return amount;
+        return amount / 1000000000000;
 
     }
 
     // returns amount, is already numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
 
-        return amount;
+        return amount * 1000000000000;
 
     }
 
     // returns balance
     function getNumeraireBalance () public returns (uint256) {
 
-        return getASUsd().balanceOf(address(this));
+        return ausdt.balanceOf(address(this)) * 1000000000000;
 
     }
     
     function safeTransfer(IERC20 token, address to, uint256 value) internal {
-
         callOptionalReturn(address(token), abi.encodeWithSelector(0xa9059cbb, to, value));
-
     }
 
     function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
-
         callOptionalReturn(address(token), abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+    }
 
+    function safeApprove(IERC20 token, address spender, uint256 value) internal {
+        callOptionalReturn(address(token), abi.encodeWithSelector(token.approve.selector, spender, value));
     }
 
     function callOptionalReturn(address token, bytes memory data) private {
-
-        (bool success, bytes memory returndata) = token.call(data);
-        require(success, "SafeERC20: low-level call failed");
-
+        (bool success, bytes memory returnData) = token.call(data);
+        assembly {
+            if eq(success, 0) {
+                revert(add(returnData, 0x20), returndatasize)
+            }
+        }
     }
 }

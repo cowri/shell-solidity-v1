@@ -73,6 +73,7 @@ interface IAToken {
     function getInterestRedirectionAddress(address _user) external view returns(address);
     function getRedirectedBalance(address _user) external view returns(uint256);
     function decimals () external view returns (uint256);
+    function deposit(uint256 _amount) external;
 
 
 }

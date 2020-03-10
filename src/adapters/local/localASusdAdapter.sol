@@ -13,61 +13,40 @@
 
 pragma solidity ^0.5.12;
 
-import "../../interfaces/ICToken.sol";
+import "../aaveResources/ILendingPoolAddressesProvider.sol";
+import "../aaveResources/ILendingPool.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "../../LoihiRoot.sol";
 
-contract MainnetCDaiAdapter {
+contract LocalASUsdAdapter is LoihiRoot {
 
-    constructor () public { }
+    IERC20 _asusd;
 
-    ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
-
-    event log_uint(bytes32, uint256 amount);
+    constructor (address __asusd) public {
+        _asusd = IERC20(__asusd);
+    }
 
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
     function intakeRaw (uint256 amount) public returns (uint256) {
 
-        bool success = cdai.transferFrom(msg.sender, address(this), amount);
-
-        if (!success) {
-            if (cdai.balanceOf(msg.sender) < amount) revert("CDai/insufficient-balance");
-            else revert("CDai/transferFrom-failed");
-        }
-
-        uint256 rate = cdai.exchangeRateStored();
-        return wmul(amount, rate);
+        asusd.transferFrom(msg.sender, address(this), amount);
+        return amount;
 
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
-        uint256 rate = cdai.exchangeRateCurrent();
-        uint256 cdaiAmount = wdiv(amount, rate);
-
-        bool success = cdai.transferFrom(msg.sender, address(this), cdaiAmount);
-
-        if (!success) {
-            if (cdai.balanceOf(msg.sender) < cdaiAmount) revert("CDai/insufficient-balance");
-            else revert("CDai/transferFrom-failed");
-        }
-
-        return cdaiAmount;
+        asusd.transferFrom(msg.sender, address(this), amount);
+        return amount;
 
     }
 
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
-        bool success = cdai.transfer(msg.sender, amount);
-
-        if (!success) {
-            if (cdai.balanceOf(address(this)) < amount) revert("CDai/insufficient-balance");
-            else revert("CDai/transfer-failed");
-        }
-
-        uint256 rate = cdai.exchangeRateStored();
-
-        return wmul(amount, rate);
+        asusd.transfer(dst, amount);
+        return amount;
 
     }
 
@@ -76,62 +55,46 @@ contract MainnetCDaiAdapter {
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
-        uint rate = cdai.exchangeRateCurrent();
-        uint cdaiAmount = wdiv(amount, rate);
-
-        bool success = cdai.transfer(dst, cdaiAmount);
-
-        if (!success) {
-            if (cdai.balanceOf(address(this)) < cdaiAmount) revert("CDai/insufficient-balance");
-            else revert("CDai/transfer-failed");
-        }
-
-        return cdaiAmount;
+        asusd.transfer(dst, amount);
+        return amount;
 
     }
 
     function viewRawAmount (uint256 amount) public view returns (uint256) {
 
-        uint256 rate = cdai.exchangeRateStored();
-        return wdiv(amount, rate);
+        return amount;
 
     }
 
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
 
-        uint256 rate = cdai.exchangeRateStored();
-        return wmul(amount, rate);
+        return amount;
 
     }
 
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance (address addr) public returns (uint256) {
 
-        uint256 rate = cdai.exchangeRateStored();
-        uint256 balance = cdai.balanceOf(addr);
-        return wmul(balance, rate);
+        return _asusd.balanceOf(addr);
 
     }
 
     // takes raw amount and gives numeraire amount
     function getRawAmount (uint256 amount) public returns (uint256) {
 
-        uint256 rate = cdai.exchangeRateCurrent();
-        return wdiv(amount, rate);
+        return amount;
 
     }
 
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
 
-        uint256 rate = cdai.exchangeRateCurrent();
-        uint256 numeraireAmount = wmul(amount, rate);
-        return numeraireAmount;
+        return amount;
 
     }
 
     function getNumeraireBalance () public returns (uint256) {
 
-        return cdai.balanceOfUnderlying(address(this));
+        return asusd.balanceOf(address(this));
 
     }
 
@@ -161,5 +124,6 @@ contract MainnetCDaiAdapter {
         // always rounds up
         z = add(mul(x, WAD), sub(y, 1)) / y;
     }
+
 
 }

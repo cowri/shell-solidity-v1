@@ -15,88 +15,94 @@ pragma solidity ^0.5.12;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../../interfaces/ICToken.sol";
+import "../../LoihiRoot.sol";
 
-contract MainnetDaiAdapter {
+contract LocalUsdcAdapter is LoihiRoot {
 
-    constructor () public { }
+    ICToken _cusdc;
 
-    ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
-    IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    constructor (address __cusdc) public {
+        _cusdc = ICToken(__cusdc);
+    }
+
     uint256 constant WAD = 10 ** 18;
 
-    // transfers dai in
-    // wraps it in chai
+    // transfers usdc in
+    // wraps it in csudc
     function intakeRaw (uint256 amount) public returns (uint256) {
-        
-        dai.transferFrom(msg.sender, address(this), amount);
-        cdai.mint(amount);
-        return amount;
-        
+
+        usdc.transferFrom(msg.sender, address(this), amount);
+        cusdc.mint(amount);
+        return amount * 1000000000000;
+
     }
 
-    // transfers dai in
-    // wraps it in cdai
+    // transfers usdc in
+    // wraps it in csudc
     function intakeNumeraire (uint256 amount) public returns (uint256) {
-        
-        dai.transferFrom(msg.sender, address(this), amount);
-        cdai.mint(amount);
+
+        amount /= 1000000000000;
+        usdc.transferFrom(msg.sender, address(this), amount);
+        cusdc.mint(amount);
         return amount;
-        
+
     }
 
-    event log_uint(bytes32, uint256);
-
-    // unwraps chai
-    // transfers out dai
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
-        cdai.redeemUnderlying(amount);
-        dai.transfer(dst, amount);
-        return amount;
+        cusdc.redeemUnderlying(amount);
+        usdc.transfer(dst, amount);
+        return amount * 1000000000000;
 
     }
 
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        
-        cdai.redeemUnderlying(amount);
-        dai.transfer(dst, amount);
+
+        amount /= 1000000000000;
+        cusdc.redeemUnderlying(amount);
+        usdc.transfer(dst, amount);
         return amount;
-        
+
     }
 
-    function viewRawAmount (uint256 amount) public pure returns (uint256) {
-        return amount;
+    function viewRawAmount (uint256 amount) public view returns (uint256) {
+
+        return amount / 1000000000000;
+
     }
 
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
-        return amount;
+
+        return amount * 1000000000000;
+
     }
 
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance (address addr) public returns (uint256) {
 
-        uint256 rate = cdai.exchangeRateStored();
-        uint256 balance = cdai.balanceOf(addr);
-        return wmul(balance, rate);
+        uint256 rate = _cusdc.exchangeRateStored();
+        uint256 balance = _cusdc.balanceOf(addr);
+        return wmul(balance, rate) * 1000000000000;
 
     }
 
     function getRawAmount (uint256 amount) public pure returns (uint256) {
 
-        return amount;
+        return amount / 1000000000000;
 
     }
 
-    // returns amount, already in numeraire
+    // is already numeraire amount
     function getNumeraireAmount (uint256 amount) public pure returns (uint256) {
 
-        return amount;
+        return amount * 1000000000000;
 
     }
 
-    // returns numeraire amount of chai balance
+    // returns numeraire balance
     function getNumeraireBalance () public returns (uint256) {
 
-        return cdai.balanceOfUnderlying(address(this));
+        uint256 bal = cusdc.balanceOfUnderlying(address(this));
+        return bal * 1000000000000;
 
     }
 
@@ -115,5 +121,4 @@ contract MainnetDaiAdapter {
     function wdiv(uint x, uint y) internal pure returns (uint z) {
         z = add(mul(x, WAD), y / 2) / y;
     }
-
 }

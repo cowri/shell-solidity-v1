@@ -15,33 +15,38 @@ pragma solidity ^0.5.12;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../../interfaces/ICToken.sol";
+import "../../LoihiRoot.sol";
 
-contract MainnetDaiAdapter {
+contract LocalDaiAdapter is LoihiRoot {
 
-    constructor () public { }
+    ICToken _cdai;
 
-    ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
-    IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    constructor (address __cdai) public { 
+        _cdai = ICToken(__cdai);
+    }
+
     uint256 constant WAD = 10 ** 18;
 
     // transfers dai in
     // wraps it in chai
     function intakeRaw (uint256 amount) public returns (uint256) {
-        
+
         dai.transferFrom(msg.sender, address(this), amount);
         cdai.mint(amount);
         return amount;
-        
+
     }
+
+    event log_addr(bytes32, address);
+    event log_erc20(bytes32, IERC20);
+
 
     // transfers dai in
     // wraps it in cdai
     function intakeNumeraire (uint256 amount) public returns (uint256) {
-        
         dai.transferFrom(msg.sender, address(this), amount);
         cdai.mint(amount);
         return amount;
-        
     }
 
     event log_uint(bytes32, uint256);
@@ -50,7 +55,9 @@ contract MainnetDaiAdapter {
     // transfers out dai
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
+        uint256 daiBalBefore = dai.balanceOf(address(this));
         cdai.redeemUnderlying(amount);
+        uint256 daiBalAfter = dai.balanceOf(address(this));
         dai.transfer(dst, amount);
         return amount;
 
@@ -72,10 +79,11 @@ contract MainnetDaiAdapter {
         return amount;
     }
 
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
-
-        uint256 rate = cdai.exchangeRateStored();
-        uint256 balance = cdai.balanceOf(addr);
+    function viewNumeraireBalance (address addr) public  returns (uint256) {
+        
+        uint256 rate = _cdai.exchangeRateCurrent();
+        uint256 balance = _cdai.balanceOf(addr);
+        emit log_uint("balance", balance);
         return wmul(balance, rate);
 
     }

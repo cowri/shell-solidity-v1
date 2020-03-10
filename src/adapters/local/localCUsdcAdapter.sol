@@ -14,12 +14,16 @@
 pragma solidity ^0.5.12;
 
 import "../../interfaces/ICToken.sol";
+import "../../LoihiRoot.sol";
 
-contract MainnetCUsdcAdapter {
+contract LocalCUsdcAdapter is LoihiRoot {
 
-    constructor () public { }
+    ICToken _cusdc;
 
-    ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
+    constructor (address __cusdc) public {
+        _cusdc = ICToken(__cusdc);
+    }
+
     event log_uint(bytes32, uint256);
     event log_bool(bytes32, bool);
     
@@ -90,25 +94,25 @@ contract MainnetCUsdcAdapter {
 
     }
 
-    function viewRawAmount (uint256 amount) public view returns (uint256) {
+    function viewRawAmount (uint256 amount) public returns (uint256) {
 
         amount /= 1000000000000;
-        uint256 rate = cusdc.exchangeRateStored();
+        uint256 rate = _cusdc.exchangeRateStored();
         return wdiv(amount, rate);
 
     }
 
-    function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+    function viewNumeraireAmount (uint256 amount) public returns (uint256) {
 
-        uint256 rate = cusdc.exchangeRateStored();
+        uint256 rate = _cusdc.exchangeRateStored();
         return wmul(amount, rate) * 1000000000000;
 
     }
 
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance (address addr) public returns (uint256) {
 
-        uint256 rate = cusdc.exchangeRateStored();
-        uint256 balance = cusdc.balanceOf(addr);
+        uint256 rate = _cusdc.exchangeRateStored();
+        uint256 balance = _cusdc.balanceOf(addr);
         return wmul(balance, rate) * 1000000000000;
 
     }
@@ -118,7 +122,7 @@ contract MainnetCUsdcAdapter {
     function getRawAmount (uint256 amount) public returns (uint256) {
 
         uint256 rate = cusdc.exchangeRateCurrent();
-        return wdiv(amount / 1000000000000 , rate);
+        return wdiv(amount / 1000000000000, rate);
 
     }
 
@@ -126,6 +130,8 @@ contract MainnetCUsdcAdapter {
     // returns corresponding numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
 
+        emit log_addr("CUSDC", address(cusdc));
+        emit log_addr("ME", address(this));
         uint256 rate = cusdc.exchangeRateCurrent();
         return wmul(amount, rate) * 1000000000000;
 

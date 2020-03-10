@@ -14,7 +14,7 @@
 //         setupFlavors();
 //         setupAdapters();
 //         setupLoihi();
-//         executeLoihiApprovals(address(l));
+//         executeApprovals(address(l));
 
 //     }
 
