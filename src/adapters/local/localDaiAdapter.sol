@@ -44,8 +44,11 @@ contract LocalDaiAdapter is LoihiRoot {
     // transfers dai in
     // wraps it in cdai
     function intakeNumeraire (uint256 amount) public returns (uint256) {
+        emit log_uint("intake numeraire", amount);
         dai.transferFrom(msg.sender, address(this), amount);
+        emit log_uint("transfered from", amount);
         cdai.mint(amount);
+        emit log_uint("cdai mint", amount);
         return amount;
     }
 

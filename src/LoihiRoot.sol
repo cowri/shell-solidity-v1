@@ -20,6 +20,7 @@ import "./interfaces/ICToken.sol";
 import "./interfaces/IChai.sol";
 import "./interfaces/IPot.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 
 contract LoihiRoot is DSMath {
 
@@ -27,8 +28,8 @@ contract LoihiRoot is DSMath {
     string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
 
-    mapping (address => uint256) public balances;
-    mapping (address => mapping (address => uint256)) public allowances;
+    mapping (address => uint256) internal balances;
+    mapping (address => mapping (address => uint256)) internal allowances;
     uint256 public totalSupply;
 
     struct Flavor { address adapter; address reserve; uint256 weight; }

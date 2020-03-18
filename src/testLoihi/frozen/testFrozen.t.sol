@@ -21,7 +21,7 @@
 //     function testFailFrozen () public {
 
 //         l.freeze(true);
-//         uint256 mintedShells = l.proportionalDeposit(100 * (10 ** 18));
+//         uint256 mintedShells = l1.proportionalDeposit(100 * (10 ** 18));
 
 //     }
 
