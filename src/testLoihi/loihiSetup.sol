@@ -275,7 +275,7 @@ contract LoihiSetup {
 
         l1.includeTestAdapterState(dai, cdai, chai, pot, usdc, cusdc, usdt, ausdt, susd, asusd);
         l2.includeTestAdapterState(dai, cdai, chai, pot, usdc, cusdc, usdt, ausdt, susd, asusd);
-        
+
     }
 
     function setupAdaptersKovan () public {
@@ -352,8 +352,7 @@ contract LoihiSetup {
         beta = 250000000000000000;
         feeDerivative = 100000000000000000;
         feeBase = 0;
-        // arbDerivative = 100000000000000000;
-        arbDerivative = 20000000000000000;
+        arbDerivative = 100000000000000000;
 
         l1.setParams(alpha, beta, feeDerivative, feeBase, arbDerivative);
         l2.setParams(alpha, beta, feeDerivative, feeBase, arbDerivative);

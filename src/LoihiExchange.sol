@@ -69,8 +69,9 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         (uint256[] memory _balances, uint256 _grossLiq) = getBalancesAndGrossLiq();
 
         uint256 _oNAmt = dGetNumeraireAmount(_o.adapter, _oAmt);
+        _oNAmt = wmul(_oNAmt, WAD-(feeBase/2));
         uint256 _tNAmt = getTargetAmount(_o.reserve, _t.reserve, _oNAmt, _balances, _grossLiq);
-        _tNAmt = wmul(_tNAmt, WAD - feeBase);
+        _tNAmt = wmul(_tNAmt, WAD-(feeBase/2));
 
         dIntakeRaw(_o.adapter, _oAmt);
         uint256 tAmt_ = dOutputNumeraire(_t.adapter, _recipient, _tNAmt);
@@ -108,9 +109,9 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         (uint256[] memory _balances, uint256 _grossLiq) = getBalancesAndGrossLiq();
 
         uint256 _tNAmt = dGetNumeraireAmount(_t.adapter, _tAmt);
-
+        _tNAmt = wmul(_tNAmt, WAD+(feeBase/2));
         uint256 _oNAmt = getOriginAmount(_o.reserve, _t.reserve, _tNAmt, _balances, _grossLiq);
-        _oNAmt = wmul(_oNAmt, WAD + feeBase);
+        _oNAmt = wmul(_oNAmt, WAD+(feeBase/2));
 
         require(dViewRawAmount(_o.adapter, _oNAmt) <= _maxOAmt, "origin amount is greater than max origin amount");
 
@@ -240,14 +241,13 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
         ( uint256[] memory _balances, uint256[] memory _withdrawals ) = getBalancesAndTokenAmounts(_flvrs, _amts);
 
-        emit log_uints("BALANCES", _balances);
-        emit log_uints("WITHDRAWALS", _withdrawals);
-
         shellsBurned_ = calculateShellsToBurn(_balances, _withdrawals);
-        shellsBurned_ = wmul(shellsBurned_, WAD + feeBase);
+
+        require(shellsBurned_ <= balances[msg.sender], "withdrawal amount exceeds balance");
+
+        shellsBurned_ = wmul(shellsBurned_, WAD+(feeBase/2));
 
         require(shellsBurned_ <= _maxShells, "withdrawal exceeds max shells limit");
-        require(shellsBurned_ <= balances[msg.sender], "withdrawal amount exceeds balance");
 
         for (uint i = 0; i < _flvrs.length; i++) if (_amts[i] > 0) dOutputRaw(flavors[_flvrs[i]].adapter, msg.sender, _amts[i]);
 
@@ -308,6 +308,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         ( uint256[] memory _balances, uint256[] memory _deposits ) = getBalancesAndTokenAmounts(_flvrs, _amts);
 
         shellsMinted_ = calculateShellsToMint(_balances, _deposits);
+        shellsMinted_ = wmul(shellsMinted_, WAD-(feeBase/2));
 
         require(shellsMinted_ >= _minShells, "minted shells less than minimum shells");
 
@@ -405,16 +406,12 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
         for (uint i = 0; i < reserves.length; i++) {
             Flavor memory _f = flavors[numeraires[i]];
-            emit log_addr("adapter", _f.adapter);
-            emit log_uint("weight", _f.weight);
-            emit log_uint("amount", wmul(_f.weight, _deposit));
             _amounts[i] = dIntakeNumeraire(_f.adapter, wmul(_f.weight, _deposit));
-            emit log_uint("ping", 0);
         }
 
-        emit ShellsMinted(msg.sender, _deposit, numeraires, _amounts);
+        _mint(msg.sender, (_deposit = wmul(_deposit, WAD-(feeBase/2))));
 
-        _mint(msg.sender, _deposit);
+        emit ShellsMinted(msg.sender, _deposit, numeraires, _amounts);
 
         return _deposit;
 
@@ -426,7 +423,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
     function proportionalWithdraw (uint256 _withdrawal) public returns (uint256[] memory) {
 
-        require(_withdrawal <= balances[msg.sender], "withdrawal amount exceeds your balance");
+        require((_withdrawal = wmul(_withdrawal, WAD+(feeBase/2))) <= balances[msg.sender], "withdrawal amount exceeds your balance");
 
         uint256 _withdrawMultiplier = wdiv(_withdrawal, totalSupply);
 

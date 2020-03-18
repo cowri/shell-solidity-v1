@@ -45,43 +45,18 @@ contract OriginSwapTest is LoihiSetup, DSMath, DSTest {
         if (_type == 2) return l2.selectiveDeposit(addrs, amounts, 0, now + 500);
     }
 
-    function testBalancedOriginSwap5DaiToUsdcWithProportional300 () public {
-        l1.proportionalDeposit(300*WAD);
-        uint256 targetAmount = l1.swapByOrigin(dai, usdc, 10*WAD, 0, now+500);
-        assertEq(targetAmount, 9995000);
-    }
+    // function testBalancedOriginSwap5DaiToUsdcWithProportional300 () public {
+    //     l1.proportionalDeposit(300*WAD);
+    //     uint256 targetAmount = l1.swapByOrigin(dai, usdc, 10*WAD, 0, now+500);
+    //     assertEq(targetAmount, 9995000);
+    // }
 
-    function testContinuityBalancedOriginSwap5DaiToUsdcWithProportional300 () public {
-        l1.proportionalDeposit(300*WAD);
-        uint256 targetAmount1 = l1.swapByOrigin(dai, usdc, 10*WAD, 0, now+500);
-        assertEq(targetAmount1, 9995000);
 
-        l2.proportionalDeposit(300*WAD);
-        uint256 targetAmount2 = l2.swapByOrigin(dai, usdc, 5*WAD, 0, now+500);
-        targetAmount2 += l2.swapByOrigin(dai, usdc, 5*WAD, 0, now+500);
-        assertEq(targetAmount2, 9995000);
-
-        assertEq(targetAmount1, targetAmount2);
-    }
-
-    function testNoFeeUnbalancedOriginSwap10UsdcToUsdtWith80Dai100Usdc85Usdt35Susd () public {
-        deposit(1, dai, 80*WAD, usdc, 10**8, usdt, 85*(10**6), susd, 35*WAD);
-        uint256 targetAmount = l1.swapByOrigin(usdc, usdt, 10**7, 0, now+500);
-        assertEq(targetAmount, 9995000);
-    }
-
-    function testContinuityNoFeeUnbalancedOriginSwap10UsdcToUsdtWith80Dai100Usdc85Usdt35Susd () public {
-        deposit(1, dai, 80*WAD, usdc, 10**8, usdt, 85*(10**6), susd, 35*WAD);
-        uint256 targetAmount1 = l1.swapByOrigin(usdc, usdt, 10**7, 0, now+500);
-        assertEq(targetAmount1, 9995000);
-
-        deposit(2, dai, 80*WAD, usdc, 10**8, usdt, 85*(10**6), susd, 35*WAD);
-        uint256 targetAmount2 = l2.swapByOrigin(usdc, usdt, (10**7)/2, 0, now+500);
-        targetAmount2 += l2.swapByOrigin(usdc, usdt, (10**7)/2, 0, now+500);
-        assertEq(targetAmount2, 9995000);
-
-        assertEq(targetAmount1, targetAmount2);
-    }
+    // function testNoFeeUnbalancedOriginSwap10UsdcToUsdtWith80Dai100Usdc85Usdt35Susd () public {
+    //     deposit(1, dai, 80*WAD, usdc, 10**8, usdt, 85*(10**6), susd, 35*WAD);
+    //     uint256 targetAmount = l1.swapByOrigin(usdc, usdt, 10**7, 0, now+500);
+    //     assertEq(targetAmount, 9995000);
+    // }
 
     // function testNoFeeBalanced10PctWeightTo30PctWeight () public {
     //     l1.proportionalDeposit(300*WAD);
@@ -213,4 +188,14 @@ contract OriginSwapTest is LoihiSetup, DSMath, DSTest {
     //     assertEq(targetAmount, 19989999996720192494);
     // }
 
+    // function testOriginSwapContinuityPartialUpperAndLowerFeesFromBalancedShell30PctWeight () logs_gas public {
+    //     l1.proportionalDeposit(300*WAD);
+    //     uint256 targetAmount1 = l1.swapByOrigin(usdc, dai, 40*(10**6), 0, now + 500);
+    //     l2.proportionalDeposit(300*WAD);
+    //     uint256 targetAmount2 = l2.swapByOrigin(usdc, dai, 20*(10**6), 0, now + 500);
+    //     targetAmount2 += l2.swapByOrigin(usdc, dai, 20*(10**6), 0, now + 500);
+    //     assertEq(targetAmount1, targetAmount2);
+    //     emit log_named_uint("1", targetAmount1);
+    //     emit log_named_uint("2", targetAmount2);
+    // }
 }
