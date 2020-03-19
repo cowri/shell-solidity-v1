@@ -124,7 +124,6 @@ contract LocalCDaiAdapter is LoihiRoot {
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
 
-
         uint256 rate = cdai.exchangeRateCurrent();
         uint256 numeraireAmount = wmul(amount, rate);
         return numeraireAmount;
@@ -132,10 +131,6 @@ contract LocalCDaiAdapter is LoihiRoot {
     }
 
     function getNumeraireBalance () public returns (uint256) {
-
-        emit log_uint("hello", 0);
-        emit log_addr("me", address(this));
-        emit log_addr("cdai addr", address(cdai));
 
         return cdai.balanceOfUnderlying(address(this));
 

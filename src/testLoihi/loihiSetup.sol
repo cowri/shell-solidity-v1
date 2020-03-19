@@ -3,6 +3,7 @@ pragma solidity ^0.5.15;
 import "../Loihi.sol";
 
 import "../LoihiExchange.sol";
+import "../LoihiLiquidity.sol";
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IBadERC20.sol";
@@ -47,7 +48,6 @@ import "../adapters/local/LocalAusdtAdapter.sol";
 import "../adapters/local/LocalSUsdAdapter.sol";
 import "../adapters/local/LocalASUsdAdapter.sol";
 
-
 contract LoihiSetup {
     Loihi l1;
     Loihi l2;
@@ -81,21 +81,18 @@ contract LoihiSetup {
     address susdAdapter;
     address asusdAdapter;
 
-    uint256 arbDerivative;
-    uint256 feeBase;
-    uint256 feeDerivative;
+    uint256 epsilon;
+    uint256 delta;
+    uint256 lambda;
     uint256 alpha;
     uint256 beta;
 
     event log_addr(bytes32, address);
 
-
     function setupLoihi () public {
 
-        l1 = new Loihi(address(new LoihiExchange()));
-        l2 = new Loihi(address(new LoihiExchange()));
-
-        emit log_addr("LOIHI", address(l1));
+        l1 = new Loihi(address(new LoihiExchange()), address(new LoihiLiquidity()));
+        l2 = new Loihi(address(new LoihiExchange()), address(new LoihiLiquidity()));
 
     }
 
@@ -119,7 +116,6 @@ contract LoihiSetup {
 
         susd = 0x57Ab1ec28D129707052df4dF418D58a2D46d5f51;
         asusd = 0x625aE63000f46200499120B906716420bd059240;
-
 
         aaveLpCore = 0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3;
 
@@ -326,36 +322,36 @@ contract LoihiSetup {
         l2.includeNumeraireReserveAndWeight(usdt, ausdtAdapter, 300000000000000000);
         l2.includeNumeraireReserveAndWeight(susd, asusdAdapter, 100000000000000000);
 
-        l1.includeAdapter(dai, daiAdapter, cdaiAdapter, 300000000000000000);
-        l1.includeAdapter(chai, chaiAdapter, cdaiAdapter, 300000000000000000);
-        l1.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, 300000000000000000);
-        l2.includeAdapter(dai, daiAdapter, cdaiAdapter, 300000000000000000);
-        l2.includeAdapter(chai, chaiAdapter, cdaiAdapter, 300000000000000000);
-        l2.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, 300000000000000000);
+        l1.includeAdapter(dai, daiAdapter, cdaiAdapter);
+        l1.includeAdapter(chai, chaiAdapter, cdaiAdapter);
+        l1.includeAdapter(cdai, cdaiAdapter, cdaiAdapter);
+        l2.includeAdapter(dai, daiAdapter, cdaiAdapter);
+        l2.includeAdapter(chai, chaiAdapter, cdaiAdapter);
+        l2.includeAdapter(cdai, cdaiAdapter, cdaiAdapter);
 
-        l1.includeAdapter(usdc, usdcAdapter, cusdcAdapter, 300000000000000000);
-        l1.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, 300000000000000000);
-        l2.includeAdapter(usdc, usdcAdapter, cusdcAdapter, 300000000000000000);
-        l2.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, 300000000000000000);
+        l1.includeAdapter(usdc, usdcAdapter, cusdcAdapter);
+        l1.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter);
+        l2.includeAdapter(usdc, usdcAdapter, cusdcAdapter);
+        l2.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter);
 
-        l1.includeAdapter(usdt, usdtAdapter, ausdtAdapter, 300000000000000000);
-        l1.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter, 300000000000000000);
-        l2.includeAdapter(usdt, usdtAdapter, ausdtAdapter, 300000000000000000);
-        l2.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter, 300000000000000000);
+        l1.includeAdapter(usdt, usdtAdapter, ausdtAdapter);
+        l1.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter);
+        l2.includeAdapter(usdt, usdtAdapter, ausdtAdapter);
+        l2.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter);
 
-        l1.includeAdapter(asusd, asusdAdapter, asusdAdapter, 100000000000000000);
-        l1.includeAdapter(susd, susdAdapter, asusdAdapter, 100000000000000000);
-        l2.includeAdapter(asusd, asusdAdapter, asusdAdapter, 100000000000000000);
-        l2.includeAdapter(susd, susdAdapter, asusdAdapter, 100000000000000000);
+        l1.includeAdapter(asusd, asusdAdapter, asusdAdapter);
+        l1.includeAdapter(susd, susdAdapter, asusdAdapter);
+        l2.includeAdapter(asusd, asusdAdapter, asusdAdapter);
+        l2.includeAdapter(susd, susdAdapter, asusdAdapter);
 
         alpha = 500000000000000000;
         beta = 250000000000000000;
-        feeDerivative = 100000000000000000;
-        feeBase = 0;
-        arbDerivative = 100000000000000000;
+        delta = 100000000000000000;
+        epsilon = 0;
+        lambda = 100000000000000000;
 
-        l1.setParams(alpha, beta, feeDerivative, feeBase, arbDerivative);
-        l2.setParams(alpha, beta, feeDerivative, feeBase, arbDerivative);
+        l1.setParams(alpha, beta, delta, epsilon, lambda);
+        l2.setParams(alpha, beta, delta, epsilon, lambda);
 
     }
 
@@ -370,36 +366,36 @@ contract LoihiSetup {
         l2.includeNumeraireReserveAndWeight(usdt, ausdtAdapter, 300000000000000000);
         l2.includeNumeraireReserveAndWeight(susd, asusdAdapter, 100000000000000000);
 
-        l1.includeAdapter(dai, daiAdapter, cdaiAdapter, 300000000000000000);
-        l1.includeAdapter(chai, chaiAdapter, cdaiAdapter, 300000000000000000);
-        l1.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, 300000000000000000);
-        l2.includeAdapter(dai, daiAdapter, cdaiAdapter, 300000000000000000);
-        l2.includeAdapter(chai, chaiAdapter, cdaiAdapter, 300000000000000000);
-        l2.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, 300000000000000000);
+        l1.includeAdapter(dai, daiAdapter, cdaiAdapter);
+        l1.includeAdapter(chai, chaiAdapter, cdaiAdapter);
+        l1.includeAdapter(cdai, cdaiAdapter, cdaiAdapter);
+        l2.includeAdapter(dai, daiAdapter, cdaiAdapter);
+        l2.includeAdapter(chai, chaiAdapter, cdaiAdapter);
+        l2.includeAdapter(cdai, cdaiAdapter, cdaiAdapter);
 
-        l1.includeAdapter(usdc, usdcAdapter, cusdcAdapter, 300000000000000000);
-        l1.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, 300000000000000000);
-        l2.includeAdapter(usdc, usdcAdapter, cusdcAdapter, 300000000000000000);
-        l2.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, 300000000000000000);
+        l1.includeAdapter(usdc, usdcAdapter, cusdcAdapter);
+        l1.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter);
+        l2.includeAdapter(usdc, usdcAdapter, cusdcAdapter);
+        l2.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter);
 
-        l1.includeAdapter(usdt, usdtAdapter, ausdtAdapter, 300000000000000000);
-        l1.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter, 300000000000000000);
-        l2.includeAdapter(usdt, usdtAdapter, ausdtAdapter, 300000000000000000);
-        l2.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter, 300000000000000000);
+        l1.includeAdapter(usdt, usdtAdapter, ausdtAdapter);
+        l1.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter);
+        l2.includeAdapter(usdt, usdtAdapter, ausdtAdapter);
+        l2.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter);
 
-        l1.includeAdapter(asusd, asusdAdapter, asusdAdapter, 100000000000000000);
-        l1.includeAdapter(susd, susdAdapter, asusdAdapter, 100000000000000000);
-        l2.includeAdapter(asusd, asusdAdapter, asusdAdapter, 100000000000000000);
-        l2.includeAdapter(susd, susdAdapter, asusdAdapter, 100000000000000000);
+        l1.includeAdapter(asusd, asusdAdapter, asusdAdapter);
+        l1.includeAdapter(susd, susdAdapter, asusdAdapter);
+        l2.includeAdapter(asusd, asusdAdapter, asusdAdapter);
+        l2.includeAdapter(susd, susdAdapter, asusdAdapter);
 
         alpha = 500000000000000000;
         beta = 250000000000000000;
-        feeDerivative = 100000000000000000;
-        feeBase = 500000000000000;
-        arbDerivative = 20000000000000000;
+        delta = 100000000000000000;
+        epsilon = 500000000000000;
+        lambda = 20000000000000000;
 
-        l1.setParams(alpha, beta, feeDerivative, feeBase, arbDerivative);
-        l2.setParams(alpha, beta, feeDerivative, feeBase, arbDerivative);
+        l1.setParams(alpha, beta, delta, epsilon, lambda);
+        l2.setParams(alpha, beta, delta, epsilon, lambda);
 
     }
 
@@ -412,31 +408,31 @@ contract LoihiSetup {
         l2.includeNumeraireReserveAndWeight(usdc, cusdcAdapter, 333333333333333333);
         l2.includeNumeraireReserveAndWeight(usdt, ausdtAdapter, 333333333333333333);
 
-        l1.includeAdapter(usdc, usdcAdapter, cusdcAdapter, 333333333333333333);
-        l1.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, 333333333333333333);
-        l2.includeAdapter(usdc, usdcAdapter, cusdcAdapter, 333333333333333333);
-        l2.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter, 333333333333333333);
+        l1.includeAdapter(usdc, usdcAdapter, cusdcAdapter);
+        l1.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter);
+        l2.includeAdapter(usdc, usdcAdapter, cusdcAdapter);
+        l2.includeAdapter(cusdc, cusdcAdapter, cusdcAdapter);
 
-        l1.includeAdapter(dai, daiAdapter, cdaiAdapter, 333333333333333333);
-        l1.includeAdapter(chai, chaiAdapter, cdaiAdapter, 333333333333333333);
-        l1.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, 333333333333333333);
-        l2.includeAdapter(dai, daiAdapter, cdaiAdapter, 333333333333333333);
-        l2.includeAdapter(chai, chaiAdapter, cdaiAdapter, 333333333333333333);
-        l2.includeAdapter(cdai, cdaiAdapter, cdaiAdapter, 333333333333333333);
+        l1.includeAdapter(dai, daiAdapter, cdaiAdapter);
+        l1.includeAdapter(chai, chaiAdapter, cdaiAdapter);
+        l1.includeAdapter(cdai, cdaiAdapter, cdaiAdapter);
+        l2.includeAdapter(dai, daiAdapter, cdaiAdapter);
+        l2.includeAdapter(chai, chaiAdapter, cdaiAdapter);
+        l2.includeAdapter(cdai, cdaiAdapter, cdaiAdapter);
 
-        l1.includeAdapter(usdt, usdtAdapter, ausdtAdapter, 333333333333333333);
-        l1.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter, 333333333333333333);
-        l2.includeAdapter(usdt, usdtAdapter, ausdtAdapter, 333333333333333333);
-        l2.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter, 333333333333333333);
+        l1.includeAdapter(usdt, usdtAdapter, ausdtAdapter);
+        l1.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter);
+        l2.includeAdapter(usdt, usdtAdapter, ausdtAdapter);
+        l2.includeAdapter(ausdt, ausdtAdapter, ausdtAdapter);
 
         alpha = 500000000000000000;
         beta = 250000000000000000;
-        feeDerivative = 100000000000000000;
-        feeBase = 500000000000000;
-        arbDerivative = 20000000000000000;
+        delta = 100000000000000000;
+        epsilon = 500000000000000;
+        lambda = 20000000000000000;
 
-        l1.setParams(alpha, beta, feeDerivative, feeBase, arbDerivative);
-        l2.setParams(alpha, beta, feeDerivative, feeBase, arbDerivative);
+        l1.setParams(alpha, beta, delta, epsilon, lambda);
+        l2.setParams(alpha, beta, delta, epsilon, lambda);
 
     }
 

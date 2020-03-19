@@ -130,8 +130,6 @@ contract LocalCUsdcAdapter is LoihiRoot {
     // returns corresponding numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
 
-        emit log_addr("CUSDC", address(cusdc));
-        emit log_addr("ME", address(this));
         uint256 rate = cusdc.exchangeRateCurrent();
         return wmul(amount, rate) * 1000000000000;
 

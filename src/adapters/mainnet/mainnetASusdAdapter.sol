@@ -77,7 +77,7 @@ contract MainnetASUsdAdapter {
 
     }
 
-    function viewNumeraireBalance (address addr) public returns (uint256) {
+    function viewNumeraireBalance (address addr) public view returns (uint256) {
 
         return getASUsd().balanceOf(addr);
 

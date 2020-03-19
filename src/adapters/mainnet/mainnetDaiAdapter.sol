@@ -27,30 +27,34 @@ contract MainnetDaiAdapter {
     // transfers dai in
     // wraps it in chai
     function intakeRaw (uint256 amount) public returns (uint256) {
-        
+
         dai.transferFrom(msg.sender, address(this), amount);
-        cdai.mint(amount);
+        uint256 success = cdai.mint(amount);
+        if (success != 0) revert("CDai/mint-failed");
         return amount;
-        
+
     }
 
     // transfers dai in
     // wraps it in cdai
     function intakeNumeraire (uint256 amount) public returns (uint256) {
-        
+
         dai.transferFrom(msg.sender, address(this), amount);
-        cdai.mint(amount);
+        uint256 success = cdai.mint(amount);
+        if (success != 0) revert("CDai/mint-failed");
         return amount;
-        
+
     }
+
 
     event log_uint(bytes32, uint256);
 
-    // unwraps chai
+    // unwraps cdai
     // transfers out dai
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
-        cdai.redeemUnderlying(amount);
+        uint256 success = cdai.redeemUnderlying(amount);
+        if (success != 0) revert("CDai/redeemUnderlying-failed");
         dai.transfer(dst, amount);
         return amount;
 
@@ -58,7 +62,8 @@ contract MainnetDaiAdapter {
 
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         
-        cdai.redeemUnderlying(amount);
+        uint256 success = cdai.redeemUnderlying(amount);
+        if (success != 0) revert("CDai/redeemUnderlying-failed");
         dai.transfer(dst, amount);
         return amount;
         

@@ -29,7 +29,8 @@ contract MainnetUsdcAdapter {
     function intakeRaw (uint256 amount) public returns (uint256) {
 
         usdc.transferFrom(msg.sender, address(this), amount);
-        cusdc.mint(amount);
+        uint256 success = cusdc.mint(amount);
+        if (success != 0) revert("CUsdc/mint-failed");
         return amount * 1000000000000;
 
     }
@@ -40,14 +41,16 @@ contract MainnetUsdcAdapter {
 
         amount /= 1000000000000;
         usdc.transferFrom(msg.sender, address(this), amount);
-        cusdc.mint(amount);
+        uint256 success = cusdc.mint(amount);
+        if (success != 0) revert("CUsdc/mint-failed");
         return amount;
 
     }
 
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
-        cusdc.redeemUnderlying(amount);
+        uint256 success = cusdc.redeemUnderlying(amount);
+        if (success != 0) revert("CUsdc/redeemUnderlying-failed");
         usdc.transfer(dst, amount);
         return amount * 1000000000000;
 
@@ -56,7 +59,8 @@ contract MainnetUsdcAdapter {
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
         amount /= 1000000000000;
-        cusdc.redeemUnderlying(amount);
+        uint256 success = cusdc.redeemUnderlying(amount);
+        if (success != 0) revert("CUsdc/redeemUnderlying-failed");
         usdc.transfer(dst, amount);
         return amount;
 

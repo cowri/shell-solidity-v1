@@ -52,8 +52,9 @@ contract Loihi is LoihiRoot {
     address constant aaveLpCore = 0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3;
 
     // constructor () public {
-    constructor (address x) public {
+    constructor (address x, address l) public {
         exchange = x;
+        liquidity = l;
 
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
@@ -84,8 +85,9 @@ contract Loihi is LoihiRoot {
         
         // alpha = 800000000000000000; // .8
         // beta = 400000000000000000; // .4
-        // feeBase = 850000000000000; // 8.5 bps
-        // feeDerivative = 100000000000000000; // .1
+        // delta = 100000000000000000; // .1
+        // epsilon = 850000000000000; // 8.5 bps
+        // lambda = 20000000000000000; // 1/5 of delta
     }
 
     function supportsInterface (bytes4 interfaceID) external returns (bool) {
@@ -102,12 +104,12 @@ contract Loihi is LoihiRoot {
         owner = newOwner;
     }
 
-    function setParams (uint256 _alpha, uint256 _beta, uint256 _feeDerivative, uint256 _feeBase, uint256 _arbDerivative) public onlyOwner {
+    function setParams (uint256 _alpha, uint256 _beta, uint256 _delta, uint256 _epsilon, uint256 _lambda) public onlyOwner {
         alpha = _alpha;
         beta = _beta;
-        feeDerivative = _feeDerivative;
-        feeBase = _feeBase;
-        arbPiece = wdiv(_arbDerivative, _feeDerivative);
+        delta = _delta;
+        epsilon = _epsilon;
+        lambda = wdiv(_lambda, _delta);
     }
 
     function includeNumeraireReserveAndWeight (address numeraire, address reserve, uint256 weight) public onlyOwner {
@@ -116,8 +118,8 @@ contract Loihi is LoihiRoot {
         weights.push(weight);
     }
 
-    function includeAdapter (address flavor, address adapter, address reserve, uint256 weight) public onlyOwner {
-        flavors[flavor] = Flavor(adapter, reserve, weight);
+    function includeAdapter (address flavor, address adapter, address reserve) public onlyOwner {
+        flavors[flavor] = Flavor(adapter, reserve);
     }
 
     function excludeAdapter (address flavor) public onlyOwner {
@@ -134,8 +136,8 @@ contract Loihi is LoihiRoot {
         return returnData;
     }
 
-    function staticTo(address callee, bytes memory data) internal returns (bytes memory) {
-        (bool success, bytes memory returnData) = callee.call(data);
+    function staticTo(address callee, bytes memory data) internal view returns (bytes memory) {
+        (bool success, bytes memory returnData) = callee.staticcall(data);
         assembly {
             if eq(success, 0) {
                 revert(add(returnData, 0x20), returndatasize)
@@ -177,7 +179,7 @@ contract Loihi is LoihiRoot {
     /// @param _t the address of the target
     /// @param _oAmt the origin amount
     /// @return tAmt_ the amount of target that has been swapped for the origin
-    function viewOriginTrade (address _o, address _t, uint256 _oAmt) external notFrozen returns (uint256) {
+    function viewOriginTrade (address _o, address _t, uint256 _oAmt) external view notFrozen returns (uint256) {
         bytes memory result = staticTo(exchange, abi.encodeWithSignature("viewOriginTrade(address,address,uint256)", _o, _t, _oAmt));
         return abi.decode(result, (uint256));
     }
@@ -188,7 +190,7 @@ contract Loihi is LoihiRoot {
     /// @param _t target address
     /// @param _tAmt amount of origin
     /// @return _oAmt the amount of origin for the target amount
-    function viewTargetTrade (address _o, address _t, uint256 _tAmt) external notFrozen returns (uint256) {
+    function viewTargetTrade (address _o, address _t, uint256 _tAmt) external view notFrozen returns (uint256) {
         bytes memory result = staticTo(exchange, abi.encodeWithSignature("viewTargetTrade(address,address,uint256)", _o, _t, _tAmt));
         return abi.decode(result, (uint256));
     }
@@ -226,7 +228,17 @@ contract Loihi is LoihiRoot {
     /// @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("selectiveDeposit(address[],uint256[],uint256,uint256)", _flvrs, _amts, _minShells, _dline));
+        bytes memory result = delegateTo(liquidity, abi.encodeWithSignature("selectiveDeposit(address[],uint256[],uint256,uint256)", _flvrs, _amts, _minShells, _dline));
+        return abi.decode(result, (uint256));
+    }
+
+    /// @author james foley http://github.com/realisation
+    /// @notice selectively deposit any supported stablecoin flavor into the contract in return for corresponding amount of shell tokens
+    /// @param _flvrs an array containing the addresses of the flavors being deposited into
+    /// @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
+    /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
+    function viewSelectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts) external view notFrozen returns (uint256) {
+        bytes memory result = staticTo(liquidity, abi.encodeWithSignature("viewSelectiveDeposit(address[],uint256[])", _flvrs, _amts));
         return abi.decode(result, (uint256));
     }
 
@@ -235,7 +247,16 @@ contract Loihi is LoihiRoot {
     /// @param _totalTokens the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
     /// @return shellsToMint_ the amount of shells you receive in return for your deposit
     function proportionalDeposit (uint256 _totalTokens) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("proportionalDeposit(uint256)", _totalTokens));
+        bytes memory result = delegateTo(liquidity, abi.encodeWithSignature("proportionalDeposit(uint256)", _totalTokens));
+        return abi.decode(result, (uint256));
+    }
+
+    /// @author james foley http://github.com/realisation
+    /// @notice deposit into the pool with no slippage from the numeraire assets the pool supports
+    /// @param _totalTokens the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
+    /// @return shellsToMint_ the amount of shells you receive in return for your deposit
+    function viewProportionalDeposit (uint256 _totalTokens) external view notFrozen returns (uint256) {
+        bytes memory result = staticTo(liquidity, abi.encodeWithSignature("viewProportionalDeposit(uint256)", _totalTokens));
         return abi.decode(result, (uint256));
     }
 
@@ -245,7 +266,17 @@ contract Loihi is LoihiRoot {
     /// @param _amts an array of amounts to withdraw that maps to _flavors
     /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("selectiveWithdraw(address[],uint256[],uint256,uint256)", _flvrs, _amts, _maxShells, _dline));
+        bytes memory result = delegateTo(liquidity, abi.encodeWithSignature("selectiveWithdraw(address[],uint256[],uint256,uint256)", _flvrs, _amts, _maxShells, _dline));
+        return abi.decode(result, (uint256));
+    }
+
+    /// @author james foley http://github.com/realisation
+    /// @notice selectively withdrawal any supported stablecoin flavor from the contract by burning a corresponding amount of shell tokens
+    /// @param _flvrs an array of flavors to withdraw from the reserves
+    /// @param _amts an array of amounts to withdraw that maps to _flavors
+    /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
+    function viewSelectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts) external view notFrozen returns (uint256) {
+        bytes memory result = staticTo(liquidity, abi.encodeWithSignature("viewSelectiveWithdraw(address[],uint256[])", _flvrs, _amts));
         return abi.decode(result, (uint256));
     }
 
@@ -254,20 +285,21 @@ contract Loihi is LoihiRoot {
     /// @param _totalShells the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
     function proportionalWithdraw (uint256 _totalShells) external nonReentrant returns (uint256[] memory) {
-        bytes memory result = delegateTo(exchange, abi.encodeWithSignature("proportionalWithdraw(uint256)", _totalShells));
+        bytes memory result = delegateTo(liquidity, abi.encodeWithSignature("proportionalWithdraw(uint256)", _totalShells));
         return abi.decode(result, (uint256[]));
     }
 
-    function getNumeraires () public returns (address[] memory) {
-        return numeraires;
+    /// @author james foley http://github.com/realisation
+    /// @notice withdrawas amount of shell tokens from the the pool equally from the numeraire assets of the pool with no slippage
+    /// @param _totalShells the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
+    /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
+    function viewProportionalWithdraw (uint256 _totalShells) external nonReentrant returns (uint256[] memory) {
+        bytes memory result = staticTo(liquidity, abi.encodeWithSignature("viewProportionalWithdraw(uint256)", _totalShells));
+        return abi.decode(result, (uint256[]));
     }
 
-    function getReserves () public returns (address[] memory) {
-        return reserves;
-    }
-
-    function totalReserves () external returns (uint256, uint256[] memory) {
-        bytes memory result = staticTo(views, abi.encodeWithSignature("totalReserves(address[],address)", reserves, address(this)));
+    function totalReserves () external view returns (uint256, uint256[] memory) {
+        bytes memory result = staticTo(liquidity, abi.encodeWithSignature("totalReserves(address[],address)", reserves, address(this)));
         return abi.decode(result, (uint256, uint256[]));
     }
 

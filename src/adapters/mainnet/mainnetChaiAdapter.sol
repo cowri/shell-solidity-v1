@@ -36,7 +36,8 @@ contract MainnetChaiAdapter {
         uint256 daiAmt = dai.balanceOf(address(this));
         chai.exit(msg.sender, amount);
         daiAmt = dai.balanceOf(address(this)) - daiAmt;
-        cdai.mint(daiAmt);
+        uint256 success = cdai.mint(daiAmt);
+        if (success != 0) revert("CDai/mint-failed");
         return daiAmt;
 
     }
@@ -47,7 +48,8 @@ contract MainnetChaiAdapter {
 
         uint256 chaiBal = chai.balanceOf(msg.sender);
         chai.draw(msg.sender, amount);
-        cdai.mint(amount);
+        uint256 success = cdai.mint(amount);
+        if (success != 0) revert("CDai/mint-failed");
         return chaiBal - chai.balanceOf(msg.sender);
 
     }
@@ -56,7 +58,8 @@ contract MainnetChaiAdapter {
     // transfers corresponding chai to destination address
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
-        cdai.redeemUnderlying(amount);
+        uint256 success = cdai.redeemUnderlying(amount);
+        if (success != 0) revert("CDai/redeemUnderlying-failed");
         uint256 chaiBal = chai.balanceOf(dst);
         chai.join(dst, amount);
         return chai.balanceOf(dst) - chaiBal;
@@ -67,7 +70,8 @@ contract MainnetChaiAdapter {
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         uint256 daiAmt = rmul(amount, pot.chi());
-        cdai.redeemUnderlying(daiAmt);
+        uint256 success = cdai.redeemUnderlying(daiAmt);
+        if (success != 0) revert("CDai/redeemUnderlying-failed");
         chai.join(dst, daiAmt);
         return daiAmt;
 

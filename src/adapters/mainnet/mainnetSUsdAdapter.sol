@@ -41,8 +41,6 @@ contract MainnetSUsdAdapter {
         susd.transferFrom(msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         pool.deposit(address(susd), amount, 0);
-        uint256 bal = getASUsd().balanceOf(address(this));
-        emit log_uint("BAL AFTER", bal);
         return amount;
 
     }
@@ -53,8 +51,6 @@ contract MainnetSUsdAdapter {
         safeTransferFrom(susd, msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         pool.deposit(address(susd), amount, 0);
-        uint256 bal = getASUsd().balanceOf(address(this));
-        emit log_uint("BAL AFTER", bal);
         return amount;
 
     }

@@ -40,10 +40,6 @@ contract LocalChaiAdapter is LoihiRoot {
     function intakeRaw (uint256 amount) public returns (uint256) {
 
         uint256 daiAmt = dai.balanceOf(address(this));
-        uint256 chaiBal = chai.balanceOf(msg.sender);
-        emit log_uint("chaiBal", chaiBal);
-        emit log_addr("ME", address(this));
-        emit log_addr("THEM", msg.sender);
         chai.exit(msg.sender, amount);
         daiAmt = dai.balanceOf(address(this)) - daiAmt;
         cdai.mint(daiAmt);
