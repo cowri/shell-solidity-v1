@@ -94,8 +94,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             shellsBurned_ = wdiv(wmul(sub(_oUtilPrime, _nUtil), totalSupply), _oUtil);
         }
 
-        emit log_uint("old sum", _oSum);
-
     }
 
     /// @notice this function allows selective depositing of any supported stablecoin flavor into the contract in return for corresponding shell tokens
@@ -163,8 +161,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             uint256 _oUtilPrime = sub(_oSum, wmul(_oFees, lambda));
             shellsMinted_ = wdiv(wmul(sub(_nUtil, _oUtilPrime), totalSupply), _oUtil);
         }
-
-        emit log_uint("old sum", _oSum);
 
     }
 
@@ -239,8 +235,8 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         uint256 _oSum;
 
         for (uint i = 0; i < reserves.length; i++) {
-            Flavor memory _f = flavors[numeraires[i]];
             _oSum += dGetNumeraireBalance(reserves[i]);
+            Flavor memory _f = flavors[numeraires[i]];
             _amounts[i] = dIntakeNumeraire(_f.adapter, wmul(weights[i], _deposit));
         }
 
@@ -251,7 +247,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         _mint(msg.sender, _deposit);
 
         emit ShellsMinted(msg.sender, _deposit, numeraires, _amounts);
-
+        
         return _deposit;
 
     }
@@ -270,11 +266,11 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         require(_withdrawal <= balances[msg.sender], "withdrawal amount exceeds your balance");
 
         uint256 _oSum;
-        uint256 _withdrawMultiplier = wdiv(wmul(_withdrawal, WAD+(epsilon/2)), totalSupply);
+        uint256 _withdrawMultiplier = wdiv(wmul(_withdrawal, WAD-(epsilon/2)), totalSupply);
         uint256[] memory withdrawalAmts_ = new uint256[](reserves.length);
         for (uint i = 0; i < reserves.length; i++) {
             _oSum += dGetNumeraireBalance(reserves[i]);
-            uint256 _proportionateValue = wmul(wmul(dGetNumeraireBalance(reserves[i]), _withdrawMultiplier), WAD-epsilon);
+            uint256 _proportionateValue = wmul(dGetNumeraireBalance(reserves[i]), _withdrawMultiplier);
             Flavor memory _f = flavors[numeraires[i]];
             withdrawalAmts_[i] = dOutputNumeraire(_f.adapter, msg.sender, _proportionateValue);
         }

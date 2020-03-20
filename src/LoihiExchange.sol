@@ -36,9 +36,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         // (uint256[] memory _balances, uint256 _grossLiq) = viewBalancesAndGrossLiq();
 
         // uint256 _oNAmt = dViewNumeraireAmount(_o.adapter, _oAmt);
-        // _oNAmt = wmul(_oNAmt, WAD-(epsilon/2));
         // uint256 _tNAmt = getTargetAmount(_o.reserve, _t.reserve, _oNAmt, _balances, _grossLiq);
-        // _tNAmt = wmul(_tNAmt, WAD-(epsilon/2));
 
         // return dViewRawAmount(_t.adapter, _tNAmt);
 
@@ -70,15 +68,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
         (uint256[] memory _balances, uint256 _grossLiq) = getBalancesAndGrossLiq();
 
         uint256 _oNAmt = dGetNumeraireAmount(_o.adapter, _oAmt);
-        // emit log_uint("_oNAmt before fee", _oNAmt);
-        // _oNAmt = wmul(_oNAmt, WAD-(epsilon/2));
-        // _oNAmt = wmul(_oNAmt, WAD-(epsilon));
-        // emit log_uint("_oNAmt after fee", _oNAmt);
         uint256 _tNAmt = getTargetAmount(_o.reserve, _t.reserve, _oNAmt, _balances, _grossLiq);
-        // emit log_uint("_tNAmt before fee", _tNAmt);
-        // _tNAmt = wmul(_tNAmt, WAD-(epsilon/2));
-        // _tNAmt = wmul(_tNAmt, WAD-(epsilon));
-        // emit log_uint("_tNAmt after fee", _tNAmt);
 
         dIntakeRaw(_o.adapter, _oAmt);
         uint256 tAmt_ = dOutputNumeraire(_t.adapter, _recipient, _tNAmt);
@@ -145,7 +135,6 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
         // uint256 _tNAmt = dViewNumeraireAmount(_t.adapter, _tAmt);
         // uint256 _oNAmt = getOriginAmount(_o.reserve, _t.reserve, _tNAmt, _balances, _grossLiq);
-        // _oNAmt = wmul(_oNAmt, WAD + epsilon);
 
         // return dViewRawAmount(_o.adapter, _oNAmt);
 
@@ -165,8 +154,8 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
                 if (j == 0) _oFees += makeFee(_balances[i], wmul(_grossLiq, weights[i]));
                 if (i == 0) _nGLiq = _grossLiq + _oNAmt - tNAmt_;
                 uint256 _nIdeal = wmul(_nGLiq, weights[i]);
-                if (reserves[i] == _oRsrv) _nFees += makeFee(_balances[i] + _oNAmt, _nIdeal);
-                else if (reserves[i] == _tRsrv) _nFees += makeFee(_balances[i] - tNAmt_, _nIdeal);
+                if (reserves[i] == _oRsrv) _nFees += makeFee(add(_balances[i], _oNAmt), _nIdeal);
+                else if (reserves[i] == _tRsrv) _nFees += makeFee(sub(_balances[i], tNAmt_), _nIdeal);
                 else _nFees += makeFee(_balances[i], _nIdeal);
             }
             if ((tNAmt_ = _oNFAmt + _oFees - _nFees) / 10000000000 == tNAmt_ / 10000000000) break;
@@ -197,8 +186,8 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
                 if (j == 0) _oFees += makeFee(_balances[i], wmul(_grossLiq, weights[i]));
                 if (i == 0) _nGLiq = _grossLiq + oNAmt_ - _tNAmt;
                 uint256 _nIdeal = wmul(_nGLiq, weights[i]);
-                if (reserves[i] == _oRsrv) _nFees += makeFee(_balances[i] + oNAmt_, _nIdeal);
-                else if (reserves[i] == _tRsrv) _nFees += makeFee(_balances[i] - _tNAmt, _nIdeal);
+                if (reserves[i] == _oRsrv) _nFees += makeFee(add(_balances[i], oNAmt_), _nIdeal);
+                else if (reserves[i] == _tRsrv) _nFees += makeFee(sub(_balances[i], _tNAmt), _nIdeal);
                 else _nFees += makeFee(_balances[i], _nIdeal);
             }
             if ((oNAmt_ = _tNFAmt + _nFees - _oFees) / 10000000000 == oNAmt_ / 10000000000) break;

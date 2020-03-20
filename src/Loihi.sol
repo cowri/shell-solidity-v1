@@ -341,6 +341,10 @@ contract Loihi is LoihiRoot {
         return true;
     }
 
+    function balanceOf(address account) public view returns (uint256) {
+        return balances[account];
+    }
+
     /**
      * @dev See {IERC20-transferFrom}.
      *

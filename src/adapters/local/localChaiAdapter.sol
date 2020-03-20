@@ -33,8 +33,6 @@ contract LocalChaiAdapter is LoihiRoot {
         _cdai = ICToken(__cdai);
     }
 
-    event log_uint(bytes32, uint256);
-
     // takes raw chai amount
     // transfers it into our balance
     function intakeRaw (uint256 amount) public returns (uint256) {

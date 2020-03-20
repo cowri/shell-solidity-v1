@@ -37,8 +37,6 @@ contract LocalUsdtAdapter is LoihiRoot {
 
     }
 
-    event log_uint(bytes32, uint256);
-
     // transfers usdt in
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 

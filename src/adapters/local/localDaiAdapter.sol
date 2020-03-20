@@ -37,10 +37,6 @@ contract LocalDaiAdapter is LoihiRoot {
 
     }
 
-    event log_addr(bytes32, address);
-    event log_erc20(bytes32, IERC20);
-
-
     // transfers dai in
     // wraps it in cdai
     function intakeNumeraire (uint256 amount) public returns (uint256) {
@@ -48,8 +44,6 @@ contract LocalDaiAdapter is LoihiRoot {
         cdai.mint(amount);
         return amount;
     }
-
-    event log_uint(bytes32, uint256);
 
     // unwraps chai
     // transfers out dai
@@ -81,7 +75,6 @@ contract LocalDaiAdapter is LoihiRoot {
         
         uint256 rate = _cdai.exchangeRateCurrent();
         uint256 balance = _cdai.balanceOf(addr);
-        emit log_uint("balance", balance);
         return wmul(balance, rate);
 
     }

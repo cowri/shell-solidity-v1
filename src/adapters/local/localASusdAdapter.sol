@@ -74,8 +74,6 @@ contract LocalASUsdAdapter is LoihiRoot {
 
     function viewNumeraireBalance (address addr) public returns (uint256) {
 
-        // emit log_addr("ADDRESS", addr);
-
         return _asusd.balanceOf(addr);
 
     }
@@ -95,7 +93,7 @@ contract LocalASUsdAdapter is LoihiRoot {
     }
 
     function getNumeraireBalance () public returns (uint256) {
-
+        
         return asusd.balanceOf(address(this));
 
     }

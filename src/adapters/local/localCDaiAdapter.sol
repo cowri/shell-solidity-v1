@@ -136,9 +136,6 @@ contract LocalCDaiAdapter is LoihiRoot {
 
     }
 
-    event log_uint(bytes32, uint256);
-    event log_addr(bytes32, address);
-
     uint constant WAD = 10 ** 18;
     
     function add(uint x, uint y) internal pure returns (uint z) {

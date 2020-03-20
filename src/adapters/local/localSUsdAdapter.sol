@@ -27,8 +27,6 @@ contract LocalSUsdAdapter is LoihiRoot {
         _asusd = IAToken(__asusd);
     }
 
-    event log_uint(bytes32, uint256);
-
     // transfers susd in
     function intakeRaw (uint256 amount) public returns (uint256) {
 
