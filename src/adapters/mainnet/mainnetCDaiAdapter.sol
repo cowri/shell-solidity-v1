@@ -21,8 +21,6 @@ contract MainnetCDaiAdapter {
 
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
 
-    event log_uint(bytes32, uint256 amount);
-
     // takes raw cdai amount
     // unwraps it into dai
     // deposits dai amount in chai
@@ -108,6 +106,7 @@ contract MainnetCDaiAdapter {
 
         uint256 rate = cdai.exchangeRateStored();
         uint256 balance = cdai.balanceOf(addr);
+        if (balance == 0) return 0;
         return wmul(balance, rate);
 
     }

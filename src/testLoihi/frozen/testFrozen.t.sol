@@ -3,24 +3,31 @@
 // import "ds-test/test.sol";
 // import "ds-math/math.sol";
 // import "../loihiSetup.sol";
-// import "../flavorsSetup.sol";
-// import "../../interfaces/Intefaces/IAdapter.sol";
 
 // contract LoihiTest is LoihiSetup, DSMath, DSTest {
 
 //     function setUp() public {
 
+//         setupLoihi();
 //         setupFlavors();
 //         setupAdapters();
-//         setupLoihi();
-//         approveFlavors(address(l));
-//         includeAdapters(address(l), 1);
+//         approveFlavors();
+//         executeApprovals();
+//         includeAdapters(0);
 
 //     }
 
 //     function testFailFrozen () public {
 
-//         l.freeze(true);
+//         l1.freeze(true);
+//         uint256 mintedShells = l1.proportionalDeposit(100 * (10 ** 18));
+
+//     }
+
+//     function testUnfreeze () public {
+
+//         l1.freeze(true);
+//         l1.freeze(false);
 //         uint256 mintedShells = l1.proportionalDeposit(100 * (10 ** 18));
 
 //     }

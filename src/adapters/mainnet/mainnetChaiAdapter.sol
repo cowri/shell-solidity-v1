@@ -95,6 +95,7 @@ contract MainnetChaiAdapter {
 
         uint256 rate = cdai.exchangeRateStored();
         uint256 balance = cdai.balanceOf(addr);
+        if (balance == 0) return 0;
         return wmul(balance, rate);
 
     }

@@ -20,8 +20,6 @@ contract MainnetCUsdcAdapter {
     constructor () public { }
 
     ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
-    event log_uint(bytes32, uint256);
-    event log_bool(bytes32, bool);
     
     // takes raw cusdc amount and transfers it in
     function intakeRaw (uint256 amount) public returns (uint256) {
@@ -109,6 +107,7 @@ contract MainnetCUsdcAdapter {
 
         uint256 rate = cusdc.exchangeRateStored();
         uint256 balance = cusdc.balanceOf(addr);
+        if (balance == 0) return 0;
         return wmul(balance, rate) * 1000000000000;
 
     }
@@ -118,7 +117,7 @@ contract MainnetCUsdcAdapter {
     function getRawAmount (uint256 amount) public returns (uint256) {
 
         uint256 rate = cusdc.exchangeRateCurrent();
-        return wdiv(amount / 1000000000000 , rate);
+        return wdiv(amount / 1000000000000, rate);
 
     }
 

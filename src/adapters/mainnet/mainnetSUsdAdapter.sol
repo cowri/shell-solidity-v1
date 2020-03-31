@@ -33,11 +33,9 @@ contract MainnetSUsdAdapter {
 
     }
 
-    event log_uint(bytes32, uint256);
-
     // transfers susd in
     function intakeRaw (uint256 amount) public returns (uint256) {
-
+        
         susd.transferFrom(msg.sender, address(this), amount);
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         pool.deposit(address(susd), amount, 0);

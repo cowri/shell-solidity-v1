@@ -46,9 +46,6 @@ contract MainnetDaiAdapter {
 
     }
 
-
-    event log_uint(bytes32, uint256);
-
     // unwraps cdai
     // transfers out dai
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
