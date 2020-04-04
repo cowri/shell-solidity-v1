@@ -94,17 +94,17 @@ contract LoihiSetup {
     function setupLoihi () public {
 
         l1 = new Loihi(
-            // address(new LoihiExchange()),
-            // address(new LoihiLiquidity()),
-            // address(new LoihiViews()),
-            // address(new LoihiERC20())
+            address(new LoihiExchange()),
+            address(new LoihiLiquidity()),
+            address(new LoihiViews()),
+            address(new LoihiERC20())
         );
 
         l2 = new Loihi(
-            // address(new LoihiExchange()),
-            // address(new LoihiLiquidity()),
-            // address(new LoihiViews()),
-            // address(new LoihiERC20())
+            address(new LoihiExchange()),
+            address(new LoihiLiquidity()),
+            address(new LoihiViews()),
+            address(new LoihiERC20())
         );
 
     }
@@ -445,6 +445,12 @@ contract LoihiSetup {
         delta = 100000000000000000;
         epsilon = 250000000000000;
         lambda = 200000000000000000;
+
+        // alpha = 900000000000000000; // .9
+        // beta = 400000000000000000; // .4
+        // delta = 150000000000000000; // .15
+        // epsilon = 175000000000000; // 1.75 bps * 2 = 3.5 bps
+        // lambda = 500000000000000000; // .5
 
         l1.setParams(alpha, beta, delta, epsilon, lambda, 0);
         l2.setParams(alpha, beta, delta, epsilon, lambda, 0);
