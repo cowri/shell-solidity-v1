@@ -108,10 +108,8 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
             } else {
                 if ((oNAmt_ = _tNFAmt - wmul(_globals[4], _globals[5] - _psi)) / 10000000000 == oNAmt_ / 10000000000) break;
             }
-            
-        }
 
-        if (_globals[5] > _psi) oNAmt_ = sub(_tNFAmt, wmul(_globals[4], sub(_globals[5], _psi)));
+        }
 
         for (uint i = 0; i < _balances.length; i++) {
             uint256 _ideal = wmul(_nGLiq, _weights[i]);
@@ -157,12 +155,12 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
         if (_globals[5] < _psi) {
             uint256 _oUtil = sub(_oSum, _globals[5]);
             uint256 _nUtil = sub(_nSum, _psi);
-            if (_oUtil == 0) return _nUtil;
+            if (_oUtil == 0) return wmul(_nUtil, WAD+_globals[3]);
             shellsBurned_ = wdiv(wmul(sub(_oUtil, _nUtil), _globals[6]), _oUtil);
         } else {
             uint256 _oUtil = sub(_oSum, _globals[5]);
             uint256 _nUtil = sub(_nSum, wmul(_psi, _globals[4]));
-            if (_oUtil == 0) return _nUtil;
+            if (_oUtil == 0) return wmul(_nUtil, WAD+_globals[3]);
             uint256 _oUtilPrime = wmul(_globals[5], _globals[4]);
             _oUtilPrime = sub(_oSum, _oUtilPrime);
             shellsBurned_ = wdiv(wmul(sub(_oUtilPrime, _nUtil), _globals[6]), _oUtil);
@@ -184,17 +182,19 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
             _oSum = add(_oSum, _balances[i]);
         }
 
+        require(_oSum < _nSum, "insufficient-deposit");
+
         uint256 _psi = viewMintFees(_balances, _deposits, _globals, _weights, _nSum, _oSum);
 
         if (_globals[5] < _psi) {
             uint256 _oUtil = sub(_oSum, _globals[5]);
             uint256 _nUtil = sub(_nSum, _psi);
-            if (_oUtil == 0) return _nUtil;
+            if (_oUtil == 0 || _globals[6] == 0) return wmul(_nUtil, WAD-_globals[3]);
             shellsMinted_ = wdiv(wmul(sub(_nUtil, _oUtil), _globals[6]), _oUtil);
         } else {
             uint256 _oUtil = sub(_oSum, _globals[5]);
             uint256 _nUtil = sub(_nSum, wmul(_psi, _globals[4]));
-            if (_oUtil == 0) return _nUtil;
+            if (_oUtil == 0 || _globals[6] == 0) return wmul(_nUtil, WAD-_globals[3]);
             uint256 _oUtilPrime = wmul(_globals[5], _globals[4]);
             _oUtilPrime = sub(_oSum, _oUtilPrime);
             shellsMinted_ = wdiv(wmul(sub(_nUtil, _oUtilPrime), _globals[6]), _oUtil);

@@ -94,17 +94,17 @@ contract LoihiSetup {
     function setupLoihi () public {
 
         l1 = new Loihi(
-            address(new LoihiExchange()),
-            address(new LoihiLiquidity()),
-            address(new LoihiViews()),
-            address(new LoihiERC20())
+            // address(new LoihiExchange()),
+            // address(new LoihiLiquidity()),
+            // address(new LoihiViews()),
+            // address(new LoihiERC20())
         );
 
         l2 = new Loihi(
-            address(new LoihiExchange()),
-            address(new LoihiLiquidity()),
-            address(new LoihiViews()),
-            address(new LoihiERC20())
+            // address(new LoihiExchange()),
+            // address(new LoihiLiquidity()),
+            // address(new LoihiViews()),
+            // address(new LoihiERC20())
         );
 
     }

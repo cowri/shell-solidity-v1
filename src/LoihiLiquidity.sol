@@ -124,6 +124,8 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
             _nSum = add(_nSum, add(_balances[i], _deposits[i]));
         }
 
+        require(_oSum < _nSum, "insufficient-deposit");
+
         uint256 _psi;
         for (uint i = 0; i < _balances.length; i++) {
             uint256 _nBal = add(_balances[i], _deposits[i]);

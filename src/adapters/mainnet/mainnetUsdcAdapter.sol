@@ -82,6 +82,7 @@ contract MainnetUsdcAdapter {
 
         uint256 rate = cusdc.exchangeRateStored();
         uint256 balance = cusdc.balanceOf(addr);
+        if (balance == 0) return 0;
         return wmul(balance, rate) * 1000000000000;
 
     }

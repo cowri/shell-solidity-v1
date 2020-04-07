@@ -184,10 +184,10 @@ contract ViewTargetSwapTest is LoihiSetup, DSMath, DSTest {
     //     assertTrue(!success);
     // }
 
-    function testThing () public {
-        deposit(dai, 13787004200000000000, usdc, 39926669, usdt, 32476855, susd, 7503542900000000000);
-        uint256 targetAmount = l1.viewOriginTrade(usdt, dai, 12080000);
-    }
+    // function testThing () public {
+    //     deposit(dai, 13787004200000000000, usdc, 39926669, usdt, 32476855, susd, 7503542900000000000);
+    //     uint256 targetAmount = l1.viewOriginTrade(usdt, dai, 12080000);
+    // }
 
     // function testNoFeesPartiallyUnbalanced10PctTarget () public {
     //     deposit(dai, 80*WAD, usdc, 100*(10**6), usdt, 85*(10**6), susd, 35*WAD);

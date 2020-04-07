@@ -14,7 +14,6 @@
 pragma solidity ^0.5.15;
 
 import "./LoihiRoot.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 
 contract ERC20Approve {
     function approve (address spender, uint256 amount) public returns (bool);
@@ -35,12 +34,12 @@ contract Loihi is LoihiRoot {
     address constant susd = 0x57Ab1ec28D129707052df4dF418D58a2D46d5f51;
     address constant asusd = 0x625aE63000f46200499120B906716420bd059240;
 
-    address constant daiAdapter = 0x9E77104724A8390b6f2e80E222B5E8fe7eb7383f;
-    address constant cdaiAdapter = 0xaEb74F5a22935FB6c812395c3e2fE2F5258c8d6E;
-    address constant chaiAdapter = 0x21C09C793cc94c964D76cEC0A80D2cC61f155375;
+    address constant daiAdapter = 0xaC3DcacaF33626963468c58001414aDf1a4CCF86;
+    address constant cdaiAdapter = 0xA5F095e778B30DcE3AD25D5A545e3e9d6092f1Af;
+    address constant chaiAdapter = 0x251D87F3d6581ae430a8Df18C2474DA07C569615;
 
-    address constant usdcAdapter = 0x54B7b567bc634E19632A8E85EEaE4EAE955ae9f9;
-    address constant cusdcAdapter = 0xf5AB3FFD9F92893cAf1CBCcEC01b1c6EaA140C3f;
+    address constant usdcAdapter = 0x98dD552EaEc607f9804fbd9758Df9C30Ada60B7B;
+    address constant cusdcAdapter = 0xA189607D20afFA0b1a578f9D14040822D507978F;
 
     address constant usdtAdapter = 0xCd0dA368E6e32912DD6633767850751969346d15;
     address constant ausdtAdapter = 0xA4906F20a7806ca28626d3D607F9a594f1B9ed3B;
@@ -131,7 +130,7 @@ contract Loihi is LoihiRoot {
         delete flavors[flavor];
     }
 
-    function delegateTo(address callee, bytes memory data) internal returns (bytes memory) {
+    function delegateTo (address callee, bytes memory data) internal returns (bytes memory) {
         (bool success, bytes memory returnData) = callee.delegatecall(data);
         assembly {
             if eq(success, 0) { revert(add(returnData, 0x20), returndatasize) }
@@ -139,7 +138,7 @@ contract Loihi is LoihiRoot {
         return returnData;
     }
 
-    function staticTo(address callee, bytes memory data) internal view returns (bytes memory) {
+    function staticTo (address callee, bytes memory data) internal view returns (bytes memory) {
         (bool success, bytes memory returnData) = callee.staticcall(data);
         assembly {
             if eq(success, 0) { revert(add(returnData, 0x20), returndatasize) }
@@ -261,7 +260,7 @@ contract Loihi is LoihiRoot {
     /// @param _flvrs an array containing the addresses of the flavors being deposited into
     /// @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
-    function viewSelectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts) external view notFrozen returns (uint256) {
+    function viewSelectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts) external notFrozen view returns (uint256) {
         uint256[] memory _globals = new uint256[](7);
         _globals[0] = alpha; _globals[1] = beta; _globals[2] = delta; _globals[3] = epsilon; _globals[4] = lambda; _globals[5] = omega; _globals[6] = totalSupply;
         address[] memory _flavors = new address[](_flvrs.length*2);

@@ -90,11 +90,6 @@ interface ILoihi {
 
     function owner () external view returns (address);
 
-    function freeze (
-        bool freeze
-    ) external;
-
-
     function includeNumeraireReserveAndWeight (address numeraire, address reserve, uint256 weight) external;
     function includeAdapter (address flavor, address adapter, address reserve, uint256 weight) external;
     function excludeAdapter (address flavor) external;

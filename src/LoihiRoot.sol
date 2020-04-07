@@ -15,13 +15,6 @@ pragma solidity ^0.5.15;
 
 import "ds-math/math.sol";
 
-import "./interfaces/IAToken.sol";
-import "./interfaces/ICToken.sol";
-import "./interfaces/IChai.sol";
-import "./interfaces/IPot.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-
 contract LoihiRoot is DSMath {
 
     string  public constant name = "Shells";
@@ -54,8 +47,8 @@ contract LoihiRoot is DSMath {
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
 
     address constant exchange = 0xfb8443545771E2BB15bB7cAdDa43A16a1Ab69c0B;
-    address constant liquidity = 0x5C3acA8BEf2a1Bb584CdCE82AFfA1bA1A0379592;
-    address constant views = 0xf4dfCb3Dbde3448dba82736d466B4C26a4e9B15f;
+    address constant liquidity = 0xA3f4A860eFa4a60279E6E50f2169FDD080aAb655;
+    address constant views = 0x81dBd2ec823cB2691f34c7b5391c9439ec5c80E3;
     address constant erc20 = 0x7DB32869056647532f80f482E5bB1fcb311493cD;
 
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
