@@ -17,8 +17,9 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../aaveResources/ILendingPool.sol";
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../../interfaces/IAToken.sol";
+import "../adapterDSMath.sol";
 
-contract MainnetSUsdAdapter {
+contract MainnetSUsdAdapter is AdapterDSMath {
 
     constructor () public { }
 
@@ -89,26 +90,6 @@ contract MainnetSUsdAdapter {
 
     }
 
-    function getRawAmount (uint256 amount) public pure returns (uint256) {
-
-        return amount;
-
-    }
-
-    // returns amount, is already numeraire amount
-    function getNumeraireAmount (uint256 amount) public returns (uint256) {
-
-        return amount;
-
-    }
-
-    // returns balance
-    function getNumeraireBalance () public returns (uint256) {
-
-        return getASUsd().balanceOf(address(this));
-
-    }
-    
     function safeTransfer(IERC20 token, address to, uint256 value) internal {
 
         callOptionalReturn(address(token), abi.encodeWithSelector(0xa9059cbb, to, value));

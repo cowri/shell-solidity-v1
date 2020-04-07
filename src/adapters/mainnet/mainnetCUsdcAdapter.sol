@@ -14,8 +14,9 @@
 pragma solidity ^0.5.12;
 
 import "../../interfaces/ICToken.sol";
+import "../adapterDSMath.sol";
 
-contract MainnetCUsdcAdapter {
+contract MainnetCUsdcAdapter is AdapterDSMath {
 
     constructor () public { }
 
@@ -112,44 +113,4 @@ contract MainnetCUsdcAdapter {
 
     }
 
-    // takes raw cusdc amount
-    // returns corresponding numeraire amount
-    function getRawAmount (uint256 amount) public returns (uint256) {
-
-        uint256 rate = cusdc.exchangeRateCurrent();
-        return wdiv(amount / 1000000000000, rate);
-
-    }
-
-    // takes raw cusdc amount
-    // returns corresponding numeraire amount
-    function getNumeraireAmount (uint256 amount) public returns (uint256) {
-
-        uint256 rate = cusdc.exchangeRateCurrent();
-        return wmul(amount, rate) * 1000000000000;
-
-    }
-
-    // returns numeraire amount of balance
-    function getNumeraireBalance () public returns (uint256) {
-
-        return cusdc.balanceOfUnderlying(address(this)) * 1000000000000;
-
-    }
-
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "ds-math-add-overflow");
-    }
-
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
-    }
-
-    function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), 1000000000000000000 / 2) / 1000000000000000000;
-    }
-
-    function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, 1000000000000000000), y / 2) / y;
-    }
 }

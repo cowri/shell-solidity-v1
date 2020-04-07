@@ -17,8 +17,9 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../aaveResources/ILendingPool.sol";
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../../interfaces/IAToken.sol";
+import "../adapterDSMath.sol";
 
-contract MainnetUsdtAdapter {
+contract MainnetUsdtAdapter is AdapterDSMath {
 
     constructor () public { }
 
@@ -74,7 +75,6 @@ contract MainnetUsdtAdapter {
 
     }
 
-
     function viewRawAmount (uint256 amount) public pure returns (uint256) {
 
         return amount / 1000000000000;
@@ -93,36 +93,12 @@ contract MainnetUsdtAdapter {
 
     }
 
-    function getRawAmount (uint256 amount) public pure returns (uint256) {
-
-        return amount / 1000000000000;
-
-    }
-
-    // returns amount, is already numeraire amount
-    function getNumeraireAmount (uint256 amount) public returns (uint256) {
-
-        return amount * 1000000000000;
-
-    }
-
-    // returns balance
-    function getNumeraireBalance () public returns (uint256) {
-
-        return getAUsdt().balanceOf(address(this)) * 1000000000000;
-
-    }
-    
     function safeTransfer(IERC20 token, address to, uint256 value) internal {
         callOptionalReturn(address(token), abi.encodeWithSelector(0xa9059cbb, to, value));
     }
 
     function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
         callOptionalReturn(address(token), abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
-    }
-
-    function safeApprove(IERC20 token, address spender, uint256 value) internal {
-        callOptionalReturn(address(token), abi.encodeWithSelector(token.approve.selector, spender, value));
     }
 
     function callOptionalReturn(address token, bytes memory data) private {

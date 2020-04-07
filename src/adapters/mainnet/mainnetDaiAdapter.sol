@@ -15,8 +15,9 @@ pragma solidity ^0.5.12;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../../interfaces/ICToken.sol";
+import "../adapterDSMath.sol";
 
-contract MainnetDaiAdapter {
+contract MainnetDaiAdapter is AdapterDSMath {
 
     constructor () public { }
 
@@ -81,42 +82,6 @@ contract MainnetDaiAdapter {
         if (balance == 0) return 0;
         return wmul(balance, rate);
 
-    }
-
-    function getRawAmount (uint256 amount) public pure returns (uint256) {
-
-        return amount;
-
-    }
-
-    // returns amount, already in numeraire
-    function getNumeraireAmount (uint256 amount) public pure returns (uint256) {
-
-        return amount;
-
-    }
-
-    // returns numeraire amount of chai balance
-    function getNumeraireBalance () public returns (uint256) {
-
-        return cdai.balanceOfUnderlying(address(this));
-
-    }
-
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "ds-math-add-overflow");
-    }
-
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
-    }
-
-    function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), WAD / 2) / WAD;
-    }
-
-    function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, WAD), y / 2) / y;
     }
 
 }

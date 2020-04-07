@@ -16,9 +16,10 @@ pragma solidity ^0.5.12;
 import "../../interfaces/IAToken.sol";
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../aaveResources/ILendingPool.sol";
+import "../adapterDSMath.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract MainnetASUsdAdapter {
+contract MainnetASUsdAdapter is AdapterDSMath {
 
     address constant susd = 0x57Ab1ec28D129707052df4dF418D58a2D46d5f51;
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
@@ -55,9 +56,6 @@ contract MainnetASUsdAdapter {
 
     }
 
-    // unwraps numeraire amount of dai from chai
-    // wraps it into cdai amount
-    // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
         getASUsd().transfer(dst, amount);
@@ -82,53 +80,5 @@ contract MainnetASUsdAdapter {
         return getASUsd().balanceOf(addr);
 
     }
-
-    // takes raw amount and gives numeraire amount
-    function getRawAmount (uint256 amount) public returns (uint256) {
-
-        return amount;
-
-    }
-
-    // takes raw amount and gives numeraire amount
-    function getNumeraireAmount (uint256 amount) public returns (uint256) {
-
-        return amount;
-
-    }
-
-    function getNumeraireBalance () public returns (uint256) {
-
-        return getASUsd().balanceOf(address(this));
-
-    }
-
-    uint constant WAD = 10 ** 18;
-    
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "ds-math-add-overflow");
-    }
-
-    function sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x);
-    }
-
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
-    }
-
-    function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), WAD) / WAD;
-    }
-
-    function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, WAD), y / 2) / y;
-    }
-
-    function wdivup(uint x, uint y) internal pure returns (uint z) {
-        // always rounds up
-        z = add(mul(x, WAD), sub(y, 1)) / y;
-    }
-
 
 }

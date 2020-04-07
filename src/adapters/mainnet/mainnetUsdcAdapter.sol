@@ -15,8 +15,9 @@ pragma solidity ^0.5.12;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../../interfaces/ICToken.sol";
+import "../adapterDSMath.sol";
 
-contract MainnetUsdcAdapter {
+contract MainnetUsdcAdapter is AdapterDSMath {
 
     constructor () public { }
 
@@ -87,40 +88,4 @@ contract MainnetUsdcAdapter {
 
     }
 
-    function getRawAmount (uint256 amount) public pure returns (uint256) {
-
-        return amount / 1000000000000;
-
-    }
-
-    // is already numeraire amount
-    function getNumeraireAmount (uint256 amount) public pure returns (uint256) {
-
-        return amount * 1000000000000;
-
-    }
-
-    // returns numeraire balance
-    function getNumeraireBalance () public returns (uint256) {
-
-        uint256 bal = cusdc.balanceOfUnderlying(address(this));
-        return bal * 1000000000000;
-
-    }
-
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "ds-math-add-overflow");
-    }
-
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
-    }
-
-    function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), WAD / 2) / WAD;
-    }
-
-    function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, WAD), y / 2) / y;
-    }
 }

@@ -14,8 +14,9 @@
 pragma solidity ^0.5.12;
 
 import "../../interfaces/ICToken.sol";
+import "../adapterDSMath.sol";
 
-contract MainnetCDaiAdapter {
+contract MainnetCDaiAdapter is AdapterDSMath {
 
     constructor () public { }
 
@@ -109,56 +110,6 @@ contract MainnetCDaiAdapter {
         if (balance == 0) return 0;
         return wmul(balance, rate);
 
-    }
-
-    // takes raw amount and gives numeraire amount
-    function getRawAmount (uint256 amount) public returns (uint256) {
-
-        uint256 rate = cdai.exchangeRateCurrent();
-        return wdiv(amount, rate);
-
-    }
-
-    // takes raw amount and gives numeraire amount
-    function getNumeraireAmount (uint256 amount) public returns (uint256) {
-
-        uint256 rate = cdai.exchangeRateCurrent();
-        uint256 numeraireAmount = wmul(amount, rate);
-        return numeraireAmount;
-
-    }
-
-    function getNumeraireBalance () public returns (uint256) {
-
-        return cdai.balanceOfUnderlying(address(this));
-
-    }
-
-    uint constant WAD = 10 ** 18;
-    
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "ds-math-add-overflow");
-    }
-
-    function sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x);
-    }
-
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
-    }
-
-    function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), WAD) / WAD;
-    }
-
-    function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, WAD), y / 2) / y;
-    }
-
-    function wdivup(uint x, uint y) internal pure returns (uint z) {
-        // always rounds up
-        z = add(mul(x, WAD), sub(y, 1)) / y;
     }
 
 }

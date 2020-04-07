@@ -17,11 +17,10 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../../interfaces/ICToken.sol";
 import "../../interfaces/IChai.sol";
 import "../../interfaces/IPot.sol";
+import "../adapterDSMath.sol";
 
-contract MainnetChaiAdapter {
+contract MainnetChaiAdapter is AdapterDSMath {
 
-    uint256 internal constant WAD = 10**18;
-    uint256 internal constant RAY = 10**27;
     IChai constant chai = IChai(0x06AF07097C9Eeb7fD685c692751D5C66dB49c215);
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
@@ -98,64 +97,6 @@ contract MainnetChaiAdapter {
         if (balance == 0) return 0;
         return wmul(balance, rate);
 
-    }
-
-    // takes chai amount
-    // tells corresponding numeraire value
-    function getNumeraireAmount (uint256 amount) public returns (uint256) {
-
-        uint chi = (now > pot.rho()) ? pot.drip() : pot.chi();
-        return rmul(amount, chi);
-
-    }
-
-    function getRawAmount (uint256 amount) public returns (uint256) {
-
-        uint chi = (now > pot.rho())
-          ? pot.drip()
-          : pot.chi();
-        return rdivup(amount, chi);
-
-    }
-
-    // tells numeraire balance
-    function getNumeraireBalance () public returns (uint256) {
-
-        return cdai.balanceOfUnderlying(address(this));
-
-    }
-    
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "ds-math-add-overflow");
-    }
-
-    function sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x);
-    }
-
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
-    }
-
-    function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), WAD / 2) / WAD;
-    }
-
-    function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, WAD), y / 2) / y;
-    }
-
-    function rmul(uint x, uint y) internal pure returns (uint z) {
-        // always rounds down
-        z = mul(x, y) / RAY;
-    }
-    function rdiv(uint x, uint y) internal pure returns (uint z) {
-        // always rounds down
-        z = mul(x, RAY) / y;
-    }
-    function rdivup(uint x, uint y) internal pure returns (uint z) {
-        // always rounds up
-        z = add(mul(x, RAY), sub(y, 1)) / y;
     }
 
 }

@@ -35,7 +35,6 @@ contract LoihiDelegators {
         return returnData;
     }
 
-
     function dViewRawAmount (address addr, uint256 amount) internal view returns (uint256) {
         bytes memory result = staticTo(addr, abi.encodeWithSignature("viewRawAmount(uint256)", amount)); // encoded selector of "getNumeraireAmount(uint256");
         return abi.decode(result, (uint256));
@@ -48,16 +47,6 @@ contract LoihiDelegators {
 
     function dViewNumeraireBalance (address addr, address _this) internal view returns (uint256) {
         bytes memory result = staticTo(addr, abi.encodeWithSignature("viewNumeraireBalance(address)", _this)); // encoded selector of "getNumeraireAmount(uint256");
-        return abi.decode(result, (uint256));
-    }
-
-    function dGetNumeraireAmount (address addr, uint256 amount) internal returns (uint256) {
-        bytes memory result = delegateTo(addr, abi.encodeWithSignature("getNumeraireAmount(uint256)", amount)); // encoded selector of "getNumeraireAmount(uint256");
-        return abi.decode(result, (uint256));
-    }
-
-    function dGetNumeraireBalance (address addr) internal returns (uint256) {
-        bytes memory result = delegateTo(addr, abi.encodeWithSignature("getNumeraireBalance()")); // encoded selector of "getNumeraireBalance()";
         return abi.decode(result, (uint256));
     }
 
