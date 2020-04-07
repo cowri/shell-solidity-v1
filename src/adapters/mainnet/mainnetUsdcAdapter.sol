@@ -25,8 +25,7 @@ contract MainnetUsdcAdapter is AdapterDSMath {
     ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
     uint256 constant WAD = 10 ** 18;
 
-    // transfers usdc in
-    // wraps it in csudc
+    // takes raw amount of usdc, transfers it in, wraps it in cusdc, returns numeraire amount
     function intakeRaw (uint256 amount) public returns (uint256) {
 
         usdc.transferFrom(msg.sender, address(this), amount);
@@ -36,8 +35,7 @@ contract MainnetUsdcAdapter is AdapterDSMath {
 
     }
 
-    // transfers usdc in
-    // wraps it in csudc
+    // takes numeraire amount of usdc, calculates raw amount, transfers it in and wraps it in cusdc, returns raw amount
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
         amount /= 1000000000000;
@@ -48,6 +46,7 @@ contract MainnetUsdcAdapter is AdapterDSMath {
 
     }
 
+    // takes raw amount of usdc, unwraps it from cusdc, transfers that out, returns numeraire amount
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         uint256 success = cusdc.redeemUnderlying(amount);
@@ -57,6 +56,7 @@ contract MainnetUsdcAdapter is AdapterDSMath {
 
     }
 
+    // takes numeraire amount of usdc, calculates raw amount, unwraps raw amount of cusdc, transfers that out, returns raw amount
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
         amount /= 1000000000000;
@@ -67,18 +67,22 @@ contract MainnetUsdcAdapter is AdapterDSMath {
 
     }
 
+
+    // takes numeraire amount, returns raw amount
     function viewRawAmount (uint256 amount) public view returns (uint256) {
 
         return amount / 1000000000000;
 
     }
 
+    // takes raw amount, returns numeraire amount
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
 
         return amount * 1000000000000;
 
     }
 
+    // returns numeraire amount of reserve asset, in this case cUsdc
     function viewNumeraireBalance (address addr) public view returns (uint256) {
 
         uint256 rate = cusdc.exchangeRateStored();

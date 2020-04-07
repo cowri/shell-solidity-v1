@@ -34,6 +34,7 @@ contract MainnetASUsdAdapter is AdapterDSMath {
 
     }
 
+    // intakes raw amount of ASUsd and returns the corresponding raw amount
     function intakeRaw (uint256 amount) public returns (uint256) {
 
         getASUsd().transferFrom(msg.sender, address(this), amount);
@@ -41,6 +42,7 @@ contract MainnetASUsdAdapter is AdapterDSMath {
 
     }
 
+    // intakes a numeraire amount of ASUsd and returns the corresponding raw amount
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
         getASUsd().transferFrom(msg.sender, address(this), amount);
@@ -48,6 +50,7 @@ contract MainnetASUsdAdapter is AdapterDSMath {
 
     }
 
+    // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         IAToken asusd = getASUsd();
@@ -56,6 +59,7 @@ contract MainnetASUsdAdapter is AdapterDSMath {
 
     }
 
+    // outputs a numeraire amount of ASUsd and returns the corresponding numeraire amount
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
         getASUsd().transfer(dst, amount);
@@ -63,18 +67,21 @@ contract MainnetASUsdAdapter is AdapterDSMath {
 
     }
 
+    // takes a numeraire amount and returns the raw amount
     function viewRawAmount (uint256 amount) public view returns (uint256) {
 
         return amount;
 
     }
 
+    // takes a raw amount and returns the numeraire amount
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
 
         return amount;
 
     }
 
+    // views the numeraire value of the current balance of the reserve, in this case ASUsd
     function viewNumeraireBalance (address addr) public view returns (uint256) {
 
         return getASUsd().balanceOf(addr);

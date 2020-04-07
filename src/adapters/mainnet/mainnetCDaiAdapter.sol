@@ -22,9 +22,7 @@ contract MainnetCDaiAdapter is AdapterDSMath {
 
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
 
-    // takes raw cdai amount
-    // unwraps it into dai
-    // deposits dai amount in chai
+    // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
     function intakeRaw (uint256 amount) public returns (uint256) {
 
         bool success = cdai.transferFrom(msg.sender, address(this), amount);
@@ -39,6 +37,7 @@ contract MainnetCDaiAdapter is AdapterDSMath {
 
     }
 
+    // takes a numeraire amount, calculates the raw amount of cDai, transfers it in and returns the corresponding raw amount
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
         uint256 rate = cdai.exchangeRateCurrent();
@@ -55,6 +54,7 @@ contract MainnetCDaiAdapter is AdapterDSMath {
 
     }
 
+    // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         bool success = cdai.transfer(msg.sender, amount);
@@ -70,9 +70,7 @@ contract MainnetCDaiAdapter is AdapterDSMath {
 
     }
 
-    // unwraps numeraire amount of dai from chai
-    // wraps it into cdai amount
-    // sends that to destination
+    // takes a numeraire value of CDai, figures out the raw amount, transfers raw amount out, and returns raw amount
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
         uint rate = cdai.exchangeRateCurrent();
@@ -89,6 +87,7 @@ contract MainnetCDaiAdapter is AdapterDSMath {
 
     }
 
+    // takes a numeraire amount and returns the raw amount
     function viewRawAmount (uint256 amount) public view returns (uint256) {
 
         uint256 rate = cdai.exchangeRateStored();
@@ -96,6 +95,7 @@ contract MainnetCDaiAdapter is AdapterDSMath {
 
     }
 
+    // takes a raw amount and returns the numeraire amount
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
 
         uint256 rate = cdai.exchangeRateStored();
@@ -103,6 +103,7 @@ contract MainnetCDaiAdapter is AdapterDSMath {
 
     }
 
+    // views the numeraire value of the current balance of the reserve, in this case CDai
     function viewNumeraireBalance (address addr) public view returns (uint256) {
 
         uint256 rate = cdai.exchangeRateStored();

@@ -34,7 +34,7 @@ contract MainnetUsdtAdapter is AdapterDSMath {
 
     }
 
-    // transfers usdt in
+    // takes raw amount, transfers it in, wraps that in aUsdt, returns numeraire amount
     function intakeRaw (uint256 amount) public returns (uint256) {
         
         safeTransferFrom(usdt, msg.sender, address(this), amount);
@@ -45,7 +45,7 @@ contract MainnetUsdtAdapter is AdapterDSMath {
 
     }
 
-    // transfers usdt in
+    // takes numeraire amount, calculates raw amount, transfers that in, wraps it in aUsdt, returns raw amount
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
         amount /= 1000000000000;
@@ -56,7 +56,7 @@ contract MainnetUsdtAdapter is AdapterDSMath {
 
     }
 
-    // transfers usdt out of our balance
+    // takes raw amount, redeems that from aUsdt, transfers it out, returns numeraire amount
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         getAUsdt().redeem(amount);
@@ -65,7 +65,7 @@ contract MainnetUsdtAdapter is AdapterDSMath {
 
     }
 
-    // transfers usdt to destination
+    // takes numeraire amount, calculates raw amount, redeems that from aUsdt, transfers it out, returns raw amount
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
         amount /= 1000000000000;
@@ -75,18 +75,21 @@ contract MainnetUsdtAdapter is AdapterDSMath {
 
     }
 
+    // takes raw amount, returns numeraire amount
     function viewRawAmount (uint256 amount) public pure returns (uint256) {
 
         return amount / 1000000000000;
 
     }
 
+    // takes raw amount, returns numeraire amount
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
 
         return amount * 1000000000000;
 
     }
 
+    // returns numeraire amount of reserve asset, in this case aUSDT
     function viewNumeraireBalance (address addr) public view returns (uint256) {
 
         return getAUsdt().balanceOf(addr) * 1000000000000;

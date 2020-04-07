@@ -89,6 +89,7 @@ contract MainnetCUsdcAdapter is AdapterDSMath {
 
     }
 
+    // takes raw amount of cUsdc, returns numeraire amount
     function viewRawAmount (uint256 amount) public view returns (uint256) {
 
         amount /= 1000000000000;
@@ -97,6 +98,7 @@ contract MainnetCUsdcAdapter is AdapterDSMath {
 
     }
 
+    // takes numeraire amount, returns raw amount of cUsdc
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
 
         uint256 rate = cusdc.exchangeRateStored();
@@ -104,6 +106,7 @@ contract MainnetCUsdcAdapter is AdapterDSMath {
 
     }
 
+    // returns numeraire balance of reserve, in this case cUsdc
     function viewNumeraireBalance (address addr) public view returns (uint256) {
 
         uint256 rate = cusdc.exchangeRateStored();

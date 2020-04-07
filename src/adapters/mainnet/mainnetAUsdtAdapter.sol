@@ -34,6 +34,7 @@ contract MainnetAUsdtAdapter is AdapterDSMath {
 
     }
 
+    // intakes raw amount of AUSsdt and returns the corresponding raw amount
     function intakeRaw (uint256 amount) public returns (uint256) {
 
         getAUsdt().transferFrom(msg.sender, address(this), amount);
@@ -41,6 +42,7 @@ contract MainnetAUsdtAdapter is AdapterDSMath {
 
     }
 
+    // intakes a numeraire amount of AUsdt and returns the corresponding raw amount
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
         amount /= 1000000000000;
@@ -49,6 +51,7 @@ contract MainnetAUsdtAdapter is AdapterDSMath {
 
     }
 
+    // outputs a raw amount of AUsdt and returns the corresponding numeraire amount
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         getAUsdt().transfer(dst, amount);
@@ -56,6 +59,7 @@ contract MainnetAUsdtAdapter is AdapterDSMath {
 
     }
 
+    // outputs a numeraire amount of AUsdt and returns the corresponding numeraire amount
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
         amount /= 1000000000000;
@@ -64,18 +68,21 @@ contract MainnetAUsdtAdapter is AdapterDSMath {
 
     }
 
+    // takes a numeraire amount and returns the raw amount
     function viewRawAmount (uint256 amount) public view returns (uint256) {
 
         return amount / 1000000000000;
 
     }
 
+    // takes a raw amount and returns the numeraire amount
     function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
 
         return amount * 1000000000000;
 
     }
 
+    // views the numeraire value of the current balance of the reserve, in this case AUsdt
     function viewNumeraireBalance (address addr) public view returns (uint256) {
 
         return getAUsdt().balanceOf(address(addr)) * 1000000000000;

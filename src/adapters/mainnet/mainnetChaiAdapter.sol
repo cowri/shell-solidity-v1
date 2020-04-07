@@ -28,8 +28,7 @@ contract MainnetChaiAdapter is AdapterDSMath {
 
     constructor () public { }
 
-    // takes raw chai amount
-    // transfers it into our balance
+    // takes raw chai amount, transfers that in, unwraps into dai, wraps into the reserve, and finally returns the numeraire amount
     function intakeRaw (uint256 amount) public returns (uint256) {
 
         uint256 daiAmt = dai.balanceOf(address(this));
@@ -41,8 +40,7 @@ contract MainnetChaiAdapter is AdapterDSMath {
 
     }
 
-    // takes numeraire amount
-    // transfers corresponding chai into our balance;
+    // takes numeraire amount, exits that from chai, wraps it in cdai, and returns the raw amount of chai
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
         uint256 chaiBal = chai.balanceOf(msg.sender);
@@ -53,8 +51,7 @@ contract MainnetChaiAdapter is AdapterDSMath {
 
     }
 
-    // takes numeraire amount
-    // transfers corresponding chai to destination address
+    // takes numeraire amount, redeems dai from cdai, wraps it in chai and sends it to the destination, and returns the raw amount
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
 
         uint256 success = cdai.redeemUnderlying(amount);
@@ -65,7 +62,7 @@ contract MainnetChaiAdapter is AdapterDSMath {
 
     }
 
-    // transfers corresponding chai to destination address
+    // takes raw amount of chai, calculates the numeraire amount, redeems that from cdai, wraps it in chai and sends to destination, then returns the numeraire amount
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         uint256 daiAmt = rmul(amount, pot.chi());
@@ -76,7 +73,7 @@ contract MainnetChaiAdapter is AdapterDSMath {
 
     }
     
-    // pass it a numeraire and get the raw amount
+    // pass it a numeraire amount and get the raw amount
     function viewRawAmount (uint256 amount) public view returns (uint256) {
 
         return rdivup(amount, pot.chi());
@@ -90,6 +87,7 @@ contract MainnetChaiAdapter is AdapterDSMath {
 
     }
 
+    // returns the numeraire balance for this numeraire's reserve, in this case cDai
     function viewNumeraireBalance (address addr) public view returns (uint256) {
 
         uint256 rate = cdai.exchangeRateStored();

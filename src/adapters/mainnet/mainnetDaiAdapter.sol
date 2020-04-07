@@ -25,8 +25,7 @@ contract MainnetDaiAdapter is AdapterDSMath {
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     uint256 constant WAD = 10 ** 18;
 
-    // transfers dai in
-    // wraps it in chai
+    // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
     function intakeRaw (uint256 amount) public returns (uint256) {
 
         dai.transferFrom(msg.sender, address(this), amount);
@@ -36,8 +35,7 @@ contract MainnetDaiAdapter is AdapterDSMath {
 
     }
 
-    // transfers dai in
-    // wraps it in cdai
+    // transfers numeraire amount of dai in, wraps it in cDai, returns raw amount
     function intakeNumeraire (uint256 amount) public returns (uint256) {
 
         dai.transferFrom(msg.sender, address(this), amount);
@@ -47,8 +45,7 @@ contract MainnetDaiAdapter is AdapterDSMath {
 
     }
 
-    // unwraps cdai
-    // transfers out dai
+    // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount 
     function outputRaw (address dst, uint256 amount) public returns (uint256) {
 
         uint256 success = cdai.redeemUnderlying(amount);
@@ -58,6 +55,7 @@ contract MainnetDaiAdapter is AdapterDSMath {
 
     }
 
+    // takes numeraire amount of dai, unwraps corresponding amount of cDai, transfers that out, returns numeraire amount
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
         
         uint256 success = cdai.redeemUnderlying(amount);
@@ -67,14 +65,17 @@ contract MainnetDaiAdapter is AdapterDSMath {
         
     }
 
+    // takes numeraire amount and returns raw amount
     function viewRawAmount (uint256 amount) public pure returns (uint256) {
         return amount;
     }
 
+    // takes raw amount and returns numeraire amount
     function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
         return amount;
     }
 
+    // returns current balance in numeraire
     function viewNumeraireBalance (address addr) public view returns (uint256) {
 
         uint256 rate = cdai.exchangeRateStored();
