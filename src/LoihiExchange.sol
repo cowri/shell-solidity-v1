@@ -18,7 +18,7 @@ import "./LoihiDelegators.sol";
 
 contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
-    /// @dev executes the origin trade
+    /// @dev executes the origin trade. refer to Loihi.bin swapByOrigin and transferByOrigin for detailed explanation of paramters
     /// @return tAmt_ the target amount
     function executeOriginTrade (uint256 _deadline, uint256 _minTAmt, address _recipient, address _origin, address _target, uint256 _oAmt) external returns (uint256) {
 
@@ -50,8 +50,7 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
     }
 
-    /// @author james foley http://github.com/realisation
-    /// @dev executes the target trade
+    /// @dev executes the target trade. refer to Loihi.bin swapByTarget and transferByTarget for detailed explanation of parameters
     /// @return oAmt_ origin amount
     function executeTargetTrade (uint256 _deadline, address _origin, address _target, uint256 _maxOAmt, uint256 _tAmt, address _recipient) external returns (uint256) {
         require(_deadline >= now, "deadline has passed for this trade");
@@ -85,8 +84,8 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
     }
 
-    /// @author james foley http://github.com/realisation
     /// @dev this function figures out the origin amount
+    /// @return tNAmt_ target amount
     function getTargetAmount (address _oRsrv, address _tRsrv, uint256 _oNAmt, uint256[] memory _balances, uint256 _grossLiq) internal returns (uint256 tNAmt_) {
 
         tNAmt_ = wmul(_oNAmt, WAD-epsilon);
@@ -123,8 +122,8 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
     }
 
-    /// @author james foley http://github.com/realisation
     /// @dev this function figures out the origin amount
+    /// @return oNAmt_ origin amount
     function getOriginAmount (address _oRsrv, address _tRsrv, uint256 _tNAmt, uint256[] memory _balances, uint256 _grossLiq) internal returns (uint256 oNAmt_) {
 
         oNAmt_ = wmul(_tNAmt, WAD+epsilon);
@@ -161,7 +160,6 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
     }
 
-    /// @author james foley http://github.com/realisation
     /// @notice this function makes our fees!
     /// @return fee_ the fee.
     function makeFee (uint256 _bal, uint256 _ideal) internal view returns (uint256 fee_) {

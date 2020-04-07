@@ -18,12 +18,8 @@ import "./LoihiDelegators.sol";
 
 contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
-    /// @notice this function allows selective the withdrawal of any supported stablecoin flavor from the contract by burning a corresponding amount of shell tokens
-    /// @param _flvrs an array of flavors to withdraw from the reserves
-    /// @param _amts an array of amounts to withdraw that maps to _flavors
-    /// @param _maxShells maximum number of shells to burn
-    /// @param _deadline deadline for tx in block time
-    /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
+    /// @dev selective the withdrawal of any supported stablecoin flavor. refer to Loihi.bin selectiveWithdraw for detailed explanation of parameters
+    /// @return shellsBurned_ amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _deadline) external returns (uint256 shellsBurned_) {
         require(_deadline >= now, "deadline has passed for this transaction");
 
@@ -46,9 +42,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
-    /// @notice this function calculates the amount of shells to burn by taking the balances and numeraire deposits of the reserve tokens being deposited into
-    /// @param _balances an array of current numeraire balances for each reserve
-    /// @param _withdrawals an array of numeraire amounts to withdraw from each reserve
+    /// @dev this function calculates the amount of shells to burn by taking the balances and numeraire deposits of the reserve tokens being deposited into
     /// @return shellsBurned_ the amount of shells the withdraw will burn
     function calculateShellsToBurn (uint256[] memory _balances, uint256[] memory _withdrawals) internal returns (uint256 shellsBurned_) {
 
@@ -86,11 +80,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
-    /// @notice this function allows selective depositing of any supported stablecoin flavor into the contract in return for corresponding shell tokens
-    /// @param _flvrs an array containing the addresses of the flavors being deposited into
-    /// @param _amts an array containing the values of the flavors you wish to deposit into the contract
-    /// @param _minShells minimum acceptable number of shells to mint
-    /// @param _deadline deadline in block time for tx
+    /// @dev selective depositing of any supported stablecoin flavor into the contract in return for corresponding shell tokens
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _deadline) external returns (uint256 shellsMinted_) {
         require(_deadline >= now, "deadline has passed for this transaction");
@@ -112,9 +102,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
-    /// @notice this function calculates the amount of shells to mint by taking the balances and numeraire deposits of the reserve tokens being deposited into
-    /// @param _balances an array of current numeraire balances for each reserve
-    /// @param _deposits an array of numeraire amounts to deposit into each reserve
+    /// @dev this function calculates the amount of shells to mint by taking the balances and numeraire deposits of the reserve tokens being deposited into
     /// @return shellsMinted_ the amount of shells the deposit will mint
     function calculateShellsToMint (uint256[] memory _balances, uint256[] memory _deposits) internal returns (uint256 shellsMinted_) {
 
@@ -154,12 +142,8 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
-    /// @author james foley http://github.com/realisation
-    /// @dev this function is used in selective deposits and selective withdraws
-    /// @dev it finds the reserves corresponding to the flavors and attributes the amounts to these reserves
-    /// @param _flvrs the addresses of the stablecoin flavor
-    /// @param _amts the specified amount of each stablecoin flavor
-    /// @return three arrays each the length of the number of reserves containing the balances, token amounts and weights for each reserve
+    /// @dev get the current balances and incoming/outgoing token amounts for the deposit/withdraw
+    /// @return two arrays the length of the number of reserves containing the current balances and incoming/outgoing token amounts
     function getBalancesAndAmounts (address[] memory _flvrs, uint256[] memory _amts) internal returns (uint256[] memory, uint256[] memory) {
 
         uint256[] memory balances_ = new uint256[](reserves.length);
@@ -179,7 +163,6 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
         return (balances_, amounts_);
     }
 
-    /// @author james foley http://github.com/realisation
     /// @notice this function makes our fees!
     /// @return fee_ the fee.
     function makeFee (uint256 _bal, uint256 _ideal) internal view returns (uint256 fee_) {
@@ -197,9 +180,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
-    /// @author james foley http://github.com/realisation
-    /// @notice this function takes a total amount to deposit into the pool with no slippage across the numeraire assets the pool supports
-    /// @param _deposit the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
+    /// @dev see Loihi.bin proportionalDeposit for a detailed explanation of parameter
     /// @return shellsToMint_ the amount of shells you receive in return for your deposit
     function proportionalDeposit (uint256 _deposit) public returns (uint256) {
 
@@ -243,9 +224,7 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
-    /// @author james foley http://github.com/realisation
-    /// @notice this function takes a total amount to from the the pool with no slippage from the numeraire assets of the pool
-    /// @param _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
+    /// @dev see Loihi.bin proportionalWithdraw for a detailed explanation of parameter
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
     function proportionalWithdraw (uint256 _withdrawal) public returns (uint256[] memory) {
 
