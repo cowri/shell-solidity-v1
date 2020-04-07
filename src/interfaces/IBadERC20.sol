@@ -10,7 +10,7 @@ interface BadERC20I {
     function balanceOf(address account) external view returns (uint256);
     function transfer(address recipient, uint256 amount) external;
     function allowance(address owner, address spender) external view returns (uint256);
-    function approve(address spender, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount) external;
     function transferFrom(address from, address to, uint value) external;
     function mint(address account, uint256 amount) external returns (bool);
     function burn(uint256 amount) external;
