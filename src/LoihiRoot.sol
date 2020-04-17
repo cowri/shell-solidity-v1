@@ -52,23 +52,11 @@ contract LoihiRoot is LoihiMath {
     bytes4 constant internal ERC20ID = 0x36372b07;
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
 
-    IERC20 dai; ICToken cdai; IChai chai; IPot pot;
-    IERC20 usdc; ICToken cusdc;
-    IERC20 usdt; IAToken ausdt;
-    IERC20 susd; IAToken asusd;
-
-    function includeTestAdapterState(address _dai, address _cdai, address _chai, address _pot, address _usdc, address _cusdc, address _usdt, address _ausdt, address _susd, address _asusd) public {
-        dai = IERC20(_dai); cdai = ICToken(_cdai); chai = IChai(_chai); pot = IPot(_pot);
-        usdc = IERC20(_usdc); cusdc = ICToken(_cusdc);
-        usdt = IERC20(_usdt); ausdt = IAToken(_ausdt);
-        susd = IERC20(_susd); asusd = IAToken(_asusd);
-    }
-
-
     // address constant exchange = 0xfb8443545771E2BB15bB7cAdDa43A16a1Ab69c0B;
     // address constant liquidity = 0xA3f4A860eFa4a60279E6E50f2169FDD080aAb655;
     // address constant views = 0x81dBd2ec823cB2691f34c7b5391c9439ec5c80E3;
     // address constant erc20 = 0x7DB32869056647532f80f482E5bB1fcb311493cD;
+    
     address exchange;
     address liquidity;
     address views;

@@ -40,15 +40,15 @@ import "../adapters/mainnet/MainnetASUsdAdapter.sol";
 import "../adapters/mainnet/MainnetUsdtAdapter.sol";
 import "../adapters/mainnet/MainnetAUsdtAdapter.sol";
 
-import "../adapters/local/LocalDaiAdapter.sol";
-import "../adapters/local/LocalCDaiAdapter.sol";
-import "../adapters/local/LocalChaiAdapter.sol";
-import "../adapters/local/LocalUsdcAdapter.sol";
-import "../adapters/local/LocalCUsdcAdapter.sol";
-import "../adapters/local/LocalUsdtAdapter.sol";
-import "../adapters/local/LocalAusdtAdapter.sol";
-import "../adapters/local/LocalSUsdAdapter.sol";
-import "../adapters/local/LocalASUsdAdapter.sol";
+// import "../adapters/local/LocalDaiAdapter.sol";
+// import "../adapters/local/LocalCDaiAdapter.sol";
+// import "../adapters/local/LocalChaiAdapter.sol";
+// import "../adapters/local/LocalUsdcAdapter.sol";
+// import "../adapters/local/LocalCUsdcAdapter.sol";
+// import "../adapters/local/LocalUsdtAdapter.sol";
+// import "../adapters/local/LocalAusdtAdapter.sol";
+// import "../adapters/local/LocalSUsdAdapter.sol";
+// import "../adapters/local/LocalASUsdAdapter.sol";
 
 contract LoihiSetup {
     Loihi l1;
@@ -110,9 +110,9 @@ contract LoihiSetup {
     }
 
     function setupFlavors () public {
-        // setupFlavorsMainnet();
+        setupFlavorsMainnet();
         // setupFlavorsKovan();
-        setupFlavorsLocal();
+        // setupFlavorsLocal();
     }
 
     function setupFlavorsMainnet () public {
@@ -225,8 +225,8 @@ contract LoihiSetup {
     }
 
     function executeApprovals () public {
-        // executeApprovalsRPC();
-        executeApprovalsLocal();
+        executeApprovalsRPC();
+        // executeApprovalsLocal();
     }
 
     function executeApprovalsLocal () public {
@@ -268,31 +268,31 @@ contract LoihiSetup {
     }
 
     function setupAdapters() public {
-        // setupAdaptersMainnet();
+        setupAdaptersMainnet();
         // setupDeployedAdaptersMainnet();
         // setupAdaptersKovan();
-        setupAdaptersLocal();
+        // setupAdaptersLocal();
     }
 
     event log_address(bytes32, address);
 
     function setupAdaptersLocal () public {
 
-        daiAdapter = address(new LocalDaiAdapter(cdai));
-        cdaiAdapter = address(new LocalCDaiAdapter(cdai));
-        chaiAdapter = address(new LocalChaiAdapter(cdai, pot));
+        // daiAdapter = address(new LocalDaiAdapter(cdai));
+        // cdaiAdapter = address(new LocalCDaiAdapter(cdai));
+        // chaiAdapter = address(new LocalChaiAdapter(cdai, pot));
 
-        usdcAdapter = address(new LocalUsdcAdapter(cusdc));
-        cusdcAdapter = address(new LocalCUsdcAdapter(cusdc));
+        // usdcAdapter = address(new LocalUsdcAdapter(cusdc));
+        // cusdcAdapter = address(new LocalCUsdcAdapter(cusdc));
 
-        usdtAdapter = address(new LocalUsdtAdapter(ausdt));
-        ausdtAdapter = address(new LocalAUsdtAdapter(ausdt));
+        // usdtAdapter = address(new LocalUsdtAdapter(ausdt));
+        // ausdtAdapter = address(new LocalAUsdtAdapter(ausdt));
 
-        susdAdapter = address(new LocalSUsdAdapter(asusd));
-        asusdAdapter = address(new LocalASUsdAdapter(asusd));
+        // susdAdapter = address(new LocalSUsdAdapter(asusd));
+        // asusdAdapter = address(new LocalASUsdAdapter(asusd));
 
-        l1.includeTestAdapterState(dai, cdai, chai, pot, usdc, cusdc, usdt, ausdt, susd, asusd);
-        l2.includeTestAdapterState(dai, cdai, chai, pot, usdc, cusdc, usdt, ausdt, susd, asusd);
+        // l1.includeTestAdapterState(dai, cdai, chai, pot, usdc, cusdc, usdt, ausdt, susd, asusd);
+        // l2.includeTestAdapterState(dai, cdai, chai, pot, usdc, cusdc, usdt, ausdt, susd, asusd);
 
     }
 
