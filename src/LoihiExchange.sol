@@ -35,10 +35,13 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
             return tAmt_;
         }
 
-        (uint256[] memory _balances, uint256 _grossLiq) = getBalancesAndGrossLiq();
+        uint256[] memory _weights = weights;
+        address[] memory _reserves = reserves;
+
+        (uint256[] memory _balances, uint256 _grossLiq) = getBalancesAndGrossLiq(_reserves);
 
         uint256 _oNAmt = dViewNumeraireAmount(_o.adapter, _oAmt);
-        uint256 _tNAmt = getTargetAmount(_o.reserve, _t.reserve, _oNAmt, _balances, _grossLiq);
+        uint256 _tNAmt = getTargetAmount(_grossLiq, _o.reserve, _t.reserve, _oNAmt, _balances, _weights, _reserves);
 
         require(dViewRawAmount(_t.adapter, _tNAmt) >= _minTAmt, "target amount is less than min target amount");
 
@@ -68,10 +71,18 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
             return oAmt_;
         }
 
-        (uint256[] memory _balances, uint256 _grossLiq) = getBalancesAndGrossLiq();
+        uint256 _tNAmt;
+        uint256 _oNAmt;
 
-        uint256 _tNAmt = dViewNumeraireAmount(_t.adapter, _tAmt);
-        uint256 _oNAmt = getOriginAmount(_o.reserve, _t.reserve, _tNAmt, _balances, _grossLiq);
+        {
+            uint256[] memory _weights = weights;
+            address[] memory _reserves = reserves;
+
+            (uint256[] memory _balances, uint256 _grossLiq) = getBalancesAndGrossLiq(_reserves);
+
+            _tNAmt = dViewNumeraireAmount(_t.adapter, _tAmt);
+            _oNAmt = getOriginAmount(_grossLiq, _o.reserve, _t.reserve, _tNAmt, _balances, _weights, _reserves);
+        }
 
         require(dViewRawAmount(_o.adapter, _oNAmt) <= _maxOAmt, "origin amount is greater than max origin amount");
 
@@ -86,77 +97,95 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
 
     /// @dev this function figures out the origin amount
     /// @return tNAmt_ target amount
-    function getTargetAmount (address _oRsrv, address _tRsrv, uint256 _oNAmt, uint256[] memory _balances, uint256 _grossLiq) internal returns (uint256 tNAmt_) {
+    function getTargetAmount (uint256 _grossLiq, address _oRsrv, address _tRsrv, uint256 _oNAmt, uint256[] memory _balances, uint256[] memory _weights, address[] memory _reserves) internal returns (uint256 tNAmt_) {
 
-        tNAmt_ = wmul(_oNAmt, WAD-epsilon);
+        tNAmt_ = omul(_oNAmt, OCTOPUS-epsilon);
+        
         uint256 _oNFAmt = tNAmt_;
         uint256 _psi;
         uint256 _nGLiq;
+        uint256 _omega = omega; // 1787 gas savings
+        uint256 _lambda = lambda;
         for (uint j = 0; j < 10; j++) {
 
             _psi = 0;
             _nGLiq = _grossLiq + _oNAmt - tNAmt_;
 
-            for (uint i = 0; i < reserves.length; i++) {
-                uint256 _nIdeal = wmul(_nGLiq, weights[i]);
-                if (reserves[i] == _oRsrv) _psi += makeFee(add(_balances[i], _oNAmt), _nIdeal);
-                else if (reserves[i] == _tRsrv) _psi += makeFee(sub(_balances[i], tNAmt_), _nIdeal);
+            for (uint i = 0; i < _reserves.length; i++) {
+                address _rsrv = _reserves[i];
+                uint256 _nIdeal = omul(_nGLiq, _weights[i]);
+                if (_rsrv == _oRsrv) _psi += makeFee(_balances[i] + _oNAmt, _nIdeal);
+                else if (_rsrv == _tRsrv) _psi += makeFee(_balances[i] - tNAmt_, _nIdeal);
                 else _psi += makeFee(_balances[i], _nIdeal);
             }
 
-            if (omega < _psi) {
-                if ((tNAmt_ = _oNFAmt + omega - _psi) / 10000000000 == tNAmt_ / 10000000000) break;
+            if (_omega < _psi) { // 32.7k gas savings against 10^13/10^14 vs 10^10
+                if ((tNAmt_ = _oNFAmt + _omega - _psi) / 100000000000000 == tNAmt_ / 100000000000000) break;
             } else {
-                if ((tNAmt_ = _oNFAmt + wmul(lambda, omega - _psi)) / 10000000000 == tNAmt_ / 10000000000) break;
+                if ((tNAmt_ = _oNFAmt + omul(_lambda, _omega - _psi)) / 100000000000000 == tNAmt_ / 100000000000000) break;
             }
         }
 
         omega = _psi;
 
-        for (uint i = 0; i < _balances.length; i++) {
-            if (reserves[i] == _oRsrv) require(add(_balances[i], _oNAmt) < wmul(wmul(_nGLiq, weights[i]), WAD + alpha), "origin halt check");
-            if (reserves[i] == _tRsrv) require(sub(_balances[i], tNAmt_) > wmul(wmul(_nGLiq, weights[i]), WAD - alpha), "target halt check");
+        {
+            uint256 _alpha = alpha; // 400-800 gas savings
+            for (uint i = 0; i < _balances.length; i++) {
+                if (_reserves[i] == _oRsrv) {
+                    require(add(_balances[i], _oNAmt) < omul(omul(_nGLiq, _weights[i]), OCTOPUS + _alpha), "origin halt check");
+                    continue; // 480 - 1415 gas savings
+                } else if (_reserves[i] == _tRsrv) require(sub(_balances[i], tNAmt_) > omul(omul(_nGLiq, _weights[i]), OCTOPUS - _alpha), "target halt check");
+            }
         }
 
-        tNAmt_ = wmul(tNAmt_, WAD-epsilon);
+        tNAmt_ = omul(tNAmt_, OCTOPUS-epsilon);
 
     }
 
     /// @dev this function figures out the origin amount
     /// @return oNAmt_ origin amount
-    function getOriginAmount (address _oRsrv, address _tRsrv, uint256 _tNAmt, uint256[] memory _balances, uint256 _grossLiq) internal returns (uint256 oNAmt_) {
+    function getOriginAmount (uint256 _grossLiq, address _oRsrv, address _tRsrv, uint256 _tNAmt, uint256[] memory _balances, uint256[] memory _weights, address[] memory _reserves) internal returns (uint256 oNAmt_) {
 
-        oNAmt_ = wmul(_tNAmt, WAD+epsilon);
+        oNAmt_ = omul(_tNAmt, OCTOPUS+epsilon);
+
         uint256 _tNFAmt = oNAmt_;
         uint256 _psi;
         uint256 _nGLiq;
+        uint256 _omega = omega;
+        uint256 _lambda = lambda;
         for (uint j = 0; j < 10; j++) {
 
             _psi = 0;
             _nGLiq = _grossLiq + oNAmt_ - _tNAmt;
 
-            for (uint i = 0; i < reserves.length; i++) {
-                uint256 _nIdeal = wmul(_nGLiq, weights[i]);
-                if (reserves[i] == _oRsrv) _psi += makeFee(add(_balances[i], oNAmt_), _nIdeal);
-                else if (reserves[i] == _tRsrv) _psi += makeFee(sub(_balances[i], _tNAmt), _nIdeal);
+            for (uint i = 0; i < _reserves.length; i++) {
+                address _rsrv = _reserves[i];
+                uint256 _nIdeal = omul(_nGLiq, _weights[i]);
+                if (_rsrv == _oRsrv) _psi += makeFee(_balances[i] + oNAmt_, _nIdeal);
+                else if (_rsrv == _tRsrv) _psi += makeFee(_balances[i] - _tNAmt, _nIdeal);
                 else _psi += makeFee(_balances[i], _nIdeal);
             }
 
-            if (omega < _psi) {
-                if ((oNAmt_ = _tNFAmt + _psi - omega) / 10000000000 == oNAmt_ / 10000000000) break;
+            if (_omega < _psi) {
+                if ((oNAmt_ = _tNFAmt + _psi - _omega) / 100000000000000 == oNAmt_ / 100000000000000) break;
             } else {
-                if ((oNAmt_ = _tNFAmt - wmul(lambda, omega - _psi)) / 10000000000 == oNAmt_ / 10000000000) break;
+                if ((oNAmt_ = _tNFAmt - omul(_lambda, _omega - _psi)) / 100000000000000 == oNAmt_ / 100000000000000) break;
             }
         }
 
         omega = _psi;
 
-        for (uint i = 0; i < _balances.length; i++) {
-            if (reserves[i] == _oRsrv) require(add(_balances[i], oNAmt_) < wmul(wmul(_nGLiq, weights[i]), WAD + alpha), "origin halt check");
-            if (reserves[i] == _tRsrv) require(sub(_balances[i], _tNAmt) > wmul(wmul(_nGLiq, weights[i]), WAD - alpha), "target halt check");
+        {
+            uint256 _alpha = alpha;
+            for (uint i = 0; i < _balances.length; i++) {
+                if (_reserves[i] == _oRsrv) {
+                    require(add(_balances[i], oNAmt_) < omul(omul(_nGLiq, _weights[i]), OCTOPUS + _alpha), "origin halt check");
+                    continue;
+                } else if (_reserves[i] == _tRsrv) require(sub(_balances[i], _tNAmt) > omul(omul(_nGLiq, _weights[i]), OCTOPUS - _alpha), "target halt check");
+            }
         }
 
-        oNAmt_ = wmul(oNAmt_, WAD+epsilon);
+        oNAmt_ = omul(oNAmt_, OCTOPUS+epsilon);
 
     }
 
@@ -165,22 +194,25 @@ contract LoihiExchange is LoihiRoot, LoihiDelegators {
     function makeFee (uint256 _bal, uint256 _ideal) internal view returns (uint256 fee_) {
 
         uint256 _threshold;
-        if (_bal < (_threshold = wmul(_ideal, WAD-beta))) {
-            fee_ = wdiv(delta, _ideal);
-            fee_ = wmul(fee_, (_threshold = sub(_threshold, _bal)));
-            fee_ = wmul(fee_, _threshold);
-        } else if (_bal > (_threshold = wmul(_ideal, WAD+beta))) {
-            fee_ = wdiv(delta, _ideal);
-            fee_ = wmul(fee_, (_threshold = sub(_bal, _threshold)));
-            fee_ = wmul(fee_, _threshold);
+        uint256 _beta = beta;
+        uint256 _delta = delta;
+        if (_bal < (_threshold = omul(_ideal, OCTOPUS-_beta))) {
+            fee_ = odiv(_delta, _ideal);
+            fee_ = omul(fee_, (_threshold = sub(_threshold, _bal)));
+            fee_ = omul(fee_, _threshold);
+        } else if (_bal > (_threshold = omul(_ideal, OCTOPUS+_beta))) {
+            fee_ = odiv(_delta, _ideal);
+            fee_ = omul(fee_, (_threshold = sub(_bal, _threshold)));
+            fee_ = omul(fee_, _threshold);
         } else fee_ = 0;
 
     }
 
-    function getBalancesAndGrossLiq () internal returns (uint256[] memory, uint256 grossLiq_) {
-        uint256[] memory balances_ = new uint256[](reserves.length);
-        for (uint i = 0; i < reserves.length; i++) {
-            balances_[i] = dViewNumeraireBalance(reserves[i], address(this));
+    function getBalancesAndGrossLiq (address[] memory _reserves) internal returns (uint256[] memory, uint256 grossLiq_) {
+        uint256[] memory balances_ = new uint256[](_reserves.length);
+        for (uint i = 0; i < _reserves.length; i++) {
+            address _rsrv = _reserves[i];
+            balances_[i] = dViewNumeraireBalance(_rsrv, address(this));
             grossLiq_ += balances_[i];
         }
         return (balances_, grossLiq_);

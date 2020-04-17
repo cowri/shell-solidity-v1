@@ -37,7 +37,7 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
             _grossLiq += _balances[i];
         }
 
-        tNAmt_ = wmul(_oNAmt, WAD-_globals[3]);
+        tNAmt_ = omul(_oNAmt, OCTOPUS-_globals[3]);
         uint256 _oNFAmt = tNAmt_;
         uint256 _psi;
         uint256 _nGLiq;
@@ -45,26 +45,26 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
             _psi = 0;
             _nGLiq = _grossLiq + _oNAmt - tNAmt_;
             for (uint i = 0; i < _balances.length; i++) {
-                if (_rsrvs[i] == _oRsrv) _psi += makeFee(add(_balances[i], _oNAmt), wmul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
-                else if (_rsrvs[i] == _tRsrv) _psi += makeFee(sub(_balances[i], tNAmt_), wmul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
-                else _psi += makeFee(_balances[i], wmul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
+                if (_rsrvs[i] == _oRsrv) _psi += makeFee(add(_balances[i], _oNAmt), omul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
+                else if (_rsrvs[i] == _tRsrv) _psi += makeFee(sub(_balances[i], tNAmt_), omul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
+                else _psi += makeFee(_balances[i], omul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
             }
 
             if (_globals[5] < _psi) {
                 if ((tNAmt_ = _oNFAmt + _globals[5] - _psi) / 10000000000 == tNAmt_ / 10000000000) break;
             } else {
-                if ((tNAmt_ = _oNFAmt + wmul(_globals[4], _globals[5] - _psi)) / 10000000000 == tNAmt_ / 10000000000) break;
+                if ((tNAmt_ = _oNFAmt + omul(_globals[4], _globals[5] - _psi)) / 10000000000 == tNAmt_ / 10000000000) break;
             }
 
         }
 
         for (uint i = 0; i < _balances.length; i++) {
-            uint256 _ideal = wmul(_nGLiq, _weights[i]);
-            if (_rsrvs[i] == _oRsrv) require(_balances[i] + _oNAmt < wmul(_ideal, WAD + _globals[0]), "origin halt check");
-            if (_rsrvs[i] == _tRsrv) require(_balances[i] - tNAmt_ > wmul(_ideal, WAD - _globals[0]), "target halt check");
+            uint256 _ideal = omul(_nGLiq, _weights[i]);
+            if (_rsrvs[i] == _oRsrv) require(_balances[i] + _oNAmt < omul(_ideal, OCTOPUS + _globals[0]), "origin halt check");
+            if (_rsrvs[i] == _tRsrv) require(_balances[i] - tNAmt_ > omul(_ideal, OCTOPUS - _globals[0]), "target halt check");
         }
 
-        tNAmt_ = wmul(tNAmt_, WAD-_globals[3]);
+        tNAmt_ = omul(tNAmt_, OCTOPUS-_globals[3]);
 
         return dViewRawAmount(_tAdptr, tNAmt_);
 
@@ -90,7 +90,7 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
             _grossLiq += _balances[i];
         }
 
-        oNAmt_ = wmul(_tNAmt, WAD+_globals[3]);
+        oNAmt_ = omul(_tNAmt, OCTOPUS+_globals[3]);
         uint256 _tNFAmt = oNAmt_;
         uint256 _psi;
         uint256 _nGLiq;
@@ -98,26 +98,26 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
             _psi = 0;
             _nGLiq = _grossLiq + oNAmt_ - _tNAmt;
             for (uint i = 0; i < _rsrvs.length; i++) {
-                if (_rsrvs[i] == _oRsrv) _psi += makeFee(add(_balances[i], oNAmt_), wmul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
-                else if (_rsrvs[i] == _tRsrv) _psi += makeFee(sub(_balances[i], _tNAmt), wmul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
-                else _psi += makeFee(_balances[i], wmul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
+                if (_rsrvs[i] == _oRsrv) _psi += makeFee(add(_balances[i], oNAmt_), omul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
+                else if (_rsrvs[i] == _tRsrv) _psi += makeFee(sub(_balances[i], _tNAmt), omul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
+                else _psi += makeFee(_balances[i], omul(_nGLiq, _weights[i]), _globals[1], _globals[2]);
             }
 
             if (_globals[5] < _psi) {
                 if ((oNAmt_ = _tNFAmt + _psi - _globals[5]) / 10000000000 == oNAmt_ / 10000000000) break;
             } else {
-                if ((oNAmt_ = _tNFAmt - wmul(_globals[4], _globals[5] - _psi)) / 10000000000 == oNAmt_ / 10000000000) break;
+                if ((oNAmt_ = _tNFAmt - omul(_globals[4], _globals[5] - _psi)) / 10000000000 == oNAmt_ / 10000000000) break;
             }
 
         }
 
         for (uint i = 0; i < _balances.length; i++) {
-            uint256 _ideal = wmul(_nGLiq, _weights[i]);
-            if (_rsrvs[i] == _oRsrv) require(_balances[i] + oNAmt_ < wmul(_ideal, WAD + _globals[0]), "origin halt check");
-            if (_rsrvs[i] == _tRsrv) require(_balances[i] - _tNAmt > wmul(_ideal, WAD - _globals[0]), "target halt check");
+            uint256 _ideal = omul(_nGLiq, _weights[i]);
+            if (_rsrvs[i] == _oRsrv) require(_balances[i] + oNAmt_ < omul(_ideal, OCTOPUS + _globals[0]), "origin halt check");
+            if (_rsrvs[i] == _tRsrv) require(_balances[i] - _tNAmt > omul(_ideal, OCTOPUS - _globals[0]), "target halt check");
         }
 
-        oNAmt_ = wmul(oNAmt_, WAD+_globals[3]);
+        oNAmt_ = omul(oNAmt_, OCTOPUS+_globals[3]);
 
         return dViewRawAmount(_oAdptr, oNAmt_);
 
@@ -126,14 +126,14 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
     function makeFee (uint256 _bal, uint256 _ideal, uint256 _beta, uint256 _delta) internal view returns (uint256 _fee) {
 
         uint256 threshold;
-        if (_bal < (threshold = wmul(_ideal, WAD-_beta))) {
-            _fee = wdiv(_delta, _ideal);
-            _fee = wmul(_fee, (threshold = sub(threshold, _bal)));
-            _fee = wmul(_fee, threshold);
-        } else if (_bal > (threshold = wmul(_ideal, WAD+_beta))) {
-            _fee = wdiv(_delta, _ideal);
-            _fee = wmul(_fee, (threshold = sub(_bal, threshold)));
-            _fee = wmul(_fee, threshold);
+        if (_bal < (threshold = omul(_ideal, OCTOPUS-_beta))) {
+            _fee = odiv(_delta, _ideal);
+            _fee = omul(_fee, (threshold = sub(threshold, _bal)));
+            _fee = omul(_fee, threshold);
+        } else if (_bal > (threshold = omul(_ideal, OCTOPUS+_beta))) {
+            _fee = odiv(_delta, _ideal);
+            _fee = omul(_fee, (threshold = sub(_bal, threshold)));
+            _fee = omul(_fee, threshold);
         } else _fee = 0;
 
     }
@@ -155,18 +155,18 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
         if (_globals[5] < _psi) {
             uint256 _oUtil = sub(_oSum, _globals[5]);
             uint256 _nUtil = sub(_nSum, _psi);
-            if (_oUtil == 0) return wmul(_nUtil, WAD+_globals[3]);
-            shellsBurned_ = wdiv(wmul(sub(_oUtil, _nUtil), _globals[6]), _oUtil);
+            if (_oUtil == 0) return omul(_nUtil, OCTOPUS+_globals[3]);
+            shellsBurned_ = odiv(omul(sub(_oUtil, _nUtil), _globals[6]), _oUtil);
         } else {
             uint256 _oUtil = sub(_oSum, _globals[5]);
-            uint256 _nUtil = sub(_nSum, wmul(_psi, _globals[4]));
-            if (_oUtil == 0) return wmul(_nUtil, WAD+_globals[3]);
-            uint256 _oUtilPrime = wmul(_globals[5], _globals[4]);
+            uint256 _nUtil = sub(_nSum, omul(_psi, _globals[4]));
+            if (_oUtil == 0) return omul(_nUtil, OCTOPUS+_globals[3]);
+            uint256 _oUtilPrime = omul(_globals[5], _globals[4]);
             _oUtilPrime = sub(_oSum, _oUtilPrime);
-            shellsBurned_ = wdiv(wmul(sub(_oUtilPrime, _nUtil), _globals[6]), _oUtil);
+            shellsBurned_ = odiv(omul(sub(_oUtilPrime, _nUtil), _globals[6]), _oUtil);
         }
 
-        return wmul(shellsBurned_, WAD+_globals[3]);
+        return omul(shellsBurned_, OCTOPUS+_globals[3]);
 
     }
 
@@ -189,27 +189,27 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
         if (_globals[5] < _psi) {
             uint256 _oUtil = sub(_oSum, _globals[5]);
             uint256 _nUtil = sub(_nSum, _psi);
-            if (_oUtil == 0 || _globals[6] == 0) return wmul(_nUtil, WAD-_globals[3]);
-            shellsMinted_ = wdiv(wmul(sub(_nUtil, _oUtil), _globals[6]), _oUtil);
+            if (_oUtil == 0 || _globals[6] == 0) return omul(_nUtil, OCTOPUS-_globals[3]);
+            shellsMinted_ = odiv(omul(sub(_nUtil, _oUtil), _globals[6]), _oUtil);
         } else {
             uint256 _oUtil = sub(_oSum, _globals[5]);
-            uint256 _nUtil = sub(_nSum, wmul(_psi, _globals[4]));
-            if (_oUtil == 0 || _globals[6] == 0) return wmul(_nUtil, WAD-_globals[3]);
-            uint256 _oUtilPrime = wmul(_globals[5], _globals[4]);
+            uint256 _nUtil = sub(_nSum, omul(_psi, _globals[4]));
+            if (_oUtil == 0 || _globals[6] == 0) return omul(_nUtil, OCTOPUS-_globals[3]);
+            uint256 _oUtilPrime = omul(_globals[5], _globals[4]);
             _oUtilPrime = sub(_oSum, _oUtilPrime);
-            shellsMinted_ = wdiv(wmul(sub(_nUtil, _oUtilPrime), _globals[6]), _oUtil);
+            shellsMinted_ = odiv(omul(sub(_nUtil, _oUtilPrime), _globals[6]), _oUtil);
         }
 
-        return wmul(shellsMinted_, WAD-_globals[3]);
+        return omul(shellsMinted_, OCTOPUS-_globals[3]);
     }
 
     function viewMintFees (uint256[] memory _balances, uint256[] memory _deposits, uint256[] memory _globals, uint256[] memory _weights, uint256 _nSum, uint256 _oSum) public view returns (uint256 psi_) {
 
         for (uint i = 0; i < _balances.length; i++) {
             uint256 _nBal = add(_balances[i], _deposits[i]);
-            uint256 _nIdeal = wmul(_nSum, _weights[i]);
-            require(_nBal <= wmul(_nIdeal, WAD + _globals[0]), "deposit upper halt check");
-            require(_nBal >= wmul(_nIdeal, WAD - _globals[0]), "deposit lower halt check");
+            uint256 _nIdeal = omul(_nSum, _weights[i]);
+            require(_nBal <= omul(_nIdeal, OCTOPUS + _globals[0]), "deposit upper halt check");
+            require(_nBal >= omul(_nIdeal, OCTOPUS - _globals[0]), "deposit lower halt check");
             psi_ += makeFee(_nBal, _nIdeal, _globals[1], _globals[2]);
         }
 
@@ -219,9 +219,9 @@ contract LoihiViews is LoihiRoot, LoihiDelegators {
 
         for (uint i = 0; i < _balances.length; i++) {
             uint256 _nBal = sub(_balances[i], _withdrawals[i]);
-            uint256 _nIdeal = wmul(_nSum, _weights[i]);
-            require(_nBal <= wmul(_nIdeal, WAD + _globals[0]), "withdraw upper halt check");
-            require(_nBal >= wmul(_nIdeal, WAD - _globals[0]), "withdraw lower halt check");
+            uint256 _nIdeal = omul(_nSum, _weights[i]);
+            require(_nBal <= omul(_nIdeal, OCTOPUS + _globals[0]), "withdraw upper halt check");
+            require(_nBal >= omul(_nIdeal, OCTOPUS - _globals[0]), "withdraw lower halt check");
             psi_ += makeFee(_nBal, _nIdeal, _globals[1], _globals[2]);
         }
 

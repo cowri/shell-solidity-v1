@@ -13,9 +13,15 @@
 
 pragma solidity ^0.5.15;
 
-import "ds-math/math.sol";
 
-contract LoihiRoot is DSMath {
+import "./LoihiMath.sol";
+import "./interfaces/ICToken.sol";
+import "./interfaces/IAToken.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "./interfaces/IChai.sol";
+import "./interfaces/IPot.sol";
+
+contract LoihiRoot is LoihiMath {
 
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
@@ -46,10 +52,27 @@ contract LoihiRoot is DSMath {
     bytes4 constant internal ERC20ID = 0x36372b07;
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
 
-    address constant exchange = 0xfb8443545771E2BB15bB7cAdDa43A16a1Ab69c0B;
-    address constant liquidity = 0xA3f4A860eFa4a60279E6E50f2169FDD080aAb655;
-    address constant views = 0x81dBd2ec823cB2691f34c7b5391c9439ec5c80E3;
-    address constant erc20 = 0x7DB32869056647532f80f482E5bB1fcb311493cD;
+    IERC20 dai; ICToken cdai; IChai chai; IPot pot;
+    IERC20 usdc; ICToken cusdc;
+    IERC20 usdt; IAToken ausdt;
+    IERC20 susd; IAToken asusd;
+
+    function includeTestAdapterState(address _dai, address _cdai, address _chai, address _pot, address _usdc, address _cusdc, address _usdt, address _ausdt, address _susd, address _asusd) public {
+        dai = IERC20(_dai); cdai = ICToken(_cdai); chai = IChai(_chai); pot = IPot(_pot);
+        usdc = IERC20(_usdc); cusdc = ICToken(_cusdc);
+        usdt = IERC20(_usdt); ausdt = IAToken(_ausdt);
+        susd = IERC20(_susd); asusd = IAToken(_asusd);
+    }
+
+
+    // address constant exchange = 0xfb8443545771E2BB15bB7cAdDa43A16a1Ab69c0B;
+    // address constant liquidity = 0xA3f4A860eFa4a60279E6E50f2169FDD080aAb655;
+    // address constant views = 0x81dBd2ec823cB2691f34c7b5391c9439ec5c80E3;
+    // address constant erc20 = 0x7DB32869056647532f80f482E5bB1fcb311493cD;
+    address exchange;
+    address liquidity;
+    address views;
+    address erc20;
 
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
     event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);

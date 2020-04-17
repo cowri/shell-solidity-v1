@@ -49,45 +49,50 @@ contract Loihi is LoihiRoot {
 
     address constant aaveLpCore = 0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3;
 
-    constructor () public {
+    // constructor () public {
+    constructor (address x, address l, address v, address e) public {
+        exchange = x;
+        liquidity = l;
+        views = v;
+        erc20 = e;
 
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
 
-        numeraires = [ dai, usdc, usdt, susd ];
-        reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
-        weights = [ 300000000000000000, 300000000000000000, 300000000000000000, 100000000000000000 ];
+        // numeraires = [ dai, usdc, usdt, susd ];
+        // reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
+        // weights = [ 300000000000000000, 300000000000000000, 300000000000000000, 100000000000000000 ];
         
-        flavors[dai] = Flavor(daiAdapter, cdaiAdapter);
-        flavors[chai] = Flavor(chaiAdapter, cdaiAdapter);
-        flavors[cdai] = Flavor(cdaiAdapter, cdaiAdapter);
-        flavors[usdc] = Flavor(usdcAdapter, cusdcAdapter);
-        flavors[cusdc] = Flavor(cusdcAdapter, cusdcAdapter);
-        flavors[usdt] = Flavor(usdtAdapter, ausdtAdapter);
-        flavors[ausdt] = Flavor(ausdtAdapter, ausdtAdapter);
-        flavors[susd] = Flavor(susdAdapter, asusdAdapter);
-        flavors[asusd] = Flavor(asusdAdapter, asusdAdapter);
+        // flavors[dai] = Flavor(daiAdapter, cdaiAdapter);
+        // flavors[chai] = Flavor(chaiAdapter, cdaiAdapter);
+        // flavors[cdai] = Flavor(cdaiAdapter, cdaiAdapter);
+        // flavors[usdc] = Flavor(usdcAdapter, cusdcAdapter);
+        // flavors[cusdc] = Flavor(cusdcAdapter, cusdcAdapter);
+        // flavors[usdt] = Flavor(usdtAdapter, ausdtAdapter);
+        // flavors[ausdt] = Flavor(ausdtAdapter, ausdtAdapter);
+        // flavors[susd] = Flavor(susdAdapter, asusdAdapter);
+        // flavors[asusd] = Flavor(asusdAdapter, asusdAdapter);
 
-        address[] memory targets = new address[](5);
-        address[] memory spenders = new address[](5);
-        targets[0] = dai; spenders[0] = chai;
-        targets[1] = dai; spenders[1] = cdai;
-        targets[2] = susd; spenders[2] = aaveLpCore;
-        targets[3] = usdc; spenders[3] = cusdc;
-        targets[4] = usdt; spenders[4] = aaveLpCore;
+        // address[] memory targets = new address[](5);
+        // address[] memory spenders = new address[](5);
+        // targets[0] = dai; spenders[0] = chai;
+        // targets[1] = dai; spenders[1] = cdai;
+        // targets[2] = susd; spenders[2] = aaveLpCore;
+        // targets[3] = usdc; spenders[3] = cusdc;
+        // targets[4] = usdt; spenders[4] = aaveLpCore;
 
-        for (uint i = 0; i < targets.length; i++) {
-            (bool success, bytes memory returndata) = targets[i].call(abi.encodeWithSignature("approve(address,uint256)", spenders[i], uint256(0)));
-            require(success, "SafeERC20: low-level call failed");
-            (success, returndata) = targets[i].call(abi.encodeWithSignature("approve(address,uint256)", spenders[i], uint256(-1)));
-            require(success, "SafeERC20: low-level call failed");
-        }
+        // for (uint i = 0; i < targets.length; i++) {
+        //     (bool success, bytes memory returndata) = targets[i].call(abi.encodeWithSignature("approve(address,uint256)", spenders[i], uint256(0)));
+        //     require(success, "SafeERC20: low-level call failed");
+        //     (success, returndata) = targets[i].call(abi.encodeWithSignature("approve(address,uint256)", spenders[i], uint256(-1)));
+        //     require(success, "SafeERC20: low-level call failed");
+        // }
         
-        alpha = 900000000000000000; // .9
-        beta = 400000000000000000; // .4
-        delta = 150000000000000000; // .15
-        epsilon = 175000000000000; // 1.75 bps * 2 = 3.5 bps
-        lambda = 500000000000000000; // .5 
+        // alpha = 900000000000000000; // .9
+        // beta = 400000000000000000; // .4
+        // delta = 150000000000000000; // .15
+        // epsilon = 175000000000000; // 1.75 bps * 2 = 3.5 bps
+        // lambda = 500000000000000000; // .5 
 
     }
 
@@ -106,7 +111,7 @@ contract Loihi is LoihiRoot {
     }
 
     function setParams (uint256 _alpha, uint256 _beta, uint256 _delta, uint256 _epsilon, uint256 _lambda, uint256 _omega) public onlyOwner {
-        require(_alpha < WAD && _alpha > 0, "invalid-alpha");
+        require(_alpha < OCTOPUS && _alpha > 0, "invalid-alpha");
         require(_beta < _alpha && _beta > 0, "invalid-beta");
         alpha = _alpha;
         beta = _beta;
