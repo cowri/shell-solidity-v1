@@ -13,13 +13,13 @@
 
 pragma solidity ^0.5.0;
 
-contract LoihiDelegators {
+library LoihiDelegators {
 
     function delegateTo(address callee, bytes memory data) internal returns (bytes memory) {
         (bool success, bytes memory returnData) = callee.delegatecall(data);
         assembly {
             if eq(success, 0) {
-                revert(add(returnData, 0x20), returndatasize)
+                revert(add(returnData, 0x20), returndatasize())
             }
         }
         return returnData;
@@ -29,43 +29,43 @@ contract LoihiDelegators {
         (bool success, bytes memory returnData) = callee.staticcall(data);
         assembly {
             if eq(success, 0) {
-                revert(add(returnData, 0x20), returndatasize)
+                revert(add(returnData, 0x20), returndatasize())
             }
         }
         return returnData;
     }
 
-    function dViewRawAmount (address addr, uint256 amount) internal view returns (uint256) {
+    function viewRawAmount (address addr, uint256 amount) internal view returns (uint256) {
         bytes memory result = staticTo(addr, abi.encodeWithSignature("viewRawAmount(uint256)", amount)); // encoded selector of "getNumeraireAmount(uint256");
         return abi.decode(result, (uint256));
     }
 
-    function dViewNumeraireAmount (address addr, uint256 amount) internal view returns (uint256) {
+    function viewNumeraireAmount (address addr, uint256 amount) internal view returns (uint256) {
         bytes memory result = staticTo(addr, abi.encodeWithSignature("viewNumeraireAmount(uint256)", amount)); // encoded selector of "getNumeraireAmount(uint256");
         return abi.decode(result, (uint256));
     }
 
-    function dViewNumeraireBalance (address addr, address _this) internal view returns (uint256) {
+    function viewNumeraireBalance (address addr, address _this) internal view returns (uint256) {
         bytes memory result = staticTo(addr, abi.encodeWithSignature("viewNumeraireBalance(address)", _this)); // encoded selector of "getNumeraireAmount(uint256");
         return abi.decode(result, (uint256));
     }
 
-    function dIntakeRaw (address addr, uint256 amount) internal returns (uint256) {
+    function intakeRaw (address addr, uint256 amount) internal returns (uint256) {
         bytes memory result = delegateTo(addr, abi.encodeWithSignature("intakeRaw(uint256)", amount)); // encoded selector of "intakeRaw(uint256)";
         return abi.decode(result, (uint256));
     }
 
-    function dIntakeNumeraire (address addr, uint256 amount) internal returns (uint256) {
+    function intakeNumeraire (address addr, uint256 amount) internal returns (uint256) {
         bytes memory result = delegateTo(addr, abi.encodeWithSignature("intakeNumeraire(uint256)", amount)); // encoded selector of "intakeNumeraire(uint256)";
         return abi.decode(result, (uint256));
     }
 
-    function dOutputRaw (address addr, address dst, uint256 amount) internal returns (uint256) {
+    function outputRaw (address addr, address dst, uint256 amount) internal returns (uint256) {
         bytes memory result = delegateTo(addr, abi.encodeWithSignature("outputRaw(address,uint256)", dst, amount)); // encoded selector of "outputRaw(address,uint256)";
         return abi.decode(result, (uint256));
     }
 
-    function dOutputNumeraire (address addr, address dst, uint256 amount) internal returns (uint256) {
+    function outputNumeraire (address addr, address dst, uint256 amount) internal returns (uint256) {
         bytes memory result = delegateTo(addr, abi.encodeWithSignature("outputNumeraire(address,uint256)", dst, amount)); // encoded selector of "outputNumeraire(address,uint256)";
         return abi.decode(result, (uint256));
     }

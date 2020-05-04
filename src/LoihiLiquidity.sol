@@ -13,28 +13,37 @@
 
 pragma solidity ^0.5.0;
 
-import "./LoihiRoot.sol";
 import "./LoihiDelegators.sol";
+import "./LoihiMath.sol";
+import "./LoihiRoot.sol";
 
-contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
+library LoihiLiquidity {
+
+    using LoihiDelegators for address;
+    using LoihiMath for uint256;
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
+    event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);
+
+    uint256 constant OCTOPUS = 1e18;
 
     /// @dev selective the withdrawal of any supported stablecoin flavor. refer to Loihi.bin selectiveWithdraw for detailed explanation of parameters
     /// @return shellsBurned_ amount of shell tokens to withdraw the specified amount of specified flavors
-    function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _deadline) external returns (uint256 shellsBurned_) {
+    function executeSelectiveWithdraw (LoihiRoot.Shell storage shell, address[] memory _flvrs, uint256[] memory _amts, uint256 _maxShells, uint256 _deadline) internal returns (uint256 shellsBurned_) {
         require(_deadline >= now, "deadline has passed for this transaction");
 
-        ( uint256[] memory _balances, uint256[] memory _withdrawals ) = getBalancesAndAmounts(_flvrs, _amts);
+        ( uint256[] memory _balances, uint256[] memory _withdrawals ) = getBalancesAndAmounts(shell, _flvrs, _amts);
 
-        shellsBurned_ = calculateShellsToBurn(_balances, _withdrawals);
+        ( shellsBurned_, shell.omega ) = calculateShellsToBurn(shell, _balances, _withdrawals);
 
-        shellsBurned_ = omul(shellsBurned_, OCTOPUS+epsilon);
-        
-        require(shellsBurned_ <= balances[msg.sender], "withdrawal amount exceeds balance");
+        require(shellsBurned_ <= shell.balances[msg.sender], "withdrawal amount exceeds balance");
+
         require(shellsBurned_ <= _maxShells, "withdrawal exceeds max shells limit");
 
-        for (uint i = 0; i < _flvrs.length; i++) if (_amts[i] > 0) dOutputRaw(flavors[_flvrs[i]].adapter, msg.sender, _amts[i]);
+        for (uint8 i = 0; i < _flvrs.length; i++) if (_amts[i] > 0) shell.assimilators[_flvrs[i]].addr.outputRaw(msg.sender, _amts[i]);
 
-        _burn(msg.sender, shellsBurned_);
+        _burn(shell, msg.sender, shellsBurned_);
 
         emit ShellsBurned(msg.sender, shellsBurned_, _flvrs, _amts);
 
@@ -42,67 +51,77 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
+    function viewSelectiveWithdraw (LoihiRoot.Shell storage shell, address[] memory _flvrs, uint256[] memory _amts) internal returns (uint256 shellsToBurn_) {
+
+        ( uint256[] memory _balances, uint256[] memory _withdrawals ) = getBalancesAndAmounts(shell, _flvrs, _amts);
+
+        ( shellsToBurn_, ) = calculateShellsToBurn(shell, _balances, _withdrawals);
+
+    }
+
     /// @dev this function calculates the amount of shells to burn by taking the balances and numeraire deposits of the reserve tokens being deposited into
-    /// @return shellsBurned_ the amount of shells the withdraw will burn
-    function calculateShellsToBurn (uint256[] memory _balances, uint256[] memory _withdrawals) internal returns (uint256 shellsBurned_) {
+    /// @return shellsToBurn_ the amount of shells the withdraw will burn
+    /// @return psi_ the new fee
+    function calculateShellsToBurn (LoihiRoot.Shell storage shell, uint256[] memory _balances, uint256[] memory _withdrawals) internal returns (uint256 shellsToBurn_, uint256 psi_) {
 
         uint256 _nSum; uint256 _oSum;
-        for (uint i = 0; i < _balances.length; i++) {
+        for (uint8 i = 0; i < _balances.length; i++) {
             _oSum += _balances[i];
-            _nSum += _balances[i] = sub(_balances[i], _withdrawals[i]);
+            _nSum += _balances[i] = _balances[i].sub(_withdrawals[i]);
         }
 
-        uint256 _psi;
         {
-            uint256 _alpha = alpha;
-            uint256[] memory _weights = weights;
-            for (uint i = 0; i < _balances.length; i++) {
+            uint256 _alpha = shell.alpha;
+            for (uint8 i = 0; i < _balances.length; i++) {
                 uint256 _nBal = _balances[i];
-                uint256 _nIdeal = omul(_nSum, _weights[i]);
-                require(_nBal <= omul(_nIdeal, OCTOPUS + _alpha), "withdraw upper halt check");
-                require(_nBal >= omul(_nIdeal, OCTOPUS - _alpha), "withdraw lower halt check");
-                _psi += makeFee(_nBal, _nIdeal);
+                uint256 _nIdeal = _nSum.omul(shell.weights[i]);
+                if (_nBal > _nIdeal) require(_balances[i] <= _nIdeal.omul(OCTOPUS + _alpha), "withdraw upper halt check");
+                else require(_balances[i] >= _nIdeal.omul(OCTOPUS - _alpha), "withdraw lower halt check");
+                psi_ += makeFee(shell, _nBal, _nIdeal);
             }
         }
 
         {
-            uint256 _omega = omega;
-            if (_omega < _psi) {
-                uint256 _oUtil = sub(_oSum, _omega);
-                uint256 _nUtil = sub(_nSum, _psi);
-                if (_oUtil == 0) shellsBurned_ = _nUtil;
-                else shellsBurned_ = odiv(omul(sub(_oUtil, _nUtil), totalSupply), _oUtil);
+            uint256 _omega = shell.omega;
+            uint256 _oUtil = _oSum.sub(_omega);
+            if (_omega < psi_) {
+                uint256 _nUtil = _nSum.sub(psi_);
+                if (_oUtil == 0) shellsToBurn_ = _nUtil;
+                else shellsToBurn_ = _oUtil.sub(_nUtil).omul(shell.totalSupply).odiv(_oUtil);
             } else {
-                uint256 _lambda = lambda;
-                uint256 _oUtil = sub(_oSum, _omega);
-                uint256 _nUtil = sub(_nSum, omul(_psi, _lambda));
-                if (_oUtil == 0) shellsBurned_ = _nUtil;
+                uint256 _lambda = shell.lambda;
+                uint256 _nUtil = _nSum.sub(psi_.omul(_lambda));
+                if (_oUtil == 0) shellsToBurn_ = _nUtil;
                 else {
-                    uint256 _oUtilPrime = sub(_oSum, omul(_omega, _lambda));
-                    shellsBurned_ = odiv(omul(sub(_oUtilPrime, _nUtil), totalSupply), _oUtil);
+                    uint256 _oUtilPrime = _oSum.sub(_omega.omul(_lambda));
+                    shellsToBurn_ = _oUtilPrime.sub(_nUtil).omul(shell.totalSupply).odiv(_oUtil);
                 }
             }
         }
 
-        omega = _psi;
+        shellsToBurn_ = shellsToBurn_.omul(OCTOPUS + shell.epsilon);
 
     }
 
+    event log_uint(bytes32, uint256);
+    event log_addr(bytes32, address);
+    event log_uints(bytes32, uint256[]);
+    event log_addrs(bytes32, address[]);
+
     /// @dev selective depositing of any supported stablecoin flavor into the contract in return for corresponding shell tokens
-    /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
-    function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _deadline) external returns (uint256 shellsMinted_) {
+    /// @return shellsMinted_ the amount of shells to mint for the deposited stablecoin flavors
+    function executeSelectiveDeposit (LoihiRoot.Shell storage shell, address[] memory _flvrs, uint256[] memory _amts, uint256 _minShells, uint256 _deadline) internal returns (uint256 shellsMinted_) {
         require(_deadline >= now, "deadline has passed for this transaction");
 
-        ( uint256[] memory _balances, uint256[] memory _deposits ) = getBalancesAndAmounts(_flvrs, _amts);
+        ( uint256[] memory _balances, uint256[] memory _deposits ) = getBalancesAndAmounts(shell, _flvrs, _amts);
 
-        shellsMinted_ = calculateShellsToMint(_balances, _deposits);
-        shellsMinted_ = omul(shellsMinted_, OCTOPUS-epsilon);
+        ( shellsMinted_, shell.omega ) = calculateShellsToMint(shell, _balances, _deposits);
 
         require(shellsMinted_ >= _minShells, "minted shells less than minimum shells");
 
-        _mint(msg.sender, shellsMinted_);
+        _mint(shell, msg.sender, shellsMinted_);
 
-        for (uint i = 0; i < _flvrs.length; i++) if (_amts[i] > 0) dIntakeRaw(flavors[_flvrs[i]].adapter, _amts[i]);
+        for (uint8 i = 0; i < _flvrs.length; i++) if (_amts[i] > 0) shell.assimilators[_flvrs[i]].addr.intakeRaw(_amts[i]);
 
         emit ShellsMinted(msg.sender, shellsMinted_, _flvrs, _amts);
 
@@ -110,72 +129,80 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     }
 
+    function viewSelectiveDeposit (LoihiRoot.Shell storage shell, address[] memory _flvrs, uint256[] memory _amts) internal returns (uint256 shellsToMint_) {
+
+        ( uint256[] memory _balances, uint256[] memory _withdrawals ) = getBalancesAndAmounts(shell, _flvrs, _amts);
+
+        ( shellsToMint_, ) = calculateShellsToMint(shell, _balances, _withdrawals);
+
+    }
+
     /// @dev this function calculates the amount of shells to mint by taking the balances and numeraire deposits of the reserve tokens being deposited into
-    /// @return shellsMinted_ the amount of shells the deposit will mint
-    function calculateShellsToMint (uint256[] memory _balances, uint256[] memory _deposits) internal returns (uint256 shellsMinted_) {
+    /// @return shellsToMint_ the amount of shells the deposit will mint
+    /// @return psi_ the new fee
+    function calculateShellsToMint (LoihiRoot.Shell storage shell, uint256[] memory _balances, uint256[] memory _deposits) internal returns (uint256 shellsToMint_, uint256 psi_) {
 
         uint256 _nSum; uint256 _oSum;
-        for (uint i = 0; i < _balances.length; i++) {
+        for (uint8 i = 0; i < _balances.length; i++) {
             _oSum += _balances[i];
-            _nSum = add(_nSum, (_balances[i] = add(_balances[i], _deposits[i])));
+            _nSum += _balances[i] = _balances[i].add(_deposits[i]);
         }
 
         require(_oSum < _nSum, "insufficient-deposit");
 
-        uint256 _psi;
         {
-            uint256 _alpha = alpha;
-            uint256[] memory _weights = weights;
-            for (uint i = 0; i < _balances.length; i++) {
+            uint256 _alpha = shell.alpha;
+            uint256[] memory _weights = shell.weights;
+            for (uint8 i = 0; i < _balances.length; i++) {
                 uint256 _nBal = _balances[i];
-                uint256 _nIdeal = omul(_weights[i], _nSum);
-                require(_nBal <= omul(_nIdeal, OCTOPUS + _alpha), "deposit upper halt check");
-                require(_nBal >= omul(_nIdeal, OCTOPUS - _alpha), "deposit lower halt check");
-                _psi += makeFee(_nBal, _nIdeal);
+                uint256 _nIdeal = _weights[i].omul(_nSum);
+                if (_nBal > _nIdeal) require(_nBal <= _nIdeal.omul(OCTOPUS + _alpha), "deposit upper halt check");
+                else require(_nBal >= _nIdeal.omul(OCTOPUS - _alpha), "deposit lower halt check");
+                psi_ += makeFee(shell, _nBal, _nIdeal);
             }
         }
 
         {
-            uint256 _omega = omega;
-            uint256 _totalSupply = totalSupply;
-            if (omega < _psi) {
-                uint256 _oUtil = _oSum - _omega;
-                uint256 _nUtil = _nSum - _psi;
-                if (_oUtil == 0 || _totalSupply == 0) shellsMinted_ = _nUtil;
-                else shellsMinted_ = odiv(omul(_nUtil - _oUtil, _totalSupply), _oUtil);
+            uint256 _omega = shell.omega;
+            uint256 _totalSupply = shell.totalSupply;
+            uint256 _oUtil = _oSum - _omega;
+            if (_omega < psi_) {
+                uint256 _nUtil = _nSum - psi_;
+                if (_oUtil == 0 || _totalSupply == 0) shellsToMint_ = _nUtil;
+                else shellsToMint_ = (_nUtil - _oUtil).omul(_totalSupply).odiv(_oUtil);
             } else {
-                uint256 _lambda = lambda;
-                uint256 _oUtil = _oSum - _omega;
-                uint256 _nUtil = _nSum - omul(_psi, _lambda);
-                if (_oUtil == 0 || _totalSupply == 0) shellsMinted_ = _nUtil;
+                uint256 _lambda = shell.lambda;
+                uint256 _nUtil = _nSum - psi_.omul(_lambda);
+                if (_oUtil == 0 || _totalSupply == 0) shellsToMint_ = _nUtil;
                 else {
-                    uint256 _oUtilPrime = _oSum - omul(_omega, _lambda);
-                    shellsMinted_ = odiv(omul(_nUtil - _oUtilPrime, _totalSupply), _oUtil);
+                    uint256 _oUtilPrime = _oSum - _omega.omul(_lambda);
+                    shellsToMint_ = (_nUtil - _oUtilPrime).omul(_totalSupply).odiv(_oUtil);
                 }
             }
         }
 
-        omega = _psi;
+        shellsToMint_ = shellsToMint_.omul(OCTOPUS - shell.epsilon);
 
     }
 
     /// @dev get the current balances and incoming/outgoing token amounts for the deposit/withdraw
     /// @return two arrays the length of the number of reserves containing the current balances and incoming/outgoing token amounts
-    function getBalancesAndAmounts (address[] memory _flvrs, uint256[] memory _amts) internal returns (uint256[] memory, uint256[] memory) {
+    function getBalancesAndAmounts (LoihiRoot.Shell storage shell, address[] memory _flvrs, uint256[] memory _amts) internal returns (uint256[] memory, uint256[] memory) {
 
-        address[] memory _reserves = reserves;
+        address[] memory _reserves = shell.reserves;
         uint256[] memory balances_ = new uint256[](_reserves.length);
         uint256[] memory amounts_ = new uint256[](_reserves.length);
 
-        for (uint i = 0; i < _flvrs.length; i++) {
+        for (uint8 i = 0; i < _flvrs.length; i++) {
 
-            Flavor memory _f = flavors[_flvrs[i]]; // withdrawing adapter + weight
-            require(_f.adapter != address(0), "flavor not supported");
+            LoihiRoot.Assimilator memory _a = shell.assimilators[_flvrs[i]]; // withdrawing adapter + weight
 
-            for (uint j = 0; j < _reserves.length; j++) {
-                if (balances_[j] == 0) balances_[j] = dViewNumeraireBalance(_reserves[j], address(this));
-                if (_reserves[j] == _f.reserve && _amts[i] > 0) amounts_[j] += dViewNumeraireAmount(_f.adapter, _amts[i]);
-            }
+            require(_a.addr != address(0), "flavor not supported");
+
+            amounts_[_a.ix] += _a.addr.viewNumeraireAmount(_amts[i]);
+
+            if (balances_[_a.ix] == 0) balances_[_a.ix] = _a.addr.viewNumeraireBalance(address(this));
+
         }
 
         return (balances_, amounts_);
@@ -183,118 +210,110 @@ contract LoihiLiquidity is LoihiRoot, LoihiDelegators {
 
     /// @notice this function makes our fees!
     /// @return fee_ the fee.
-    function makeFee (uint256 _bal, uint256 _ideal) internal view returns (uint256 fee_) {
+    function makeFee (LoihiRoot.Shell storage shell, uint256 _bal, uint256 _ideal) internal view returns (uint256 fee_) {
 
         uint256 _threshold;
-        uint256 _beta = beta;
-        uint256 _delta = delta;
-        if (_bal < (_threshold = omul(_ideal, OCTOPUS-_beta))) {
-            fee_ = odiv(_delta, _ideal);
-            fee_ = omul(fee_, (_threshold = _threshold - _bal));
-            fee_ = omul(fee_, _threshold);
-        } else if (_bal > (_threshold = omul(_ideal, OCTOPUS+_beta))) {
-            fee_ = odiv(_delta, _ideal);
-            fee_ = omul(fee_, (_threshold = _bal - _threshold));
-            fee_ = omul(fee_, _threshold);
+        uint256 _beta = shell.beta;
+        uint256 _delta = shell.delta;
+        if (_bal < (_threshold = _ideal.omul(OCTOPUS - _beta))) {
+            fee_ = _delta.odiv(_ideal);
+            fee_ = fee_.omul(_threshold = _threshold - _bal);
+            fee_ = fee_.omul(_threshold);
+        } else if (_bal > (_threshold = _ideal.omul(OCTOPUS + _beta))) {
+            fee_ = _delta.odiv(_ideal);
+            fee_ = fee_.omul(_threshold = _bal - _threshold);
+            fee_ = fee_.omul(_threshold);
         } else fee_ = 0;
 
     }
 
     /// @dev see Loihi.bin proportionalDeposit for a detailed explanation of parameter
-    /// @return shellsToMint_ the amount of shells you receive in return for your deposit
-    function proportionalDeposit (uint256 _deposit) public returns (uint256) {
+    /// @return shellsMinted_ the amount of shells you receive in return for your deposit
+    function executeProportionalDeposit (LoihiRoot.Shell storage shell, uint256 _deposit) internal returns (uint256 shellsMinted_) {
 
-        address[] memory _numeraires = numeraires;
-        address[] memory _reserves = reserves;
-
-        uint256[] memory _amounts = new uint256[](_numeraires.length);
+        uint256[] memory _amounts = new uint256[](shell.numeraires.length);
         uint256 _oSum;
 
-        for (uint i = 0; i < _reserves.length; i++) {
-            uint256 _oBal = dViewNumeraireBalance(_reserves[i], address(this));
+        for (uint8 i = 0; i < shell.reserves.length; i++) {
+            uint256 _oBal = shell.reserves[i].viewNumeraireBalance(address(this));
             _amounts[i] = _oBal;
             _oSum += _oBal;
         }
 
         if (_oSum == 0) {
 
-            uint256[] memory _weights = weights;
-            for (uint i = 0; i < _reserves.length; i++) {
-                Flavor memory _f = flavors[_numeraires[i]];
-                _amounts[i] = dIntakeNumeraire(_f.adapter, omul(_deposit, _weights[i]));
+            for (uint8 i = 0; i < shell.reserves.length; i++) {
+                LoihiRoot.Assimilator memory _a = shell.assimilators[shell.numeraires[i]];
+                _amounts[i] = _a.addr.intakeNumeraire(_deposit.omul(shell.weights[i]));
             }
 
         } else {
 
-            uint256 _multiplier = odiv(_deposit, _oSum);
-            for (uint i = 0; i < _reserves.length; i++) {
-                Flavor memory _f = flavors[_numeraires[i]];
-                uint256 _value = omul(_amounts[i], _multiplier);
-                _amounts[i] = dIntakeNumeraire(_f.adapter, _value);
+            uint256 _multiplier = _deposit.odiv(_oSum);
+            for (uint8 i = 0; i < shell.reserves.length; i++) {
+                LoihiRoot.Assimilator memory _a = shell.assimilators[shell.numeraires[i]];
+                uint256 _value = _amounts[i].omul(_multiplier);
+                _amounts[i] = _a.addr.intakeNumeraire(_value);
             }
 
-            omega = omul(omega, OCTOPUS + _multiplier);
+            shell.omega = shell.omega.omul(OCTOPUS + _multiplier);
 
         }
 
-        _deposit = omul(_deposit, OCTOPUS-epsilon);
+        shellsMinted_ = _deposit.omul(OCTOPUS - shell.epsilon);
 
-        if (totalSupply > 0) _deposit = omul(odiv(_deposit, _oSum), totalSupply);
+        if (shell.totalSupply > 0) shellsMinted_ = shellsMinted_.odiv(_oSum).omul(shell.totalSupply);
 
-        _mint(msg.sender, _deposit);
+        _mint(shell, msg.sender, shellsMinted_);
 
-        emit ShellsMinted(msg.sender, _deposit, numeraires, _amounts);
+        emit ShellsMinted(msg.sender, shellsMinted_, shell.numeraires, _amounts);
 
-        return _deposit;
+        return shellsMinted_;
 
     }
 
     /// @dev see Loihi.bin proportionalWithdraw for a detailed explanation of parameter
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
-    function proportionalWithdraw (uint256 _withdrawal) public returns (uint256[] memory) {
+    function executeProportionalWithdraw (LoihiRoot.Shell storage shell, uint256 _withdrawal) internal returns (uint256[] memory) {
 
-        require(_withdrawal <= balances[msg.sender], "withdrawal amount exceeds your balance");
-
-        address[] memory _reserves = reserves;
-        address[] memory _numeraires = numeraires;
+        require(_withdrawal <= shell.balances[msg.sender], "withdrawal amount exceeds your balance");
 
         uint256 _oSum;
-        uint256[] memory withdrawals_ = new uint256[](_reserves.length);
+        uint256[] memory withdrawals_ = new uint256[](shell.reserves.length);
 
-        for (uint i = 0; i < _reserves.length; i++) {
-            uint256 _oBal = dViewNumeraireBalance(_reserves[i], address(this));
-            withdrawals_[i] = _oBal;
-            _oSum += _oBal;
+        for (uint8 i = 0; i < shell.reserves.length; i++) {
+            withdrawals_[i] = shell.reserves[i].viewNumeraireBalance(address(this));
+            _oSum += withdrawals_[i];
         }
 
-        uint256 _multiplier = odiv(omul(_withdrawal, OCTOPUS-epsilon), totalSupply);
+        uint256 _multiplier = _withdrawal.omul(OCTOPUS - shell.epsilon).odiv(shell.totalSupply);
 
-        for (uint i = 0; i < _reserves.length; i++) {
-            uint256 _value = omul(withdrawals_[i], _multiplier);
-            Flavor memory _f = flavors[_numeraires[i]];
-            withdrawals_[i] = dOutputNumeraire(_f.adapter, msg.sender, _value);
+        for (uint8 i = 0; i < shell.reserves.length; i++) {
+            uint256 _value = withdrawals_[i].omul(_multiplier);
+            LoihiRoot.Assimilator memory _a = shell.assimilators[shell.numeraires[i]];
+            withdrawals_[i] = _a.addr.outputNumeraire(msg.sender, _value);
         }
 
-        omega = omul(omega, OCTOPUS - _multiplier);
+        shell.omega = shell.omega.omul(OCTOPUS - _multiplier);
 
-        _burn(msg.sender, _withdrawal);
+        _burn(shell, msg.sender, _withdrawal);
 
-        emit ShellsBurned(msg.sender, _withdrawal, _numeraires, withdrawals_);
+        emit ShellsBurned(msg.sender, _withdrawal, shell.numeraires, withdrawals_);
 
         return withdrawals_;
 
     }
 
-    function _burn(address account, uint256 amount) internal {
-        require(account != address(0), "ERC20: burn from the zero address");
-        balances[account] = sub(balances[account], amount);
-        totalSupply = sub(totalSupply, amount);
+    function _burn(LoihiRoot.Shell storage shell, address account, uint256 amount) internal {
+        shell.balances[account] = shell.balances[account].sub(amount);
+        shell.totalSupply = shell.totalSupply.sub(amount);
+        emit Transfer(msg.sender, address(0), amount);
     }
 
-    function _mint(address account, uint256 amount) internal {
-        require(account != address(0), "ERC20: mint to the zero address");
-        totalSupply = add(totalSupply, amount);
-        balances[account] = add(balances[account], amount);
+    function _mint(LoihiRoot.Shell storage shell, address account, uint256 amount) internal {
+        shell.totalSupply = shell.totalSupply.add(amount);
+        shell.balances[account] = shell.balances[account].add(amount);
+        emit Transfer(address(0), msg.sender, amount);
     }
 
 }

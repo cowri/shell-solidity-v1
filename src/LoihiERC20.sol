@@ -13,11 +13,14 @@
 
 pragma solidity ^0.5.0;
 
-import "openzeppelin-contracts/contracts/math/SafeMath.sol";
+import "./LoihiMath.sol";
 import "./LoihiRoot.sol";
 
-contract LoihiERC20 is LoihiRoot {
-    using SafeMath for uint256;
+library LoihiERC20 {
+    using LoihiMath for uint256;
+
+    event Approval(address indexed _owner, address indexed spender, uint256 value);
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
     /**
      * @dev See {IERC20-transfer}.
@@ -27,8 +30,8 @@ contract LoihiERC20 is LoihiRoot {
      * - `recipient` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer(address recipient, uint256 amount) public returns (bool) {
-        _transfer(msg.sender, recipient, amount);
+    function transfer(LoihiRoot.Shell storage shell, address recipient, uint256 amount) internal returns (bool) {
+        _transfer(shell, msg.sender, recipient, amount);
         return true;
     }
 
@@ -39,8 +42,8 @@ contract LoihiERC20 is LoihiRoot {
      *
      * - `spender` cannot be the zero address.
      */
-    function approve(address spender, uint256 amount) public returns (bool) {
-        _approve(msg.sender, spender, amount);
+    function approve(LoihiRoot.Shell storage shell, address spender, uint256 amount) internal returns (bool) {
+        _approve(shell, msg.sender, spender, amount);
         return true;
     }
 
@@ -56,9 +59,9 @@ contract LoihiERC20 is LoihiRoot {
      * - the caller must have allowance for `sender`'s tokens of at least
      * `amount`.
      */
-    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
-        _transfer(sender, recipient, amount);
-        _approve(sender, msg.sender, allowances[sender][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
+    function transferFrom(LoihiRoot.Shell storage shell, address sender, address recipient, uint256 amount) internal returns (bool) {
+        _transfer(shell, msg.sender, recipient, amount);
+        _approve(shell, sender, msg.sender, shell.allowances[sender][msg.sender].sub(amount));
         return true;
     }
 
@@ -74,8 +77,8 @@ contract LoihiERC20 is LoihiRoot {
      *
      * - `spender` cannot be the zero address.
      */
-    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
-        _approve(msg.sender, spender, allowances[msg.sender][spender].add(addedValue));
+    function increaseAllowance(LoihiRoot.Shell storage shell, address spender, uint256 addedValue) internal returns (bool) {
+        _approve(shell, msg.sender, spender, shell.allowances[msg.sender][spender].add(addedValue));
         return true;
     }
 
@@ -93,8 +96,8 @@ contract LoihiERC20 is LoihiRoot {
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
      */
-    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
-        _approve(msg.sender, spender, allowances[msg.sender][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+    function decreaseAllowance(LoihiRoot.Shell storage shell, address spender, uint256 subtractedValue) internal returns (bool) {
+        _approve(shell, msg.sender, spender, shell.allowances[msg.sender][spender].sub(subtractedValue));
         return true;
     }
 
@@ -112,18 +115,18 @@ contract LoihiERC20 is LoihiRoot {
      * - `recipient` cannot be the zero address.
      * - `sender` must have a balance of at least `amount`.
      */
-    function _transfer(address sender, address recipient, uint256 amount) internal {
+    function _transfer(LoihiRoot.Shell storage shell, address sender, address recipient, uint256 amount) internal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
 
-        balances[sender] = balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
-        balances[recipient] = balances[recipient].add(amount);
+        shell.balances[sender] = shell.balances[sender].sub(amount);
+        shell.balances[recipient] = shell.balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
     }
 
 
     /**
-     * @dev Sets `amount` as the allowance of `spender` over the `owner`s tokens.
+     * @dev Sets `amount` as the allowance of `spender` over the `_owner`s tokens.
      *
      * This is internal function is equivalent to `approve`, and can be used to
      * e.g. set automatic allowances for certain subsystems, etc.
@@ -132,15 +135,15 @@ contract LoihiERC20 is LoihiRoot {
      *
      * Requirements:
      *
-     * - `owner` cannot be the zero address.
+     * - `_owner` cannot be the zero address.
      * - `spender` cannot be the zero address.
      */
-    function _approve(address owner, address spender, uint256 amount) internal {
-        require(owner != address(0), "ERC20: approve from the zero address");
+    function _approve(LoihiRoot.Shell storage shell, address _owner, address spender, uint256 amount) internal {
+        require(_owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
 
-        allowances[owner][spender] = amount;
-        emit Approval(owner, spender, amount);
+        shell.allowances[_owner][spender] = amount;
+        emit Approval(_owner, spender, amount);
     }
 
 }

@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.15;
 
 
 import "./LoihiMath.sol";
@@ -21,22 +21,36 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IChai.sol";
 import "./interfaces/IPot.sol";
 
-contract LoihiRoot is LoihiMath {
+contract LoihiRoot {
+
+    uint256 public constant OCTOPUS = 1e18;
 
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
 
-    mapping (address => uint256) internal balances;
-    mapping (address => mapping (address => uint256)) internal allowances;
-    uint256 public totalSupply;
+    Shell public shell;
 
-    struct Flavor { address adapter; address reserve; }
-    mapping(address => Flavor) public flavors;
+    struct Shell {
+        uint256 alpha;
+        uint256 beta;
+        uint256 delta;
+        uint256 epsilon;
+        uint256 lambda;
+        uint256 omega;
+        uint256[] weights;
+        address[] reserves;
+        address[] numeraires;
+        uint256 totalSupply;
+        mapping (address => uint256) balances;
+        mapping (address => mapping (address => uint256)) allowances;
+        mapping(address => Assimilator) assimilators;
+    }
 
-    address[] public reserves;
-    address[] public numeraires;
-    uint256[] public weights;
+    struct Assimilator {
+        address addr;
+        uint8 ix;
+    }
 
     address public owner;
     bool internal notEntered = true;
@@ -57,11 +71,6 @@ contract LoihiRoot is LoihiMath {
     // address constant views = 0x81dBd2ec823cB2691f34c7b5391c9439ec5c80E3;
     // address constant erc20 = 0x7DB32869056647532f80f482E5bB1fcb311493cD;
     
-    address exchange;
-    address liquidity;
-    address views;
-    address erc20;
-
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
     event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
