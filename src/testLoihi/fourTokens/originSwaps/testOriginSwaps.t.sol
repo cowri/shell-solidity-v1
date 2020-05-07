@@ -167,7 +167,9 @@ contract OriginSwapTest is LoihiSetup, DSMath, DSTest {
 
     function testExecuteOriginSwapPartialUpperAndLowerAntiSlippageUnbalanced30PctWeightTo10PctWeight () public {
         deposit(1, dai, 90*WAD, usdc, 90*(10**6), usdt, 58*(10**6), susd, 40*WAD);
+        uint256 g1 = gasleft();
         uint256 targetAmount = l1.swapByOrigin(usdt, susd, 10**7, 0, now +50);
+        emit log_named_uint("swap gas", g1 - gasleft());
         assertEq(targetAmount, 10019788191004510065);
     }
 

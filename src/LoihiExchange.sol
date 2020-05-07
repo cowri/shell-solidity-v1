@@ -40,7 +40,6 @@ library LoihiExchange {
         LoihiRoot.Assimilator memory _o = shell.assimilators[_origin];
         LoihiRoot.Assimilator memory _t = shell.assimilators[_target];
 
-
         require(_o.addr != address(0), "origin flavor not supported");
         require(_t.addr != address(0), "target flavor not supported");
 
@@ -51,12 +50,15 @@ library LoihiExchange {
             return tAmt_;
         }
 
-
         ( uint256[] memory _balances, uint256 _grossLiq ) = getBalancesAndGrossLiq(shell);
 
         uint256 _oNAmt = _o.addr.intakeRaw(_oAmt);
 
-        ( tAmt_, shell.omega ) = calculateTargetAmount(shell, _o.ix, _t.ix, _oNAmt, _balances, _grossLiq);
+        emit log_uint("before calculate target amount", gasleft());
+
+        ( tAmt_, shell.omega ) = calculateTargetAmount(_grossLiq, _oNAmt, shell, _o.ix, _t.ix, _balances);
+
+        emit log_uint("after calculate target amount", gasleft());
 
         tAmt_ = _t.addr.outputNumeraire(_rcpnt, tAmt_);
 
@@ -85,7 +87,7 @@ library LoihiExchange {
 
         uint256 _oNAmt = _o.addr.viewNumeraireAmount(_oAmt);
 
-        ( uint256 _tNAmt, ) = calculateTargetAmount(shell, _o.ix, _t.ix, _oNAmt, _balances, _grossLiq);
+        ( uint256 _tNAmt, ) = calculateTargetAmount(_grossLiq, _oNAmt, shell, _o.ix, _t.ix, _balances);
 
         return _t.addr.viewRawAmount(_tNAmt);
 
@@ -113,7 +115,7 @@ library LoihiExchange {
 
         uint256 _tNAmt = _t.addr.outputRaw(_recipient, _tAmt);
 
-        ( oAmt_, shell.omega ) = calculateOriginAmount(shell, _o.ix, _t.ix, _tNAmt, _balances, _grossLiq);
+        ( oAmt_, shell.omega ) = calculateOriginAmount(_grossLiq, _tNAmt, shell, _o.ix, _t.ix, _balances);
 
         oAmt_ = _o.addr.intakeNumeraire(oAmt_);
 
@@ -142,7 +144,7 @@ library LoihiExchange {
 
         uint256 _tNAmt = _t.addr.viewNumeraireAmount(_tAmt);
 
-        ( uint256 _oNAmt, ) = calculateOriginAmount(shell, _o.ix, _t.ix, _tNAmt, _balances, _grossLiq);
+        ( uint256 _oNAmt, ) = calculateOriginAmount(_grossLiq, _tNAmt, shell, _o.ix, _t.ix, _balances);
 
         return _o.addr.viewRawAmount(_oNAmt);
 
@@ -151,101 +153,91 @@ library LoihiExchange {
 
     /// @dev this function figures out the origin amount
     /// @return tNAmt_ target amount
-    function calculateTargetAmount (LoihiRoot.Shell storage shell, uint8 _oIndex, uint8 _tIndex, uint256 _oNAmt, uint256[] memory _balances, uint256 _grossLiq) internal returns (uint256 tNAmt_, uint256 psi_) {
+    function calculateTargetAmount (uint256 _grossLiq, uint256 _oNAmt, LoihiRoot.Shell storage shell, uint8 _oIndex, uint8 _tIndex, uint256[] memory _balances) internal returns (uint256 tNAmt_, uint256 psi_) {
 
-        emit log_uint("o index", uint256(_oIndex));
-        emit log_uint("t index", _tIndex);
-
-        emit log_addrs("shell.numeraires", shell.numeraires);
-        emit log_addrs("shell.reserves", shell.reserves);
-
-        emit log_uint("shell.alpha", shell.alpha);
-        emit log_uint("shell.beta", shell.beta);
-        emit log_uint("shell.delta", shell.delta);
-        emit log_uint("shell.epsilon", shell.epsilon);
-        emit log_uint("shell.lambda", shell.lambda);
-        emit log_uint("shell.omega", shell.omega);
-        emit log_uints("shell.weights", shell.weights);
+        emit log_uint("start of calculate target amount", gasleft());
 
         tNAmt_ = _oNAmt.omul(OCTOPUS - shell.epsilon);
 
-        emit log_uint("tNAmt_", tNAmt_);
-
         uint256 _oNFAmt = tNAmt_;
         uint256 _nGLiq;
+        uint256[] memory _weights = shell.weights;
+        uint256 _omega = shell.omega;
+        uint256 _lambda = shell.lambda;
         for (uint8 j = 0; j < 10; j++) {
-
-            emit log_uint("tNAmt_", tNAmt_);
 
             psi_ = 0;
             _nGLiq = _grossLiq + _oNAmt - tNAmt_;
 
-            for (uint8 i = 0; i < shell.reserves.length; i++) {
+            for (uint8 i = 0; i < _weights.length; i++) {
 
                 uint256 _bal;
-                uint256 _nIdeal = _nGLiq.omul(shell.weights[i]);
+                uint256 _nIdeal = _nGLiq.omul(_weights[i]);
 
                 if (i == _oIndex) _bal = _balances[i] + _oNAmt;
                 else if (i == _tIndex) _bal = _balances[i] - tNAmt_;
                 else _bal = _balances[i];
 
-                psi_ += makeFee(shell, _bal, _nIdeal);
-
-            }
-
-
-            if (shell.omega < psi_) { // 32.7k gas savings against 10^13/10^14 vs 10^10
-                if ((tNAmt_ = _oNFAmt + shell.omega - psi_) / 1e14 == tNAmt_ / 1e14) break;
-            } else {
-                if ((tNAmt_ = _oNFAmt + shell.lambda.omul(shell.omega - psi_)) / 1e14 == tNAmt_ / 1e14) break;
-            }
-
-        }
-
-        {
-            uint256 _alpha = shell.alpha; // 400-800 gas savings
-            for (uint8 i = 0; i < _balances.length; i++) {
-
-                if (i == _oIndex) {
-                    require(_balances[i].add(_oNAmt) < _nGLiq.omul(shell.weights[i]).omul(OCTOPUS + _alpha), "origin halt check");
-                    continue; // 480 - 1415 gas savings
-                } else if (i == _tIndex) {
-                    
-                    emit log_uint("octopus", OCTOPUS);
-                    emit log_uint("alpha", _alpha);
-                    emit log_uint("balances[i]", _balances[i]);
-                    emit log_uint("tNAmt_", tNAmt_);
-                    emit log_uint("new bal", _balances[i].sub(tNAmt_));
-                    emit log_uint("new ideal", _nGLiq.omul(shell.weights[i]));
-                    emit log_uint("new lower alpha", _nGLiq.omul(shell.weights[i]).omul(OCTOPUS - _alpha));
-
-                    require(_balances[i].sub(tNAmt_) > _nGLiq.omul(shell.weights[i]).omul(OCTOPUS - _alpha), "target halt check");
+                {
+                    psi_ += makeFee(shell, _bal, _nIdeal);
                 }
 
             }
+
+
+            if (_omega < psi_) { // 32.7k gas savings against 10^13/10^14 vs 10^10
+                if ((tNAmt_ = _oNFAmt + _omega - psi_) / 1e14 == tNAmt_ / 1e14) break;
+            } else {
+                if ((tNAmt_ = _oNFAmt + _lambda.omul(_omega - psi_)) / 1e14 == tNAmt_ / 1e14) break;
+            }
+
         }
 
         tNAmt_ = tNAmt_.omul(OCTOPUS - shell.epsilon);
+
+        {
+            uint256 _alpha = shell.alpha;
+            for (uint8 i = 0; i < _balances.length; i++) {
+
+                uint256 _nBal;
+                if (i == _oIndex) _nBal = _balances[i].add(_oNAmt);
+                if (i == _tIndex) _nBal = _balances[i].sub(tNAmt_);
+                else _nBal = _balances[i];
+
+                uint256 _ideal = _nGLiq.omul(_weights[i]);
+
+                if (_nBal < _ideal) require(_nBal > _ideal.omul(OCTOPUS - _alpha), "Loihi/lower-halt-check");
+                else require(_nBal < _ideal.omul(OCTOPUS + _alpha), "Loihi/upper-halt-check");
+
+            }
+        }
+
+        emit log_uint("end of calculate target amount", gasleft());
 
     }
 
     /// @dev this function figures out the origin amount
     /// @return oNAmt_ origin amount
-    function calculateOriginAmount (LoihiRoot.Shell storage shell, uint8 _oIndex, uint8 _tIndex, uint256 _tNAmt, uint256[] memory _balances, uint256 _grossLiq) internal returns (uint256 oNAmt_, uint256 psi_) {
+    function calculateOriginAmount (uint256 _grossLiq, uint256 _tNAmt, LoihiRoot.Shell storage shell, uint8 _oIndex, uint8 _tIndex, uint256[] memory _balances) internal returns (uint256 oNAmt_, uint256 psi_) {
+
+        emit log_uint("start of calculate origin amount", gasleft());
 
         oNAmt_ = _tNAmt.omul(OCTOPUS + shell.epsilon);
 
         uint256 _tNFAmt = oNAmt_;
         uint256 _nGLiq;
+        uint256[] memory _weights = shell.weights;
+        uint256 _omega = shell.omega;
+        uint256 _lambda = shell.lambda;
         for (uint8 j = 0; j < 10; j++) {
 
             psi_ = 0;
             _nGLiq = _grossLiq + oNAmt_ - _tNAmt;
 
-            for (uint8 i = 0; i < shell.reserves.length; i++) {
+            for (uint8 i = 0; i < _weights.length; i++) {
 
                 uint256 _bal;
-                uint256 _nIdeal = _nGLiq.omul(shell.weights[i]);
+                uint256 _nIdeal = _nGLiq.omul(_weights[i]);
 
                 if (i == _oIndex) _bal = _balances[i] + oNAmt_;
                 else if (i == _tIndex) _bal = _balances[i] - _tNAmt;
@@ -255,25 +247,35 @@ library LoihiExchange {
 
             }
 
-            if (shell.omega < psi_) {
-                if ((oNAmt_ = _tNFAmt + psi_ - shell.omega) / 1e14 == oNAmt_ / 1e14) break;
+            if (_omega < psi_) {
+                if ((oNAmt_ = _tNFAmt + psi_ - _omega) / 1e14 == oNAmt_ / 1e14) break;
             } else {
-                if ((oNAmt_ = _tNFAmt - shell.lambda.omul(shell.omega - psi_)) / 1e14 == oNAmt_ / 1e14) break;
+                if ((oNAmt_ = _tNFAmt - _lambda.omul(_omega - psi_)) / 1e14 == oNAmt_ / 1e14) break;
             }
 
         }
+
+        oNAmt_ = oNAmt_.omul(OCTOPUS + shell.epsilon);
 
         {
             uint256 _alpha = shell.alpha;
             for (uint8 i = 0; i < _balances.length; i++) {
-                if (i == _oIndex) {
-                    require(_balances[i].add(oNAmt_) < _nGLiq.omul(shell.weights[i]).omul(OCTOPUS + _alpha), "origin halt check");
-                    continue;
-                } else if (i == _tIndex) require(_balances[i].sub(_tNAmt) > _nGLiq.omul(shell.weights[i]).omul(OCTOPUS - _alpha), "target halt check");
+
+                uint256 _nBal;
+                if (i == _oIndex) _nBal = _balances[i].add(oNAmt_);
+                if (i == _tIndex) _nBal = _balances[i].sub(_tNAmt);
+                else _nBal = _balances[i];
+
+                uint256 _ideal = _nGLiq.omul(_weights[i]);
+
+                if (_nBal < _ideal) require(_nBal > _ideal.omul(OCTOPUS - _alpha), "Loihi/lower-halt-check");
+                else require(_nBal < _ideal.omul(OCTOPUS + _alpha), "Loihi/upper-halt-check");
+
+
             }
         }
 
-        oNAmt_ = oNAmt_.omul(OCTOPUS + shell.epsilon);
+        emit log_uint("end of calculate origin amount", gasleft());
 
     }
 
@@ -284,15 +286,23 @@ library LoihiExchange {
         uint256 _threshold;
         uint256 _beta = shell.beta;
         uint256 _delta = shell.delta;
-        if (_bal < (_threshold = _ideal.omul(OCTOPUS-_beta))) {
-            fee_ = _delta.odiv(_ideal);
-            fee_ = fee_.omul(_threshold = _threshold.sub(_bal));
-            fee_ = fee_.omul(_threshold);
-        } else if (_bal > (_threshold = _ideal.omul(OCTOPUS+_beta))) {
-            fee_ = _delta.odiv(_ideal);
-            fee_ = fee_.omul(_threshold = _bal.sub(_threshold));
-            fee_ = fee_.omul(_threshold);
-        } else fee_ = 0;
+        if (_bal < _ideal) {
+
+            if (_bal < (_threshold = _ideal.omul(OCTOPUS-_beta))) {
+                fee_ = _delta.odiv(_ideal);
+                fee_ = fee_.omul(_threshold = _threshold.sub(_bal));
+                fee_ = fee_.omul(_threshold);
+            } else fee_ = 0;
+
+        } else {
+
+            if (_bal > (_threshold = _ideal.omul(OCTOPUS+_beta))) {
+                fee_ = _delta.odiv(_ideal);
+                fee_ = fee_.omul(_threshold = _bal.sub(_threshold));
+                fee_ = fee_.omul(_threshold);
+            } else fee_ = 0;
+
+        }
 
     }
 
