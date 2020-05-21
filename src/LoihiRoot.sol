@@ -44,7 +44,7 @@ contract LoihiRoot {
         uint256 totalSupply;
         mapping (address => uint256) balances;
         mapping (address => mapping (address => uint256)) allowances;
-        mapping(address => Assimilator) assimilators;
+        mapping (address => Assimilator) assimilators;
     }
 
     struct Assimilator {

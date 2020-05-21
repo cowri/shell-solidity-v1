@@ -37,15 +37,17 @@ library LoihiExchange {
         emit log_uint("deadline", _dline);
         require(_dline >= now, "deadline has passed for this trade");
 
-        LoihiRoot.Assimilator memory _o = shell.assimilators[_origin];
-        LoihiRoot.Assimilator memory _t = shell.assimilators[_target];
+        LoihiRoot.Assimilator[] memory _assims = [
+            shell.assimilators[_origin],
+            shell.assimilators[_target]
+        ];
 
-        require(_o.addr != address(0), "origin flavor not supported");
-        require(_t.addr != address(0), "target flavor not supported");
+        require(_assims[0].addr != address(0), "origin flavor not supported");
+        require(_assims[1].addr != address(0), "target flavor not supported");
 
-        if (_o.ix == _t.ix) {
-            uint256 _oNAmt = _o.addr.intakeRaw(_oAmt);
-            uint256 tAmt_ = _t.addr.outputNumeraire(_rcpnt, _oNAmt);
+        if (_assims[0].ix == _assims[1].ix) {
+            uint256 _oNAmt = _assims[0].addr.intakeRaw(_oAmt);
+            uint256 tAmt_ = _assims[1].addr.outputNumeraire(_rcpnt, _oNAmt);
             emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
             return tAmt_;
         }
@@ -155,8 +157,6 @@ library LoihiExchange {
     /// @return tNAmt_ target amount
     function calculateTargetAmount (uint256 _grossLiq, uint256 _oNAmt, LoihiRoot.Shell storage shell, uint8 _oIndex, uint8 _tIndex, uint256[] memory _balances) internal returns (uint256 tNAmt_, uint256 psi_) {
 
-        emit log_uint("start of calculate target amount", gasleft());
-
         tNAmt_ = _oNAmt.omul(OCTOPUS - shell.epsilon);
 
         uint256 _oNFAmt = tNAmt_;
@@ -183,7 +183,6 @@ library LoihiExchange {
                 }
 
             }
-
 
             if (_omega < psi_) { // 32.7k gas savings against 10^13/10^14 vs 10^10
                 if ((tNAmt_ = _oNFAmt + _omega - psi_) / 1e14 == tNAmt_ / 1e14) break;
@@ -219,8 +218,6 @@ library LoihiExchange {
     /// @dev this function figures out the origin amount
     /// @return oNAmt_ origin amount
     function calculateOriginAmount (uint256 _grossLiq, uint256 _tNAmt, LoihiRoot.Shell storage shell, uint8 _oIndex, uint8 _tIndex, uint256[] memory _balances) internal returns (uint256 oNAmt_, uint256 psi_) {
-
-        emit log_uint("start of calculate origin amount", gasleft());
 
         oNAmt_ = _tNAmt.omul(OCTOPUS + shell.epsilon);
 
@@ -275,8 +272,6 @@ library LoihiExchange {
             }
         }
 
-        emit log_uint("end of calculate origin amount", gasleft());
-
     }
 
     /// @notice this function makes our fees!
@@ -291,6 +286,7 @@ library LoihiExchange {
             if (_bal < (_threshold = _ideal.omul(OCTOPUS-_beta))) {
                 fee_ = _delta.odiv(_ideal);
                 fee_ = fee_.omul(_threshold = _threshold.sub(_bal));
+                if (fee_ > 25e16) fee_ = 25e16 - 1;
                 fee_ = fee_.omul(_threshold);
             } else fee_ = 0;
 
@@ -299,6 +295,7 @@ library LoihiExchange {
             if (_bal > (_threshold = _ideal.omul(OCTOPUS+_beta))) {
                 fee_ = _delta.odiv(_ideal);
                 fee_ = fee_.omul(_threshold = _bal.sub(_threshold));
+                if (fee_ > 25e16) fee_ = 25e16 - 1;
                 fee_ = fee_.omul(_threshold);
             } else fee_ = 0;
 

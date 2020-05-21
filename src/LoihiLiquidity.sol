@@ -33,6 +33,8 @@ library LoihiLiquidity {
     function executeSelectiveWithdraw (LoihiRoot.Shell storage shell, address[] memory _flvrs, uint256[] memory _amts, uint256 _maxShells, uint256 _deadline) internal returns (uint256 shellsBurned_) {
         require(_deadline >= now, "deadline has passed for this transaction");
 
+        LoihiRoot.Assimilator[] memory _assims = 
+
         ( uint256[] memory _balances, uint256[] memory _withdrawals ) = getBalancesAndAmounts(shell, _flvrs, _amts);
 
         ( shellsBurned_, shell.omega ) = calculateShellsToBurn(shell, _balances, _withdrawals);
@@ -75,8 +77,22 @@ library LoihiLiquidity {
             for (uint8 i = 0; i < _balances.length; i++) {
                 uint256 _nBal = _balances[i];
                 uint256 _nIdeal = _nSum.omul(shell.weights[i]);
-                if (_nBal > _nIdeal) require(_balances[i] <= _nIdeal.omul(OCTOPUS + _alpha), "withdraw upper halt check");
-                else require(_balances[i] >= _nIdeal.omul(OCTOPUS - _alpha), "withdraw lower halt check");
+
+                if (_nBal > _nIdeal) {
+                    uint256 _nHalt = _nIdeal.omul(OCTOPUS + _alpha);
+                    uint256 _oHalt = 0; // TODO
+                    uint256 _oBal = 0; // TODO
+
+                    if (_nBal > _nHalt) {
+                        if (_oBal < _oHalt || _nBal - _nHalt > _oBal - _oHalt) revert("upper-halt");
+                    }
+
+                } else {
+                    if (_nBal < _nHalt) {
+                        if (_oBal > _nHalt || _nHalt - _nBal > _oHalt - _nHalt) revert("lower-halt");
+                    }
+                }
+
                 psi_ += makeFee(shell, _nBal, _nIdeal);
             }
         }
@@ -102,11 +118,6 @@ library LoihiLiquidity {
         shellsToBurn_ = shellsToBurn_.omul(OCTOPUS + shell.epsilon);
 
     }
-
-    event log_uint(bytes32, uint256);
-    event log_addr(bytes32, address);
-    event log_uints(bytes32, uint256[]);
-    event log_addrs(bytes32, address[]);
 
     /// @dev selective depositing of any supported stablecoin flavor into the contract in return for corresponding shell tokens
     /// @return shellsMinted_ the amount of shells to mint for the deposited stablecoin flavors
@@ -187,7 +198,7 @@ library LoihiLiquidity {
 
     /// @dev get the current balances and incoming/outgoing token amounts for the deposit/withdraw
     /// @return two arrays the length of the number of reserves containing the current balances and incoming/outgoing token amounts
-    function getBalancesAndAmounts (LoihiRoot.Shell storage shell, address[] memory _flvrs, uint256[] memory _amts) internal returns (uint256[] memory, uint256[] memory) {
+    function getBalancesAndAmounts (LoihiRoot.Shell storage shell, uint256[] memory _fIxs, uint256[] memory _amts) internal returns (uint256[] memory, uint256[] memory) {
 
         address[] memory _reserves = shell.reserves;
         uint256[] memory balances_ = new uint256[](_reserves.length);

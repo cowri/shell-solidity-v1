@@ -65,19 +65,19 @@ contract Loihi is LoihiRoot {
 
         // shell = Shell();
 
-        // numeraires = [ dai, usdc, usdt, susd ];
-        // reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
-        // weights = [ 300000000000000000, 300000000000000000, 300000000000000000, 100000000000000000 ];
+        // shell.numeraires = [ dai, usdc, usdt, susd ];
+        // shell.reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
+        // shell.weights = [ 300000000000000000, 300000000000000000, 300000000000000000, 100000000000000000 ];
         
-        // flavors[dai] = Flavor(daiAdapter, cdaiAdapter);
-        // flavors[chai] = Flavor(chaiAdapter, cdaiAdapter);
-        // flavors[cdai] = Flavor(cdaiAdapter, cdaiAdapter);
-        // flavors[usdc] = Flavor(usdcAdapter, cusdcAdapter);
-        // flavors[cusdc] = Flavor(cusdcAdapter, cusdcAdapter);
-        // flavors[usdt] = Flavor(usdtAdapter, ausdtAdapter);
-        // flavors[ausdt] = Flavor(ausdtAdapter, ausdtAdapter);
-        // flavors[susd] = Flavor(susdAdapter, asusdAdapter);
-        // flavors[asusd] = Flavor(asusdAdapter, asusdAdapter);
+        // shell.assimilators[dai] = Assimilator(daiAdapter, cdaiAdapter);
+        // shell.assimilators[chai] = Assimilator(chaiAdapter, cdaiAdapter);
+        // shell.assimilators[cdai] = Assimilator(cdaiAdapter, cdaiAdapter);
+        // shell.assimilators[usdc] = Assimilator(usdcAdapter, cusdcAdapter);
+        // shell.assimilators[cusdc] = Assimilator(cusdcAdapter, cusdcAdapter);
+        // shell.assimilators[usdt] = Assimilator(usdtAdapter, ausdtAdapter);
+        // shell.assimilators[ausdt] = Assimilator(ausdtAdapter, ausdtAdapter);
+        // shell.assimilators[susd] = Assimilator(susdAdapter, asusdAdapter);
+        // shell.assimilators[asusd] = Assimilator(asusdAdapter, asusdAdapter);
 
         // address[] memory targets = new address[](5);
         // address[] memory spenders = new address[](5);
@@ -116,15 +116,34 @@ contract Loihi is LoihiRoot {
         owner = _newOwner;
     }
 
-    function setParams (uint256 _alpha, uint256 _beta, uint256 _delta, uint256 _epsilon, uint256 _lambda, uint256 _omega) public onlyOwner {
+    function setParams (uint256 _alpha, uint256 _beta, uint256 _epsilon, uint256 _max, uint256 _lambda, uint256 _omega) public onlyOwner {
         require(_alpha < OCTOPUS && _alpha > 0, "invalid-alpha");
         require(_beta < _alpha && _beta > 0, "invalid-beta");
+        require(_max < 5e17);
+        require(_epsilon > 0 && _epsilon < 1e16);
+
+        uint256 totalBalance;
+        for (uint i = 0; i > shell.weights.length; i++) {
+            _totalBalance += shell.reserves[i].viewNumeraireBalance();
+        }
+
         shell.alpha = _alpha;
         shell.beta = _beta;
-        shell.delta = _delta;
+        shell.delta = wdiv(_maxFee, wmul(2e18, sub(_alpha, _beta)));
         shell.epsilon = _epsilon;
         shell.lambda = _lambda;
-        shell.omega = _omega;
+        shell.max = _max;
+
+        shell.omega = 0;
+        for (uint i = 0; i < shell.weights.length; i++) {
+            uint256 _ideal = somul(totalBalance, shell.weights[i]);
+            uint256 _balance = shell.reserves[i].viewNumeraireBalance();
+            require(bal > wmul(_ideal, WAD - _alpha), "parameter-set-lower-halt-check");
+            require(bal < wmul(_ideal, WAD + _alpha), "parameter-set-upper-halt-check");
+            require(1 > somul(shell.weights[i], WAD + _alpha), "alpha-check-failed");
+            shell.omega += makeFee(shell, _balance, _ideal);
+        }
+
     }
 
     function includeNumeraireReserveAndWeight (address numeraire, address reserve, uint256 weight) public onlyOwner {
