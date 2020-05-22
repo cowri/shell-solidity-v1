@@ -10,3 +10,6 @@
 [submodule "lib/abdk-libraries-solidity"]
 	path = lib/abdk-libraries-solidity
 	url = https://github.com/cowri/abdk-libraries-solidity.git
+[submodule "lib/contracts"]
+	path = lib/contracts
+	url = https://github.com/cowri/contracts
