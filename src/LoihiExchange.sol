@@ -37,38 +37,32 @@ library LoihiExchange {
         emit log_uint("deadline", _dline);
         require(_dline >= now, "deadline has passed for this trade");
 
-        LoihiRoot.Assimilator[] memory _assims = [
-            shell.assimilators[_origin],
-            shell.assimilators[_target]
-        ];
+        // LoihiRoot.Assimilator[] memory _assims = [
+        //     shell.assimilators[_origin],
+        //     shell.assimilators[_target]
+        // ];
 
-        require(_assims[0].addr != address(0), "origin flavor not supported");
-        require(_assims[1].addr != address(0), "target flavor not supported");
+        // require(_assims[0].addr != address(0), "origin flavor not supported");
+        // require(_assims[1].addr != address(0), "target flavor not supported");
 
-        if (_assims[0].ix == _assims[1].ix) {
-            uint256 _oNAmt = _assims[0].addr.intakeRaw(_oAmt);
-            uint256 tAmt_ = _assims[1].addr.outputNumeraire(_rcpnt, _oNAmt);
-            emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
-            return tAmt_;
-        }
+        // if (_assims[0].ix == _assims[1].ix) {
+        //     uint256 _oNAmt = _assims[0].addr.intakeRaw(_oAmt);
+        //     uint256 tAmt_ = _assims[1].addr.outputNumeraire(_rcpnt, _oNAmt);
+        //     emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
+        //     return tAmt_;
+        // }
 
-        ( uint256[] memory _balances, uint256 _grossLiq ) = getBalancesAndGrossLiq(shell);
+        // ( uint256[] memory _balances, uint256 _grossLiq ) = getBalancesAndGrossLiq(shell);
 
-        uint256 _oNAmt = _o.addr.intakeRaw(_oAmt);
+        // uint256 _oNAmt = _o.addr.intakeRaw(_oAmt);
 
-        emit log_uint("before calculate target amount", gasleft());
+        // ( tAmt_, shell.omega ) = calculateTargetAmount(_grossLiq, _oNAmt, shell, _o.ix, _t.ix, _balances);
 
-        ( tAmt_, shell.omega ) = calculateTargetAmount(_grossLiq, _oNAmt, shell, _o.ix, _t.ix, _balances);
+        // tAmt_ = _t.addr.outputNumeraire(_rcpnt, tAmt_);
 
-        emit log_uint("after calculate target amount", gasleft());
+        // emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
 
-        tAmt_ = _t.addr.outputNumeraire(_rcpnt, tAmt_);
-
-        require(tAmt_ >= _mTAmt, "target amount is less than min target amount");
-
-        emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
-
-        return tAmt_;
+        // return tAmt_;
 
     }
 

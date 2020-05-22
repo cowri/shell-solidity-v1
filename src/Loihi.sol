@@ -117,32 +117,32 @@ contract Loihi is LoihiRoot {
     }
 
     function setParams (uint256 _alpha, uint256 _beta, uint256 _epsilon, uint256 _max, uint256 _lambda, uint256 _omega) public onlyOwner {
-        require(_alpha < OCTOPUS && _alpha > 0, "invalid-alpha");
-        require(_beta < _alpha && _beta > 0, "invalid-beta");
-        require(_max < 5e17);
-        require(_epsilon > 0 && _epsilon < 1e16);
+        // require(_alpha < OCTOPUS && _alpha > 0, "invalid-alpha");
+        // require(_beta < _alpha && _beta > 0, "invalid-beta");
+        // require(_max < 5e17);
+        // require(_epsilon > 0 && _epsilon < 1e16);
 
-        uint256 totalBalance;
-        for (uint i = 0; i > shell.weights.length; i++) {
-            _totalBalance += shell.reserves[i].viewNumeraireBalance();
-        }
+        // uint256 totalBalance;
+        // for (uint i = 0; i > shell.weights.length; i++) {
+        //     _totalBalance += shell.reserves[i].viewNumeraireBalance();
+        // }
 
-        shell.alpha = _alpha;
-        shell.beta = _beta;
-        shell.delta = wdiv(_maxFee, wmul(2e18, sub(_alpha, _beta)));
-        shell.epsilon = _epsilon;
-        shell.lambda = _lambda;
-        shell.max = _max;
+        // shell.alpha = _alpha;
+        // shell.beta = _beta;
+        // shell.delta = wdiv(_maxFee, wmul(2e18, sub(_alpha, _beta)));
+        // shell.epsilon = _epsilon;
+        // shell.lambda = _lambda;
+        // shell.max = _max;
 
-        shell.omega = 0;
-        for (uint i = 0; i < shell.weights.length; i++) {
-            uint256 _ideal = somul(totalBalance, shell.weights[i]);
-            uint256 _balance = shell.reserves[i].viewNumeraireBalance();
-            require(bal > wmul(_ideal, WAD - _alpha), "parameter-set-lower-halt-check");
-            require(bal < wmul(_ideal, WAD + _alpha), "parameter-set-upper-halt-check");
-            require(1 > somul(shell.weights[i], WAD + _alpha), "alpha-check-failed");
-            shell.omega += makeFee(shell, _balance, _ideal);
-        }
+        // shell.omega = 0;
+        // for (uint i = 0; i < shell.weights.length; i++) {
+        //     uint256 _ideal = somul(totalBalance, shell.weights[i]);
+        //     uint256 _balance = shell.reserves[i].viewNumeraireBalance();
+        //     require(bal > wmul(_ideal, WAD - _alpha), "parameter-set-lower-halt-check");
+        //     require(bal < wmul(_ideal, WAD + _alpha), "parameter-set-upper-halt-check");
+        //     require(1 > somul(shell.weights[i], WAD + _alpha), "alpha-check-failed");
+        //     shell.omega += makeFee(shell, _balance, _ideal);
+        // }
 
     }
 
