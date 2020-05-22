@@ -33,23 +33,23 @@ library LoihiLiquidity {
     function executeSelectiveWithdraw (LoihiRoot.Shell storage shell, address[] memory _flvrs, uint256[] memory _amts, uint256 _maxShells, uint256 _deadline) internal returns (uint256 shellsBurned_) {
         // require(_deadline >= now, "deadline has passed for this transaction");
 
-        // // LoihiRoot.Assimilator[] memory _assims = 
+        // LoihiRoot.Assimilator[] memory _assims = 
 
-        // ( uint256[] memory _balances, uint256[] memory _withdrawals ) = getBalancesAndAmounts(shell, _flvrs, _amts);
+        ( uint256[] memory _balances, uint256[] memory _withdrawals ) = getBalancesAndAmounts(shell, _flvrs, _amts);
 
-        // ( shellsBurned_, shell.omega ) = calculateShellsToBurn(shell, _balances, _withdrawals);
+        ( shellsBurned_, shell.omega ) = calculateShellsToBurn(shell, _balances, _withdrawals);
 
-        // require(shellsBurned_ <= shell.balances[msg.sender], "withdrawal amount exceeds balance");
+        require(shellsBurned_ <= shell.balances[msg.sender], "withdrawal amount exceeds balance");
 
-        // require(shellsBurned_ <= _maxShells, "withdrawal exceeds max shells limit");
+        require(shellsBurned_ <= _maxShells, "withdrawal exceeds max shells limit");
 
-        // for (uint8 i = 0; i < _flvrs.length; i++) if (_amts[i] > 0) shell.assimilators[_flvrs[i]].addr.outputRaw(msg.sender, _amts[i]);
+        for (uint8 i = 0; i < _flvrs.length; i++) if (_amts[i] > 0) shell.assimilators[_flvrs[i]].addr.outputRaw(msg.sender, _amts[i]);
 
-        // _burn(shell, msg.sender, shellsBurned_);
+        _burn(shell, msg.sender, shellsBurned_);
 
-        // emit ShellsBurned(msg.sender, shellsBurned_, _flvrs, _amts);
+        emit ShellsBurned(msg.sender, shellsBurned_, _flvrs, _amts);
 
-        // return shellsBurned_;
+        return shellsBurned_;
 
     }
 

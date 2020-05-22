@@ -181,30 +181,51 @@ contract Loihi is LoihiRoot {
         return returnData;
     }
 
-    /// @author james foley http://github.com/realisation
-    /// @notice swap a given origin amount for a bounded minimum of the target
-    /// @param _o the address of the origin
-    /// @param _t the address of the target
-    /// @param _oAmt the origin amount
-    /// @param _mTAmt the minimum target amount
-    /// @param _dline deadline in block number after which the trade will not execute
-    /// @return tAmt_ the amount of target that has been swapped for the origin
     function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) external notFrozen nonReentrant returns (uint256 tAmt_) {
         return shell.executeOriginTrade(_o, _t, _oAmt, _mTAmt, _dline, msg.sender);
     }
 
 
-    /// @author james foley http://github.com/realisation
-    /// @notice transfer a fixed origin amount into a dynamic target amount at the recipients address 
-    /// @param _o the address of the origin
-    /// @param _t the address of the target
-    /// @param _oAmt the origin amount
-    /// @param _mTAmt the minimum target amount 
-    /// @param _dline deadline in block number after which the trade will not execute
-    /// @param _rcpnt the address of the recipient of the target
-    /// @return tAmt_ the amount of target that has been swapped for the origin
-    function transferByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) external notFrozen nonReentrant returns (uint256) {
-        return shell.executeOriginTrade(_o, _t, _oAmt, _mTAmt, _dline, _rcpnt);
+    function transferByOrigin (address _o, address _t, uint256 _oAmt, int128 _mTAmt, uint256 _dline, address _rcpnt) external notFrozen nonReentrant returns (uint256) {
+
+        Assimilator[] memory _inputs = [ shell.assimilators[_o], shell.assimilators[_t] ];
+
+        _inputs[0].amount = _inputs[0].addr.intakeRaw(_oAmt);
+        _inputs[1].amount = -int128(_oAmt);
+
+        if (_inputs[0].ix == _inputs[1].ix) {
+
+            uint256 tAmt_ = _inputs[1].addr.outputNumeraire(_inputs[0].amount);
+            require(tAmt_ > _mTAmt, "below-minimum-target-amount");
+            return tAmt_;
+
+        }
+
+        (   int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _oBals,
+            int128[] memory _nBals  ) = shell.getPoolData(_inputs);
+
+        int128 _tNAmt;
+
+        ( _tNAmt, shell.omega ) = shell.calculateOriginSwap(
+            _nBals,
+            _oGLiq,
+            _nGLiq,
+            _inputs[0].ix,
+            _inputs[1].ix
+        );
+
+        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+
+        uint256 tAmt_ = inputs[1].addr.outputNumeraire(_tNAmt, _rcpnt);
+
+        require(tAmt_ > _mTAmt, "below-minimum-target-amount");
+
+        emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
+
+        return tAmt_;
+
     }
 
     /// @author james foley http://github.com/realisation
@@ -259,8 +280,30 @@ contract Loihi is LoihiRoot {
     /// @param _minShells minimum acceptable amount of shells
     /// @param _dline deadline for tx
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
-    function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
-        return shell.executeSelectiveDeposit(_flvrs, _amts, _minShells, _dline);
+    function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external notFrozen nonReentrant returns (uint256 shells_) {
+
+        LoihiRoot.Assimilator[] memory _assims = new LoihiRoot.Assimilator[](_flvrs.length);
+        for (uint i = 0; i < _flvrs.length; i++) {
+            _assims[i] = shell.assimilators[_flvrs[i]];
+            _assims[i].amount = assims[i].addr.intakeRaw(_amts[i]);
+        }
+
+        (   int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _oBals,
+            int128[] memory _nBals  ) = shell.getPoolData(_assims);
+
+        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+
+        int128 _shells;
+        ( _shells, shell.omega ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
+
+        shells_ = _shells.toUInt();
+
+        shell.mint(msg.sender, shells_);
+
+        emit ShellsMinted(msg.sender, shells_, _flvrs, _amts);
+
     }
 
     /// @author james foley http://github.com/realisation
