@@ -17,6 +17,9 @@ import "./LoihiRoot.sol";
 import "./LoihiExchange.sol";
 import "./LoihiLiquidity.sol";
 import "./LoihiERC20.sol";
+import "./Assimilators.sol";
+
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 contract ERC20Approve {
     function approve (address spender, uint256 amount) public returns (bool);
@@ -24,10 +27,16 @@ contract ERC20Approve {
 
 contract Loihi is LoihiRoot {
 
-    using LoihiExchange for Shell;
-    using LoihiLiquidity for Shell;
-    using LoihiERC20 for Shell;
-    using LoihiDelegators for address;
+    using ABDKMath64x64 for int128;
+    using ABDKMath64x64 for uint256;
+
+    using Assimilators for Assimilators.Assimilator;
+    using Shells for Shells.Shell;
+
+    // using LoihiExchange for Shell;
+    // using LoihiLiquidity for Shell;
+    // using LoihiERC20 for Shell;
+    // using LoihiDelegators for address;
 
     address constant dai = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address constant cdai = 0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643;
@@ -68,7 +77,7 @@ contract Loihi is LoihiRoot {
         // shell.numeraires = [ dai, usdc, usdt, susd ];
         // shell.reserves = [ cdaiAdapter, cusdcAdapter, ausdtAdapter, asusdAdapter ];
         // shell.weights = [ 300000000000000000, 300000000000000000, 300000000000000000, 100000000000000000 ];
-        
+
         // shell.assimilators[dai] = Assimilator(daiAdapter, cdaiAdapter);
         // shell.assimilators[chai] = Assimilator(chaiAdapter, cdaiAdapter);
         // shell.assimilators[cdai] = Assimilator(cdaiAdapter, cdaiAdapter);
@@ -93,7 +102,7 @@ contract Loihi is LoihiRoot {
         //     (success, returndata) = targets[i].call(abi.encodeWithSignature("approve(address,uint256)", spenders[i], uint256(-1)));
         //     require(success, "SafeERC20: low-level call failed");
         // }
-        
+
         // alpha = 900000000000000000; // .9
         // beta = 400000000000000000; // .4
         // delta = 150000000000000000; // .15
@@ -102,11 +111,11 @@ contract Loihi is LoihiRoot {
 
     }
 
-    function supportsInterface (bytes4 interfaceID) external returns (bool) {
+    function supportsInterface (bytes4 interfaceID) public returns (bool) {
         return interfaceID == ERC20ID || interfaceID == ERC165ID;
     }
 
-    function freeze (bool _freeze) external onlyOwner {
+    function freeze (bool _freeze) public onlyOwner {
         frozen = _freeze;
     }
 
@@ -116,13 +125,20 @@ contract Loihi is LoihiRoot {
         owner = _newOwner;
     }
 
-    function setParams (uint256 _alpha, uint256 _beta, uint256 _epsilon, uint256 _max, uint256 _lambda, uint256 _omega) public onlyOwner {
-        // require(_alpha < OCTOPUS && _alpha > 0, "invalid-alpha");
-        // require(_beta < _alpha && _beta > 0, "invalid-beta");
-        // require(_max < 5e17);
-        // require(_epsilon > 0 && _epsilon < 1e16);
+    function setParams (uint256 __alpha, uint256 __beta, uint256 __epsilon, uint256 __max, uint256 __lambda, uint256 __omega) public onlyOwner {
+        int128 _alpha = __alpha.fromUInt();
+        int128 _beta = __beta.fromUInt();
+        int128 _epsilon = __epsilon.fromUInt();
+        int128 _lambda = __lambda.fromUInt();
+        int128 _max = __max.fromUInt();
 
-        // uint256 totalBalance;
+        require(_alpha < ZEN && _alpha > 0, "invalid-alpha");
+        require(_beta < _alpha && _beta > 0, "invalid-beta");
+        require(_epsilon > 0 && _epsilon < 1e16, "invalid-epsilon");
+
+        require(_max < ZEN.div(uint256(2).fromUInt()), "invalid-max-fee");
+
+        // int128 _totalBalance;
         // for (uint i = 0; i > shell.weights.length; i++) {
         //     _totalBalance += shell.reserves[i].viewNumeraireBalance();
         // }
@@ -136,7 +152,7 @@ contract Loihi is LoihiRoot {
 
         // shell.omega = 0;
         // for (uint i = 0; i < shell.weights.length; i++) {
-        //     uint256 _ideal = somul(totalBalance, shell.weights[i]);
+        //     uint256 _ideal = somul(_totalBalance, shell.weights[i]);
         //     uint256 _balance = shell.reserves[i].viewNumeraireBalance();
         //     require(bal > wmul(_ideal, WAD - _alpha), "parameter-set-lower-halt-check");
         //     require(bal < wmul(_ideal, WAD + _alpha), "parameter-set-upper-halt-check");
@@ -146,83 +162,70 @@ contract Loihi is LoihiRoot {
 
     }
 
-    function includeNumeraireReserveAndWeight (address numeraire, address reserve, uint256 weight) public onlyOwner {
-        shell.numeraires.push(numeraire);
-        shell.reserves.push(reserve);
-        shell.weights.push(weight);
+    function includeNumeraireReserveAndWeight (address _numeraire, address _reserve, uint256 _weight) public onlyOwner {
+
+        shell.numeraires.push(_numeraire);
+
+        shell.reserves.push(Assimilators.Assimilator(_reserve, shell.reserves.length, 0));
+
+        shell.weights.push(_weight.fromUInt().div(ZEN));
+
     }
 
     function includeAssimilator (address _derivative, address _assimilator, address _reserve) public onlyOwner {
+
         for (uint8 i = 0; i < shell.reserves.length; i++) {
-            if (shell.reserves[i] == _reserve) {
-                shell.assimilators[_derivative] = Assimilator(_assimilator, i);
+
+            if (shell.reserves[i].addr == _reserve) {
+
+                shell.assimilators[_derivative] = Assimilators.Assimilator(_assimilator, i, 0);
                 break;
+
             }
+
         }
     }
 
     function excludeAdapter (address _assimilator) public onlyOwner {
+
         delete shell.assimilators[_assimilator];
+
     }
 
-    function delegateTo (address callee, bytes memory data) internal returns (bytes memory) {
-        (bool success, bytes memory returnData) = callee.delegatecall(data);
-        assembly {
-            if eq(success, 0) { revert(add(returnData, 0x20), returndatasize()) }
-        }
-        return returnData;
-    }
+    function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) public notFrozen nonReentrant returns (uint256 tAmt_) {
 
-    function staticTo (address callee, bytes memory data) internal view returns (bytes memory) {
-        (bool success, bytes memory returnData) = callee.staticcall(data);
-        assembly {
-            if eq(success, 0) { revert(add(returnData, 0x20), returndatasize()) }
-        }
-        return returnData;
-    }
+        return transferByOrigin(_o, _t, _oAmt, _mTAmt, _dline, msg.sender);
 
-    function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) external notFrozen nonReentrant returns (uint256 tAmt_) {
-        return shell.executeOriginTrade(_o, _t, _oAmt, _mTAmt, _dline, msg.sender);
     }
 
 
-    function transferByOrigin (address _o, address _t, uint256 _oAmt, int128 _mTAmt, uint256 _dline, address _rcpnt) external notFrozen nonReentrant returns (uint256) {
+    function transferByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) public notFrozen nonReentrant returns (uint256) {
 
-        Assimilator[] memory _inputs = [ shell.assimilators[_o], shell.assimilators[_t] ];
+        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
+        _assims[0] = shell.assimilators[_o];
+        _assims[1] = shell.assimilators[_t];
 
-        _inputs[0].amount = _inputs[0].addr.intakeRaw(_oAmt);
-        _inputs[1].amount = -int128(_oAmt);
+        _assims[0].intakeRaw(_oAmt);
 
-        if (_inputs[0].ix == _inputs[1].ix) {
+        _assims[1].amt = _assims[0].amt.neg();
 
-            uint256 tAmt_ = _inputs[1].addr.outputNumeraire(_inputs[0].amount);
+        if (_assims[0].ix == _assims[1].ix) {
+
+            uint256 tAmt_ = _assims[1].outputNumeraire(_rcpnt);
+
             require(tAmt_ > _mTAmt, "below-minimum-target-amount");
+
             return tAmt_;
 
         }
 
-        (   int128 _oGLiq,
-            int128 _nGLiq,
-            int128[] memory _oBals,
-            int128[] memory _nBals  ) = shell.getPoolData(_inputs);
+        ( _assims, shell.omega ) = shell.calculateOriginTrade(_assims);
 
-        int128 _tNAmt;
-
-        ( _tNAmt, shell.omega ) = shell.calculateOriginSwap(
-            _nBals,
-            _oGLiq,
-            _nGLiq,
-            _inputs[0].ix,
-            _inputs[1].ix
-        );
-
-        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
-
-        uint256 tAmt_ = inputs[1].addr.outputNumeraire(_tNAmt, _rcpnt);
+        uint256 tAmt_ = _assims[1].outputNumeraire(_rcpnt);
 
         require(tAmt_ > _mTAmt, "below-minimum-target-amount");
 
-        emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
+        emit Trade(msg.sender, _o, _t, _oAmt, tAmt_);
 
         return tAmt_;
 
@@ -234,8 +237,22 @@ contract Loihi is LoihiRoot {
     /// @param _t the address of the target
     /// @param _oAmt the origin amount
     /// @return tAmt_ the amount of target that has been swapped for the origin
-    function viewOriginTrade (address _o, address _t, uint256 _oAmt) external notFrozen returns (uint256) {
-        return shell.viewOriginTrade(_o, _t, _oAmt);
+    function viewOriginTrade (address _o, address _t, uint256 _oAmt) public notFrozen returns (uint256) {
+
+        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
+        _assims[0] = shell.assimilators[_o];
+        _assims[1] = shell.assimilators[_t];
+
+        _assims[0].viewNumeraireAmount(_oAmt);
+
+        if (_assims[0].ix == _assims[1].ix) return _assims[1].viewRawAmount();
+
+        _assims[1].amt = _assims[0].amt.neg();
+
+        ( _assims, ) = shell.calculateOriginTrade(_assims);
+
+        return  _assims[1].viewRawAmount();
+
     }
 
     /// @author james foley http://github.com/realisation
@@ -246,8 +263,10 @@ contract Loihi is LoihiRoot {
     /// @param _tAmt the target amount
     /// @param _dline deadline in block number after which the trade will not execute
     /// @return oAmt_ the amount of origin that has been swapped for the target
-    function swapByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
-        return shell.executeTargetTrade(_o, _t, _mOAmt, _tAmt, _dline, msg.sender);
+    function swapByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) public notFrozen nonReentrant returns (uint256) {
+
+        return transferByTarget(_o, _t, _mOAmt, _tAmt, _dline, msg.sender);
+
     }
 
     /// @author james foley http://github.com/realisation
@@ -259,8 +278,36 @@ contract Loihi is LoihiRoot {
     /// @param _dline deadline in block number after which the trade will not execute
     /// @param _rcpnt the address of the recipient of the target
     /// @return oAmt_ the amount of origin that has been swapped for the target
-    function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline, address _rcpnt) external notFrozen nonReentrant returns (uint256) {
-        return shell.executeTargetTrade(_o, _t, _mOAmt, _tAmt, _dline, _rcpnt);
+    function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline, address _rcpnt) public notFrozen nonReentrant returns (uint256) {
+
+        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
+        _assims[0] = shell.assimilators[_o];
+        _assims[1] = shell.assimilators[_t];
+
+        _assims[1].outputRaw(_rcpnt, _tAmt);
+
+        _assims[0].amt = _assims[1].amt.neg();
+
+        if (_assims[0].ix == _assims[1].ix) {
+
+            uint256 oAmt_ = _assims[0].intakeNumeraire();
+
+            require(oAmt_ < _mOAmt, "above-maximum-origin-amount");
+
+            return oAmt_;
+
+        }
+
+        ( _assims, shell.omega ) = shell.calculateTargetTrade(_assims);
+
+        uint256 oAmt_ = _assims[0].intakeNumeraire();
+
+        require(oAmt_ < _mOAmt, "above-maximum-origin-amount");
+
+        emit Trade(msg.sender, _o, _t, oAmt_, _tAmt);
+
+        return oAmt_;
+
     }
 
     /// @author james foley http://github.com/realisation
@@ -269,8 +316,24 @@ contract Loihi is LoihiRoot {
     /// @param _t the address of the target
     /// @param _tAmt the target amount
     /// @return oAmt_ the amount of target that has been swapped for the origin
-    function viewTargetTrade (address _o, address _t, uint256 _tAmt) external notFrozen returns (uint256) {
-        return shell.viewTargetTrade(_o, _t, _tAmt);
+    function viewTargetTrade (address _o, address _t, uint256 _tAmt) public notFrozen returns (uint256) {
+
+        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
+        _assims[0] = shell.assimilators[_o];
+        _assims[1] = shell.assimilators[_t];
+
+        _assims[1].viewNumeraireAmount(_tAmt);
+
+        _assims[0].amt = _assims[1].amt;
+
+        if (_assims[0].ix == _assims[1].ix) return _assims[0].intakeNumeraire();
+
+        _assims[1].flip();
+
+        ( _assims, ) = shell.calculateTargetTrade(_assims);
+
+        return _assims[0].viewRawAmount();
+
     }
 
     /// @author james foley http://github.com/realisation
@@ -282,10 +345,11 @@ contract Loihi is LoihiRoot {
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external notFrozen nonReentrant returns (uint256 shells_) {
 
-        LoihiRoot.Assimilator[] memory _assims = new LoihiRoot.Assimilator[](_flvrs.length);
+        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](_flvrs.length);
+
         for (uint i = 0; i < _flvrs.length; i++) {
             _assims[i] = shell.assimilators[_flvrs[i]];
-            _assims[i].amount = assims[i].addr.intakeRaw(_amts[i]);
+            _assims[i].intakeRaw(_amts[i]);
         }
 
         (   int128 _oGLiq,
@@ -312,15 +376,15 @@ contract Loihi is LoihiRoot {
     /// @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function viewSelectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts) external notFrozen returns (uint256) {
-        return shell.viewSelectiveDeposit(_flvrs, _amts);
+        // return shell.viewSelectiveDeposit(_flvrs, _amts);
     }
 
     /// @author james foley http://github.com/realisation
     /// @notice deposit into the pool with no slippage from the numeraire assets the pool supports
     /// @param _deposit the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
     /// @return shellsToMint_ the amount of shells you receive in return for your deposit
-    function proportionalDeposit (uint256 _deposit) external notFrozen nonReentrant returns (uint256) {
-        return shell.executeProportionalDeposit(_deposit);
+    function proportionalDeposit (uint256 _deposit) public notFrozen nonReentrant returns (uint256) {
+        // return shell.executeProportionalDeposit(_deposit);
     }
 
     /// @author james foley http://github.com/realisation
@@ -329,7 +393,7 @@ contract Loihi is LoihiRoot {
     /// @param _amts an array of amounts to withdraw that maps to _flavors
     /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _dline) external notFrozen nonReentrant returns (uint256) {
-        return shell.executeSelectiveWithdraw(_flvrs, _amts, _maxShells, _dline);
+        // return shell.executeSelectiveWithdraw(_flvrs, _amts, _maxShells, _dline);
     }
 
     /// @author james foley http://github.com/realisation
@@ -338,15 +402,15 @@ contract Loihi is LoihiRoot {
     /// @param _amts an array of amounts to withdraw that maps to _flavors
     /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function viewSelectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts) external notFrozen returns (uint256) {
-        return shell.viewSelectiveWithdraw(_flvrs, _amts);
+        // return shell.viewSelectiveWithdraw(_flvrs, _amts);
     }
 
     /// @author james foley http://github.com/realisation
     /// @notice withdrawas amount of shell tokens from the the pool equally from the numeraire assets of the pool with no slippage
     /// @param _totalShells the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
-    function proportionalWithdraw (uint256 _totalShells) external nonReentrant returns (uint256[] memory) {
-        return shell.executeProportionalWithdraw(_totalShells);
+    function proportionalWithdraw (uint256 _totalShells) public nonReentrant returns (uint256[] memory) {
+        // return shell.executeProportionalWithdraw(_totalShells);
     }
 
     function transfer (address _recipient, uint256 _amount) public nonReentrant returns (bool) {
@@ -365,7 +429,7 @@ contract Loihi is LoihiRoot {
         // return shell.increaseAllowance(_spender, _addedValue);
     }
 
-    function decreaseAllowance(address _spender, uint256 _subtractedValue) external returns (bool) {
+    function decreaseAllowance(address _spender, uint256 _subtractedValue) public returns (bool) {
         // return shell.decreaseAllowance(_spender, _subtractedValue);
     }
 
@@ -377,14 +441,14 @@ contract Loihi is LoihiRoot {
         // return shell.allowances[_owner][_spender];
     }
 
-    function totalReserves () external returns (uint256, uint256[] memory) {
-        uint256 totalBalance_;
-        uint256[] memory balances_ = new uint256[](shell.reserves.length);
-        for (uint i = 0; i < shell.reserves.length; i++) {
-            balances_[i] = shell.reserves[i].viewNumeraireBalance(address(this));
-            totalBalance_ += balances_[i];
-        }
-        return (totalBalance_, balances_);
+    function totalReserves () public returns (uint256, uint256[] memory) {
+        // uint256 totalBalance_;
+        // uint256[] memory balances_ = new uint256[](shell.reserves.length);
+        // for (uint i = 0; i < shell.reserves.length; i++) {
+        //     balances_[i] = shell.reserves[i].viewNumeraireBalance(address(this));
+        //     totalBalance_ += balances_[i];
+        // }
+        // return (totalBalance_, balances_);
     }
 
     function safeApprove(address _token, address _spender, uint256 _value) public onlyOwner {

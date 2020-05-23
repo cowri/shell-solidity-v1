@@ -13,68 +13,38 @@
 
 pragma solidity ^0.5.15;
 
-
-import "./LoihiMath.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/ICToken.sol";
 import "./interfaces/IAToken.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IChai.sol";
 import "./interfaces/IPot.sol";
 
+import "./Assimilators.sol";
+import "./Shells.sol";
+
 contract LoihiRoot {
 
-    uint256 public constant OCTOPUS = 1e18;
+    int128 constant ZEN = 18446744073709551616000000;
 
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
 
-    Shell public shell;
-
-    struct Shell {
-        uint256 alpha;
-        uint256 beta;
-        uint256 delta;
-        uint256 epsilon;
-        uint256 lambda;
-        uint256 omega;
-        uint256[] weights;
-        address[] reserves;
-        address[] numeraires;
-        uint256 totalSupply;
-        mapping (address => uint256) balances;
-        mapping (address => mapping (address => uint256)) allowances;
-        mapping (address => Assimilator) assimilators;
-    }
-
-    struct Assimilator {
-        address addr;
-        uint8 ix;
-    }
+    Shells.Shell public shell;
 
     address public owner;
     bool internal notEntered = true;
     bool public frozen = false;
 
-    uint256 public alpha;
-    uint256 public beta;
-    uint256 public delta;
-    uint256 public epsilon;
-    uint256 public lambda;
-    uint256 internal omega;
-
     bytes4 constant internal ERC20ID = 0x36372b07;
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
 
-    // address constant exchange = 0xfb8443545771E2BB15bB7cAdDa43A16a1Ab69c0B;
-    // address constant liquidity = 0xA3f4A860eFa4a60279E6E50f2169FDD080aAb655;
-    // address constant views = 0x81dBd2ec823cB2691f34c7b5391c9439ec5c80E3;
-    // address constant erc20 = 0x7DB32869056647532f80f482E5bB1fcb311493cD;
-    
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
     event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
 

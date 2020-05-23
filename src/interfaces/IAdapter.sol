@@ -14,14 +14,11 @@
 pragma solidity ^0.5.0;
 
 interface IAdapter {
-    function intakeNumeraire (uint256 amount) external returns (uint256);
-    function intakeRaw (uint256 amount) external;
-    function outputNumeraire (address dst, uint256 amount) external returns (uint256);
-    function outputRaw (address dst, uint256 amount) external;
-    function getNumeraireAmount (uint256) external returns (uint256);
-    function getRawAmount (uint256) external returns (uint256);
-    function getNumeraireBalance (uint256) external returns (uint256);
-    function viewRawAmount (uint256) external view returns (uint256);
-    function viewNumeraireAmount (uint256) external view returns (uint256);
-    function viewNumeraireBalance (address addr) external view returns (uint256);
+    function intakeRaw (uint256 amount) external returns (int128);
+    function intakeNumeraire (int128 amount) external returns (uint256);
+    function outputRaw (address dst, uint256 amount) external returns (int128);
+    function outputNumeraire (address dst, int128 amount) external returns (uint256);
+    function viewRawAmount (int128) external view returns (uint256);
+    function viewNumeraireAmount (uint256) external view returns (int128);
+    function viewNumeraireBalance (address addr) external view returns (int128);
 }
