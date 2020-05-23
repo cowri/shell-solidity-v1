@@ -39,10 +39,6 @@ library Shells {
 
     using SafeERC20Arithmetic for uint256;
 
-    event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
-    event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);
-    event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
-
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
 

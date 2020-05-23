@@ -18,6 +18,7 @@ import "./LoihiExchange.sol";
 import "./LoihiLiquidity.sol";
 import "./LoihiERC20.sol";
 import "./Assimilators.sol";
+import "./Controller.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
@@ -32,6 +33,11 @@ contract Loihi is LoihiRoot {
 
     using Assimilators for Assimilators.Assimilator;
     using Shells for Shells.Shell;
+    using Controller for Shells.Shell;
+
+    event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
+    event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);
+    event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
 
     // using LoihiExchange for Shell;
     // using LoihiLiquidity for Shell;
@@ -111,6 +117,22 @@ contract Loihi is LoihiRoot {
 
     }
 
+    function setParams (uint256 _alpha, uint256 _beta, uint256 _epsilon, uint256 _max, uint256 _lambda, uint256 _omega) public onlyOwner {
+        shell.setParams(_alpha, _beta, _epsilon, _max, _lambda, _omega);
+    }
+
+    function includeNumeraireAsset (address _numeraire, address _reserve, uint256 _weight) public onlyOwner {
+        shell.includeNumeraireAsset(_numeraire, _reserve, _weight);
+    }
+
+    function includeAssimilator (address _derivative, address _assimilator, address _reserve) public onlyOwner {
+        shell.includeAssimilator(_derivative, _assimilator, _reserve);
+    }
+
+    function excludeAdapter (address _assimilator) external onlyOwner {
+        delete shell.assimilators[_assimilator];
+    }
+
     function supportsInterface (bytes4 interfaceID) public returns (bool) {
         return interfaceID == ERC20ID || interfaceID == ERC165ID;
     }
@@ -125,79 +147,11 @@ contract Loihi is LoihiRoot {
         owner = _newOwner;
     }
 
-    function setParams (uint256 __alpha, uint256 __beta, uint256 __epsilon, uint256 __max, uint256 __lambda, uint256 __omega) public onlyOwner {
-        int128 _alpha = __alpha.fromUInt();
-        int128 _beta = __beta.fromUInt();
-        int128 _epsilon = __epsilon.fromUInt();
-        int128 _lambda = __lambda.fromUInt();
-        int128 _max = __max.fromUInt();
-
-        require(_alpha < ZEN && _alpha > 0, "invalid-alpha");
-        require(_beta < _alpha && _beta > 0, "invalid-beta");
-        require(_epsilon > 0 && _epsilon < 1e16, "invalid-epsilon");
-
-        require(_max < ZEN.div(uint256(2).fromUInt()), "invalid-max-fee");
-
-        // int128 _totalBalance;
-        // for (uint i = 0; i > shell.weights.length; i++) {
-        //     _totalBalance += shell.reserves[i].viewNumeraireBalance();
-        // }
-
-        // shell.alpha = _alpha;
-        // shell.beta = _beta;
-        // shell.delta = wdiv(_maxFee, wmul(2e18, sub(_alpha, _beta)));
-        // shell.epsilon = _epsilon;
-        // shell.lambda = _lambda;
-        // shell.max = _max;
-
-        // shell.omega = 0;
-        // for (uint i = 0; i < shell.weights.length; i++) {
-        //     uint256 _ideal = somul(_totalBalance, shell.weights[i]);
-        //     uint256 _balance = shell.reserves[i].viewNumeraireBalance();
-        //     require(bal > wmul(_ideal, WAD - _alpha), "parameter-set-lower-halt-check");
-        //     require(bal < wmul(_ideal, WAD + _alpha), "parameter-set-upper-halt-check");
-        //     require(1 > somul(shell.weights[i], WAD + _alpha), "alpha-check-failed");
-        //     shell.omega += makeFee(shell, _balance, _ideal);
-        // }
-
-    }
-
-    function includeNumeraireReserveAndWeight (address _numeraire, address _reserve, uint256 _weight) public onlyOwner {
-
-        shell.numeraires.push(_numeraire);
-
-        shell.reserves.push(Assimilators.Assimilator(_reserve, shell.reserves.length, 0));
-
-        shell.weights.push(_weight.fromUInt().div(ZEN));
-
-    }
-
-    function includeAssimilator (address _derivative, address _assimilator, address _reserve) public onlyOwner {
-
-        for (uint8 i = 0; i < shell.reserves.length; i++) {
-
-            if (shell.reserves[i].addr == _reserve) {
-
-                shell.assimilators[_derivative] = Assimilators.Assimilator(_assimilator, i, 0);
-                break;
-
-            }
-
-        }
-    }
-
-    function excludeAdapter (address _assimilator) public onlyOwner {
-
-        delete shell.assimilators[_assimilator];
-
-    }
-
     function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) public notFrozen nonReentrant returns (uint256 tAmt_) {
 
         return transferByOrigin(_o, _t, _oAmt, _mTAmt, _dline, msg.sender);
 
     }
-
 
     function transferByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) public notFrozen nonReentrant returns (uint256) {
 
