@@ -21,6 +21,12 @@ import "../adapterDSMath.sol";
 
 contract MainnetChaiAdapter is AdapterDSMath {
 
+    using ABDKMath64x64 for int128;
+    using ABDKMath64x64 for uint256;
+    using AssimilatorMath for uint;
+
+    uint256 constant ZEN_DELTA = 1e12;
+
     IChai constant chai = IChai(0x06AF07097C9Eeb7fD685c692751D5C66dB49c215);
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
@@ -28,72 +34,106 @@ contract MainnetChaiAdapter is AdapterDSMath {
 
     constructor () public { }
 
-    // takes raw chai amount, transfers that in, unwraps into dai, wraps into the reserve, and finally returns the numeraire amount
-    function intakeRaw (uint256 amount) public returns (uint256) {
+    function toZen (uint256 _amt) internal pure returns (int128 zenAmt_) {
+        zenAmt_ = (_amt / ZEN_DELTA).fromUInt();
+    }
 
-        uint256 daiAmt = dai.balanceOf(address(this));
-        chai.exit(msg.sender, amount);
-        daiAmt = dai.balanceOf(address(this)) - daiAmt;
-        uint256 success = cdai.mint(daiAmt);
+    function fromZen (int128 _zenAmt) internal pure returns (uint256 amt_) {
+        amt_ = _zenAmt.toUInt() * ZEN_DELTA;
+    }
+
+    function toDai (uint256 _chai, uint256 _chi) internal pure returns (uint256 dai_) {
+        dai_ = _chai.rmul(_chi);
+    }
+
+    function fromDai (uint256 _dai, uint256 _chi) internal pure returns (uint256 chai_) {
+        chai_ = _dai.rdivup(_chi);
+    }
+
+    // takes raw chai amount, transfers it in, unwraps into dai, wraps into the reserve, and finally returns the numeraire amount
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        chai.exit(msg.sender, _amount);
+
+        _amount = toDai(_amount, pot.chi());
+
+        uint256 success = cdai.mint(_amount);
+
         if (success != 0) revert("CDai/mint-failed");
-        return daiAmt;
+
+        amount_ = toZen(_amount);
 
     }
 
     // takes numeraire amount, exits that from chai, wraps it in cdai, and returns the raw amount of chai
-    function intakeNumeraire (uint256 amount) public returns (uint256) {
+    function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        uint256 chaiBal = chai.balanceOf(msg.sender);
-        chai.draw(msg.sender, amount);
-        uint256 success = cdai.mint(amount);
+        amount_ = fromZen(_amount);
+
+        chai.draw(msg.sender, amount_);
+
+        uint256 success = cdai.mint(amount_);
+
         if (success != 0) revert("CDai/mint-failed");
-        return chaiBal - chai.balanceOf(msg.sender);
+
+        amount_ = fromDai(amount_, pot.chi());
 
     }
 
     // takes numeraire amount, redeems dai from cdai, wraps it in chai and sends it to the destination, and returns the raw amount
-    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+    function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        uint256 success = cdai.redeemUnderlying(amount);
+        amount_ = fromZen(_amount);
+
+        uint256 success = cdai.redeemUnderlying(amount_);
+
         if (success != 0) revert("CDai/redeemUnderlying-failed");
-        uint256 chaiBal = chai.balanceOf(dst);
-        chai.join(dst, amount);
-        return chai.balanceOf(dst) - chaiBal;
+
+        chai.join(_dst, amount_);
+
+        amount_ = fromDai(amount_, pot.chi());
 
     }
 
     // takes raw amount of chai, calculates the numeraire amount, redeems that from cdai, wraps it in chai and sends to destination, then returns the numeraire amount
-    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        uint256 daiAmt = rmul(amount, pot.chi());
-        uint256 success = cdai.redeemUnderlying(daiAmt);
+        _amount = toDai(_amount, pot.chi());
+
+        uint256 success = cdai.redeemUnderlying(_amount);
+
         if (success != 0) revert("CDai/redeemUnderlying-failed");
-        chai.join(dst, daiAmt);
-        return daiAmt;
+
+        chai.join(dst, _amount);
+
+        amount_ = toZen(_amount);
 
     }
-    
+
     // pass it a numeraire amount and get the raw amount
-    function viewRawAmount (uint256 amount) public view returns (uint256) {
+    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
-        return rdivup(amount, pot.chi());
-
+        amount_ = fromZen(fromDai(_amount, pot.chi());
+            
     }
 
     // pass it a raw amount and get the numeraire amount
-    function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
-        return rmul(amount, pot.chi());
+        amount_ = toZen(toDai(_amount, pot.chi()));
 
     }
 
     // returns the numeraire balance for this numeraire's reserve, in this case cDai
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance () public view returns (int128 amount_) {
 
-        uint256 rate = cdai.exchangeRateStored();
-        uint256 balance = cdai.balanceOf(addr);
-        if (balance == 0) return 0;
-        return wmul(balance, rate);
+        uint256 _rate = cdai.exchangeRateStored();
+
+        uint256 _balance = cdai.balanceOf(addr);
+
+        if (balance == 0) return ABDKMath64x64.fromUInt(0);
+
+        amount_ = toZen(_balance.wmul(_rate));
 
     }
 

@@ -238,82 +238,82 @@
 
 //     }
 
-//     /// @dev see Loihi.bin proportionalDeposit for a detailed explanation of parameter
-//     /// @return shellsMinted_ the amount of shells you receive in return for your deposit
-//     function executeProportionalDeposit (LoihiRoot.Shell storage shell, uint256 _deposit) internal returns (uint256 shellsMinted_) {
+    // /// @dev see Loihi.bin proportionalDeposit for a detailed explanation of parameter
+    // /// @return shellsMinted_ the amount of shells you receive in return for your deposit
+    // function executeProportionalDeposit (LoihiRoot.Shell storage shell, uint256 _deposit) internal returns (uint256 shellsMinted_) {
 
-//         // uint256[] memory _amounts = new uint256[](shell.numeraires.length);
-//         // uint256 _oSum;
+    //     uint256[] memory _amounts = new uint256[](shell.numeraires.length);
+    //     uint256 _oSum;
 
-//         // for (uint8 i = 0; i < shell.reserves.length; i++) {
-//         //     uint256 _oBal = shell.reserves[i].viewNumeraireBalance(address(this));
-//         //     _amounts[i] = _oBal;
-//         //     _oSum += _oBal;
-//         // }
+    //     for (uint8 i = 0; i < shell.reserves.length; i++) {
+    //         uint256 _oBal = shell.reserves[i].viewNumeraireBalance(address(this));
+    //         _amounts[i] = _oBal;
+    //         _oSum += _oBal;
+    //     }
 
-//         // if (_oSum == 0) {
+    //     if (_oSum == 0) {
 
-//         //     for (uint8 i = 0; i < shell.reserves.length; i++) {
-//         //         LoihiRoot.Assimilator memory _a = shell.assimilators[shell.numeraires[i]];
-//         //         _amounts[i] = _a.addr.intakeNumeraire(_deposit.omul(shell.weights[i]));
-//         //     }
+    //         for (uint8 i = 0; i < shell.reserves.length; i++) {
+    //             LoihiRoot.Assimilator memory _a = shell.assimilators[shell.numeraires[i]];
+    //             _amounts[i] = _a.addr.intakeNumeraire(_deposit.omul(shell.weights[i]));
+    //         }
 
-//         // } else {
+    //     } else {
 
-//         //     uint256 _multiplier = _deposit.odiv(_oSum);
-//         //     for (uint8 i = 0; i < shell.reserves.length; i++) {
-//         //         LoihiRoot.Assimilator memory _a = shell.assimilators[shell.numeraires[i]];
-//         //         uint256 _value = _amounts[i].omul(_multiplier);
-//         //         _amounts[i] = _a.addr.intakeNumeraire(_value);
-//         //     }
+    //         uint256 _multiplier = _deposit.odiv(_oSum);
+    //         for (uint8 i = 0; i < shell.reserves.length; i++) {
+    //             LoihiRoot.Assimilator memory _a = shell.assimilators[shell.numeraires[i]];
+    //             uint256 _value = _amounts[i].omul(_multiplier);
+    //             _amounts[i] = _a.addr.intakeNumeraire(_value);
+    //         }
 
-//         //     shell.omega = shell.omega.omul(OCTOPUS + _multiplier);
+    //         shell.omega = shell.omega.omul(OCTOPUS + _multiplier);
 
-//         // }
+    //     }
 
-//         // shellsMinted_ = _deposit.omul(OCTOPUS - shell.epsilon);
+    //     shellsMinted_ = _deposit.omul(OCTOPUS - shell.epsilon);
 
-//         // if (shell.totalSupply > 0) shellsMinted_ = shellsMinted_.odiv(_oSum).omul(shell.totalSupply);
+    //     if (shell.totalSupply > 0) shellsMinted_ = shellsMinted_.odiv(_oSum).omul(shell.totalSupply);
 
-//         // _mint(shell, msg.sender, shellsMinted_);
+    //     _mint(shell, msg.sender, shellsMinted_);
 
-//         // emit ShellsMinted(msg.sender, shellsMinted_, shell.numeraires, _amounts);
+    //     emit ShellsMinted(msg.sender, shellsMinted_, shell.numeraires, _amounts);
 
-//         // return shellsMinted_;
+    //     return shellsMinted_;
 
-//     }
+    // }
 
-//     /// @dev see Loihi.bin proportionalWithdraw for a detailed explanation of parameter
-//     /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
-//     function executeProportionalWithdraw (LoihiRoot.Shell storage shell, uint256 _withdrawal) internal returns (uint256[] memory) {
+    /// @dev see Loihi.bin proportionalWithdraw for a detailed explanation of parameter
+    /// @return withdrawnAmts_ the amount withdrawn from each of the numeraire assets
+    // function executeProportionalWithdraw (LoihiRoot.Shell storage shell, uint256 _withdrawal) internal returns (uint256[] memory) {
 
-//         // require(_withdrawal <= shell.balances[msg.sender], "withdrawal amount exceeds your balance");
+    //     require(_withdrawal <= shell.balances[msg.sender], "withdrawal amount exceeds your balance");
 
-//         // uint256 _oSum;
-//         // uint256[] memory withdrawals_ = new uint256[](shell.reserves.length);
+    //     uint256 _oSum;
+    //     uint256[] memory withdrawals_ = new uint256[](shell.reserves.length);
 
-//         // for (uint8 i = 0; i < shell.reserves.length; i++) {
-//         //     withdrawals_[i] = shell.reserves[i].viewNumeraireBalance(address(this));
-//         //     _oSum += withdrawals_[i];
-//         // }
+    //     for (uint8 i = 0; i < shell.reserves.length; i++) {
+    //         withdrawals_[i] = shell.reserves[i].viewNumeraireBalance(address(this));
+    //         _oSum += withdrawals_[i];
+    //     }
 
-//         // uint256 _multiplier = _withdrawal.omul(OCTOPUS - shell.epsilon).odiv(shell.totalSupply);
+    //     uint256 _multiplier = _withdrawal.omul(OCTOPUS - shell.epsilon).odiv(shell.totalSupply);
 
-//         // for (uint8 i = 0; i < shell.reserves.length; i++) {
-//         //     uint256 _value = withdrawals_[i].omul(_multiplier);
-//         //     LoihiRoot.Assimilator memory _a = shell.assimilators[shell.numeraires[i]];
-//         //     withdrawals_[i] = _a.addr.outputNumeraire(msg.sender, _value);
-//         // }
+    //     for (uint8 i = 0; i < shell.reserves.length; i++) {
+    //         uint256 _value = withdrawals_[i].omul(_multiplier);
+    //         LoihiRoot.Assimilator memory _a = shell.assimilators[shell.numeraires[i]];
+    //         withdrawals_[i] = _a.addr.outputNumeraire(msg.sender, _value);
+    //     }
 
-//         // shell.omega = shell.omega.omul(OCTOPUS - _multiplier);
+    //     shell.omega = shell.omega.omul(OCTOPUS - _multiplier);
 
-//         // _burn(shell, msg.sender, _withdrawal);
+    //     _burn(shell, msg.sender, _withdrawal);
 
-//         // emit ShellsBurned(msg.sender, _withdrawal, shell.numeraires, withdrawals_);
+    //     emit ShellsBurned(msg.sender, _withdrawal, shell.numeraires, withdrawals_);
 
-//         // return withdrawals_;
+    //     return withdrawals_;
 
-//     }
+    // }
 
 //     function _burn(LoihiRoot.Shell storage shell, address account, uint256 amount) internal {
 //         // shell.balances[account] = shell.balances[account].sub(amount);

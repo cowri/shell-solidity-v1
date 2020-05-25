@@ -16,15 +16,22 @@ pragma solidity ^0.5.0;
 import "../../interfaces/IAToken.sol";
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../aaveResources/ILendingPool.sol";
-import "../adapterDSMath.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MainnetAUsdtAdapter is AdapterDSMath {
+contract MainnetAUsdtAdapter {
 
     address constant usdt = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
     constructor () public { }
+
+    function fromZen (int128 _amount) internal pure returns (uint256 amount_) {
+        amount_ = _amount.toUInt();
+    }
+
+    function toZen (uint256 _amount) internal pure returns (int128 amount_) {
+        amount_ = _amount.fromUInt();
+    }
 
     function getAUsdt () private view returns (IAToken) {
 
@@ -35,57 +42,59 @@ contract MainnetAUsdtAdapter is AdapterDSMath {
     }
 
     // intakes raw amount of AUSsdt and returns the corresponding raw amount
-    function intakeRaw (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        getAUsdt().transferFrom(msg.sender, address(this), amount);
-        return amount * 1000000000000;
+        getAUsdt().transferFrom(msg.sender, address(this), _amount);
+
+        amount_ = toZen(_amount);
 
     }
 
     // intakes a numeraire amount of AUsdt and returns the corresponding raw amount
-    function intakeNumeraire (uint256 amount) public returns (uint256) {
+    function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount /= 1000000000000;
-        getAUsdt().transferFrom(msg.sender, address(this), amount);
-        return amount;
+        amount_ = fromZen(_amount);
+
+        getAUsdt().transferFrom(msg.sender, address(this), amount_);
 
     }
 
     // outputs a raw amount of AUsdt and returns the corresponding numeraire amount
-    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        getAUsdt().transfer(dst, amount);
-        return amount * 1000000000000;
+        getAUsdt().transfer(_dst, _amount);
+
+        amount_ = toZen(_amount);
 
     }
 
     // outputs a numeraire amount of AUsdt and returns the corresponding numeraire amount
-    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+    function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        amount /= 1000000000000;
-        getAUsdt().transfer(dst, amount);
-        return amount;
+        amount_ = fromZen(_amount);
+
+        getAUsdt().transfer(_dst, amount_).toUInt();
 
     }
 
     // takes a numeraire amount and returns the raw amount
-    function viewRawAmount (uint256 amount) public view returns (uint256) {
+    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
-        return amount / 1000000000000;
+        amount_ = fromZen(_amount);
 
     }
 
     // takes a raw amount and returns the numeraire amount
-    function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
-        return amount * 1000000000000;
+        amount_ = toZen(_amount);
 
     }
 
     // views the numeraire value of the current balance of the reserve, in this case AUsdt
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance () public view returns (int128 amount_) {
 
-        return getAUsdt().balanceOf(address(addr)) * 1000000000000;
+        amount_ = toZen(getAUsdt().balanceOf(address(addr)));
 
     }
 

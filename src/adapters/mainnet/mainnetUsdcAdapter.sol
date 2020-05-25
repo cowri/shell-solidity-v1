@@ -19,76 +19,100 @@ import "../adapterDSMath.sol";
 
 contract MainnetUsdcAdapter is AdapterDSMath {
 
+    IERC20 constant usdc = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+
+    ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
+
     constructor () public { }
 
-    IERC20 constant usdc = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-    ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
-    uint256 constant WAD = 10 ** 18;
+    function toZen (uint256 _amount) internal pure returns (int128 zenAmt_) {
+
+        zenAmt_ = _amount.fromUInt();
+
+    }
+
+    function fromZen (int128 _zenAmt) internal pure returns (uint256 amount_) {
+
+        amount_ = _zenAmt.toUInt();
+
+    }
 
     // takes raw amount of usdc, transfers it in, wraps it in cusdc, returns numeraire amount
-    function intakeRaw (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        usdc.transferFrom(msg.sender, address(this), amount);
-        uint256 success = cusdc.mint(amount);
+        usdc.transferFrom(msg.sender, address(this), _amount);
+
+        uint256 success = cusdc.mint(_amount);
+
         if (success != 0) revert("CUsdc/mint-failed");
-        return amount * 1000000000000;
+
+        amount_ = toZen(_amount);
 
     }
 
     // takes numeraire amount of usdc, calculates raw amount, transfers it in and wraps it in cusdc, returns raw amount
-    function intakeNumeraire (uint256 amount) public returns (uint256) {
+    function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount /= 1000000000000;
+        amount_ = fromzen(_amount);
+
         usdc.transferFrom(msg.sender, address(this), amount);
+
         uint256 success = cusdc.mint(amount);
+
         if (success != 0) revert("CUsdc/mint-failed");
-        return amount;
 
     }
 
     // takes raw amount of usdc, unwraps it from cusdc, transfers that out, returns numeraire amount
-    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        uint256 success = cusdc.redeemUnderlying(amount);
+        uint256 success = cusdc.redeemUnderlying(_amount);
+
         if (success != 0) revert("CUsdc/redeemUnderlying-failed");
-        usdc.transfer(dst, amount);
-        return amount * 1000000000000;
+
+        usdc.transfer(dst, _amount);
+
+        amount_ = toZen(_amount);
 
     }
 
     // takes numeraire amount of usdc, calculates raw amount, unwraps raw amount of cusdc, transfers that out, returns raw amount
-    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+    function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        amount /= 1000000000000;
-        uint256 success = cusdc.redeemUnderlying(amount);
+        amount_ = fromZen(_amount);
+
+        uint256 success = cusdc.redeemUnderlying(amount_);
+
         if (success != 0) revert("CUsdc/redeemUnderlying-failed");
-        usdc.transfer(dst, amount);
-        return amount;
+
+        usdc.transfer(dst, amount_);
 
     }
 
-
     // takes numeraire amount, returns raw amount
-    function viewRawAmount (uint256 amount) public view returns (uint256) {
+    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
-        return amount / 1000000000000;
+        amount_ = fromZen(_amount);
 
     }
 
     // takes raw amount, returns numeraire amount
-    function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
+    function viewNumeraireAmount (uint256 _amount) public pure returns (int128 amount_) {
 
-        return amount * 1000000000000;
+        amount_ = toZen(_amount);
 
     }
 
     // returns numeraire amount of reserve asset, in this case cUsdc
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance () public view returns (int128 amount_) {
 
-        uint256 rate = cusdc.exchangeRateStored();
-        uint256 balance = cusdc.balanceOf(addr);
-        if (balance == 0) return 0;
-        return wmul(balance, rate) * 1000000000000;
+        uint256 _rate = cusdc.exchangeRateStored();
+
+        uint256 _balance = cusdc.balanceOf(addr);
+
+        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
+
+        amount_ = toZen(wmul(balance, rate));
 
     }
 

@@ -253,6 +253,40 @@ library Shells {
 
     }
 
+    function calculateSelectiveDeposit (Shells.Shell storage shell, Assimilators.Assimilator[] memory _assims) internal returns (uint256 shells_, int128 omega_) {
+
+        (   int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _oBals,
+            int128[] memory _nBals  ) = shell.getPoolData(_assims);
+
+        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+
+        int128 _shells;
+
+        ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
+
+        shells_ = _shells.toUInt();
+
+    }
+
+    function calculateSelectiveWithdraw (Shells.Shell storage shell, Assimilators.Assimilator[] memory _assims) internal returns (uint256 shells_, int128 omega_) {
+
+        (   int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _oBals,
+            int128[] memory _nBals  ) = shell.getPoolData(_assims);
+
+        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+
+        int128 _shells;
+
+        ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
+
+        shells_ = _shells.neg().toUInt();
+
+    }
+
     function enforceHalts (
         Shell storage shell,
         int128 _oGLiq,

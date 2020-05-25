@@ -28,7 +28,6 @@ library Controller {
 
     using Shells for Shells.Shell;
 
-
     function setParams (Shells.Shell storage shell, uint256 __alpha, uint256 __beta, uint256 __epsilon, uint256 __max, uint256 __lambda, uint256 __omega) external {
         int128 _alpha = __alpha.fromUInt();
         int128 _beta = __beta.fromUInt();

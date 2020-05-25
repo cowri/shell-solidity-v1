@@ -19,69 +19,99 @@ import "../adapterDSMath.sol";
 
 contract MainnetDaiAdapter is AdapterDSMath {
 
-    constructor () public { }
-
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    uint256 constant WAD = 10 ** 18;
+
+    uint256 constant ZEN_DELTA = 1e12;
+
+    constructor () public { }
+
+    function toZen (uint256 _amount) internal pure returns (int128 _zenAmt) {
+        zenAmt_ = (_amount / ZEN_DELTA).fromUInt();
+    }
+
+    function fromZen (int128 _zenAmt) internal pure returns (uint256 amount_) {
+        amount_ = _zenAmt.toUInt() * ZEN_DELTA;
+    }
 
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
-    function intakeRaw (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        dai.transferFrom(msg.sender, address(this), amount);
-        uint256 success = cdai.mint(amount);
+        dai.transferFrom(msg.sender, address(this), _amount);
+
+        uint256 success = cdai.mint(_amount);
+
         if (success != 0) revert("CDai/mint-failed");
-        return amount;
+
+        amount_ = toZen(_amount);
 
     }
 
     // transfers numeraire amount of dai in, wraps it in cDai, returns raw amount
-    function intakeNumeraire (uint256 amount) public returns (uint256) {
+    function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        dai.transferFrom(msg.sender, address(this), amount);
-        uint256 success = cdai.mint(amount);
+        amount_ = fromZen(_amount);
+
+        dai.transferFrom(msg.sender, address(this), amount_);
+
+        uint256 success = cdai.mint(amount_);
+
         if (success != 0) revert("CDai/mint-failed");
-        return amount;
 
     }
 
-    // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount 
-    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+    // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        uint256 success = cdai.redeemUnderlying(amount);
+        uint256 success = cdai.redeemUnderlying(_amount);
+
         if (success != 0) revert("CDai/redeemUnderlying-failed");
-        dai.transfer(dst, amount);
-        return amount;
+
+        dai.transfer(dst, _amount);
+
+        amount_ = toZen(_amount);
 
     }
 
     // takes numeraire amount of dai, unwraps corresponding amount of cDai, transfers that out, returns numeraire amount
-    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        
-        uint256 success = cdai.redeemUnderlying(amount);
+    function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
+
+        amount_ = fromZen(_amount);
+
+        uint256 success = cdai.redeemUnderlying(amount_);
+
         if (success != 0) revert("CDai/redeemUnderlying-failed");
-        dai.transfer(dst, amount);
-        return amount;
-        
+
+        dai.transfer(_dst, amount_);
+
+        return amount_;
+
     }
 
     // takes numeraire amount and returns raw amount
-    function viewRawAmount (uint256 amount) public pure returns (uint256) {
-        return amount;
+    function viewRawAmount (int128 _amount) public pure returns (uint256 amount_) {
+
+        amount_ = fromZen(_amount);
+
     }
 
     // takes raw amount and returns numeraire amount
-    function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
-        return amount;
+    function viewNumeraireAmount (uint256 _amount) public pure returns (int128 amount_) {
+
+        amount_ = toZen(_amount).fromUInt();
+
     }
 
     // returns current balance in numeraire
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance () public view returns (int128 amount_) {
 
-        uint256 rate = cdai.exchangeRateStored();
-        uint256 balance = cdai.balanceOf(addr);
-        if (balance == 0) return 0;
-        return wmul(balance, rate);
+        uint256 _rate = cdai.exchangeRateStored();
+
+        uint256 _balance = cdai.balanceOf(addr);
+
+        if (balance == 0) return ABDKMath64x64.fromUInt(0);
+
+        amount_ = toZen(_balance.wmul(_rate));
 
     }
 

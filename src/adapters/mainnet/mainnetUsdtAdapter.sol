@@ -21,10 +21,10 @@ import "../adapterDSMath.sol";
 
 contract MainnetUsdtAdapter is AdapterDSMath {
 
-    constructor () public { }
-
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
     IERC20 constant usdt = IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7);
+
+    constructor () public { }
 
     function getAUsdt () public view returns (IAToken) {
 
@@ -34,70 +34,89 @@ contract MainnetUsdtAdapter is AdapterDSMath {
 
     }
 
+    function fromZen (int128 _amount) internal pure returns (uint256 amount_) {
+
+        amount_ = _amount.toUInt();
+
+    }
+
+    function toZen (uint256 _amount) internal pure returns (int128 amount_) {
+
+        amount_ = _amount.fromUInt();
+
+    }
+
     // takes raw amount, transfers it in, wraps that in aUsdt, returns numeraire amount
-    function intakeRaw (uint256 amount) public returns (uint256) {
-        
-        safeTransferFrom(usdt, msg.sender, address(this), amount);
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        safeTransferFrom(usdt, msg.sender, address(this), _amount);
+
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        pool.deposit(address(usdt), amount, 0);
-        uint256 bal = getAUsdt().balanceOf(address(this));
-        return amount * 1000000000000;
+
+        pool.deposit(address(usdt), _amount, 0);
+
+        amount_ = toZen(_amount);
 
     }
 
     // takes numeraire amount, calculates raw amount, transfers that in, wraps it in aUsdt, returns raw amount
-    function intakeNumeraire (uint256 amount) public returns (uint256) {
+    function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount /= 1000000000000;
-        safeTransferFrom(usdt, msg.sender, address(this), amount);
+        amount_ = fromZen(_amount);
+
+        safeTransferFrom(usdt, msg.sender, address(this), amount_);
+
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        pool.deposit(address(usdt), amount, 0);
-        return amount;
+
+        pool.deposit(address(usdt), amount_, 0);
 
     }
 
     // takes raw amount, redeems that from aUsdt, transfers it out, returns numeraire amount
-    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        getAUsdt().redeem(amount);
-        safeTransfer(usdt, dst, amount);
-        return amount * 1000000000000;
+        getAUsdt().redeem(_amount);
+
+        safeTransfer(usdt, dst, _amount);
+
+        amount_ = toZen(_amount);
 
     }
 
     // takes numeraire amount, calculates raw amount, redeems that from aUsdt, transfers it out, returns raw amount
-    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+    function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        amount /= 1000000000000;
-        getAUsdt().redeem(amount);
-        safeTransfer(usdt, dst, amount);
-        return amount;
+        amount_ = fromZen(_amount);
+
+        getAUsdt().redeem(amount_);
+
+        safeTransfer(usdt, dst, amount_);
+
+    }
+
+    // takes numeraire amount, returns raw amount
+    function viewRawAmount (int128 _amount) public pure returns (uint256 amount_) {
+
+        amount_ = fromZen(_amount);
 
     }
 
     // takes raw amount, returns numeraire amount
-    function viewRawAmount (uint256 amount) public pure returns (uint256) {
+    function viewNumeraireAmount (uint256 _amount) public pure returns (int128 amount_) {
 
-        return amount / 1000000000000;
-
-    }
-
-    // takes raw amount, returns numeraire amount
-    function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
-
-        return amount * 1000000000000;
+        amount_ = toZen(_amount);
 
     }
 
     // returns numeraire amount of reserve asset, in this case aUSDT
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance () public view returns (int128 amount_) {
 
-        return getAUsdt().balanceOf(addr) * 1000000000000;
+        amount_ = toZen(getAUsdt().balanceOf(addr));
 
     }
 
     function safeTransfer(IERC20 token, address to, uint256 value) internal {
-        callOptionalReturn(address(token), abi.encodeWithSelector(0xa9059cbb, to, value));
+        callOptionalReturn(address(token), abi.encodeWithSelector(token.transfer.selector, to, value));
     }
 
     function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {

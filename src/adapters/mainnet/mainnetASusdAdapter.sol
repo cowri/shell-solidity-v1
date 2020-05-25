@@ -16,15 +16,28 @@ pragma solidity ^0.5.0;
 import "../../interfaces/IAToken.sol";
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../aaveResources/ILendingPool.sol";
-import "../adapterDSMath.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MainnetASUsdAdapter is AdapterDSMath {
+contract MainnetASUsdAdapter {
+
+    using ABDKMath64x64 for int128;
+    using ABDKMath64x64 for uint256;
+
+    uint256 constant ZEN = 1e12;
+    int128 constant ZEN64 = 0;
 
     address constant susd = 0x57Ab1ec28D129707052df4dF418D58a2D46d5f51;
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
     constructor () public { }
+
+    function toZen (uint256 _amt) internal pure returns (int128 zenAmt_) {
+        zenAmt_ = (_amt / ZEN_DELTA).fromUInt();
+    }
+
+    function fromZen (int128 _zenAmt) internal pure returns (uint256 amt_) {
+        amt_ = _zenAmt.toUInt() * ZEN_DELTA;
+    }
 
     function getASUsd () public view returns (IAToken) {
 
@@ -35,56 +48,59 @@ contract MainnetASUsdAdapter is AdapterDSMath {
     }
 
     // intakes raw amount of ASUsd and returns the corresponding raw amount
-    function intakeRaw (uint256 amount) public returns (uint256) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        getASUsd().transferFrom(msg.sender, address(this), amount);
-        return amount;
+        getASUsd().transferFrom(msg.sender, address(this), _amount);
+
+        amount_ = toZen(_amount);
 
     }
 
     // intakes a numeraire amount of ASUsd and returns the corresponding raw amount
-    function intakeNumeraire (uint256 amount) public returns (uint256) {
+    function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        getASUsd().transferFrom(msg.sender, address(this), amount);
-        return amount;
+        amount_ = fromZen(_amount);
+
+        getASUsd().transferFrom(msg.sender, address(this), amount_);
 
     }
 
     // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
-    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        IAToken asusd = getASUsd();
-        asusd.transfer(dst, amount);
-        return amount;
+        getASUsd().transfer(dst, _amount);
+
+        amount_ = toZen(_amount);
 
     }
 
     // outputs a numeraire amount of ASUsd and returns the corresponding numeraire amount
-    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+    function outputNumeraire (address dst, int128 amount) public returns (uint256 amount_) {
 
-        getASUsd().transfer(dst, amount);
-        return amount;
+        amount_ = fromZen(_amount);
+
+        getASUsd().transfer(dst, amount_);
 
     }
 
     // takes a numeraire amount and returns the raw amount
-    function viewRawAmount (uint256 amount) public view returns (uint256) {
+    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
-        return amount;
+        amount_ = fromZen(_amount);
 
     }
 
     // takes a raw amount and returns the numeraire amount
-    function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
+    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
-        return amount;
+        amount_ = toZen(_amount);
 
     }
 
     // views the numeraire value of the current balance of the reserve, in this case ASUsd
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance () public view returns (int128 amount_) {
 
-        return getASUsd().balanceOf(addr);
+        amount_ = toZen(getASUsd().balanceOf(address(this)));
 
     }
 

@@ -76,7 +76,13 @@ library Assimilators {
 
     function intakeNumeraire (Assimilator memory _assim) internal returns (uint256) {
 
-        bytes memory data = abi.encodeWithSelector(iAdptr.intakeNumeraire.selector, _assim.amt);
+        return intakeNumeraire(_assim, _assim.amt);
+
+    }
+
+    function intakeNumeraire (Assimilator memory _assim, int128 _amt) internal returns (uint256) {
+
+        bytes memory data = abi.encodeWithSelector(iAdptr.intakeNumeraire.selector, _amt);
 
         return abi.decode(_assim.addr.delegate(data), (uint256));
 
@@ -92,7 +98,13 @@ library Assimilators {
 
     function outputNumeraire (Assimilator memory _assim, address _dst) internal returns (uint256) {
 
-        bytes memory data = abi.encodeWithSelector(iAdptr.outputNumeraire.selector, _dst, _assim.amt);
+        return outputNumeraire(_assim, _dst, _assim.amt);
+
+    }
+
+    function outputNumeraire (Assimilator memory _assim, address _dst, int128 _amt) internal returns (uint256) {
+
+        bytes memory data = abi.encodeWithSelector(iAdptr.outputNumeraire.selector, _dst, _amt);
 
         return abi.decode(_assim.addr.delegate(data), (uint256));
 

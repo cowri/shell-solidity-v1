@@ -21,10 +21,14 @@ import "../adapterDSMath.sol";
 
 contract MainnetSUsdAdapter is AdapterDSMath {
 
+    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
+
+    IERC20 constant susd = IERC20(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
+
+    uint256 constant ZEN_DELTA = 1e12;
+
     constructor () public { }
 
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
-    IERC20 constant susd = IERC20(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
 
     function getASUsd () public view returns (IAToken) {
 
@@ -34,81 +38,86 @@ contract MainnetSUsdAdapter is AdapterDSMath {
 
     }
 
+    function toZen (uint256 _amount) internal pure returns (int128 zenAmt_) {
+
+        zenAmt_ = (_amount / ZEN_DELTA).fromUInt();
+
+    }
+
+    function fromZen (int128 _zenAmt) internal pure returns (uint256 amount_) {
+
+        amount_ = _zenAmt.toUInt() * ZEN_DELTA;
+
+    }
+
     // takes raw amount, transfers it in, wraps it in asusd, returns numeraire amount
-    function intakeRaw (uint256 amount) public returns (uint256) {
-        
-        susd.transferFrom(msg.sender, address(this), amount);
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        susd.transferFrom(msg.sender, address(this), _amount);
+
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        pool.deposit(address(susd), amount, 0);
-        return amount;
+
+        pool.deposit(address(susd), _amount, 0);
+
+        amount_ = toZen(_amount);
 
     }
 
     // takes numeraire amount of susd, transfers it in, wraps it in asusd, returns raw amount
-    function intakeNumeraire (uint256 amount) public returns (uint256) {
+    function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        safeTransferFrom(susd, msg.sender, address(this), amount);
+        amount_ = fromZen(_amount);
+
+        susd.transferFrom(msg.sender, address(this) amount_);
+
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        pool.deposit(address(susd), amount, 0);
-        return amount;
+
+        pool.deposit(address(susd), amount_, 0);
+
 
     }
 
     // takes raw amount, transfers to destination, returns numeraire amount
-    function outputRaw (address dst, uint256 amount) public returns (uint256) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        getASUsd().redeem(amount);
-        safeTransfer(susd, dst, amount);
-        return amount;
+        getASUsd().redeem(_amount);
+
+        susd.transfer(_dst, _amount);
+
+        amount_ = toZen(_amount);
 
     }
 
     // takes numeraire amount, transfers to destination, returns raw amount
-    function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
+    function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        getASUsd().redeem(amount);
-        safeTransfer(susd, dst, amount);
-        return amount;
+        amount_ = fromZen(_amount);
+
+        getASUsd().redeem(amount_);
+
+        susd.transfer(_dst, amount_);
 
     }
 
     // takes numeraire amount, returns raw amount
-    function viewRawAmount (uint256 amount) public pure returns (uint256) {
+    function viewRawAmount (int128 _amount) public pure returns (uint256 amount_) {
 
-        return amount;
+        amount_ = fromZen(_amount);
 
     }
 
     // takes raw amount, returns numeraire amount
-    function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
+    function viewNumeraireAmount (uint256 _amount) public pure returns (int128 amount_) {
 
-        return amount;
+        amount_ = toZen(_amount);
 
     }
 
     // returns numeraire value of reserve asset, in this case ASUsd
-    function viewNumeraireBalance (address addr) public view returns (uint256) {
+    function viewNumeraireBalance () public view returns (int128 amount_) {
 
-        return getASUsd().balanceOf(addr);
-
-    }
-
-    function safeTransfer(IERC20 token, address to, uint256 value) internal {
-
-        callOptionalReturn(address(token), abi.encodeWithSelector(0xa9059cbb, to, value));
+        amount_ = toZen(getASUsd().balanceOf(address(this)));
 
     }
 
-    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
-
-        callOptionalReturn(address(token), abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
-
-    }
-
-    function callOptionalReturn(address token, bytes memory data) private {
-
-        (bool success, bytes memory returndata) = token.call(data);
-        require(success, "SafeERC20: low-level call failed");
-
-    }
 }
