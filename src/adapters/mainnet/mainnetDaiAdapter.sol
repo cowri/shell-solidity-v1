@@ -30,16 +30,18 @@ contract MainnetDaiAdapter {
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
-    uint256 constant ZEN_DELTA = 1e12;
+    uint256 constant ZEN_DELTA = 1e18;
+
+    int128 constant ZEN = 0xF42400000000000000000;
 
     constructor () public { }
 
     function toZen (uint256 _amount) internal pure returns (int128 zenAmt_) {
-        zenAmt_ = (_amount / ZEN_DELTA).fromUInt();
+        zenAmt_ = _amount.fromUInt().divu(ZEN_DELTA);
     }
 
     function fromZen (int128 _zenAmt) internal pure returns (uint256 amount_) {
-        amount_ = _zenAmt.toUInt() * ZEN_DELTA;
+        amount_ = _zenAmt.mulu(ZEN_DELTA).toUInt();
     }
 
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount

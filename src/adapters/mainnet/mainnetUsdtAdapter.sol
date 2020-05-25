@@ -31,6 +31,8 @@ contract MainnetUsdtAdapter {
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
     IERC20 constant usdt = IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7);
 
+    int128 constant ZEN_DELTA = 1e6;
+
     constructor () public { }
 
     function getAUsdt () public view returns (IAToken) {
@@ -43,13 +45,13 @@ contract MainnetUsdtAdapter {
 
     function fromZen (int128 _amount) internal pure returns (uint256 amount_) {
 
-        amount_ = _amount.toUInt();
+        amount_ = _amount.mulu(ZEN_DELTA).toUInt();
 
     }
 
     function toZen (uint256 _amount) internal pure returns (int128 amount_) {
 
-        amount_ = _amount.fromUInt();
+        amount_ = _amount.fromUInt().divu(ZEN_DELTA);
 
     }
 

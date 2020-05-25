@@ -25,19 +25,21 @@ contract MainnetCUsdcAdapter {
     using ABDKMath64x64 for uint256;
     using AssimilatorMath for uint;
 
+    uint256 constant ZEN_DELTA = 1e6;
+
     ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
 
     constructor () public { }
 
     function toZen (uint256 _amount, uint256 _rate) internal pure returns (int128 amount_) {
 
-        amount_ = _amount.wmul(_rate).fromUInt();
+        amount_ = _amount.wmul(_rate).fromUInt().divu(ZEN_DELTA);
 
     }
 
     function fromZen (int128 _amount, uint256 _rate) internal pure returns (uint256 amount_) {
 
-        amount_ = _amount.toUInt().wdiv(_rate);
+        amount_ = _amount.mulu(ZEN_DELTA).toUInt().wdiv(_rate);
 
     }
 

@@ -33,11 +33,11 @@ contract MainnetAUsdtAdapter {
     constructor () public { }
 
     function fromZen (int128 _amount) internal pure returns (uint256 amount_) {
-        amount_ = _amount.toUInt();
+        amount_ = _amount.mulu(ZEN_DELTA).toUInt();
     }
 
     function toZen (uint256 _amount) internal pure returns (int128 amount_) {
-        amount_ = _amount.fromUInt();
+        amount_ = _amount.fromUInt().divu(ZEN_DELTA);
     }
 
     function getAUsdt () private view returns (IAToken) {

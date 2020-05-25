@@ -35,7 +35,7 @@ contract MainnetSUsdAdapter {
 
     IERC20 constant susd = IERC20(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
 
-    uint256 constant ZEN_DELTA = 1e12;
+    uint256 constant ZEN_DELTA = 1e18;
 
     constructor () public { }
 
@@ -49,13 +49,13 @@ contract MainnetSUsdAdapter {
 
     function toZen (uint256 _amount) internal pure returns (int128 zenAmt_) {
 
-        zenAmt_ = (_amount / ZEN_DELTA).fromUInt();
+        zenAmt_ = _amount.fromUInt().divu(ZEN_DELTA);
 
     }
 
     function fromZen (int128 _zenAmt) internal pure returns (uint256 amount_) {
 
-        amount_ = _zenAmt.toUInt() * ZEN_DELTA;
+        amount_ = _zenAmt.mulu(ZEN_DELTA).toUInt();
 
     }
 

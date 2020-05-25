@@ -25,7 +25,9 @@ contract MainnetCDaiAdapter {
     using ABDKMath64x64 for uint256;
     using AssimilatorMath for uint;
 
-    uint256 constant ZEN_DELTA = 1e12;
+    uint256 constant ZEN_DELTA = 1e18;
+
+    int128 constant ZEN = 0xF42400000000000000000;
 
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
 
@@ -33,13 +35,13 @@ contract MainnetCDaiAdapter {
 
     function toZen (uint256 _amount, uint256 _rate) internal pure returns (int128 zenAmt_) {
 
-        zenAmt_ = (_amount.wmul(_rate) / ZEN_DELTA).fromUInt();
+        zenAmt_ = (_amount.wmul(_rate)).fromUInt().divu(ZEN_DELTA);
 
     }
 
     function fromZen (int128 _zenAmt, uint256 _rate) internal pure returns (uint256 amount_) {
 
-        amount_ = (_zenAmt.toUInt() * ZEN_DELTA).wdiv(_rate);
+        amount_ = _zenAmt.mulu(ZEN_DELTA).toUInt().wdiv(_rate);
 
     }
 

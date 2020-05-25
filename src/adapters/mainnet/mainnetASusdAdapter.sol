@@ -24,7 +24,7 @@ contract MainnetASUsdAdapter {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    uint256 constant ZEN_DELTA = 1e12;
+    uint256 constant ZEN_DELTA = 1e18;
 
     address constant susd = 0x57Ab1ec28D129707052df4dF418D58a2D46d5f51;
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
@@ -32,11 +32,11 @@ contract MainnetASUsdAdapter {
     constructor () public { }
 
     function toZen (uint256 _amt) internal pure returns (int128 zenAmt_) {
-        zenAmt_ = (_amt / ZEN_DELTA).fromUInt();
+        zenAmt_ = _amt.fromUInt().divu(ZEN_DELTA);
     }
 
     function fromZen (int128 _zenAmt) internal pure returns (uint256 amt_) {
-        amt_ = _zenAmt.toUInt() * ZEN_DELTA;
+        amt_ = _zenAmt.mulu(ZEN_DELTA).toUInt();
     }
 
     function getASUsd () public view returns (IAToken) {

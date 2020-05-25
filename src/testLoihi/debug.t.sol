@@ -82,13 +82,11 @@ contract DebugTest is DSMath, DSTest {
 
     function testMath () public {
 
-        uint256 a = 654323456543456;
+        uint256 a = 1e6;
 
-        int128 a64 = a.fromUInt();
+        int128 a64 = 0xF42400000000000000000;
 
-        a = a64.toUInt();
-
-        emit log_named_uint("aU64", a);
+        emit log_named_int("aU64", a64);
 
 
     }
