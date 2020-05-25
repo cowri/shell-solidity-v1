@@ -14,9 +14,16 @@
 pragma solidity ^0.5.0;
 
 import "../../interfaces/ICToken.sol";
-import "../adapterDSMath.sol";
 
-contract MainnetCUsdcAdapter is AdapterDSMath {
+import "../AssimilatorMath.sol";
+
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
+contract MainnetCUsdcAdapter {
+
+    using ABDKMath64x64 for int128;
+    using ABDKMath64x64 for uint256;
+    using AssimilatorMath for uint;
 
     ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
 
@@ -28,7 +35,7 @@ contract MainnetCUsdcAdapter is AdapterDSMath {
 
     }
 
-    function fromZen (int128 _amount, uint256 _rate) internal pure returns (int128 amount_) {
+    function fromZen (int128 _amount, uint256 _rate) internal pure returns (uint256 amount_) {
 
         amount_ = _amount.toUInt().wdiv(_rate);
 
@@ -66,9 +73,9 @@ contract MainnetCUsdcAdapter is AdapterDSMath {
 
         uint256 _rate = cusdc.exchangeRateCurrent();
 
-        amount_ = fromZen(amount, _rate);
+        amount_ = fromZen(_amount, _rate);
 
-        bool success = cusdc.transfer(dst, amount_);
+        bool success = cusdc.transfer(_dst, amount_);
 
         if (!success) revert("CUsdc/transfer-failed");
 
@@ -98,7 +105,7 @@ contract MainnetCUsdcAdapter is AdapterDSMath {
     }
 
     // takes numeraire amount, returns raw amount of cUsdc
-    function viewNumeraireAmount (uint256 amount) public view returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
@@ -111,9 +118,9 @@ contract MainnetCUsdcAdapter is AdapterDSMath {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
-        uint256 _balance = cusdc.balanceOf(addr);
+        uint256 _balance = cusdc.balanceOf(address(this));
 
-        if (balance == 0) return ABDKMAth64x64.fromUint(0);
+        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
         amount_ = toZen(_balance, _rate);
 

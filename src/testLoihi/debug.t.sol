@@ -81,103 +81,15 @@ contract DebugTest is DSMath, DSTest {
     // }
 
     function testMath () public {
-        // uint256 wad = 1e18;
 
-        // uint256 whole = 18446744073709551999;
-        // whole /= 2;
-        // emit log_named_uint("whole", whole);
-        // whole /= 2;
-        // emit log_named_uint("whole", whole);
-        // whole += (whole/2);
-        // emit log_named_uint("whole", whole);
-        // whole += (whole/4);
-        // emit log_named_uint("whole", whole);
-        // whole += (whole/8);
-        // emit log_named_uint("whole", whole);
-        // int128 whole64 = whole.fromUInt();
+        uint256 a = 654323456543456;
 
-        int128 max64 = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-        emit log_named_uint("max64", max64.toUInt());
+        int128 a64 = a.fromUInt();
 
-        // uint256 pad = 1e6;
-        int128 pad64 = 18446744073709551616000000;
-        uint256 usdc = 548112585854;
+        a = a64.toUInt();
 
-        emit log_named_uint("whole usdc", usdc);
-        emit log_named_int("pad64", pad64);
+        emit log_named_uint("aU64", a);
 
-        uint256 gas = gasleft();
-
-        int128 usdc64 = usdc.fromUInt();
-        
-        emit log_named_uint("from uint", gas - gasleft());
-        gas = gasleft();
-
-        usdc64 = usdc64.div(pad64);
-
-        emit log_named_uint("apply decimals", gas - gasleft());
-        gas = gasleft();
-
-        usdc64 = usdc64.mul(pad64);
-
-        emit log_named_uint("remove decimals", gas - gasleft());
-        gas = gasleft();
-
-        usdc = usdc64.toUInt();
-
-        emit log_named_uint("to uint", gas - gasleft());
-        gas = gasleft();
-
-        usdc64.unsafe_div(pad64);
-
-        emit log_named_uint("unsafe 64x64 div", gas - gasleft());
-        gas = gasleft();
-
-        usdc64.unsafe_mul(pad64);
-
-        emit log_named_uint("unsafe 64x64 mul", gas - gasleft());
-
-        emit log_named_uint("whole usdc", usdc);
-
-        uint256 dai = 494338447553444333191;
-        uint256 half = 1e18/2;
-        emit log_named_uint("dai", dai/1e18);
-
-        gas = gasleft();
-
-        dai = wmul(dai, half);
-
-        emit log_named_uint("uint safe fixed mul", gas - gasleft());
-
-        gas = gasleft();
-
-        dai = fmul(dai, half);
-
-        emit log_named_uint("uint unsafe fixed mul", gas - gasleft());
-
-        gas = gasleft();
-
-        dai = fdiv(dai, half);
-
-        emit log_named_uint("uint unsafe fixed div", gas - gasleft());
-
-        gas = gasleft();
-
-
-        uint256 octopus = 1e6;
-
-        int128 octopus64 = octopus.fromUInt();
-        int128 octopus6464 = 18446744073709551616000000;
-        emit log_named_int("octopus 64", octopus64);
-        emit log_named_int("octopus 6464", octopus6464);
-
-        uint256 zero = 0;
-        int128 zero64 = zero.fromUInt();
-        
-        // uint256 half = 4611686018427388000;
-        // int128 half64 = half.fromUInt();
-
-        // int128 whole64 = half64.add(half64);
 
     }
 

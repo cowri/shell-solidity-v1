@@ -14,11 +14,12 @@
 pragma solidity ^0.5.0;
 
 import "./LoihiRoot.sol";
-import "./LoihiExchange.sol";
-import "./LoihiLiquidity.sol";
-import "./LoihiERC20.sol";
+
 import "./Assimilators.sol";
+
 import "./Controller.sol";
+
+import "./ShellsExternal.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
@@ -33,6 +34,7 @@ contract Loihi is LoihiRoot {
 
     using Assimilators for Assimilators.Assimilator;
     using Shells for Shells.Shell;
+    using ShellsExternal for Shells.Shell;
     using Controller for Shells.Shell;
 
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);

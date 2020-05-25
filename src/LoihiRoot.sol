@@ -59,17 +59,17 @@ contract LoihiRoot {
         _;
     }
 
-    IERC20 dai; ICToken cdai; IChai chai; IPot pot;
-    IERC20 usdc; ICToken cusdc;
-    IERC20 usdt; IAToken ausdt;
-    IERC20 susd; IAToken asusd;
+    // IERC20 dai; ICToken cdai; IChai chai; IPot pot;
+    // IERC20 usdc; ICToken cusdc;
+    // IERC20 usdt; IAToken ausdt;
+    // IERC20 susd; IAToken asusd;
 
-    function includeTestAdapterState(address _dai, address _cdai, address _chai, address _pot, address _usdc, address _cusdc, address _usdt, address _ausdt, address _susd, address _asusd) public {
-        dai = IERC20(_dai); cdai = ICToken(_cdai); chai = IChai(_chai); pot = IPot(_pot);
-        usdc = IERC20(_usdc); cusdc = ICToken(_cusdc);
-        usdt = IERC20(_usdt); ausdt = IAToken(_ausdt);
-        susd = IERC20(_susd); asusd = IAToken(_asusd);
-    }
+    // function includeTestAdapterState(address _dai, address _cdai, address _chai, address _pot, address _usdc, address _cusdc, address _usdt, address _ausdt, address _susd, address _asusd) public {
+    //     dai = IERC20(_dai); cdai = ICToken(_cdai); chai = IChai(_chai); pot = IPot(_pot);
+    //     usdc = IERC20(_usdc); cusdc = ICToken(_cusdc);
+    //     usdt = IERC20(_usdt); ausdt = IAToken(_ausdt);
+    //     susd = IERC20(_susd); asusd = IAToken(_asusd);
+    // }
 
 
 }

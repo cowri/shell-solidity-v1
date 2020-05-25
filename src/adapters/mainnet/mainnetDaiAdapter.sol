@@ -14,10 +14,18 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "../../interfaces/ICToken.sol";
-import "../adapterDSMath.sol";
 
-contract MainnetDaiAdapter is AdapterDSMath {
+import "../../interfaces/ICToken.sol";
+
+import "../AssimilatorMath.sol";
+
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
+contract MainnetDaiAdapter {
+
+    using ABDKMath64x64 for int128;
+    using ABDKMath64x64 for uint256;
+    using AssimilatorMath for uint256;
 
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
@@ -26,7 +34,7 @@ contract MainnetDaiAdapter is AdapterDSMath {
 
     constructor () public { }
 
-    function toZen (uint256 _amount) internal pure returns (int128 _zenAmt) {
+    function toZen (uint256 _amount) internal pure returns (int128 zenAmt_) {
         zenAmt_ = (_amount / ZEN_DELTA).fromUInt();
     }
 
@@ -67,7 +75,7 @@ contract MainnetDaiAdapter is AdapterDSMath {
 
         if (success != 0) revert("CDai/redeemUnderlying-failed");
 
-        dai.transfer(dst, _amount);
+        dai.transfer(_dst, _amount);
 
         amount_ = toZen(_amount);
 
@@ -98,7 +106,7 @@ contract MainnetDaiAdapter is AdapterDSMath {
     // takes raw amount and returns numeraire amount
     function viewNumeraireAmount (uint256 _amount) public pure returns (int128 amount_) {
 
-        amount_ = toZen(_amount).fromUInt();
+        amount_ = toZen(_amount);
 
     }
 
@@ -107,9 +115,9 @@ contract MainnetDaiAdapter is AdapterDSMath {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _balance = cdai.balanceOf(addr);
+        uint256 _balance = cdai.balanceOf(address(this));
 
-        if (balance == 0) return ABDKMath64x64.fromUInt(0);
+        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
         amount_ = toZen(_balance.wmul(_rate));
 

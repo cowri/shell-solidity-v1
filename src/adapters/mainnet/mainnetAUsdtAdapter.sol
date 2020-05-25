@@ -14,13 +14,20 @@
 pragma solidity ^0.5.0;
 
 import "../../interfaces/IAToken.sol";
+
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
+
 import "../aaveResources/ILendingPool.sol";
+
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 contract MainnetAUsdtAdapter {
 
+    using ABDKMath64x64 for int128;
+    using ABDKMath64x64 for uint256;
+
     address constant usdt = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
     constructor () public { }
@@ -73,7 +80,7 @@ contract MainnetAUsdtAdapter {
 
         amount_ = fromZen(_amount);
 
-        getAUsdt().transfer(_dst, amount_).toUInt();
+        getAUsdt().transfer(_dst, amount_);
 
     }
 
@@ -94,7 +101,7 @@ contract MainnetAUsdtAdapter {
     // views the numeraire value of the current balance of the reserve, in this case AUsdt
     function viewNumeraireBalance () public view returns (int128 amount_) {
 
-        amount_ = toZen(getAUsdt().balanceOf(address(addr)));
+        amount_ = toZen(getAUsdt().balanceOf(address(this)));
 
     }
 

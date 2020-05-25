@@ -14,12 +14,22 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "../aaveResources/ILendingPool.sol";
-import "../aaveResources/ILendingPoolAddressesProvider.sol";
-import "../../interfaces/IAToken.sol";
-import "../adapterDSMath.sol";
 
-contract MainnetSUsdAdapter is AdapterDSMath {
+import "../aaveResources/ILendingPool.sol";
+
+import "../aaveResources/ILendingPoolAddressesProvider.sol";
+
+import "../../interfaces/IAToken.sol";
+
+import "../AssimilatorMath.sol";
+
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
+contract MainnetSUsdAdapter {
+
+    using ABDKMath64x64 for int128;
+    using ABDKMath64x64 for uint256;
+    using AssimilatorMath for uint;
 
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
@@ -28,7 +38,6 @@ contract MainnetSUsdAdapter is AdapterDSMath {
     uint256 constant ZEN_DELTA = 1e12;
 
     constructor () public { }
-
 
     function getASUsd () public view returns (IAToken) {
 
@@ -68,7 +77,7 @@ contract MainnetSUsdAdapter is AdapterDSMath {
 
         amount_ = fromZen(_amount);
 
-        susd.transferFrom(msg.sender, address(this) amount_);
+        susd.transferFrom(msg.sender, address(this), amount_);
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 

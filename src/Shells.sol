@@ -13,6 +13,8 @@
 
 import "./Assimilators.sol";
 
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
 pragma solidity >0.4.13;
 
 library SafeERC20Arithmetic {

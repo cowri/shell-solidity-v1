@@ -16,6 +16,7 @@ pragma solidity ^0.5.0;
 import "../../interfaces/IAToken.sol";
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../aaveResources/ILendingPool.sol";
+
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 contract MainnetASUsdAdapter {
@@ -23,8 +24,7 @@ contract MainnetASUsdAdapter {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    uint256 constant ZEN = 1e12;
-    int128 constant ZEN64 = 0;
+    uint256 constant ZEN_DELTA = 1e12;
 
     address constant susd = 0x57Ab1ec28D129707052df4dF418D58a2D46d5f51;
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
@@ -68,18 +68,18 @@ contract MainnetASUsdAdapter {
     // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        getASUsd().transfer(dst, _amount);
+        getASUsd().transfer(_dst, _amount);
 
         amount_ = toZen(_amount);
 
     }
 
     // outputs a numeraire amount of ASUsd and returns the corresponding numeraire amount
-    function outputNumeraire (address dst, int128 amount) public returns (uint256 amount_) {
+    function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
         amount_ = fromZen(_amount);
 
-        getASUsd().transfer(dst, amount_);
+        getASUsd().transfer(_dst, amount_);
 
     }
 

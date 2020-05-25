@@ -14,10 +14,18 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "../../interfaces/ICToken.sol";
-import "../adapterDSMath.sol";
 
-contract MainnetUsdcAdapter is AdapterDSMath {
+import "../../interfaces/ICToken.sol";
+
+import "../AssimilatorMath.sol";
+
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
+contract MainnetUsdcAdapter {
+
+    using ABDKMath64x64 for int128;
+    using ABDKMath64x64 for uint256;
+    using AssimilatorMath for uint;
 
     IERC20 constant usdc = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
 
@@ -53,11 +61,11 @@ contract MainnetUsdcAdapter is AdapterDSMath {
     // takes numeraire amount of usdc, calculates raw amount, transfers it in and wraps it in cusdc, returns raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = fromzen(_amount);
+        amount_ = fromZen(_amount);
 
-        usdc.transferFrom(msg.sender, address(this), amount);
+        usdc.transferFrom(msg.sender, address(this), amount_);
 
-        uint256 success = cusdc.mint(amount);
+        uint256 success = cusdc.mint(amount_);
 
         if (success != 0) revert("CUsdc/mint-failed");
 
@@ -70,7 +78,7 @@ contract MainnetUsdcAdapter is AdapterDSMath {
 
         if (success != 0) revert("CUsdc/redeemUnderlying-failed");
 
-        usdc.transfer(dst, _amount);
+        usdc.transfer(_dst, _amount);
 
         amount_ = toZen(_amount);
 
@@ -85,7 +93,7 @@ contract MainnetUsdcAdapter is AdapterDSMath {
 
         if (success != 0) revert("CUsdc/redeemUnderlying-failed");
 
-        usdc.transfer(dst, amount_);
+        usdc.transfer(_dst, amount_);
 
     }
 
@@ -108,11 +116,11 @@ contract MainnetUsdcAdapter is AdapterDSMath {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
-        uint256 _balance = cusdc.balanceOf(addr);
+        uint256 _balance = cusdc.balanceOf(address(this));
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
-        amount_ = toZen(wmul(balance, rate));
+        amount_ = toZen(_balance.wmul(_rate));
 
     }
 

@@ -14,12 +14,18 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "../../interfaces/ICToken.sol";
-import "../../interfaces/IChai.sol";
-import "../../interfaces/IPot.sol";
-import "../adapterDSMath.sol";
 
-contract MainnetChaiAdapter is AdapterDSMath {
+import "../../interfaces/ICToken.sol";
+
+import "../../interfaces/IChai.sol";
+
+import "../../interfaces/IPot.sol";
+
+import "../AssimilatorMath.sol";
+
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
+contract MainnetChaiAdapter {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -104,7 +110,7 @@ contract MainnetChaiAdapter is AdapterDSMath {
 
         if (success != 0) revert("CDai/redeemUnderlying-failed");
 
-        chai.join(dst, _amount);
+        chai.join(_dst, _amount);
 
         amount_ = toZen(_amount);
 
@@ -113,8 +119,8 @@ contract MainnetChaiAdapter is AdapterDSMath {
     // pass it a numeraire amount and get the raw amount
     function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
-        amount_ = fromZen(fromDai(_amount, pot.chi());
-            
+        amount_ = fromDai(fromZen(_amount), pot.chi());
+
     }
 
     // pass it a raw amount and get the numeraire amount
@@ -129,9 +135,9 @@ contract MainnetChaiAdapter is AdapterDSMath {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _balance = cdai.balanceOf(addr);
+        uint256 _balance = cdai.balanceOf(address(this));
 
-        if (balance == 0) return ABDKMath64x64.fromUInt(0);
+        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
         amount_ = toZen(_balance.wmul(_rate));
 

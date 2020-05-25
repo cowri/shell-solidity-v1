@@ -14,10 +14,15 @@
 pragma solidity ^0.5.0;
 
 import "../../interfaces/ICToken.sol";
+
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
 import "../AssimilatorMath.sol";
 
 contract MainnetCDaiAdapter {
 
+    using ABDKMath64x64 for int128;
+    using ABDKMath64x64 for uint256;
     using AssimilatorMath for uint;
 
     uint256 constant ZEN_DELTA = 1e12;
@@ -47,7 +52,7 @@ contract MainnetCDaiAdapter {
 
         uint256 rate = cdai.exchangeRateStored();
 
-        amount_ = toZen(amount, rate);
+        amount_ = toZen(_amount, rate);
 
     }
 
@@ -58,7 +63,7 @@ contract MainnetCDaiAdapter {
 
         amount_ = fromZen(_amount, _rate);
 
-        bool success = cdai.transferFrom(msg.sender, address(this), _amount);
+        bool success = cdai.transferFrom(msg.sender, address(this), amount_);
 
         if (!success) revert("CDai/transferFrom-failed");
 
@@ -67,7 +72,7 @@ contract MainnetCDaiAdapter {
     // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        bool success = cdai.transfer(msg.sender, _amount);
+        bool success = cdai.transfer(_dst, _amount);
 
         if (!success) revert("CDai/transfer-failed");
 
@@ -84,7 +89,7 @@ contract MainnetCDaiAdapter {
 
         amount_ = fromZen(_amount, _rate);
 
-        bool success = cdai.transfer(dst, amount_);
+        bool success = cdai.transfer(_dst, amount_);
 
         if (!success) revert("CDai/transfer-failed");
 
@@ -113,9 +118,9 @@ contract MainnetCDaiAdapter {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _balance = cdai.balanceOf(addr);
+        uint256 _balance = cdai.balanceOf(address(this));
 
-        if (balance == 0) return ABDKMath64x64.fromUInt(0);
+        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
         amount_ = toZen(_balance, _rate);
 
