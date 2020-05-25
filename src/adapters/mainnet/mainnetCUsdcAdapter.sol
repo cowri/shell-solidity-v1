@@ -33,13 +33,13 @@ contract MainnetCUsdcAdapter {
 
     function toZen (uint256 _amount, uint256 _rate) internal pure returns (int128 amount_) {
 
-        amount_ = _amount.wmul(_rate).fromUInt().divu(ZEN_DELTA);
+        amount_ = _amount.wmul(_rate).divu(ZEN_DELTA);
 
     }
 
     function fromZen (int128 _amount, uint256 _rate) internal pure returns (uint256 amount_) {
 
-        amount_ = _amount.mulu(ZEN_DELTA).toUInt().wdiv(_rate);
+        amount_ = _amount.mulu(ZEN_DELTA).wdiv(_rate);
 
     }
 

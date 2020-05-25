@@ -32,16 +32,14 @@ contract MainnetDaiAdapter {
 
     uint256 constant ZEN_DELTA = 1e18;
 
-    int128 constant ZEN = 0xF42400000000000000000;
-
     constructor () public { }
 
     function toZen (uint256 _amount) internal pure returns (int128 zenAmt_) {
-        zenAmt_ = _amount.fromUInt().divu(ZEN_DELTA);
+        zenAmt_ = _amount.divu(ZEN_DELTA);
     }
 
     function fromZen (int128 _zenAmt) internal pure returns (uint256 amount_) {
-        amount_ = _zenAmt.mulu(ZEN_DELTA).toUInt();
+        amount_ = _zenAmt.mulu(ZEN_DELTA);
     }
 
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount

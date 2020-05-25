@@ -33,8 +33,6 @@ contract MainnetChaiAdapter {
 
     uint256 constant ZEN_DELTA = 1e18;
 
-    int128 constant ZEN = 0xF42400000000000000000;
-
     IChai constant chai = IChai(0x06AF07097C9Eeb7fD685c692751D5C66dB49c215);
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
@@ -43,11 +41,11 @@ contract MainnetChaiAdapter {
     constructor () public { }
 
     function toZen (uint256 _amt) internal pure returns (int128 zenAmt_) {
-        zenAmt_ = _amt.fromUInt().divu(ZEN_DELTA);
+        zenAmt_ = _amt.divu(ZEN_DELTA);
     }
 
     function fromZen (int128 _zenAmt) internal pure returns (uint256 amt_) {
-        amt_ = _zenAmt.mulu(ZEN_DELTA).toUInt();
+        amt_ = _zenAmt.mulu(ZEN_DELTA);
     }
 
     function toDai (uint256 _chai, uint256 _chi) internal pure returns (uint256 dai_) {

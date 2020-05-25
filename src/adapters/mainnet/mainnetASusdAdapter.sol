@@ -32,11 +32,11 @@ contract MainnetASUsdAdapter {
     constructor () public { }
 
     function toZen (uint256 _amt) internal pure returns (int128 zenAmt_) {
-        zenAmt_ = _amt.fromUInt().divu(ZEN_DELTA);
+        zenAmt_ = _amt.divu(ZEN_DELTA);
     }
 
     function fromZen (int128 _zenAmt) internal pure returns (uint256 amt_) {
-        amt_ = _zenAmt.mulu(ZEN_DELTA).toUInt();
+        amt_ = _zenAmt.mulu(ZEN_DELTA);
     }
 
     function getASUsd () public view returns (IAToken) {

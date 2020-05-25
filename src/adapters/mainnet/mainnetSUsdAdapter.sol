@@ -49,13 +49,13 @@ contract MainnetSUsdAdapter {
 
     function toZen (uint256 _amount) internal pure returns (int128 zenAmt_) {
 
-        zenAmt_ = _amount.fromUInt().divu(ZEN_DELTA);
+        zenAmt_ = _amount.divu(ZEN_DELTA);
 
     }
 
     function fromZen (int128 _zenAmt) internal pure returns (uint256 amount_) {
 
-        amount_ = _zenAmt.mulu(ZEN_DELTA).toUInt();
+        amount_ = _zenAmt.mulu(ZEN_DELTA);
 
     }
 
