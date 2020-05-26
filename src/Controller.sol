@@ -28,7 +28,8 @@ library Controller {
 
     using Shells for Shells.Shell;
 
-    function setParams (Shells.Shell storage shell, uint256 __alpha, uint256 __beta, uint256 __epsilon, uint256 __max, uint256 __lambda, uint256 __omega) external {
+    function setParams (Shells.Shell storage shell, uint256 __alpha, uint256 __beta, uint256 __epsilon, uint256 __max, uint256 __lambda, uint256 __omega) internal {
+
         int128 _alpha = __alpha.fromUInt();
         int128 _beta = __beta.fromUInt();
         int128 _epsilon = __epsilon.fromUInt();
@@ -65,7 +66,7 @@ library Controller {
 
     }
 
-    function includeNumeraireAsset (Shells.Shell storage shell, address _numeraire, address _reserve, uint256 _weight) external {
+    function includeNumeraireAsset (Shells.Shell storage shell, address _numeraire, address _reserve, uint256 _weight) internal {
 
         shell.numeraires.push(_numeraire);
 
@@ -75,7 +76,7 @@ library Controller {
 
     }
 
-    function includeAssimilator (Shells.Shell storage shell, address _derivative, address _assimilator, address _reserve) external {
+    function includeAssimilator (Shells.Shell storage shell, address _derivative, address _assimilator, address _reserve) internal {
 
         for (uint8 i = 0; i < shell.reserves.length; i++) {
 

@@ -1,3 +1,4 @@
+
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -13,50 +14,58 @@
 
 pragma solidity ^0.5.0;
 
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "../../interfaces/ICToken.sol";
 
-contract KovanCDaiAdapter {
+contract KovanDaiAssimilator {
 
     constructor () public { }
 
     ICToken constant cdai = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
+    IERC20 constant dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
 
-    // takes raw cdai amount
-    // unwraps it into dai
-    // deposits dai amount in chai
+    // transfers dai in
+    // wraps it in chai
     function intakeRaw (uint256 amount) public {
-        cdai.transferFrom(msg.sender, address(this), amount);
+        
+        dai.transferFrom(msg.sender, address(this), amount);
+        cdai.mint(amount);
+        
     }
 
+    // transfers dai in
+    // wraps it in cdai
     function intakeNumeraire (uint256 amount) public returns (uint256) {
-        uint256 rate = cdai.exchangeRateCurrent();
-        uint256 cdaiAmount = wmul(rate, amount);
-        cdai.transferFrom(msg.sender, address(this), cdaiAmount);
-        return cdaiAmount;
+        
+        dai.transferFrom(msg.sender, address(this), amount);
+        cdai.mint(amount);
+        return amount;
+        
     }
 
+    // unwraps chai
+    // transfers out dai
     function outputRaw (address dst, uint256 amount) public {
-        cdai.transfer(msg.sender, amount);
+        
+        cdai.redeemUnderlying(amount);
+        dai.transfer(dst, amount);
+        
     }
 
-    // unwraps numeraire amount of dai from chai
-    // wraps it into cdai amount
-    // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        uint rate = cdai.exchangeRateCurrent();
-        uint cdaiAmount = wdiv(amount, rate);
-        cdai.transfer(dst, cdaiAmount);
-        return cdaiAmount;
+        
+        cdai.redeemUnderlying(amount);
+        dai.transfer(dst, amount);
+        return amount;
+        
     }
 
-    function viewRawAmount (uint256 amount) public view returns (uint256) {
-        uint256 rate = cdai.exchangeRateStored();
-        return wdiv(amount, rate);
+    function viewRawAmount (uint256 amount) public pure returns (uint256) {
+        return amount;
     }
 
-    function viewNumeraireAmount (uint256 amount) public view returns (uint256) {
-        uint256 rate = cdai.exchangeRateStored();
-        return wmul(amount, rate);
+    function viewNumeraireAmount (uint256 amount) public pure returns (uint256) {
+        return amount;
     }
 
     function viewNumeraireBalance (address addr) public view returns (uint256) {
@@ -65,30 +74,24 @@ contract KovanCDaiAdapter {
         return wmul(balance, rate);
     }
 
-    // takes raw amount and gives numeraire amount
-    function getRawAmount (uint256 amount) public returns (uint256) {
-        uint256 rate = cdai.exchangeRateCurrent();
-        return wdiv(amount, rate);
+    function getRawAmount (uint256 amount) public pure returns (uint256) {
+        return amount;
     }
 
-    // takes raw amount and gives numeraire amount
-    function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        uint256 rate = cdai.exchangeRateCurrent();
-        return wmul(amount, rate);
+    // returns amount, already in numeraire
+    function getNumeraireAmount (uint256 amount) public pure returns (uint256) {
+        return amount;
     }
 
+    // returns numeraire amount of chai balance
     function getNumeraireBalance () public returns (uint256) {
+        
         return cdai.balanceOfUnderlying(address(this));
+        
     }
 
-    uint constant WAD = 10 ** 18;
-    
     function add(uint x, uint y) internal pure returns (uint z) {
         require((z = x + y) >= x, "ds-math-add-overflow");
-    }
-
-    function sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x);
     }
 
     function mul(uint x, uint y) internal pure returns (uint z) {
@@ -96,16 +99,11 @@ contract KovanCDaiAdapter {
     }
 
     function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), WAD) / WAD;
+        z = add(mul(x, y), 1000000000000000000 / 2) / 1000000000000000000;
     }
 
     function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, WAD), y / 2) / y;
-    }
-
-    function wdivup(uint x, uint y) internal pure returns (uint z) {
-        // always rounds up
-        z = add(mul(x, WAD), sub(y, 1)) / y;
+        z = add(mul(x, 1000000000000000000), y / 2) / y;
     }
 
 }

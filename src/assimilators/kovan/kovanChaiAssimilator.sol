@@ -18,7 +18,7 @@ import "../../interfaces/ICToken.sol";
 import "../../interfaces/IChai.sol";
 import "../../interfaces/IPot.sol";
 
-contract KovanChaiAdapter {
+contract KovanChaiAssimilator {
 
     uint256 internal constant WAD = 10**18;
     uint256 internal constant RAY = 10**27;

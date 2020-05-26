@@ -255,7 +255,10 @@ library Shells {
 
     }
 
-    function calculateSelectiveDeposit (Shells.Shell storage shell, Assimilators.Assimilator[] memory _assims) internal returns (uint256 shells_, int128 omega_) {
+    function calculateSelectiveDeposit (
+        Shells.Shell storage shell,
+        Assimilators.Assimilator[] memory _assims
+    ) internal returns (uint256 shells_, int128 omega_) {
 
         (   int128 _oGLiq,
             int128 _nGLiq,
@@ -272,7 +275,10 @@ library Shells {
 
     }
 
-    function calculateSelectiveWithdraw (Shells.Shell storage shell, Assimilators.Assimilator[] memory _assims) internal returns (uint256 shells_, int128 omega_) {
+    function calculateSelectiveWithdraw (
+        Shells.Shell storage shell,
+        Assimilators.Assimilator[] memory _assims
+    ) internal returns (uint256 shells_, int128 omega_) {
 
         (   int128 _oGLiq,
             int128 _nGLiq,

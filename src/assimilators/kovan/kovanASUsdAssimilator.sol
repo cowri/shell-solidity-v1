@@ -18,7 +18,7 @@ import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../aaveResources/ILendingPool.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-contract KovanASUsdAdapter {
+contract KovanASUsdAssimilator {
 
     address constant susd = 0xD868790F57B39C9B2B51b12de046975f986675f9;
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);

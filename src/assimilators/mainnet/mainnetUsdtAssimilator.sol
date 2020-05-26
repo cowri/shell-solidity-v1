@@ -23,7 +23,7 @@ import "../../interfaces/IAToken.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MainnetUsdtAdapter {
+contract MainnetUsdtAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

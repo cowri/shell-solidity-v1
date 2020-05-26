@@ -18,7 +18,7 @@ import "../aaveResources/ILendingPool.sol";
 import "../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../../interfaces/IAToken.sol";
 
-contract KovanUsdtAdapter {
+contract KovanUsdtAssimilator {
 
     constructor () public { }
 

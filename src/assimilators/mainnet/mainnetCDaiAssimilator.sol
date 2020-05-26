@@ -19,7 +19,7 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "../AssimilatorMath.sol";
 
-contract MainnetCDaiAdapter {
+contract MainnetCDaiAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

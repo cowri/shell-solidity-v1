@@ -16,7 +16,7 @@ pragma solidity ^0.5.0;
 
 import "../../interfaces/ICToken.sol";
 
-contract KovanCUsdcAdapter {
+contract KovanCUsdcAssimilator {
 
     constructor () public { }
 
