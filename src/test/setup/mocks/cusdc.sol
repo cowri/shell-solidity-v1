@@ -18,27 +18,36 @@ contract CUsdcMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
 
     event log_uint(bytes32, uint256);
 
-    function mint (uint256 amount) public returns (uint) {
-        uint256 balance = balanceOf(msg.sender);
-        uint256 cusdcAmount = wdiv(amount, rate);
-        emit log_uint("amount", amount);
-        emit log_uint("mul", cusdcAmount);
-        emit log_uint("div", wdiv(amount, rate));
-        _mint(msg.sender, cusdcAmount);
-        underlying.transferFrom(msg.sender, address(this), amount);
-        return cusdcAmount;
+    function mint (uint256 _amount) public returns (uint cusdcAmount_) {
+
+        uint256 _balance = balanceOf(msg.sender);
+
+        cusdcAmount_ = wdiv(_amount, rate);
+
+        _mint(msg.sender, cusdcAmount_);
+
+        underlying.transferFrom(msg.sender, address(this), _amount);
+
     }
 
-    function redeem (uint256 amount) public returns (uint) {
-        _burn(msg.sender, amount);
-        underlying.transfer(msg.sender, wmul(amount, rate));
-        return wmul(amount, rate);
+    function redeem (uint256 _amount) public returns (uint underlyingAmt_) {
+
+        _burn(msg.sender, _amount);
+
+        underlyingAmt_ = wmul(_amount, rate);
+
+        underlying.transfer(msg.sender, underlyingAmt_);
+
     }
 
     function redeemUnderlying (uint256 amount) public returns (uint) {
+
         _burn(msg.sender, wdiv(amount, rate));
+
         underlying.transfer(msg.sender, amount);
+
         return amount;
+
     }
 
     function exchangeRateStored () public returns (uint256){

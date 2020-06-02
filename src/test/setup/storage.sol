@@ -1,35 +1,45 @@
 pragma solidity ^0.5.0;
 
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20NoBool.sol";
+
+import "../../interfaces/IAssimilator.sol";
+import "../../interfaces/IAToken.sol";
+import "../../interfaces/ICToken.sol";
+import "../../interfaces/IChai.sol";
+import "../../interfaces/IPot.sol";
+
 contract StorageSetup {
 
-    address dai;
-    address chai;
-    address cdai;
+    IERC20 dai;
+    IChai chai;
+    ICToken cdai;
 
-    address usdc;
-    address cusdc;
+    IERC20 usdc;
+    ICToken cusdc;
 
-    address usdt;
-    address ausdt;
+    IERC20NoBool usdt;
+    IAToken ausdt;
 
-    address susd;
-    address asusd;
+    IERC20 susd;
+    IAToken asusd;
 
-    address pot;
+    IPot pot;
 
     address aaveLpCore;
-    address daiAssimilator;
-    address chaiAssimilator;
-    address cdaiAssimilator;
 
-    address usdcAssimilator;
-    address cusdcAssimilator;
+    IAssimilator daiAssimilator;
+    IAssimilator chaiAssimilator;
+    IAssimilator cdaiAssimilator;
 
-    address usdtAssimilator;
-    address ausdtAssimilator;
+    IAssimilator usdcAssimilator;
+    IAssimilator cusdcAssimilator;
 
-    address susdAssimilator;
-    address asusdAssimilator;
+    IAssimilator usdtAssimilator;
+    IAssimilator ausdtAssimilator;
+
+    IAssimilator susdAssimilator;
+    IAssimilator asusdAssimilator;
 
     uint256 epsilon;
     uint256 delta;
