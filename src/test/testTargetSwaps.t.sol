@@ -276,9 +276,9 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 25e18
         );
 
-        uint256 chaiOf10Numeraire = IAssimilator(chaiAssimilator).viewRawAmount(10*WAD);
+        uint256 chaiOf10Numeraire = IAssimilator(chaiAssimilator).viewRawAmount(uint(10e18).divu(1e18));
 
-        uint256 originAmount = l1.swapByTarget(
+        uint256 originAmount = l.targetSwap(
             address(susd),
             address(chai),
             chaiOf10Numeraire
@@ -335,7 +335,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 30e18
         );
 
-        uint256 originAmount = l1.targetSwap(
+        uint256 originAmount = l.targetSwap(
             address(usdt),
             address(usdc),
             5e6
@@ -354,7 +354,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 25e18
         );
 
-        uint256 originAmount = l.swapByTarget(
+        uint256 originAmount = l.targetSwap(
             address(susd),
             address(usdt),
             3.6537e6
@@ -379,7 +379,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             2.349e18
         );
 
-        uint256 numeraireOfTargetCdai = IAssimilator(cdaiAssimilator).viewNumeraireAmount(originAmount);
+        uint256 numeraireOfTargetCdai = IAssimilator(cdaiAssimilator).viewNumeraireAmount(originAmount).mulu(1e18);
 
         assertEq(numeraireOfTargetCdai, 2332615973198180868);
 
@@ -432,7 +432,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 20e18
         );
 
-        uint256 originAmount = l.swapByTarget(
+        uint256 originAmount = l.targetSwap(
             address(susd),
             address(usdt),
             20e6
@@ -470,7 +470,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 30e18
         );
 
-        ( bool success, ) = address(l).call(abi.encodeWithSeector(
+        ( bool success, ) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector,
             address(usdc),
             address(usdt),
@@ -492,8 +492,8 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 30e18
         );
 
-        (bool success, bytes memory result) = address(l1).call(abi.encodeWithSelector(
-            l.swapByTarget.selector
+        (bool success, bytes memory result) = address(l).call(abi.encodeWithSelector(
+            l.swapByTarget.selector,
             address(usdc),
             address(dai),
             31e18,
@@ -509,7 +509,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
 
         l.proportionalDeposit(300e18);
 
-        (bool success, bytes memory result) = address(l1).call(abi.encodeWithSelector(
+        (bool success, bytes memory result) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector,
             address(susd),
             address(usdt),
@@ -526,7 +526,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
 
         l.proportionalDeposit(300e18);
 
-        (bool success, bytes memory result) = address(l1).call(abi.encodeWithSelector(
+        (bool success, bytes memory result) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector, 
             address(dai),
             address(susd),
@@ -579,7 +579,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
 
         l.proportionalDeposit(300e18);
 
-        uint256 originAmount = l1.targetSwap(
+        uint256 originAmount = l.targetSwap(
             address(usdc),
             address(susd),
             31e18

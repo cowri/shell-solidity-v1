@@ -22,15 +22,15 @@ import "../../assimilators/mainnet/MainnetASUsdAssimilator.sol";
 import "../../assimilators/mainnet/MainnetUsdtAssimilator.sol";
 import "../../assimilators/mainnet/MainnetAUsdtAssimilator.sol";
 
-import "../../assimilators/local/LocalDaiAssimilator.sol";
-import "../../assimilators/local/LocalCDaiAssimilator.sol";
-import "../../assimilators/local/LocalChaiAssimilator.sol";
-import "../../assimilators/local/LocalUsdcAssimilator.sol";
-import "../../assimilators/local/LocalCUsdcAssimilator.sol";
-import "../../assimilators/local/LocalUsdtAssimilator.sol";
-import "../../assimilators/local/LocalAusdtAssimilator.sol";
-import "../../assimilators/local/LocalSUsdAssimilator.sol";
-import "../../assimilators/local/LocalASUsdAssimilator.sol";
+import "../../assimilators/local/cdaiReserves/LocalDaiToCDaiAssimilator.sol";
+import "../../assimilators/local/cdaiReserves/LocalCDaiToCDaiAssimilator.sol";
+import "../../assimilators/local/cdaiReserves/LocalChaiToCDaiAssimilator.sol";
+import "../../assimilators/local/cusdcReserves/LocalUsdcToCUsdcAssimilator.sol";
+import "../../assimilators/local/cusdcReserves/LocalCUsdcToCUsdcAssimilator.sol";
+import "../../assimilators/local/ausdtReserves/LocalUsdtToAUsdtAssimilator.sol";
+import "../../assimilators/local/ausdtReserves/LocalAUsdtToAUsdtAssimilator.sol";
+import "../../assimilators/local/asusdReserves/LocalSUsdToASUsdAssimilator.sol";
+import "../../assimilators/local/asusdReserves/LocalASUsdToASUsdAssimilator.sol";
 
 contract AssimilatorSetup is StorageSetup {
 
@@ -38,18 +38,18 @@ contract AssimilatorSetup is StorageSetup {
 
     function setupAssimilatorsLocal () public {
 
-        daiAssimilator = IAssimilator(address(new LocalDaiAssimilator(address(dai), address(cdai))));
-        cdaiAssimilator = IAssimilator(address(new LocalCDaiAssimilator(address(cdai))));
-        chaiAssimilator = IAssimilator(address(new LocalChaiAssimilator(address(dai), address(cdai), address(chai), address(pot))));
+        daiAssimilator = IAssimilator(address(new LocalDaiToCDaiAssimilator(address(dai), address(cdai))));
+        cdaiAssimilator = IAssimilator(address(new LocalCDaiToCDaiAssimilator(address(cdai))));
+        chaiAssimilator = IAssimilator(address(new LocalChaiToCDaiAssimilator(address(dai), address(cdai), address(chai), address(pot))));
 
-        usdcAssimilator = IAssimilator(address(new LocalUsdcAssimilator(address(usdc), address(cusdc))));
-        cusdcAssimilator = IAssimilator(address(new LocalCUsdcAssimilator(address(cusdc))));
+        usdcAssimilator = IAssimilator(address(new LocalUsdcToCUsdcAssimilator(address(usdc), address(cusdc))));
+        cusdcAssimilator = IAssimilator(address(new LocalCUsdcToCUsdcAssimilator(address(cusdc))));
 
-        usdtAssimilator = IAssimilator(address(new LocalUsdtAssimilator(address(usdt), address(ausdt))));
-        ausdtAssimilator = IAssimilator(address(new LocalAUsdtAssimilator(address(ausdt))));
+        usdtAssimilator = IAssimilator(address(new LocalUsdtToAUsdtAssimilator(address(usdt), address(ausdt))));
+        ausdtAssimilator = IAssimilator(address(new LocalAUsdtToAUsdtAssimilator(address(ausdt))));
 
-        susdAssimilator = IAssimilator(address(new LocalSUsdAssimilator(address(susd), address(asusd))));
-        asusdAssimilator = IAssimilator(address(new LocalASUsdAssimilator(address(asusd))));
+        susdAssimilator = IAssimilator(address(new LocalSUsdToASUsdAssimilator(address(susd), address(asusd))));
+        asusdAssimilator = IAssimilator(address(new LocalASUsdToASUsdAssimilator(address(asusd))));
 
     }
 
