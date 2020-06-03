@@ -31,9 +31,10 @@ library SafeERC20Arithmetic {
 
 library Shells {
 
-    int128 constant ZEN = 18446744073709551616000000;
+    int128 constant ONE = 0x10000000000000000;
 
     using ABDKMath64x64 for int128;
+    using ABDKMath64x64 for uint256;
 
     using Assimilators for Assimilators.Assimilator;
 
@@ -51,8 +52,9 @@ library Shells {
         int128 epsilon;
         int128 lambda;
         int128 omega;
+        int128 max;
         int128[] weights;
-        address[] numeraires;
+        Assimilators.Assimilator[] numeraires;
         Assimilators.Assimilator[] reserves;
         mapping (address => Assimilators.Assimilator) assimilators;
         mapping (address => uint256) balances;
@@ -67,89 +69,69 @@ library Shells {
     ) internal view returns (int128 psi_) {
 
         int128 _beta = shell.beta;
-        int128 _delta = shell.delta;
         int128[] memory _weights = shell.weights;
 
-        for (uint i = 0; i < _weights.length; i++) {
-            int128 _ideal = _grossLiq.mul(_weights[i]);
-            psi_ += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
-        }
+        for (uint256 i = 0; i < _bals.length; i++) {
 
-    }
+            int128 _imbalance = _bals[i]
+                .div(_weights[i].mul(_grossLiq))
+                .sub(ONE).abs();
 
-    function calculateMicroFee (
-        int128 _bal,
-        int128 _ideal,
-        int128 _beta,
-        int128 _delta
-    ) internal pure returns (int128 fee_) {
+            if (_imbalance > _beta) {
 
-        if (_bal < _ideal) {
+                int128 _margin = _imbalance - _beta;
 
-            int128 _threshold = _ideal.mul(ZEN - _beta);
+                psi_ = psi_.add(_weights[i].mul(_margin).mul(_margin));
 
-            if (_bal < _threshold) {
-                int128 _feeSection = _threshold.sub(_bal);
-                fee_ = _feeSection.div(_ideal);
-                fee_ = fee_.mul(_delta);
-                if (fee_ > 25e16) fee_ = 25e16;
-                fee_ = fee_.mul(_feeSection);
-            } else fee_ = 0;
-
-        } else {
-
-            int128 _threshold = _ideal.mul(ZEN + _beta);
-
-            if (_bal > _threshold) {
-                int128 _feeSection = _bal.sub(_threshold);
-                fee_ = _feeSection.div(_ideal);
-                fee_ = fee_.mul(_delta);
-                if (fee_ > 25e16) fee_ = 25e16;
-                fee_ = fee_.mul(_feeSection);
-            } else fee_ = 0;
+            }
 
         }
+
+        psi_ = psi_.mul(shell.delta).mul(_grossLiq);
 
     }
 
     function calculateTargetTrade (
         Shell storage shell,
         Assimilators.Assimilator[] memory assims_
-    ) internal view returns (Assimilators.Assimilator[] memory, int128 psi_) {
+    ) internal returns (Assimilators.Assimilator[] memory, int128 psi_) {
 
         (   int128 _oGLiq,
             int128 _nGLiq,
             int128[] memory _oBals,
             int128[] memory _nBals  ) = shell.getPoolData(assims_);
 
+        emit log_uint("--- old liquidity ---", _oGLiq.mulu(1e18));
+
         {
 
             int128 _lambda = shell.lambda;
             int128 _omega = shell.omega;
             uint256 _oIx = assims_[0].ix;
-            uint256 _tIx = assims_[1].ix;
 
-            for (uint8 i = 0; i < 10; i++) {
+            for (uint i = 0; i < 10; i++) {
 
                 psi_ = shell.calculateFee(_nBals, _nGLiq);
 
-                int128 _prev = _nBals[_oIx];
-                int128 _next = _nBals[_oIx] = _omega < psi_
-                    ? _nBals[_tIx] + psi_ - _omega
-                    : _nBals[_tIx] - _lambda.mul(_omega - psi_);
+                int128 _prev = assims_[0].amt;
+                int128 _next = assims_[0].amt = _omega < psi_
+                    ? ( assims_[1].amt.add(psi_.sub(_omega)) ).neg()
+                    : ( assims_[1].amt.sub(_lambda.mul(_omega.sub(psi_))) ).neg();
 
-                _nGLiq = _oGLiq + _prev - _next;
+                _nGLiq = _oGLiq.add(_prev).sub(_next);
+
+                _nBals[_oIx] = _oBals[_oIx].add(_next);
 
                 if (_prev / 1e14 == _next / 1e14) break;
 
             }
 
-            assims_[0].amt = _nBals[_oIx];
 
         }
 
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
 
+        assims_[0].amt = assims_[0].amt.mul(ONE.add(shell.epsilon));
 
         return (assims_, psi_);
 
@@ -158,7 +140,7 @@ library Shells {
     function calculateOriginTrade (
         Shell storage shell,
         Assimilators.Assimilator[] memory assims_
-    ) internal view returns (Assimilators.Assimilator[] memory, int128 psi_) {
+    ) internal returns (Assimilators.Assimilator[] memory, int128 psi_) {
 
         (   int128 _oGLiq,
             int128 _nGLiq,
@@ -166,61 +148,127 @@ library Shells {
             int128[] memory _nBals  ) = shell.getPoolData(assims_);
 
         {
-
             int128 _lambda = shell.lambda;
             int128 _omega = shell.omega;
-            uint256 _oIx = assims_[0].ix;
             uint256 _tIx = assims_[1].ix;
 
-            for (uint8 i = 0; i < 10; i++) {
+            // emit log_uint("start of iteration", gasleft());
+
+            for (uint i = 0; i < 10; i++) {
 
                 psi_ = shell.calculateFee(_nBals, _nGLiq);
 
-                int128 _prev = _nBals[_tIx];
-                int128 _next = _nBals[_tIx] = _omega < psi_
-                    ? _nBals[_oIx] + _omega - psi_
-                    : _nBals[_oIx] + _lambda.mul(_omega - psi_);
+                int128 _prev = assims_[1].amt;
+                int128 _next = assims_[1].amt = _omega < psi_
+                    ? ( assims_[0].amt + _omega - psi_ ).neg()
+                    : ( assims_[0].amt + _lambda.mul(_omega - psi_) ).neg();
 
                 _nGLiq = _oGLiq + _prev - _next;
 
+                _nBals[_tIx] = _oBals[_tIx].add(_next);
+
+                // emit log_int("_oGLiq", _oGLiq.muli(1e18));
+                // for (uint j = 0; j < _oBals.length; j++) {
+                //     emit log_int("_oBals[i]", _oBals[j].muli(1e18));
+                // }
+
+                // emit log_int("_nGLiq", _nGLiq.muli(1e18));
+                // for (uint j = 0; j < _nBals.length; j++) {
+                //     emit log_int("_nBals[i]", _nBals[j].muli(1e18));
+                // }
+
+                // emit log_int("prev", _prev.muli(1e18));
+                // emit log_int("next", _next.muli(1e18));
+
+                // emit log_uint("iteration gas", gasleft());
+                // emit log_uint("iteration number", i);
                 if (_prev / 1e14 == _next / 1e14) break;
 
             }
 
-            assims_[1].amt = _nBals[_tIx];
+            // emit log_uint("done iterations", 555);
 
+        }
+
+        emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        for (uint i = 0; i < _oBals.length; i++) {
+            emit log_int("_oBals[i]", _oBals[i].muli(1e18));
+        }
+
+        emit log_int("_nGLiq", _nGLiq.muli(1e18));
+        for (uint i = 0; i < _nBals.length; i++) {
+            emit log_int("_nBals[i]", _nBals[i].muli(1e18));
         }
 
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
 
+        assims_[1].amt = assims_[1].amt.mul(ONE.sub(shell.epsilon));
 
         return (assims_, psi_);
 
     }
 
+    event log_uint(bytes32, uint);
+    event log_uints(bytes32, uint[]);
+    event log_int(bytes32, int);
+    event log_ints(bytes32, int[]);
+    event log(bytes32);
+
     function getPoolData (
         Shell storage shell,
-        Assimilators.Assimilator[] memory _inputs
-    ) internal view returns (int128 oGLiq_, int128 nGLiq_, int128[] memory, int128[] memory) {
+        Assimilators.Assimilator[] memory _assims
+    ) internal returns (int128 oGLiq_, int128 nGLiq_, int128[] memory, int128[] memory) {
 
         int128[] memory oBals_ = new int128[](shell.reserves.length);
         int128[] memory nBals_ = new int128[](shell.reserves.length);
 
-        for (uint8 i = 0; i < _inputs.length; i++) {
-            for (uint j = 0; j < shell.reserves.length; j++) {
-                if (_inputs[i].ix == j) {
+        for (uint i = 0; i <= _assims.length; i++) {
 
-                    if (oBals_[j] == 0) {
-                        oGLiq_ += oBals_[j] = shell.reserves[j].viewNumeraireBalance();
-                        nGLiq_ += nBals_[j] = oBals_[j];
+            for (uint j = 0; j < shell.reserves.length; j++) {
+
+                if (i < _assims.length && _assims[i].ix == j) {
+
+                    if (nBals_[j] == 0) {
+
+                        int128 _bal = _assims[i].bal;
+                        nBals_[j] = oBals_[j] = _bal;
+                        oGLiq_ = oGLiq_.add(_bal);
+                        nGLiq_ = nGLiq_.add(_bal);
+
                     }
 
-                    nBals_[j] = nBals_[j].add(_inputs[i].amt);
-                    nGLiq_ = nGLiq_.add(_inputs[i].amt);
+                    int128 _amt = _assims[i].amt;
+                    oGLiq_ = oGLiq_.sub(_amt);
+                    oBals_[j] = oBals_[j].sub(_amt);
 
                     break;
+
+                } else if (nBals_[j] == 0 && oBals_[j] == 0) {
+
+                    int128 _bal = shell.reserves[j].viewNumeraireBalance();
+
+                    nBals_[j] = oBals_[j] = _bal;
+                    nGLiq_ = nGLiq_.add(_bal);
+                    oGLiq_ = oGLiq_.add(_bal);
+
                 }
+
             }
+
+        }
+
+        for (uint i = 0; i < _assims.length; i++) {
+            emit log_int("_assims[i].amt", _assims[i].amt.muli(1e18));
+        }
+
+        emit log_int("oGLiq_", oGLiq_.muli(1e18));
+        for (uint i = 0; i < oBals_.length; i++) {
+            emit log_int("oBals[i]_", oBals_[i].muli(1e18));
+        }
+
+        emit log_int("nGLiq_", nGLiq_.muli(1e18));
+        for (uint i = 0; i < nBals_.length; i++) {
+            emit log_int("nBals_[i]", nBals_[i].muli(1e18));
         }
 
         return (oGLiq_, nGLiq_, oBals_, nBals_);
@@ -232,7 +280,7 @@ library Shells {
         int128 _oGLiq,
         int128 _nGLiq,
         int128[] memory _bals
-    ) internal view returns (int128 shells_, int128 psi_) {
+    ) internal returns (int128 shells_, int128 psi_) {
 
         psi_ = shell.calculateFee(_bals, _nGLiq);
 
@@ -241,17 +289,43 @@ library Shells {
         int128 _liqDiff = _nGLiq.sub(_oGLiq);
         int128 _oUtil = _oGLiq.sub(_omega);
 
-        if (_feeDiff > 0) {
+        emit log_int("psi_ 1e6", psi_.muli(1e6));
+        emit log_int("omega_ 1e6", _omega.muli(1e6));
+        emit log_int("_nGLiq 1e6", _nGLiq.muli(1e6));
+        emit log_int("_oGLiq 1e18", _oGLiq.muli(1e18));
+        emit log_int("_liqDiff 1e6", _liqDiff.muli(1e6));
+        emit log_int("_feeDiff 1e6", _feeDiff.muli(1e6));
+        emit log_int("_oUtil", _oUtil.muli(1e6));
 
-            if (_oGLiq == 0) shells_ = _nGLiq.sub(psi_);
-            else shells_ = _liqDiff.sub(_feeDiff).div(_oGLiq.sub(_oUtil));
+        if (_feeDiff >= 0) {
+
+            emit log_uint("what", 0);
+
+            if (_oGLiq == 0) {
+                shells_ = _nGLiq.sub(psi_);
+                emit log_int("shells_", shells_.muli(1e6));
+            }
+            else shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
 
         } else {
 
             if (_oGLiq == 0) shells_ = _nGLiq.sub(psi_);
-            else shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff)).div(_oUtil);
+            else {
+
+                int128 _var = shell.lambda.mul(_feeDiff);
+                emit log_int("lambda fee diff", _var.muli(1e6));
+                _var = _liqDiff.sub(_var);
+                emit log_int("liq diff subbed", _var.muli(1e6));
+
+                shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff)).div(_oUtil);
+
+            }
 
         }
+
+        emit log_int("shells_", shells_.muli(1e6));
+
+        if ( shell.totalSupply != 0 ) shells_ = shells_.mul(shell.totalSupply.divu(1e18));
 
     }
 
@@ -271,7 +345,7 @@ library Shells {
 
         ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
 
-        shells_ = _shells.toUInt();
+        shells_ = _shells.mulu(1e18);
 
     }
 
@@ -291,7 +365,7 @@ library Shells {
 
         ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
 
-        shells_ = _shells.neg().toUInt();
+        shells_ = _shells.abs().mul(ONE.add(shell.epsilon)).mulu(1e18);
 
     }
 
@@ -301,37 +375,50 @@ library Shells {
         int128 _nGLiq,
         int128[] memory _oBals,
         int128[] memory _nBals
-    ) internal view {
+    ) internal {
 
         int128 _alpha = shell.alpha;
 
         for (uint i = 0; i < _nBals.length; i++) {
 
+            emit log_uint(" --- i --- ", i);
+
             int128 _nIdeal = _nGLiq.mul(shell.weights[i]);
+
+            emit log_int("weights[i]", shell.weights[i].muli(1e6));
+            emit log_int("_oBals[i]", _oBals[i].muli(1e6));
+            emit log_int("_nBals[i]", _nBals[i].muli(1e6));
+            emit log_int("_nIdeal", _nIdeal.muli(1e6));
 
             if (_nBals[i] > _nIdeal) {
 
-                int128 _nHalt = _nIdeal.mul(ZEN + _alpha);
+                int128 _upperAlpha = ONE.add(_alpha);
+
+                int128 _nHalt = _nIdeal.mul(_upperAlpha);
 
                 if (_nBals[i] > _nHalt){
 
-                    int128 _oHalt = _oGLiq.mul(shell.weights[i]).mul(ZEN + _alpha);
+                    int128 _oHalt = _oGLiq.mul(shell.weights[i]).mul(_upperAlpha);
 
-                    if (_oBals[i] < _oHalt) revert("upper-halt");
-                    if (_nBals[i] - _nHalt > _oBals[i] - _oHalt) revert("upper-halt");
+                    if (_oBals[i] < _oHalt) revert("Shell/upper-halt");
+                    if (_nBals[i] - _nHalt > _oBals[i] - _oHalt) revert("Shell/upper-halt");
 
                 }
 
             } else {
 
-                int128 _nHalt = _nIdeal.mul(ZEN - _alpha);
+                int128 _lowerAlpha = ONE.sub(_alpha);
+
+                int128 _nHalt = _nIdeal.mul(_lowerAlpha);
 
                 if (_nBals[i] < _nHalt){
 
-                    int128 _oHalt = _oGLiq.mul(shell.weights[i]).mul(ZEN - _alpha);
+                    emit log_uint("halt index", i);
 
-                    if (_oBals[i] < _oHalt) revert("upper-halt");
-                    if (_nHalt - _nBals[i] > _oHalt - _oBals[i]) revert("upper-halt");
+                    int128 _oHalt = _oGLiq.mul(shell.weights[i]).mul(_lowerAlpha);
+
+                    if (_oBals[i] < _oHalt) revert("Shell/lower-halt");
+                    if (_nHalt - _nBals[i] > _oHalt - _oBals[i]) revert("Shel/lower-halt");
 
                 }
             }
