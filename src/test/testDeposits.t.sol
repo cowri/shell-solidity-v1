@@ -46,7 +46,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
         emit log_named_uint("starting reserves", startingReserves);
         emit log_named_uint("starting shells", startingShells);
 
-        assertEq(newShells, 32483751922977906373);
+        assertEq(newShells, 32499999216641686631);
 
     }
 
@@ -68,10 +68,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 1e18
         );
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(newShells, 9995000591686018553);
+        assertEq(newShells, 9999998966167174500);
 
     }
 
@@ -84,7 +81,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 50e18
         );
 
-        assertEq(newShells, 374863205208333333331);
+        assertEq(newShells, 374956943424882834388);
 
     }
 
@@ -97,7 +94,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 15e18
         );
 
-        assertEq(newShells, 259841433653846153849);
+        assertEq(newShells, 259906409242241292207);
 
     }
 
@@ -118,7 +115,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
         emit log_named_uint("starting reserves", startingReserves);
         emit log_named_uint("starting shells", startingShells);
 
-        assertEq(newShells, 107785955736099867653);
+        assertEq(newShells, 107839868987150692242);
 
     }
 
@@ -140,10 +137,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 1e18
         );
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("staring shells", startingShells);
-
-        assertEq(newShells, 103751906449728113092);
+        assertEq(newShells, 103803800870238866890);
 
     }
 
@@ -162,7 +156,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
         emit log_named_uint("starting reserves", startingReserves);
         emit log_named_uint("starting shells", startingShells);
 
-        assertEq(newShells, 179611178241247451581);
+        assertEq(newShells, 179701018321068682614);
 
     }
 
@@ -185,7 +179,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
         emit log_named_uint("starting reserves", startingReserves);
         emit log_named_uint("startingShells", startingShells);
 
-        assertEq(newShells, 98959112727321870543);
+        assertEq(newShells, 99008609844270035541);
 
     }
 
@@ -207,10 +201,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 1e18
         );
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(newShells, 100958112846963763183);
+        assertEq(newShells, 101008609838582174525);
 
     }
 
@@ -276,7 +267,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
         emit log_named_uint("starting reserves", startingReserves);
         emit log_named_uint("starting shells", startingShells);
 
-        assertEq(newShells, 53991711756245652893);
+        assertEq(newShells, 54018716739832990695);
 
     }
 
@@ -296,10 +287,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 3e18
         );
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(newShells, 7935137412354349862);
+        assertEq(newShells, 7939105448732499106);
 
     }
 
@@ -312,8 +300,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 15e18
         );
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 newShells = l.deposit(
             address(dai), 12e18,
             address(usdc), 12e6,
@@ -321,10 +307,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 1e18
         );
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(newShells, 25895520576151595834);
+        assertEq(newShells, 25908472086895042433);
 
     }
 
@@ -337,17 +320,12 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 15e18
         );
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 newShells = l.deposit(
             address(dai), 9e18,
             address(usdc), 9e6
         );
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(newShells, 17893188953689663008);
+        assertEq(newShells, 17902137819144617096);
 
     }
 
@@ -397,7 +375,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
         emit log_named_uint("starting reserves", startingReserves);
         emit log_named_uint("starting shells", startingShells);
 
-        assertEq(newShells, 10001714411049177791);
+        assertEq(newShells, 10006716145229473334);
 
     }
 
@@ -419,10 +397,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 2e18
         );
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(newShells, 31991964078802255779);
+        assertEq(newShells, 32007965048728686700);
 
     }
 
@@ -434,9 +409,8 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 95e6,
             address(susd), 15e18
         );
-        
-        ( uint256 startingReserves, ) = l.totalReserves();
 
+        ( uint256 startingReserves, ) = l.totalReserves();
 
         uint256 newShells = l.deposit(
             address(dai), 5e18,
@@ -448,7 +422,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
         emit log_named_uint("starting reserves", startingReserves);
         emit log_named_uint("starting shells", startingShells);
 
-        assertEq(newShells, 16998625195108995468);
+        assertEq(newShells, 17007126629845201617);
 
     }
 
@@ -456,14 +430,9 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
 
         uint256 startingShells = l.proportionalDeposit(300e18);
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 cdaiOf36Numeraire = cdaiAssimilator.viewRawAmount(uint(36e18).divu(1e18));
 
         uint256 shellsMinted = l.deposit(address(cdai), cdaiOf36Numeraire);
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(shellsMinted, 35991000239800010000);
 
@@ -473,14 +442,9 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
 
         uint256 startingShells = l.proportionalDeposit(300e18);
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 shellsMinted = l.deposit(address(dai), 36e18);
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsMinted, 35982002130067834752);
+        assertEq(shellsMinted, 36000000233425481370);
 
     }
 
@@ -488,14 +452,9 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
 
         uint256 startingShells = l.proportionalDeposit(300e18);
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 shellsMinted = l.deposit(address(dai), 36.001e18);
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsMinted, 35982102080069924643);
+        assertEq(shellsMinted, 36001000238070333757);
 
     }
 
@@ -508,17 +467,12 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 15e18
         );
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 newShells = l.deposit(
             address(dai), 105e18,
             address(susd), 37e18
         );
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(newShells, 141932012220330711758);
+        assertEq(newShells, 142003004834841080526);
 
     }
 
@@ -538,10 +492,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 165e6
         );
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(newShells, 329778606762192660838);
+        assertEq(newShells, 329943557873174181881);
 
     }
 
@@ -582,9 +533,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 50e18
         );
 
-        
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 newShells = l.deposit(
             address(dai), 165e18,
             address(usdc), 0.0001e6,
@@ -592,10 +540,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), .5e18
         );
 
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(newShells, 330280539057168288940);
+        assertEq(newShells, 330445739346952556280);
 
     }
 
