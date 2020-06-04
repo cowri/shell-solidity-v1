@@ -28,13 +28,9 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
 
     }
 
-    event log_named_uints(bytes32, uint256[]);
-
     function testSelectiveDeposit_noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD () public {
 
         uint256 startingShells = l.proportionalDeposit(300e18);
-
-        ( uint256 startingReserves, ) = l.totalReserves();
 
         uint256 newShells = l.deposit(
             address(dai), 10e18,
@@ -42,9 +38,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 10e6,
             address(susd), 2.5e18
         );
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(newShells, 32499999216641686631);
 
@@ -58,8 +51,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 85e6,
             address(susd), 35e18
         );
-
-        ( uint256 startingReserves, ) = l.totalReserves();
 
         uint256 newShells = l.deposit(
             address(dai), 5e18,
@@ -102,18 +93,12 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
 
         uint256 startingShells = l.proportionalDeposit(300e18);
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
-
         uint256 newShells = l.deposit(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 70e6,
             address(susd), 28e18
         );
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(newShells, 107839868987150692242);
 
@@ -127,8 +112,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 100e6,
             address(susd), 23e18
         );
-
-        ( uint256 startingReserves, ) = l.totalReserves();
 
         uint256 newShells = l.deposit(
             address(dai), 1e18,
@@ -145,16 +128,11 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
 
         uint256 startingShells = l.proportionalDeposit(300e18);
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 newShells = l.deposit(
             address(dai), .001e18,
             address(usdc), 90e6,
             address(usdt), 90e6
         );
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(newShells, 179701018321068682614);
 
@@ -169,15 +147,10 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 50e18
         );
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 newShells = l.deposit(
             address(usdc), 46e6,
             address(usdt), 53e6
         );
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("startingShells", startingShells);
 
         assertEq(newShells, 99008609844270035541);
 
@@ -191,8 +164,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 90e6,
             address(susd), 50e18
         );
-
-        ( uint256 startingReserves, ) = l.totalReserves();
 
         uint256 newShells = l.deposit(
             address(dai), 1e18,
@@ -209,14 +180,9 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
 
         uint256 startingShells = l.proportionalDeposit(300e18);
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 _chaiOf36Numeraire = chaiAssimilator.viewRawAmount(uint(36e18).divu(1e18));
 
         uint256 shellsMinted = l.deposit(address(chai), _chaiOf36Numeraire);
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(shellsMinted, 35991000233367100000);
 
@@ -231,8 +197,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 15e18
         );
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 cusdcOf36Numeraire = cusdcAssimilator.viewRawAmount(uint(36e18).divu(1e18));
         uint256 asusdOf18Numeraire = asusdAssimilator.viewRawAmount(uint(18e18).divu(1e18));
 
@@ -240,9 +204,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(cusdc), cusdcOf36Numeraire,
             address(asusd), asusdOf18Numeraire
         );
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(newShells,  53991711756245652892);
 
@@ -256,16 +217,11 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 95e6,
             address(susd), 15e18
         );
-        
-        ( uint256 startingReserves, ) = l.totalReserves();
 
         uint256 newShells = l.deposit(
             address(usdc), 36e6,
             address(susd), 18e18
         );
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(newShells, 54018716739832990695);
 
@@ -279,8 +235,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 90e6,
             address(susd), 50e18
         );
-
-        ( uint256 startingReserves, ) = l.totalReserves();
 
         uint256 newShells = l.deposit(
             address(usdc), 5e6,
@@ -337,9 +291,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 145e6,
             address(susd), 50e18
         );
-        
-        ( uint256 startingReserves, ) = l.totalReserves();
-
 
         uint256 chaiOf5Numeraire = chaiAssimilator.viewRawAmount(uint(5e18).divu(1e18));
         uint256 cusdcOf5Numeraire = cusdcAssimilator.viewRawAmount(uint(5e18).divu(1e18));
@@ -348,9 +299,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(chai), chaiOf5Numeraire,
             address(cusdc), cusdcOf5Numeraire
         );
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(newShells, 10001714411049177790);
 
@@ -365,15 +313,10 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 50e18
         );
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 newShells = l.deposit(
             address(dai), 5e18,
             address(usdc), 5e6
         );
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(newShells, 10006716145229473334);
 
@@ -387,8 +330,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 90e6,
             address(susd), 50e18
         );
-        
-        ( uint256 startingReserves, ) = l.totalReserves();
 
         uint256 newShells = l.deposit(
             address(dai), 8e18,
@@ -410,17 +351,12 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 15e18
         );
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 newShells = l.deposit(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 5e6,
             address(susd), 2e18
         );
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(newShells, 17007126629845201617);
 
@@ -485,8 +421,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 50e18
         );
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 newShells = l.deposit(
             address(dai), 165e18,
             address(usdt), 165e6
@@ -505,8 +439,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(susd), 50e18
         );
 
-        ( uint256 startingReserves, ) = l.totalReserves();
-
         uint256 cdaiOf165Numeraire = cdaiAssimilator.viewRawAmount(uint(165e18).divu(1e18));
         uint256 cusdcOf0Point0001Numeraire = cusdcAssimilator.viewRawAmount(uint(0.0001e6).divu(1e6));
 
@@ -516,9 +448,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
             address(usdt), 165e6,
             address(susd), 5e18
         );
-
-        emit log_named_uint("starting reserves", startingReserves);
-        emit log_named_uint("starting shells", startingShells);
 
         assertEq(newShells, 33028053905716828894);
 
