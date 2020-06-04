@@ -24,7 +24,7 @@ contract DebugTest is Setup, DSMath, DSTest {
     function setUp() public {
 
         start();
-        l = getALoihi();
+        l = getLoihiSuiteOne();
 
     }
 

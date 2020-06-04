@@ -25,7 +25,7 @@ contract OriginSwapTest is Setup, DSMath, DSTest {
 
         start();
 
-        l = getALoihi();
+        l = getLoihiSuiteTwo();
 
     }
 
@@ -212,7 +212,7 @@ contract OriginSwapTest is Setup, DSMath, DSTest {
 
     }
 
-    function testOriginSwap_fullUpperAndLowerSlippage_unbalanced_10PctWeight_to_30PctWeight_ASUSD_CUSDC () public {
+    function testOriginSwap_fullUpperAndLowerSlippage_CUSDC_ASUSD_unbalanced_10PctWeight_to_30PctWeight_ASUSD_CUSDC () public {
 
         l.deposit(
             address(dai), 90e18,
@@ -254,7 +254,7 @@ contract OriginSwapTest is Setup, DSMath, DSTest {
 
     }
 
-    function testOriginSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight () public {
+    function testOriginSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight__ () public {
 
         l.deposit(
             address(dai), 135e18,
@@ -304,7 +304,7 @@ contract OriginSwapTest is Setup, DSMath, DSTest {
         uint256 targetAmount = l.originSwap(
             address(usdt),
             address(susd),
-            100e6
+            10e6
         );
 
         assertEq(targetAmount, 10019788191004510065);

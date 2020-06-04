@@ -24,7 +24,7 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
 
         start();
 
-        l = getALoihi();
+        l = getLoihiSuiteOne();
 
     }
 

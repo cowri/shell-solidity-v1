@@ -9,12 +9,11 @@ import "./storage.sol";
 
 contract ApproveFrom {
     function safeApprove(address _token, address _spender, uint256 _value) public;
-
 }
 
 contract LoihiSetup is StorageSetup {
 
-    function setupLoihi30_30_30_10_Local () public returns (Loihi loihi_) {
+    function setupLocalLoihiSuiteOne () public returns (Loihi loihi_) {
 
         loihi_ = new Loihi();
         includeAssimilators(loihi_);
@@ -32,7 +31,7 @@ contract LoihiSetup is StorageSetup {
 
     }
 
-    function setupLoihi30_30_30_10_RPC () public returns (Loihi loihi_) {
+    function setupRPCLoihiSuiteOne () public returns (Loihi loihi_) {
 
         loihi_ = new Loihi();
         includeAssimilators(loihi_);
@@ -40,6 +39,35 @@ contract LoihiSetup is StorageSetup {
         approveStablecoins(address(loihi_));
         interApproveStablecoinsRPC(address(loihi_));
         setLoihiParamsSetNumberOne(loihi_);
+
+    }
+
+    function setupLocalLoihiSuiteTwo () public returns (Loihi loihi_) {
+
+        loihi_ = new Loihi();
+        includeAssimilators(loihi_);
+        setNumeraireAssets30_30_30_10(loihi_);
+        approveStablecoins(address(loihi_));
+        interApproveStablecoinsLocal(address(loihi_));
+        setLoihiParamsSetNumberTwo(loihi_);
+
+        loihi_.includeTestAdapterState(
+            dai, cdai, chai, pot,
+            usdc, cusdc,
+            usdt, ausdt,
+            susd, asusd
+        );
+
+    }
+
+    function setupRPCLoihiSuiteTwo () public returns (Loihi loihi_) {
+
+        loihi_ = new Loihi();
+        includeAssimilators(loihi_);
+        setNumeraireAssets30_30_30_10(loihi_);
+        approveStablecoins(address(loihi_));
+        interApproveStablecoinsRPC(address(loihi_));
+        setLoihiParamsSetNumberTwo(loihi_);
 
     }
 
@@ -56,6 +84,18 @@ contract LoihiSetup is StorageSetup {
     }
 
     function setLoihiParamsSetNumberTwo (Loihi _loihi) public {
+
+       uint256 _alpha = .5e18;
+       uint256 _beta = .25e18;
+       uint256 _max = .05e18;
+       uint256 _epsilon = 5e14;
+       uint256 _lambda = .2e18;
+
+       _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda, 0);
+
+    }
+
+    function setLoihiParamsSetNumberThree (Loihi _loihi) public {
 
         uint256 _alpha = .5e18;
         uint256 _beta = .25e18;
@@ -135,14 +175,7 @@ contract LoihiSetup is StorageSetup {
 
     }
 
-    event log_bytes4(bytes32, bytes4);
-
     function interApproveStablecoinsRPC (address _approveFrom) public {
-
-        emit log_addr("Hello!", _approveFrom);
-        emit log_bytes4("safeApprove selector", ApproveFrom(address(0)).safeApprove.selector);
-
-        emit log_addr("this", address(this));
 
         address[] memory targets = new address[](5);
         address[] memory spenders = new address[](5);
@@ -153,24 +186,16 @@ contract LoihiSetup is StorageSetup {
         targets[4] = address(usdt); spenders[4] = aaveLpCore;
 
         for (uint i = 0; i < targets.length; i++) {
-            emit log_uint("---Hello!", i);
             ApproveFrom(_approveFrom).safeApprove(targets[i], spenders[i], uint256(0));
-            emit log_uint("---Hello!---", i);
             ApproveFrom(_approveFrom).safeApprove(targets[i], spenders[i], uint256(-1));
-            emit log_uint("Hello!---", i);
         }
 
     }
-
-    event log(bytes32);
-    event log_uint(bytes32, uint256);
-    event log_addr(bytes32, address);
 
     function approve (address token, address l) public {
         uint256 approved = IERC20(token).allowance(address(this), l);
         if (approved > 0) IERC20(token).approve(l, 0);
         IERC20(token).approve(l, uint256(-1));
-        emit log("ping");
     }
 
     function approveBad (address token, address l) public {

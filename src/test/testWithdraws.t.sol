@@ -24,7 +24,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
 
         start();
 
-        l = getALoihi();
+        l = getLoihiSuiteOne();
 
     }
 

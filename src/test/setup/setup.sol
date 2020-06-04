@@ -12,9 +12,14 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         startLocal();
     }
 
-    function getALoihi () public returns (Loihi loihi_) {
-        loihi_ = setupLoihi30_30_30_10_Local();
-        // loihi_ = setupLoihi30_30_30_10_RPC();
+    function getLoihiSuiteOne () public returns (Loihi loihi_) {
+        loihi_ = setupLocalLoihiSuiteOne();
+        // loihi_ = setupRPCLoihiSuiteOne();
+    }
+
+    function getLoihiSuiteTwo () public returns (Loihi loihi_) {
+        loihi_ = setupLocalLoihiSuiteTwo();
+        // loihi_ = setupRPCLoihiSuiteTwo();
     }
 
     function startMainnet () public {

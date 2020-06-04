@@ -25,7 +25,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
 
         start();
 
-        l = getALoihi();
+        l = getLoihiSuiteTwo();
 
     }
 
@@ -90,7 +90,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
 
     }
 
-    function testTargetSwap_partialUpperAndLowerSlippage_balanced_30PctWeight () public {
+    function testTargetSwap_partialUpperAndLowerSlippage_balanced_30PctWeight_to30PctWeight () public {
 
         l.proportionalDeposit(300e18);
 
@@ -163,7 +163,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
         uint256 originAmount = l.targetSwap(
             address(usdc),
             address(susd),
-            31e18
+            3e18
         );
 
         assertEq(originAmount, 3001500);
@@ -248,7 +248,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
 
     }
 
-    function testTargetSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight () public {
+    function testTargetSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight () public {
 
         l.deposit(
             address(dai), 135e18,
@@ -300,7 +300,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
         uint256 originAmount = l.targetSwap(
             address(susd),
             address(dai),
-            11e18
+            10e18
         );
 
         assertEq(originAmount, 9993821361386267461);
@@ -527,7 +527,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
         l.proportionalDeposit(300e18);
 
         (bool success, bytes memory result) = address(l).call(abi.encodeWithSelector(
-            l.swapByTarget.selector, 
+            l.swapByTarget.selector,
             address(dai),
             address(susd),
             21e18,
@@ -550,7 +550,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
 
         uint256 originAmount = l.targetSwap(
             address(dai),
-            address(susd), 
+            address(susd),
             3e18
         );
 
@@ -561,7 +561,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
     function testFailTargetSwap_targetGreaterThanBalance_30Pct () public {
 
         l.deposit(
-            address(dai), 46e18, 
+            address(dai), 46e18,
             address(usdc), 134e6,
             address(usdt), 75e6,
             address(susd), 45e18
