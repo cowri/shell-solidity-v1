@@ -39,9 +39,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 2.5e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 32499997860423756789);
+        assertEq(shellsBurned, 32508125216729574694);
 
     }
 
@@ -61,9 +59,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 1e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 9999999341669357397);
+        assertEq(shellsBurned, 10002499999733097916);
 
     }
 
@@ -78,9 +74,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 16e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 73136056131754670221);
+        assertEq(shellsBurned, 73154345690075849040);
 
     }
 
@@ -100,9 +94,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 1e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 94078702922653052517);
+        assertEq(shellsBurned, 94102228495008790366);
 
     }
 
@@ -117,9 +109,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 10e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 90201865540244940833);
+        assertEq(shellsBurned, 90224422906045360592);
 
     }
 
@@ -137,9 +127,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(usdt), 40e6
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 79981276744199058590);
+        assertEq(shellsBurned, 80001277060135043666);
 
     }
 
@@ -159,9 +147,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 1e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 82981376864951243388);
+        assertEq(shellsBurned, 83002127076568926436);
 
     }
 
@@ -179,9 +165,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 18e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 67991384639438932785);
+        assertEq(shellsBurned, 68008386735015754177);
 
     }
 
@@ -201,8 +185,6 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 18e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
         assertEq(shellsBurned, 67991384639438932784);
 
     }
@@ -221,9 +203,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(usdt), 5e6
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 10069672125594190772);
+        assertEq(shellsBurned, 10072190169539376480);
 
     }
 
@@ -243,9 +223,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 2e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 20085523001309582294);
+        assertEq(shellsBurned, 20090545586275051778);
 
     }
 
@@ -264,9 +242,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 2e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 10131576289851891571);
+        assertEq(shellsBurned, 10134109814565570448);
 
     }
 
@@ -287,10 +263,8 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(cusdc), cusdcOf5Numeraire
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
         assertEq(shellsBurned, 9992948093387737702);
-
+        
     }
 
     function testSelectiveWithdraw_fullIndirectLowerAntiSlippage_5DAI_5USDC_from_95DAI_95USDC_55USDT_15SUSD () public {
@@ -307,9 +281,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(usdc), 5e6
         );
 
-        emit log_named_uint("startingShells", startingShells);
-
-        assertEq(shellsBurned, 9992948093387737702);
+        assertEq(shellsBurned, 9995446955063918311);
 
     }
 
@@ -329,9 +301,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 0.2e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 10694146090744721415);
+        assertEq(shellsBurned, 10696820295674489134);
 
     }
 
@@ -351,8 +321,6 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(asusd), 2e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
         assertEq(shellsBurned, 6994286984194756641);
 
     }
@@ -371,9 +339,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 2e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 6994286984194756641);
+        assertEq(shellsBurned, 6996035991529215020);
 
     }
 
@@ -391,9 +357,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 35e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 130039163869573249706);
+        assertEq(shellsBurned, 130071681773528500889);
 
     }
 
@@ -412,9 +376,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(usdt), 74e6
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsMinted, 159105703117593955184);
+        assertEq(shellsMinted, 159145489520065366756);
 
     }
 
@@ -434,9 +396,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 0.0001e18
         );
 
-        emit log_named_uint("starting shells", startingShells);
-
-        assertEq(shellsBurned, 159105800203612160910);
+        assertEq(shellsBurned, 159145586630360938967);
 
     }
 
