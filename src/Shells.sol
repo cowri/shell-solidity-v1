@@ -42,7 +42,6 @@ library Shells {
 
     using SafeERC20Arithmetic for uint256;
 
-    event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     struct Shell {
@@ -101,8 +100,6 @@ library Shells {
             int128[] memory _oBals,
             int128[] memory _nBals  ) = shell.getPoolData(assims_);
 
-        emit log_uint("--- old liquidity ---", _oGLiq.mulu(1e18));
-
         {
 
             int128 _lambda = shell.lambda;
@@ -115,8 +112,8 @@ library Shells {
 
                 int128 _prev = assims_[0].amt;
                 int128 _next = assims_[0].amt = _omega < psi_
-                    ? ( assims_[1].amt.add(psi_.sub(_omega)) ).neg()
-                    : ( assims_[1].amt.sub(_lambda.mul(_omega.sub(psi_))) ).neg();
+                    ? ( assims_[1].amt.sub(psi_.sub(_omega)) ).neg()
+                    : ( assims_[1].amt.add(_lambda.mul(_omega.sub(psi_))) ).neg();
 
                 _nGLiq = _oGLiq.add(_prev).sub(_next);
 
@@ -152,8 +149,6 @@ library Shells {
             int128 _omega = shell.omega;
             uint256 _tIx = assims_[1].ix;
 
-            // emit log_uint("start of iteration", gasleft());
-
             for (uint i = 0; i < 10; i++) {
 
                 psi_ = shell.calculateFee(_nBals, _nGLiq);
@@ -167,37 +162,10 @@ library Shells {
 
                 _nBals[_tIx] = _oBals[_tIx].add(_next);
 
-                // emit log_int("_oGLiq", _oGLiq.muli(1e18));
-                // for (uint j = 0; j < _oBals.length; j++) {
-                //     emit log_int("_oBals[i]", _oBals[j].muli(1e18));
-                // }
-
-                // emit log_int("_nGLiq", _nGLiq.muli(1e18));
-                // for (uint j = 0; j < _nBals.length; j++) {
-                //     emit log_int("_nBals[i]", _nBals[j].muli(1e18));
-                // }
-
-                // emit log_int("prev", _prev.muli(1e18));
-                // emit log_int("next", _next.muli(1e18));
-
-                // emit log_uint("iteration gas", gasleft());
-                // emit log_uint("iteration number", i);
                 if (_prev / 1e14 == _next / 1e14) break;
 
             }
 
-            // emit log_uint("done iterations", 555);
-
-        }
-
-        emit log_int("_oGLiq", _oGLiq.muli(1e18));
-        for (uint i = 0; i < _oBals.length; i++) {
-            emit log_int("_oBals[i]", _oBals[i].muli(1e18));
-        }
-
-        emit log_int("_nGLiq", _nGLiq.muli(1e18));
-        for (uint i = 0; i < _nBals.length; i++) {
-            emit log_int("_nBals[i]", _nBals[i].muli(1e18));
         }
 
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
@@ -208,11 +176,6 @@ library Shells {
 
     }
 
-    event log_uint(bytes32, uint);
-    event log_uints(bytes32, uint[]);
-    event log_int(bytes32, int);
-    event log_ints(bytes32, int[]);
-    event log(bytes32);
 
     function getPoolData (
         Shell storage shell,
@@ -243,7 +206,7 @@ library Shells {
 
                     break;
 
-                } else if (nBals_[j] == 0 && oBals_[j] == 0) {
+                } else if (i == _assims.length && nBals_[j] == 0 && oBals_[j] == 0) {
 
                     int128 _bal = shell.reserves[j].viewNumeraireBalance();
 
@@ -255,20 +218,6 @@ library Shells {
 
             }
 
-        }
-
-        for (uint i = 0; i < _assims.length; i++) {
-            emit log_int("_assims[i].amt", _assims[i].amt.muli(1e18));
-        }
-
-        emit log_int("oGLiq_", oGLiq_.muli(1e18));
-        for (uint i = 0; i < oBals_.length; i++) {
-            emit log_int("oBals[i]_", oBals_[i].muli(1e18));
-        }
-
-        emit log_int("nGLiq_", nGLiq_.muli(1e18));
-        for (uint i = 0; i < nBals_.length; i++) {
-            emit log_int("nBals_[i]", nBals_[i].muli(1e18));
         }
 
         return (oGLiq_, nGLiq_, oBals_, nBals_);
@@ -289,41 +238,17 @@ library Shells {
         int128 _liqDiff = _nGLiq.sub(_oGLiq);
         int128 _oUtil = _oGLiq.sub(_omega);
 
-        emit log_int("psi_ 1e6", psi_.muli(1e6));
-        emit log_int("omega_ 1e6", _omega.muli(1e6));
-        emit log_int("_nGLiq 1e6", _nGLiq.muli(1e6));
-        emit log_int("_oGLiq 1e18", _oGLiq.muli(1e18));
-        emit log_int("_liqDiff 1e6", _liqDiff.muli(1e6));
-        emit log_int("_feeDiff 1e6", _feeDiff.muli(1e6));
-        emit log_int("_oUtil", _oUtil.muli(1e6));
-
         if (_feeDiff >= 0) {
 
-            emit log_uint("what", 0);
-
-            if (_oGLiq == 0) {
-                shells_ = _nGLiq.sub(psi_);
-                emit log_int("shells_", shells_.muli(1e6));
-            }
+            if (_oGLiq == 0) shells_ = _nGLiq.sub(psi_);
             else shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
 
         } else {
 
             if (_oGLiq == 0) shells_ = _nGLiq.sub(psi_);
-            else {
-
-                int128 _var = shell.lambda.mul(_feeDiff);
-                emit log_int("lambda fee diff", _var.muli(1e6));
-                _var = _liqDiff.sub(_var);
-                emit log_int("liq diff subbed", _var.muli(1e6));
-
-                shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff)).div(_oUtil);
-
-            }
+            else shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff)).div(_oUtil);
 
         }
-
-        emit log_int("shells_", shells_.muli(1e6));
 
         if ( shell.totalSupply != 0 ) shells_ = shells_.mul(shell.totalSupply.divu(1e18));
 
@@ -381,14 +306,7 @@ library Shells {
 
         for (uint i = 0; i < _nBals.length; i++) {
 
-            emit log_uint(" --- i --- ", i);
-
             int128 _nIdeal = _nGLiq.mul(shell.weights[i]);
-
-            emit log_int("weights[i]", shell.weights[i].muli(1e6));
-            emit log_int("_oBals[i]", _oBals[i].muli(1e6));
-            emit log_int("_nBals[i]", _nBals[i].muli(1e6));
-            emit log_int("_nIdeal", _nIdeal.muli(1e6));
 
             if (_nBals[i] > _nIdeal) {
 
@@ -412,8 +330,6 @@ library Shells {
                 int128 _nHalt = _nIdeal.mul(_lowerAlpha);
 
                 if (_nBals[i] < _nHalt){
-
-                    emit log_uint("halt index", i);
 
                     int128 _oHalt = _oGLiq.mul(shell.weights[i]).mul(_lowerAlpha);
 
