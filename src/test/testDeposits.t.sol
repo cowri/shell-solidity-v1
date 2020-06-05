@@ -22,8 +22,6 @@ contract SelectiveDepositTest is Setup, DSMath, DSTest {
 
     function setUp() public {
 
-        start();
-
         l = getLoihiSuiteOne();
 
     }

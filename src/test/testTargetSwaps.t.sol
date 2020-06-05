@@ -23,8 +23,6 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
 
     function setUp() public {
 
-        start();
-
         l = getLoihiSuiteTwo();
 
     }

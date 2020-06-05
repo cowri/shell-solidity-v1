@@ -13,63 +13,63 @@ contract ApproveFrom {
 
 contract LoihiSetup is StorageSetup {
 
-    function setupLocalLoihiSuiteOne () public returns (Loihi loihi_) {
+    // function setupLoihiSuiteOneLocal () public returns (Loihi loihi_) {
 
-        loihi_ = new Loihi();
-        includeAssimilators(loihi_);
-        setNumeraireAssets30_30_30_10(loihi_);
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
-        setLoihiParamsSetNumberOne(loihi_);
+    //     loihi_ = new Loihi();
+    //     includeAssimilators(loihi_);
+    //     setNumeraireAssets30_30_30_10(loihi_);
+    //     approveStablecoins(address(loihi_));
+    //     interApproveStablecoinsLocal(address(loihi_));
+    //     setLoihiParamsSetNumberOne(loihi_);
 
-        loihi_.includeTestAdapterState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
+    //     loihi_.includeTestAdapterState(
+    //         dai, cdai, chai, pot,
+    //         usdc, cusdc,
+    //         usdt, ausdt,
+    //         susd, asusd
+    //     );
 
-    }
+    // }
 
-    function setupRPCLoihiSuiteOne () public returns (Loihi loihi_) {
+    // function setupLoihiSuiteOneRPC () public returns (Loihi loihi_) {
 
-        loihi_ = new Loihi();
-        includeAssimilators(loihi_);
-        setNumeraireAssets30_30_30_10(loihi_);
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsRPC(address(loihi_));
-        setLoihiParamsSetNumberOne(loihi_);
+    //     loihi_ = new Loihi();
+    //     includeAssimilators(loihi_);
+    //     setNumeraireAssets30_30_30_10(loihi_);
+    //     approveStablecoins(address(loihi_));
+    //     interApproveStablecoinsRPC(address(loihi_));
+    //     setLoihiParamsSetNumberOne(loihi_);
 
-    }
+    // }
 
-    function setupLocalLoihiSuiteTwo () public returns (Loihi loihi_) {
+    // function setupLocalLoihiSuiteTwo () public returns (Loihi loihi_) {
 
-        loihi_ = new Loihi();
-        includeAssimilators(loihi_);
-        setNumeraireAssets30_30_30_10(loihi_);
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
-        setLoihiParamsSetNumberTwo(loihi_);
+    //     loihi_ = new Loihi();
+    //     includeAssimilators(loihi_);
+    //     setNumeraireAssets30_30_30_10(loihi_);
+    //     approveStablecoins(address(loihi_));
+    //     interApproveStablecoinsLocal(address(loihi_));
+    //     setLoihiParamsSetNumberTwo(loihi_);
 
-        loihi_.includeTestAdapterState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
+    //     loihi_.includeTestAdapterState(
+    //         dai, cdai, chai, pot,
+    //         usdc, cusdc,
+    //         usdt, ausdt,
+    //         susd, asusd
+    //     );
 
-    }
+    // }
 
-    function setupRPCLoihiSuiteTwo () public returns (Loihi loihi_) {
+    // function setupRPCLoihiSuiteTwo () public returns (Loihi loihi_) {
 
-        loihi_ = new Loihi();
-        includeAssimilators(loihi_);
-        setNumeraireAssets30_30_30_10(loihi_);
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsRPC(address(loihi_));
-        setLoihiParamsSetNumberTwo(loihi_);
+    //     loihi_ = new Loihi();
+    //     includeAssimilators(loihi_);
+    //     setNumeraireAssets30_30_30_10(loihi_);
+    //     approveStablecoins(address(loihi_));
+    //     interApproveStablecoinsRPC(address(loihi_));
+    //     setLoihiParamsSetNumberTwo(loihi_);
 
-    }
+    // }
 
     function setLoihiParamsSetNumberOne (Loihi _loihi) public {
 

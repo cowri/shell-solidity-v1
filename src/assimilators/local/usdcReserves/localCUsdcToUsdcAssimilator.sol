@@ -25,7 +25,9 @@ contract LocalCUsdcToUsdcAssimilator is LoihiRoot {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    constructor (address _cusdc) public {
+    constructor (address _usdc, address _cusdc) public {
+
+        usdc = IERC20(_usdc);
 
         cusdc = ICToken(_cusdc);
 

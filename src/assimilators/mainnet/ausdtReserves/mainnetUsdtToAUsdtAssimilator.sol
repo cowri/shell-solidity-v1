@@ -15,15 +15,15 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-import "../aaveResources/ILendingPool.sol";
+import "../../aaveResources/ILendingPool.sol";
 
-import "../aaveResources/ILendingPoolAddressesProvider.sol";
+import "../../aaveResources/ILendingPoolAddressesProvider.sol";
 
-import "../../interfaces/IAToken.sol";
+import "../../../interfaces/IAToken.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MainnetUsdtAssimilator {
+contract MainnetUsdtToAUsdtAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

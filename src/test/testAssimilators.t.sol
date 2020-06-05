@@ -59,7 +59,7 @@ contract AssimilatorTests is Setup, DSMath, DSTest {
 
     function setUp() public {
 
-        setupAssimilatorsMainnet();
+        setupAssimilatorsSetOneMainnet();
         setupStablecoinsMainnet();
         assimBouncer = new AssimilatorBouncer();
         approveStablecoins(address(assimBouncer));

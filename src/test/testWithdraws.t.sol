@@ -22,8 +22,6 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
 
     function setUp() public {
 
-        start();
-
         l = getLoihiSuiteOne();
 
     }
@@ -264,7 +262,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
         );
 
         assertEq(shellsBurned, 9992948093387737702);
-        
+
     }
 
     function testSelectiveWithdraw_fullIndirectLowerAntiSlippage_5DAI_5USDC_from_95DAI_95USDC_55USDT_15SUSD () public {
@@ -506,5 +504,29 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
         assertEq(startingShells - endingShells, 150e18);
 
     }
+
+    // function testSelectiveWithdraw_excess () public {
+
+    //     l.proportionalDeposit(300e18);
+
+    //     usdc.transfer(address(l), 110e6);
+
+    //     bool success = l.withdrawSuccess(address(usdc), 1e6);
+
+    //     assertTrue(success);
+
+    // }
+
+    // function testSelectiveWithdraw_excess_to_within_halt () public {
+
+    //     l.proportionalDeposit(300e18);
+
+    //     usdc.transfer(address(l), 110e6);
+
+    //     bool success = l.withdrawSuccess(address(usdc), 100e6);
+
+    //     assertTrue(success);
+
+    // }
 
 }

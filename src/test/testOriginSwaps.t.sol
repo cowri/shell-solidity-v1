@@ -23,8 +23,6 @@ contract OriginSwapTest is Setup, DSMath, DSTest {
 
     function setUp() public {
 
-        start();
-
         l = getLoihiSuiteTwo();
 
     }

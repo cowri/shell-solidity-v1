@@ -183,6 +183,114 @@ library LoihiMethods {
 
     }
 
+    function depositSuccess (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2,
+        address _token3,
+        uint256 _amt3,
+        address _token4,
+        uint256 _amt4
+    ) internal returns (bool success_) {
+
+        address[] memory _stblcns = new address[](4);
+        uint256[] memory _amts = new uint256[](4);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+        _stblcns[2] = _token3;
+        _amts[2] = _amt3;
+        _stblcns[3] = _token4;
+        _amts[3] = _amt4;
+
+        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
+            loihi.selectiveDeposit.selector,
+            _stblcns,
+            _amts,
+            0,
+            1e50
+        ));
+
+    }
+
+    function depositSuccess (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2,
+        address _token3,
+        uint256 _amt3
+    ) internal returns (bool success_) {
+
+        address[] memory _stblcns = new address[](3);
+        uint256[] memory _amts = new uint256[](3);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+        _stblcns[2] = _token3;
+        _amts[2] = _amt3;
+
+        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
+            loihi.selectiveDeposit.selector,
+            _stblcns,
+            _amts,
+            0,
+            1e50
+        ));
+
+    }
+
+    function depositSuccess (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2
+    ) internal returns (bool success_) {
+
+        address[] memory _stblcns = new address[](2);
+        uint256[] memory _amts = new uint256[](2);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+
+        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
+            loihi.selectiveDeposit.selector,
+            _stblcns,
+            _amts,
+            0,
+            1e50
+        ));
+
+    }
+
+    function depositSuccess (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1
+    ) internal returns (bool success_) {
+
+        address[] memory _stblcns = new address[](1);
+        uint256[] memory _amts = new uint256[](1);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+
+        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
+            loihi.selectiveDeposit.selector,
+            _stblcns,
+            _amts,
+            0,
+            1e50
+        ));
+
+    }
+
     function withdraw (
         Loihi loihi,
         address[] memory _flvrs,
@@ -276,6 +384,114 @@ library LoihiMethods {
 
     }
 
+    function withdrawSuccess (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2,
+        address _token3,
+        uint256 _amt3,
+        address _token4,
+        uint256 _amt4
+    ) internal returns (bool success_) {
+
+        address[] memory _stblcns = new address[](4);
+        uint256[] memory _amts = new uint256[](4);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+        _stblcns[2] = _token3;
+        _amts[2] = _amt3;
+        _stblcns[3] = _token4;
+        _amts[3] = _amt4;
+
+        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
+            loihi.selectiveWithdraw.selector,
+            _stblcns,
+            _amts,
+            1e50,
+            1e50
+        ));
+
+    }
+
+    function withdrawSuccess (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2,
+        address _token3,
+        uint256 _amt3
+    ) internal returns (bool success_) {
+
+        address[] memory _stblcns = new address[](3);
+        uint256[] memory _amts = new uint256[](3);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+        _stblcns[2] = _token3;
+        _amts[2] = _amt3;
+
+        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
+            loihi.selectiveWithdraw.selector,
+            _stblcns,
+            _amts,
+            1e50,
+            1e50
+        ));
+
+    }
+
+    function withdrawSuccess (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2
+    ) internal returns (bool success_) {
+
+        address[] memory _stblcns = new address[](2);
+        uint256[] memory _amts = new uint256[](2);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+
+        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
+            loihi.selectiveWithdraw.selector,
+            _stblcns,
+            _amts,
+            1e50,
+            1e50
+        ));
+
+    }
+
+    function withdrawSuccess (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1
+    ) internal returns (bool success_) {
+
+        address[] memory _stblcns = new address[](1);
+        uint256[] memory _amts = new uint256[](1);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+
+        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
+            loihi.selectiveWithdraw.selector,
+            _stblcns,
+            _amts,
+            1e50,
+            1e50
+        ));
+
+    }
+
     function originSwap (
         Loihi loihi,
         address _origin,
@@ -284,6 +500,24 @@ library LoihiMethods {
     ) internal returns (uint256 targetAmount_) {
 
         targetAmount_ = loihi.swapByOrigin(_origin, _target, _originAmount, 0, 1e50);
+
+    }
+
+    function originSwapSuccess (
+        Loihi loihi,
+        address _origin,
+        address _target,
+        uint256 _originAmount
+    ) internal returns (bool success_) {
+
+        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
+            loihi.swapByOrigin.selector,
+            _origin,
+            _target,
+            _originAmount,
+            0,
+            1e50
+        ));
 
     }
 
@@ -298,22 +532,22 @@ library LoihiMethods {
 
     }
 
-    // function calculateFee (Shell storage _shell, int128 [] memory _balances, int128 _grossLiquidity) internal view returns (int128 _psi) {
+    function targetSwapSuccess (
+        Loihi loihi,
+        address _origin,
+        address _target,
+        uint256 _targetAmount
+    ) internal returns (bool success_) {
 
-    //     for (uint256 i = 0; i < _balances.length; i++) {
+        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
+            loihi.swapByTarget.selector,
+            _origin,
+            _target,
+            1e50,
+            _targetAmount,
+            1e50
+        ));
 
-    //         int128 imbalance = _balances[i]
-    //             .div(_shell.weights[i].mul(_grossLiquidity))
-    //             .sub(2**64).abs();
-
-    //         if (imbalance > _shell.beta) {
-    //             int128 margin = imbalance.sub (_shell.beta);
-    //             _psi = _psi.add(_shell.weights[i].mul(margin).mul(margin));
-    //         }
-
-    //     }
-
-    //     return _psi.mul(_shell.delta).mul(_grossLiquidity);
-    // }
+    }
 
 }

@@ -12,16 +12,18 @@ import "../../assimilators/kovan/KovanASUsdAssimilator.sol";
 import "../../assimilators/kovan/KovanUsdtAssimilator.sol";
 import "../../assimilators/kovan/KovanAUsdtAssimilator.sol";
 
-import "../../assimilators/mainnet/MainnetDaiAssimilator.sol";
-import "../../assimilators/mainnet/MainnetCDaiAssimilator.sol";
-import "../../assimilators/mainnet/MainnetChaiAssimilator.sol";
-import "../../assimilators/mainnet/MainnetUsdcAssimilator.sol";
-import "../../assimilators/mainnet/MainnetCUsdcAssimilator.sol";
-import "../../assimilators/mainnet/MainnetSUsdAssimilator.sol";
-import "../../assimilators/mainnet/MainnetASUsdAssimilator.sol";
-import "../../assimilators/mainnet/MainnetUsdtAssimilator.sol";
-import "../../assimilators/mainnet/MainnetAUsdtAssimilator.sol";
+/* Assimilator set one - holding reserves in cDai, cUsdc, aUsdt and aSusd */
+import "../../assimilators/mainnet/cdaiReserves/MainnetDaiToCDaiAssimilator.sol";
+import "../../assimilators/mainnet/cdaiReserves/MainnetCDaiToCDaiAssimilator.sol";
+import "../../assimilators/mainnet/cdaiReserves/MainnetChaiToCDaiAssimilator.sol";
+import "../../assimilators/mainnet/cusdcReserves/MainnetUsdcToCUsdcAssimilator.sol";
+import "../../assimilators/mainnet/cusdcReserves/MainnetCUsdcToCUsdcAssimilator.sol";
+import "../../assimilators/mainnet/asusdReserves/MainnetSUsdToASUsdAssimilator.sol";
+import "../../assimilators/mainnet/asusdReserves/MainnetASUsdToASUsdAssimilator.sol";
+import "../../assimilators/mainnet/ausdtReserves/MainnetUsdtToAUsdtAssimilator.sol";
+import "../../assimilators/mainnet/ausdtReserves/MainnetAUsdtToAUsdtAssimilator.sol";
 
+/* Assimilator set one - holding reserves in cDai, cUsdc, aUsdt and aSusd */
 import "../../assimilators/local/cdaiReserves/LocalDaiToCDaiAssimilator.sol";
 import "../../assimilators/local/cdaiReserves/LocalCDaiToCDaiAssimilator.sol";
 import "../../assimilators/local/cdaiReserves/LocalChaiToCDaiAssimilator.sol";
@@ -32,11 +34,23 @@ import "../../assimilators/local/ausdtReserves/LocalAUsdtToAUsdtAssimilator.sol"
 import "../../assimilators/local/asusdReserves/LocalSUsdToASUsdAssimilator.sol";
 import "../../assimilators/local/asusdReserves/LocalASUsdToASUsdAssimilator.sol";
 
+/* Assimilator set two - staking to dai, usdc, usdt and susd */
+import "../../assimilators/local/daiReserves/LocalDaiToDaiAssimilator.sol";
+import "../../assimilators/local/daiReserves/LocalCDaiToDaiAssimilator.sol";
+import "../../assimilators/local/daiReserves/LocalChaiToDaiAssimilator.sol";
+import "../../assimilators/local/usdcReserves/LocalUsdcToUsdcAssimilator.sol";
+import "../../assimilators/local/usdcReserves/LocalCUsdcToUsdcAssimilator.sol";
+import "../../assimilators/local/usdtReserves/LocalUsdtToUsdtAssimilator.sol";
+import "../../assimilators/local/usdtReserves/LocalAUsdtToUsdtAssimilator.sol";
+import "../../assimilators/local/susdReserves/LocalSUsdToSUsdAssimilator.sol";
+import "../../assimilators/local/susdReserves/LocalASUsdToSUsdAssimilator.sol";
+
+
 contract AssimilatorSetup is StorageSetup {
 
     event log_bytes(bytes32, bytes4);
 
-    function setupAssimilatorsLocal () public {
+    function setupAssimilatorsSetOneLocal () public {
 
         daiAssimilator = IAssimilator(address(new LocalDaiToCDaiAssimilator(address(dai), address(cdai))));
         cdaiAssimilator = IAssimilator(address(new LocalCDaiToCDaiAssimilator(address(cdai))));
@@ -50,6 +64,23 @@ contract AssimilatorSetup is StorageSetup {
 
         susdAssimilator = IAssimilator(address(new LocalSUsdToASUsdAssimilator(address(susd), address(asusd))));
         asusdAssimilator = IAssimilator(address(new LocalASUsdToASUsdAssimilator(address(asusd))));
+
+    }
+
+    function steupAssimilatorSetTwoLocal () public {
+
+        daiAssimilator = IAssimilator(address(new LocalDaiToDaiAssimilator(address(dai))));
+        cdaiAssimilator = IAssimilator(address(new LocalCDaiToDaiAssimilator(address(dai), address(cdai))));
+        chaiAssimilator = IAssimilator(address(new LocalChaiToDaiAssimilator(address(dai), address(chai), address(pot))));
+
+        usdcAssimilator = IAssimilator(address(new LocalUsdcToUsdcAssimilator(address(usdc))));
+        cusdcAssimilator = IAssimilator(address(new LocalCUsdcToUsdcAssimilator(address(usdc), address(cusdc))));
+
+        usdtAssimilator = IAssimilator(address(new LocalUsdtToUsdtAssimilator(address(usdt))));
+        ausdtAssimilator = IAssimilator(address(new LocalAUsdtToUsdtAssimilator(address(usdt), address(ausdt))));
+
+        susdAssimilator = IAssimilator(address(new LocalSUsdToSUsdAssimilator(address(susd))));
+        asusdAssimilator = IAssimilator(address(new LocalASUsdToSUsdAssimilator(address(susd), address(asusd))));
 
     }
 
@@ -70,20 +101,20 @@ contract AssimilatorSetup is StorageSetup {
 
     }
 
-    function setupAssimilatorsMainnet () public {
+    function setupAssimilatorsSetOneMainnet () public {
 
-        usdcAssimilator = IAssimilator(address(new MainnetUsdcAssimilator()));
-        cusdcAssimilator = IAssimilator(address(new MainnetCUsdcAssimilator()));
+        usdcAssimilator = IAssimilator(address(new MainnetUsdcToCUsdcAssimilator()));
+        cusdcAssimilator = IAssimilator(address(new MainnetCUsdcToCUsdcAssimilator()));
 
-        daiAssimilator = IAssimilator(address(new MainnetDaiAssimilator()));
-        cdaiAssimilator = IAssimilator(address(new MainnetCDaiAssimilator()));
-        chaiAssimilator = IAssimilator(address(new MainnetChaiAssimilator()));
+        daiAssimilator = IAssimilator(address(new MainnetDaiToCDaiAssimilator()));
+        cdaiAssimilator = IAssimilator(address(new MainnetCDaiToCDaiAssimilator()));
+        chaiAssimilator = IAssimilator(address(new MainnetChaiToCDaiAssimilator()));
 
-        usdtAssimilator = IAssimilator(address(new MainnetUsdtAssimilator()));
-        ausdtAssimilator = IAssimilator(address(new MainnetAUsdtAssimilator()));
+        usdtAssimilator = IAssimilator(address(new MainnetUsdtToAUsdtAssimilator()));
+        ausdtAssimilator = IAssimilator(address(new MainnetAUsdtToAUsdtAssimilator()));
 
-        susdAssimilator = IAssimilator(address(new MainnetSUsdAssimilator()));
-        asusdAssimilator = IAssimilator(address(new MainnetASUsdAssimilator()));
+        susdAssimilator = IAssimilator(address(new MainnetSUsdToASUsdAssimilator()));
+        asusdAssimilator = IAssimilator(address(new MainnetASUsdToASUsdAssimilator()));
 
     }
 

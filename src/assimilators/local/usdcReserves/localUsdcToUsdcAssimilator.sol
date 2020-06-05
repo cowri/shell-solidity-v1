@@ -17,19 +17,14 @@ import "../../../LoihiRoot.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-import "../../../interfaces/ICToken.sol";
-// import "../../interfaces/IERC20.sol";
-
 contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    constructor (address _usdc, address _cusdc) public {
+    constructor (address _usdc) public {
 
         usdc = IERC20(_usdc);
-
-        cusdc = ICToken(_cusdc);
 
     }
 
@@ -38,15 +33,11 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
         usdc.transferFrom(msg.sender, address(this), _amount);
 
-        cusdc.mint(_amount);
+        uint256 _balance = usdc.balanceOf(address(this));
 
-        uint256 _balance = cusdc.balanceOf(address(this));
+        amount_ = _amount.divu(1e6);
 
-        uint256 _rate = cusdc.exchangeRateStored();
-
-        amount_ = ( ( ( ( _amount * 1e18 ) / _rate / 1e2 * 1e2 ) * _rate ) / 1e18 ).divu(1e6);
-
-        balance_ = ( ( ( _balance / 1e2 * 1e2 ) * _rate ) / 1e18 ).divu(1e6);
+        balance_ = _balance.divu(1e6);
 
     }
 
@@ -57,8 +48,6 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
         usdc.transferFrom(msg.sender, address(this), amount_);
 
-        cusdc.mint(amount_);
-
     }
 
     // takes raw amount of usdc, unwraps it from cusdc, transfers that out, returns numeraire amount
@@ -68,13 +57,11 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
         usdc.transfer(_dst, _amount);
 
-        uint256 _balance = cusdc.balanceOf(address(this));
-
-        uint256 _rate = cusdc.exchangeRateStored();
+        uint256 _balance = usdc.balanceOf(address(this));
 
         amount_ = _amount.divu(1e6);
 
-        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
+        balance_ = _balance.divu(1e6);
 
     }
 
@@ -82,8 +69,6 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
-
-        cusdc.redeemUnderlying(amount_);
 
         usdc.transfer(_dst, amount_);
 
@@ -104,16 +89,14 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
     }
 
     // returns numeraire amount of reserve asset, in this case cUsdc
-    function viewNumeraireBalance (address _addr) public view returns (int128 amount_) {
+    function viewNumeraireBalance (address _addr) public view returns (int128 balance_) {
 
-        uint256 _rate = cusdc.exchangeRateStored();
-
-        uint256 _balance = cusdc.balanceOf(_addr);
+        uint256 _balance = usdc.balanceOf(_addr);
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
-        amount_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
-        
+        balance_ = _balance.divu(1e6);
+
     }
 
 }

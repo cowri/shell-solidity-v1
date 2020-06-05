@@ -13,13 +13,13 @@
 
 pragma solidity ^0.5.0;
 
-import "../../interfaces/ICToken.sol";
+import "../../../interfaces/ICToken.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-import "../AssimilatorMath.sol";
+import "../../AssimilatorMath.sol";
 
-contract MainnetCDaiAssimilator {
+contract MainnetCDaiToCDaiAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
