@@ -70,8 +70,6 @@ contract LocalCUsdcToCUsdcAssimilator is LoihiRoot {
 
     }
 
-    event log_uint(bytes32, uint256);
-
     // takes raw amount
     // transfers that amount to destination
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
@@ -86,14 +84,7 @@ contract LocalCUsdcToCUsdcAssimilator is LoihiRoot {
 
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
 
-        emit log_uint("amount_", amount_.mulu(1e18));
-
         balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
-
-        emit log_uint("balance_", balance_.mulu(1e18));
-
-        emit log_uint("balance before", (_balanceBefore * _rate) / 1e6);
-
 
     }
 
@@ -101,8 +92,6 @@ contract LocalCUsdcToCUsdcAssimilator is LoihiRoot {
     function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
 
         uint256 _rate = cusdc.exchangeRateStored();
-
-        uint256 mulud = _amount.mulu(1e6);
 
         amount_ = ( ( _amount.mulu(1e6) * 1e18 ) / _rate );
 

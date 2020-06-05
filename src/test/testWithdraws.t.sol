@@ -176,7 +176,7 @@ contract SelectiveWithdrawTest is Setup, DSMath, DSTest {
             address(susd), 50e18
         );
 
-        uint256 cusdcOf50Numeraires = IAssimilator(cusdcAssimilator).viewRawAmount(uint(50e18).divu(1e18));
+        uint256 cusdcOf50Numeraires = cusdcAssimilator.viewRawAmount(uint(50e18).divu(1e18));
 
         uint256 shellsBurned = l.withdraw(
             address(cusdc), cusdcOf50Numeraires,

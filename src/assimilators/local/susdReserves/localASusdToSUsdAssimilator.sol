@@ -91,21 +91,21 @@ contract LocalASUsdToSUsdAssimilator is LoihiRoot {
     }
 
     // takes a numeraire amount and returns the raw amount
-    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e18);
 
     }
 
     // takes a raw amount and returns the numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         amount_ = _amount.divu(1e18);
 
     }
 
     // views the numeraire value of the current balance of the reserve, in this case ASUsd
-    function viewNumeraireBalance (address _addr) public view returns (int128 amount_) {
+    function viewNumeraireBalance (address _addr) public returns (int128 amount_) {
 
         uint256 _balance = susd.balanceOf(_addr);
 

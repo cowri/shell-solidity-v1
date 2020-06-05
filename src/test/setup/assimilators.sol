@@ -67,7 +67,7 @@ contract AssimilatorSetup is StorageSetup {
 
     }
 
-    function steupAssimilatorSetTwoLocal () public {
+    function setupAssimilatorsSetTwoLocal () public {
 
         daiAssimilator = IAssimilator(address(new LocalDaiToDaiAssimilator(address(dai))));
         cdaiAssimilator = IAssimilator(address(new LocalCDaiToDaiAssimilator(address(dai), address(cdai))));
