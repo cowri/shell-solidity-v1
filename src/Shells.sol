@@ -61,34 +61,61 @@ library Shells {
         uint256 totalSupply;
     }
 
+    event log_int(bytes32, int256);
+    event log_uint(bytes32, uint256);
+
     function calculateFee (
         Shell storage shell,
         int128[] memory _bals,
         int128 _grossLiq
-    ) internal view returns (int128 psi_) {
+    ) internal returns (int128 psi_) {
 
         int128 _beta = shell.beta;
+        int128 _delta = shell.delta;
         int128[] memory _weights = shell.weights;
 
-        for (uint256 i = 0; i < _bals.length; i++) {
+        for (uint i = 0; i < _weights.length; i++) {
+            int128 _ideal = _grossLiq.mul(_weights[i]);
+            psi_ += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
+        }
 
-            int128 _imbalance = _bals[i]
-                .div(_weights[i].mul(_grossLiq))
-                .sub(ONE).abs();
+    }
 
-            if (_imbalance > _beta) {
+    function calculateMicroFee (
+        int128 _bal,
+        int128 _ideal,
+        int128 _beta,
+        int128 _delta
+    ) internal returns (int128 fee_) {
 
-                int128 _margin = _imbalance - _beta;
+        if (_bal < _ideal) {
 
-                psi_ = psi_.add(_weights[i].mul(_margin).mul(_margin));
+            int128 _threshold = _ideal.mul(ONE - _beta);
 
-            }
+            if (_bal < _threshold) {
+                int128 _feeSection = _threshold.sub(_bal);
+                fee_ = _feeSection.div(_ideal);
+                fee_ = fee_.mul(_delta);
+                if (fee_ > 25e16) fee_ = 25e16;
+                fee_ = fee_.mul(_feeSection);
+            } else fee_ = 0;
+
+        } else {
+
+            int128 _threshold = _ideal.mul(ONE + _beta);
+
+            if (_bal > _threshold) {
+                int128 _feeSection = _bal.sub(_threshold);
+                fee_ = _feeSection.div(_ideal);
+                fee_ = fee_.mul(_delta);
+                if (fee_ > 25e16) fee_ = 25e16;
+                fee_ = fee_.mul(_feeSection);
+            } else fee_ = 0;
 
         }
 
-        psi_ = psi_.mul(shell.delta).mul(_grossLiq);
-
     }
+
 
     function calculateTargetTrade (
         Shell storage shell,
@@ -218,6 +245,20 @@ library Shells {
 
             }
 
+        }
+
+        for (uint i = 0; i < _assims.length; i++) {
+            emit log_int("_assis[i].amt", _assims[i].amt.muli(1e18));
+        }
+
+        emit log_uint("oGLiq_", oGLiq_.mulu(1e18));
+        for (uint i = 0; i < oBals_.length; i++) {
+            emit log_uint("oBals_[i]", oBals_[i].mulu(1e18));
+        }
+
+        emit log_uint("nGLiq_", nGLiq_.mulu(1e18));
+        for (uint i = 0; i < oBals_.length; i++) {
+            emit log_uint("nBals_[i]", nBals_[i].mulu(1e18));
         }
 
         return (oGLiq_, nGLiq_, oBals_, nBals_);
