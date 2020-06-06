@@ -25,34 +25,33 @@ contract CDaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
 
     event log_uint(bytes32, uint256);
 
-    function mint (uint256 amount) public returns (uint) {
+    function mint (uint256 amount) public returns (uint cdaiAmount_) {
 
         uint256 balance = balanceOf(msg.sender);
 
-        // uint256 cdaiAmount = amount.divu(1e18).div(rate).mulu(1e8);
-        uint256 cdaiAmount = wdiv(amount, rate);
+        cdaiAmount_ = ( amount * 1e18 ) / rate;
 
-        _mint(msg.sender, cdaiAmount);
+        _mint(msg.sender, cdaiAmount_);
 
         underlying.transferFrom(msg.sender, address(this), amount);
 
-        return cdaiAmount;
-
     }
 
-    function redeem (uint256 amount) public returns (uint) {
+    function redeem (uint256 amount) public returns (uint underlyingAmount_) {
 
         _burn(msg.sender, amount);
 
-        underlying.transfer(msg.sender, wmul(amount, rate));
+        underlyingAmount_ = ( amount * rate ) / 1e18;
 
-        return wmul(amount, rate);
+        underlying.transfer(msg.sender, underlyingAmount_);
 
     }
 
     function redeemUnderlying (uint256 amount) public returns (uint) {
 
-        _burn(msg.sender, wdiv(amount, rate));
+        uint256 _cdaiAmount = ( amount * 1e18 ) / rate;
+
+        _burn(msg.sender, _cdaiAmount);
 
         underlying.transfer(msg.sender, amount);
 
@@ -72,42 +71,14 @@ contract CDaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
 
     }
 
-    function balanceOfUnderlying (address _account) public returns (uint256) {
+    function balanceOfUnderlying (address _account) public returns (uint256 underlyingBalance_) {
 
         uint256 _balance = balanceOf(_account);
 
         if (_balance == 0) return 0;
 
-        else return wmul(_balance, rate);
+        underlyingBalance_ = ( _balance * rate ) / 1e18;
 
     }
-
-    uint constant WAD = 1e18;
-
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "ds-math-add-overflow");
-    }
-
-    function sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x);
-    }
-
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
-    }
-
-    function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), WAD) / WAD;
-    }
-
-    function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, WAD), y / 2) / y;
-    }
-
-    function wdivup(uint x, uint y) internal pure returns (uint z) {
-        // always rounds up
-        z = add(mul(x, WAD), sub(y, 1)) / y;
-    }
-
 
 }

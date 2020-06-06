@@ -50,7 +50,7 @@ contract AssimilatorSetup is StorageSetup {
 
     event log_bytes(bytes32, bytes4);
 
-    function setupAssimilatorsSetOneLocal () public {
+    function setupAssimilatorsSetTwoLocal () public {
 
         daiAssimilator = IAssimilator(address(new LocalDaiToCDaiAssimilator(address(dai), address(cdai))));
         cdaiAssimilator = IAssimilator(address(new LocalCDaiToCDaiAssimilator(address(cdai))));
@@ -67,7 +67,7 @@ contract AssimilatorSetup is StorageSetup {
 
     }
 
-    function setupAssimilatorsSetTwoLocal () public {
+    function setupAssimilatorsSetOneLocal () public {
 
         daiAssimilator = IAssimilator(address(new LocalDaiToDaiAssimilator(address(dai))));
         cdaiAssimilator = IAssimilator(address(new LocalCDaiToDaiAssimilator(address(dai), address(cdai))));

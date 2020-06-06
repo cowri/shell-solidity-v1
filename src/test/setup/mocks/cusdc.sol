@@ -20,9 +20,7 @@ contract CUsdcMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
 
     function mint (uint256 _amount) public returns (uint cusdcAmount_) {
 
-        uint256 _balance = balanceOf(msg.sender);
-
-        cusdcAmount_ = wdiv(_amount, rate);
+        cusdcAmount_ = ( _amount * 1e18 ) / rate;
 
         _mint(msg.sender, cusdcAmount_);
 
@@ -34,7 +32,7 @@ contract CUsdcMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
 
         _burn(msg.sender, _amount);
 
-        underlyingAmt_ = wmul(_amount, rate);
+        underlyingAmt_ = ( _amount * rate ) / 1e18;
 
         underlying.transfer(msg.sender, underlyingAmt_);
 
@@ -42,7 +40,9 @@ contract CUsdcMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
 
     function redeemUnderlying (uint256 amount) public returns (uint) {
 
-        _burn(msg.sender, wdiv(amount, rate));
+        uint256 _cUsdcAmount = ( amount * 1e18 ) / rate;
+
+        _burn(msg.sender, _cUsdcAmount);
 
         underlying.transfer(msg.sender, amount);
 
@@ -51,47 +51,25 @@ contract CUsdcMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
     }
 
     function exchangeRateStored () public returns (uint256){
+
         return rate;
+
     }
 
     function exchangeRateCurrent () public returns (uint256) {
+
         return rate;
+
     }
 
     function balanceOfUnderlying (address account) public returns (uint256) {
+
         uint256 balance = balanceOf(account);
+
         if (balance == 0) return 0;
-        else return wmul(balance, rate);
+
+        else return ( balance * rate ) / 1e18;
+
     }
-
-    event log_addr(bytes32, address);
-
-    uint constant WAD = 10 ** 18;
-    
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "ds-math-add-overflow");
-    }
-
-    function sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x);
-    }
-
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
-    }
-
-    function wmul(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, y), WAD) / WAD;
-    }
-
-    function wdiv(uint x, uint y) internal pure returns (uint z) {
-        z = add(mul(x, WAD), y / 2) / y;
-    }
-
-    function wdivup(uint x, uint y) internal pure returns (uint z) {
-        // always rounds up
-        z = add(mul(x, WAD), sub(y, 1)) / y;
-    }
-
 
 }

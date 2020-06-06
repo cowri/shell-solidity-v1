@@ -13,65 +13,7 @@ contract ApproveFrom {
 
 contract LoihiSetup is StorageSetup {
 
-    // function setupLoihiSuiteOneLocal () public returns (Loihi loihi_) {
-
-    //     loihi_ = new Loihi();
-    //     includeAssimilators(loihi_);
-    //     setNumeraireAssets30_30_30_10(loihi_);
-    //     approveStablecoins(address(loihi_));
-    //     interApproveStablecoinsLocal(address(loihi_));
-    //     setLoihiParamsSetNumberOne(loihi_);
-
-    //     loihi_.includeTestAdapterState(
-    //         dai, cdai, chai, pot,
-    //         usdc, cusdc,
-    //         usdt, ausdt,
-    //         susd, asusd
-    //     );
-
-    // }
-
-    // function setupLoihiSuiteOneRPC () public returns (Loihi loihi_) {
-
-    //     loihi_ = new Loihi();
-    //     includeAssimilators(loihi_);
-    //     setNumeraireAssets30_30_30_10(loihi_);
-    //     approveStablecoins(address(loihi_));
-    //     interApproveStablecoinsRPC(address(loihi_));
-    //     setLoihiParamsSetNumberOne(loihi_);
-
-    // }
-
-    // function setupLocalLoihiSuiteTwo () public returns (Loihi loihi_) {
-
-    //     loihi_ = new Loihi();
-    //     includeAssimilators(loihi_);
-    //     setNumeraireAssets30_30_30_10(loihi_);
-    //     approveStablecoins(address(loihi_));
-    //     interApproveStablecoinsLocal(address(loihi_));
-    //     setLoihiParamsSetNumberTwo(loihi_);
-
-    //     loihi_.includeTestAdapterState(
-    //         dai, cdai, chai, pot,
-    //         usdc, cusdc,
-    //         usdt, ausdt,
-    //         susd, asusd
-    //     );
-
-    // }
-
-    // function setupRPCLoihiSuiteTwo () public returns (Loihi loihi_) {
-
-    //     loihi_ = new Loihi();
-    //     includeAssimilators(loihi_);
-    //     setNumeraireAssets30_30_30_10(loihi_);
-    //     approveStablecoins(address(loihi_));
-    //     interApproveStablecoinsRPC(address(loihi_));
-    //     setLoihiParamsSetNumberTwo(loihi_);
-
-    // }
-
-    function setLoihiParamsSetNumberOne (Loihi _loihi) public {
+    function setLoihiParamsSetOne (Loihi _loihi) public {
 
         uint256 _alpha = 5e17;
         uint256 _beta = 25e16;
@@ -83,7 +25,7 @@ contract LoihiSetup is StorageSetup {
 
     }
 
-    function setLoihiParamsSetNumberTwo (Loihi _loihi) public {
+    function setLoihiParamsSetTwo (Loihi _loihi) public {
 
        uint256 _alpha = .5e18;
        uint256 _beta = .25e18;
@@ -95,7 +37,7 @@ contract LoihiSetup is StorageSetup {
 
     }
 
-    function setLoihiParamsSetNumberThree (Loihi _loihi) public {
+    function setLoihiParamsSetThree (Loihi _loihi) public {
 
         uint256 _alpha = .5e18;
         uint256 _beta = .25e18;
@@ -124,16 +66,33 @@ contract LoihiSetup is StorageSetup {
 
     }
 
-    function setNumeraireAssets30_30_30_10 (Loihi _loihi) public {
+    function setNumeraireAssetsSetOne_30_30_30_10 (Loihi _loihi) public {
 
-        _loihi.includeNumeraireAsset(address(dai), address(cdai), 3e17);
-        _loihi.includeNumeraireAsset(address(usdc), address(cusdc), 3e17);
-        _loihi.includeNumeraireAsset(address(usdt), address(ausdt), 3e17);
-        _loihi.includeNumeraireAsset(address(susd), address(asusd), 1e17);
+        _loihi.includeNumeraireAsset(address(dai), address(cdai), .3e18);
+        _loihi.includeNumeraireAsset(address(usdc), address(cusdc), .3e18);
+        _loihi.includeNumeraireAsset(address(usdt), address(ausdt), .3e18);
+        _loihi.includeNumeraireAsset(address(susd), address(asusd), .1e18);
 
     }
 
-    function setNumeraireAssets33_33_33 (Loihi _loihi) public {
+    function setNumeraireAssetsSetTwo_30_30_30_10 (Loihi _loihi) public {
+
+        _loihi.includeNumeraireAsset(address(dai), address(cdai), .3e18);
+        _loihi.includeNumeraireAsset(address(usdc), address(cusdc), .3e18);
+        _loihi.includeNumeraireAsset(address(usdt), address(ausdt), .3e18);
+        _loihi.includeNumeraireAsset(address(susd), address(asusd), .1e18);
+
+    }
+
+    function setNumeraireAssetsSetOne_33_33_33 (Loihi _loihi) public {
+
+        _loihi.includeNumeraireAsset(address(dai), address(cdai), 333333333333333333);
+        _loihi.includeNumeraireAsset(address(usdc), address(cusdc), 333333333333333333);
+        _loihi.includeNumeraireAsset(address(usdt), address(ausdt), 333333333333333333);
+
+    }
+
+    function setNumeraireAssetsSetTwo_33_33_33 (Loihi _loihi) public {
 
         _loihi.includeNumeraireAsset(address(dai), address(cdai), 333333333333333333);
         _loihi.includeNumeraireAsset(address(usdc), address(cusdc), 333333333333333333);

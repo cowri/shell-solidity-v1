@@ -26,10 +26,10 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         loihi_ = new Loihi();
 
         includeAssimilators(loihi_);
-        setNumeraireAssets30_30_30_10(loihi_);
+        setNumeraireAssetsSetOne_30_30_30_10(loihi_);
         approveStablecoins(address(loihi_));
         interApproveStablecoinsLocal(address(loihi_));
-        setLoihiParamsSetNumberOne(loihi_);
+        setLoihiParamsSetOne(loihi_);
 
         loihi_.includeTestAdapterState(
             dai, cdai, chai, pot,
@@ -48,10 +48,10 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         loihi_ = new Loihi();
 
         includeAssimilators(loihi_);
-        setNumeraireAssets30_30_30_10(loihi_);
+        setNumeraireAssetsSetOne_30_30_30_10(loihi_);
         approveStablecoins(address(loihi_));
         interApproveStablecoinsRPC(address(loihi_));
-        setLoihiParamsSetNumberOne(loihi_);
+        setLoihiParamsSetOne(loihi_);
 
     }
 
@@ -63,10 +63,10 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         loihi_ = new Loihi();
 
         includeAssimilators(loihi_);
-        setNumeraireAssets30_30_30_10(loihi_);
+        setNumeraireAssetsSetTwo_30_30_30_10(loihi_);
         approveStablecoins(address(loihi_));
         interApproveStablecoinsLocal(address(loihi_));
-        setLoihiParamsSetNumberTwo(loihi_);
+        setLoihiParamsSetTwo(loihi_);
 
         loihi_.includeTestAdapterState(
             dai, cdai, chai, pot,

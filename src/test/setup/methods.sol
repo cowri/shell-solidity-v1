@@ -13,7 +13,7 @@ library AssimilatorMethods {
 
     IAssimilator constant iAsmltr = IAssimilator(address(0));
 
-    function viewRawAmount (address _assim, uint256 _amt) internal returns (uint256 amount_) {
+    function viewRawAmount (address _assim, int128 _amt) internal returns (uint256 amount_) {
 
         // amount_ = IAssimilator(_assim.addr).viewRawAmount(_assim.amt);
 
@@ -41,7 +41,7 @@ library AssimilatorMethods {
 
     function intakeRaw (address _assim, uint256 _amount) internal returns (int128 amount_, int128 balance_) {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.intakeRaw.selector, _amount); // encoded selector of "intakeRaw(uint256)";
+        bytes memory data = abi.encodeWithSelector(iAsmltr.intakeRaw.selector, _amount);
 
         ( amount_, balance_ ) = abi.decode(_assim.delegate(data), (int128,int128));
 
