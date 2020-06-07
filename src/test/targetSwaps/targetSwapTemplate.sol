@@ -1,18 +1,15 @@
 
 pragma solidity ^0.5.0;
 
-import "ds-test/test.sol";
-import "ds-math/math.sol";
-
-import "../interfaces/IAssimilator.sol";
-
-import "./setup/setup.sol";
-
-import "./setup/methods.sol";
-
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract TargetSwapTest is Setup, DSMath, DSTest {
+import "../../interfaces/IAssimilator.sol";
+
+import "../setup/setup.sol";
+
+import "../setup/methods.sol";
+
+contract TargetSwapTemplate is Setup {
 
     using ABDKMath64x64 for uint;
     using ABDKMath64x64 for int128;
@@ -21,27 +18,19 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
 
     Loihi l;
 
-    function setUp() public {
-
-        l = getLoihiSuiteTwo();
-
-    }
-
-    function testTargetSwap_noSlippage_balanced_DAI_to_10USDC_300Proportional () public {
+    function noSlippage_balanced_DAI_to_10USDC_300Proportional () public returns (uint256 originAmount_) {
 
         l.proportionalDeposit(300e18);
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(dai),
             address(usdc),
             10e6
         );
 
-        assertEq(originAmount, 10005000625000000000);
-
     }
 
-    function testTargetSwap_noSlippage_unbalanced_USDC_to_3SUSD_with_80DAI_100USDC_85USDT_35SUSD () public {
+    function noSlippage_unbalanced_USDC_to_3SUSD_with_80DAI_100USDC_85USDT_35SUSD () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 80e18,
@@ -50,87 +39,75 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 35e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(usdc),
             address(susd),
             3e18
         );
 
-        assertEq(originAmount, 3001500);
-
     }
 
-    function testTargetSwap_noSlippage_balanced_10PctWeight_to_30PctWeight () public {
+    function noSlippage_balanced_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
         l.proportionalDeposit(300e18);
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(susd),
             address(usdt),
             4e6
         );
 
-        assertEq(originAmount, 4002000250000000000);
-
     }
 
-    function testTargetSwap_noSlippage_Balanced_10PctWeight_to_30PctWeight_AUSDT () public {
+    function noSlippage_Balanced_10PctWeight_to_30PctWeight_AUSDT () public returns (uint256 originAmount_) {
 
         l.proportionalDeposit(300e18);
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(susd),
             address(ausdt),
             4e18
         );
 
-        assertEq(originAmount, 4002000250000000000);
-
     }
 
-    function testTargetSwap_partialUpperAndLowerSlippage_balanced_30PctWeight_to30PctWeight () public {
+    function partialUpperAndLowerSlippage_balanced_30PctWeight_to30PctWeight () public returns (uint256 originAmount_) {
 
         l.proportionalDeposit(300e18);
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(usdc),
             address(dai),
             40e18
         );
 
-        assertEq(originAmount, 40722871);
-
     }
 
-    function testTargetSwap_partialUpperAndLowerSlippage_balanced_30PctWeight_to_10PctWeight () public {
+    function partialUpperAndLowerSlippage_balanced_30PctWeight_to_10PctWeight () public returns (uint256 originAmount_) {
 
         l.proportionalDeposit(300e18);
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(usdc),
             address(susd),
             12e18
         );
 
-        assertEq(originAmount, 12073660);
-
     }
 
-    function testTargetSwap_partialUpperAndLowerSLippage_balanced_30PctWeight_to_10PctWeight_ASUSD () public {
+    function partialUpperAndLowerSLippage_balanced_30PctWeight_to_10PctWeight_ASUSD () public returns (uint256 originAmount_) {
 
         l.proportionalDeposit(300e18);
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(usdc),
             address(asusd),
             12e18
         );
 
-        assertEq(originAmount, 12073660);
-
     }
 
-    function testTargetSwap_partialUpperAndLowerSlippage_unbalanced_10PctWeight_to_30PctWeight () public {
+    function partialUpperAndLowerSlippage_unbalanced_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 65e18,
@@ -139,17 +116,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 30e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(susd),
             address(dai),
             8e18
         );
 
-        assertEq(originAmount, 8082681715960427072);
-
     }
 
-    function testTargetSwap_noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight () public {
+    function noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 80e18,
@@ -158,17 +133,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 35e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(usdc),
             address(susd),
             3e18
         );
 
-        assertEq(originAmount, 3001500);
-
     }
 
-    function testTargetSwap_noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight_CUSDC () public {
+    function noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight_CUSDC () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 80e18,
@@ -183,13 +156,12 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             3e18
         );
 
-        uint256 numeraireOfTargetCusdc = IAssimilator(cusdcAssimilator).viewNumeraireAmount(originAmount).mulu(1e18);
+        originAmount_ = cusdcAssimilator.viewNumeraireAmount(originAmount).mulu(1e18);
 
-        assertEq(numeraireOfTargetCusdc, 3001500000000000000);
 
     }
 
-    function testTargetSwap_fullUpperAndLowerSlippage_unbalanced_30PctWeight () public {
+    function fullUpperAndLowerSlippage_unbalanced_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 135e18,
@@ -198,17 +170,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 30e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(dai),
             address(usdt),
             5e6
         );
 
-        assertEq(originAmount, 5361455914007417759);
-
     }
 
-    function testTargetSwap_fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight () public {
+    function fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 135e18,
@@ -217,17 +187,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 25e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(dai),
             address(susd),
             3e18
         );
 
-        assertEq(originAmount, 3130264791663764854);
-
     }
 
-    function testTargetSwap_fullUpperAndLowerSlippage_unbalanced_10PctWeight_to_30PctWeight () public {
+    function fullUpperAndLowerSlippage_unbalanced_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 90e18,
@@ -236,17 +204,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 35e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(susd),
             address(usdc),
             2.8e6
         );
 
-        assertEq(originAmount, 2909155536050677534);
-
     }
 
-    function testTargetSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight () public {
+    function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 135e18,
@@ -255,17 +221,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 30e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(usdc),
             address(dai),
             30e18
         );
 
-        assertEq(originAmount, 29929682);
-
     }
 
-    function testTargetSwap_partialUpperAndLowerAntiSlippage_unbalanced_CHAI_10PctWeight_to_30PctWeight () public {
+    function partialUpperAndLowerAntiSlippage_unbalanced_CHAI_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 135e18,
@@ -274,19 +238,17 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 25e18
         );
 
-        uint256 chaiOf10Numeraire = IAssimilator(chaiAssimilator).viewRawAmount(uint(10e18).divu(1e18));
+        uint256 chaiOf10Numeraire = chaiAssimilator.viewRawAmount(uint(10e18).divu(1e18));
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(susd),
             address(chai),
             chaiOf10Numeraire
         );
 
-        assertEq(originAmount, 9993821361386267461);
-
     }
 
-    function testTargetSwap_partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight () public {
+    function partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 135e18,
@@ -295,17 +257,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 25e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(susd),
             address(dai),
             10e18
         );
 
-        assertEq(originAmount, 9993821361386267461);
-
     }
 
-    function testTargetSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight () public {
+    function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 90e18,
@@ -314,17 +274,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 40e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(usdt),
             address(susd),
             10e18
         );
 
-        assertEq(originAmount, 9980200);
-
     }
 
-    function testTargetSwap_fullUpperAndLowerAntiSlippage_unbalanced_30PctWeight () public {
+    function fullUpperAndLowerAntiSlippage_unbalanced_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 90e18,
@@ -333,17 +291,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 30e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(usdt),
             address(usdc),
             5e6
         );
 
-        assertEq(originAmount, 4954524);
-
     }
 
-    function testTargetSwap_fullUpperAndLowerAntiSlippage_10PctOrigin_to_30PctTarget () public {
+    function fullUpperAndLowerAntiSlippage_10PctOrigin_to_30PctTarget () public returns (uint256 originAmount_) {
 
         l. deposit(
             address(dai), 90e18,
@@ -352,17 +308,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 25e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(susd),
             address(usdt),
             3.6537e6
         );
 
-        assertEq(originAmount, 3647253554589698680);
-
     }
 
-    function testTargetSwap_fullUpperAndLowerAntiSlippage_CDAI_30pct_to_10Pct () public {
+    function fullUpperAndLowerAntiSlippage_CDAI_30pct_to_10Pct () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 58e18,
@@ -377,13 +331,11 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             2.349e18
         );
 
-        uint256 numeraireOfTargetCdai = IAssimilator(cdaiAssimilator).viewNumeraireAmount(originAmount).mulu(1e18);
-
-        assertEq(numeraireOfTargetCdai, 2332615973198180868);
+        originAmount_ = cdaiAssimilator.viewNumeraireAmount(originAmount).mulu(1e18);
 
     }
 
-    function testTargetSwap_fullUpperAndLowerAntiSlippage_30Pct_To10Pct () public {
+    function fullUpperAndLowerAntiSlippage_30Pct_To10Pct () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 58e18,
@@ -392,17 +344,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 40e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(dai),
             address(susd),
             2.349e18
         );
 
-        assertEq(originAmount, 2332615973232859927);
-
     }
 
-    function testTargetSwap_megaLowerToUpperUpperToLower_30PctWeight () public {
+    function megaLowerToUpperUpperToLower_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 55e18,
@@ -411,17 +361,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 30e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(dai),
             address(usdt),
             70e6
         );
 
-        assertEq(originAmount, 70035406577130885767);
-
     }
 
-    function testTargetSwap_megaLowerToUpper_10PctWeight_to_30PctWeight () public {
+    function megaLowerToUpper_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 90e18,
@@ -430,17 +378,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 20e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(susd),
             address(usdt),
             20e6
         );
 
-        assertEq(originAmount, 20010074968656541264);
-
     }
 
-    function testTargetSwap_megaUpperToLower_30PctWeight_to_10PctWeight () public {
+    function megaUpperToLower_30PctWeight_to_10PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 80e18,
@@ -449,17 +395,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 40e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(dai),
             address(susd),
             20e18
         );
 
-        assertEq(originAmount, 20010007164941759473);
-
     }
 
-    function testTargetSwap_upperHaltCheck_30PctWeight () public {
+    function upperHaltCheck_30PctWeight () public returns (bool success_) {
 
         l.deposit(
             address(dai), 90e18,
@@ -468,7 +412,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 30e18
         );
 
-        ( bool success, ) = address(l).call(abi.encodeWithSelector(
+        ( success_, ) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector,
             address(usdc),
             address(usdt),
@@ -477,11 +421,9 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             1e50
         ));
 
-        assertTrue(!success);
-
     }
 
-    function testTargetSwap_lowerHaltCheck_30PctWeight () public {
+    function lowerHaltCheck_30PctWeight () public returns (bool success_) {
 
         l.deposit(
             address(dai), 60e18,
@@ -490,7 +432,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 30e18
         );
 
-        (bool success, bytes memory result) = address(l).call(abi.encodeWithSelector(
+        ( success_, ) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector,
             address(usdc),
             address(dai),
@@ -499,15 +441,13 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             1e50
         ));
 
-        assertTrue(!success);
-
     }
 
-    function testTargetSwap_upperHaltCheck_10PctWeight () public {
+    function upperHaltCheck_10PctWeight () public returns (bool success_) {
 
         l.proportionalDeposit(300e18);
 
-        (bool success, bytes memory result) = address(l).call(abi.encodeWithSelector(
+        ( success_, ) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector,
             address(susd),
             address(usdt),
@@ -516,15 +456,13 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             1e50
         ));
 
-        assertTrue(!success);
-
     }
 
-    function testTargetSwap_lowerhaltCheck_10PctWeight () public {
+    function lowerhaltCheck_10PctWeight () public returns (bool success_) {
 
         l.proportionalDeposit(300e18);
 
-        (bool success, bytes memory result) = address(l).call(abi.encodeWithSelector(
+        ( success_, ) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector,
             address(dai),
             address(susd),
@@ -533,11 +471,9 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             1e50
         ));
 
-        assertTrue(!success);
-
     }
 
-    function testTargetSwap_noSlippage_partiallyUnbalanced_10PctTarget () public {
+    function noSlippage_partiallyUnbalanced_10PctTarget () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 80e18,
@@ -546,17 +482,15 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 35e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        originAmount_ = l.targetSwap(
             address(dai),
             address(susd),
             3e18
         );
 
-        assertEq(originAmount, 3001500187500000000);
-
     }
 
-    function testFailTargetSwap_targetGreaterThanBalance_30Pct () public {
+    function targetGreaterThanBalance_30Pct () public {
 
         l.deposit(
             address(dai), 46e18,
@@ -565,7 +499,7 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
             address(susd), 45e18
         );
 
-        uint256 originAmount = l.targetSwap(
+        l.targetSwap(
             address(usdt),
             address(dai),
             50e18
@@ -573,11 +507,11 @@ contract TargetSwapTest is Setup, DSMath, DSTest {
 
     }
 
-    function testFailTargetSwap_targetGreaterThanBalance_10Pct () public {
+    function targetGreaterThanBalance_10Pct () public {
 
         l.proportionalDeposit(300e18);
 
-        uint256 originAmount = l.targetSwap(
+        l.targetSwap(
             address(usdc),
             address(susd),
             31e18
