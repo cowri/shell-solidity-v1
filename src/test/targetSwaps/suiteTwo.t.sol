@@ -5,7 +5,7 @@ import "ds-test/test.sol";
 
 import "./targetSwapTemplate.sol";
 
-contract TargetSwapTest is TargetSwapTemplate, DSTest {
+contract TargetSwapSuiteTwoTests is TargetSwapTemplate, DSTest {
 
     function setUp() public {
 

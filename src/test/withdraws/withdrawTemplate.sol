@@ -445,43 +445,110 @@ contract SelectiveWithdrawTemplate is Setup {
 
     }
 
-    // function smartHalt_excess_to_excess () public {
+    function smartHalt_upper_outOfBounds_to_outOfBounds () public returns (bool success_) {
 
-    //     l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18);
 
-    //     uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
+        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
-    //     emit log_named_uint("_rawCUsdc", _rawCUsdc);
+        cusdc.transfer(address(l), _rawCUsdc);
+        usdc.transfer(address(l), 110e6);
 
-    //     cusdc.transfer(address(l), _rawCUsdc);
+        success_ = l.withdrawSuccess(address(usdc), 1e6);
 
-    //     ( uint256 _totalReserves, uint256[] memory _reserves ) = l.totalReserves();
+    }
 
-    //     uint256 _totalSupply = l.totalSupply();
+    function smartHalt_upper_outOfBounds_to_inBounds () public returns (bool success_) {
 
-    //     emit log_named_uint("_totalReserves", _totalReserves);
+        l.proportionalDeposit(300e18);
 
-    //     // bool success = l.withdrawSuccess(address(usdc), 1e6);
-    //     uint256 _amount = l.withdraw(address(usdc), .000001e6);
-    //     _amount = l.withdraw(address(usdc), 1e6);
+        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
-    //     emit log_named_uint("_amount", _amount);
-    //     emit log_named_uint("_totalSupply", _totalSupply);
+        cusdc.transfer(address(l), _rawCUsdc);
+        usdc.transfer(address(l), 110e6);
 
-    //     assertTrue(success);
+        success_ = l.withdrawSuccess(address(usdc), 100e6);
 
-    // }
+    }
 
-    // function smartHalt_excess_to_within () public {
+    function smartHalt_upper_unrelated () public returns (bool success_) {
 
-    //     l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18);
 
-    //     usdc.transfer(address(l), 110e6);
+        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
-    //     bool success = l.withdrawSuccess(address(usdc), 100e6);
+        cusdc.transfer(address(l), _rawCUsdc);
+        usdc.transfer(address(l), 110e6);
 
-    //     assertTrue(success);
+        success_ = l.withdrawSuccess(address(usdt), 1e6);
 
-    // }
+    }
+
+    function smartHalt_lower_outOfBounds_exacerbated () public returns (bool success_) {
+
+        l.proportionalDeposit(67e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
+
+        cdai.transfer(address(l), _rawCDai);
+        dai.transfer(address(l), 70e18);
+
+        usdt.transfer(address(l), 70e6);
+        ausdt.transfer(address(l), 70e6);
+
+        susd.transfer(address(l), 23e18);
+        asusd.transfer(address(l), 23e18);
+
+        success_ = l.withdrawSuccess(
+            address(usdc), 1e6
+        );
+
+    }
+
+    function smartHalt_lower_outOfBounds_to_outOfBounds () public returns (bool success_) {
+
+        l.proportionalDeposit(67e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
+
+        cdai.transfer(address(l), _rawCDai);
+        dai.transfer(address(l), 70e18);
+
+        usdt.transfer(address(l), 70e6);
+        ausdt.transfer(address(l), 70e6);
+
+        susd.transfer(address(l), 23e18);
+        asusd.transfer(address(l), 23e18);
+
+        success_ = l.withdrawSuccess(
+            address(dai), 1e18,
+            address(usdt), 1e6,
+            address(susd), 1e18
+        );
+
+    }
+
+    function smartHalt_lower_outOfBounds_to_inBounds () public returns (bool success_) {
+
+        l.proportionalDeposit(67e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
+
+        cdai.transfer(address(l), _rawCDai);
+        dai.transfer(address(l), 70e18);
+
+        usdt.transfer(address(l), 70e6);
+        ausdt.transfer(address(l), 70e6);
+
+        susd.transfer(address(l), 23e18);
+        asusd.transfer(address(l), 23e18);
+
+        success_ = l.withdrawSuccess(
+            address(dai), 80e18,
+            address(usdt), 80e6,
+            address(susd), 23e18
+        );
+
+    }
 
 }

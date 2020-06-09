@@ -519,4 +519,101 @@ contract TargetSwapTemplate is Setup {
 
     }
 
+    function smartHalt_upper_outOfBounds_to_outOfBounds () public returns (bool success_) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
+
+        cusdc.transfer(address(l), _rawCUsdc);
+        usdc.transfer(address(l), 110e6);
+
+        success_ = l.targetSwapSuccess(
+            address(dai),
+            address(usdc),
+            10e6
+        );
+
+    }
+
+    function smartHalt_upper_outOfBounds_to_inBounds () public returns (bool success_) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
+
+        cusdc.transfer(address(l), _rawCUsdc);
+        usdc.transfer(address(l), 110e6);
+
+        success_ = l.targetSwapSuccess(
+            address(dai),
+            address(usdc),
+            30e6
+        );
+
+    }
+
+    function smartHalt_upper_unrelated () public returns (bool success_) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
+
+        cusdc.transfer(address(l), _rawCUsdc);
+        usdc.transfer(address(l), 110e6);
+
+        success_ = l.targetSwapSuccess(
+            address(usdt),
+            address(susd),
+            1e6
+        );
+
+    }
+
+    function smartHalt_lower () public returns (bool success_) {
+
+        l.proportionalDeposit(67e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
+
+        cdai.transfer(address(l), _rawCDai);
+        dai.transfer(address(l), 70e18);
+
+        usdt.transfer(address(l), 70e6);
+        ausdt.transfer(address(l), 70e6);
+
+        susd.transfer(address(l), 23e18);
+        asusd.transfer(address(l), 23e18);
+
+        success_ = l.targetSwapSuccess(
+            address(dai),
+            address(usdc),
+            1e6
+        );
+
+    }
+
+    function smartHalt_lower_unrelated () public returns (bool success_) {
+
+        l.proportionalDeposit(67e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
+
+        cdai.transfer(address(l), _rawCDai);
+        dai.transfer(address(l), 70e18);
+
+        usdt.transfer(address(l), 70e6);
+        ausdt.transfer(address(l), 70e6);
+
+        susd.transfer(address(l), 23e18);
+        asusd.transfer(address(l), 23e18);
+
+        success_ = l.targetSwapSuccess(
+            address(usdt),
+            address(susd),
+            1e6
+        );
+
+    }
+
 }

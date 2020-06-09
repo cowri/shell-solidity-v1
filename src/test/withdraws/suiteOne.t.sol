@@ -12,7 +12,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_balanced_10DAI_10USDC_10USDT_2p5SUSD_from_300Proportional () public {
+    function test_s1_selectiveWithdraw_balanced_10DAI_10USDC_10USDT_2p5SUSD_from_300Proportional () public {
 
         uint256 shellsBurned = super.balanced_10DAI_10USDC_10USDT_2p5SUSD_from_300Proportional();
 
@@ -20,7 +20,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_lightlyUnbalanced_5DAI_1USDC_3USDT_1SUSD_from_80DAI_100USDC_85USDT_35SUSD () public {
+    function test_s1_selectiveWithdraw_lightlyUnbalanced_5DAI_1USDC_3USDT_1SUSD_from_80DAI_100USDC_85USDT_35SUSD () public {
 
         uint256 shellsBurned = super.lightlyUnbalanced_5DAI_1USDC_3USDT_1SUSD_from_80DAI_100USDC_85USDT_35SUSD();
 
@@ -28,7 +28,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional () public {
+    function test_s1_selectiveWithdraw_partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional () public {
 
         uint256 shellsBurned = super.partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional();
 
@@ -36,7 +36,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_partialLowerSlippage_3DAI_60USDC_30USDT_1SUSD_from_80DAI_100USDC_100USDT_23SUSD () public {
+    function test_s1_selectiveWithdraw_partialLowerSlippage_3DAI_60USDC_30USDT_1SUSD_from_80DAI_100USDC_100USDT_23SUSD () public {
 
         uint256 shellsBurned = super.partialLowerSlippage_3DAI_60USDC_30USDT_1SUSD_from_80DAI_100USDC_100USDT_23SUSD();
 
@@ -44,7 +44,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_partialUpperSlippage_balanced_0p001DAI_40USDC_40USDT_10SUSD_from_300Proportional () public {
+    function test_s1_selectiveWithdraw_partialUpperSlippage_balanced_0p001DAI_40USDC_40USDT_10SUSD_from_300Proportional () public {
 
         uint256 shellsBurned = super.partialUpperSlippage_balanced_0p001DAI_40USDC_40USDT_10SUSD_from_300Proportional();
 
@@ -52,7 +52,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_partialLowerIndirectAntiSlippage_40DAI_40USDT_from_95DAI_55USDC_95USDT_15SUSD () public {
+    function test_s1_selectiveWithdraw_partialLowerIndirectAntiSlippage_40DAI_40USDT_from_95DAI_55USDC_95USDT_15SUSD () public {
 
         uint256 shellsBurned = super.partialLowerIndirectAntiSlippage_40DAI_40USDT_from_95DAI_55USDC_95USDT_15SUSD();
 
@@ -60,7 +60,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_partialLowerAntiSlippage_0p0001DAI_41USDC_41USDT_1SUSD_from_55DAI_95USDC_95USDT_15SUSD () public {
+    function test_s1_selectiveWithdraw_partialLowerAntiSlippage_0p0001DAI_41USDC_41USDT_1SUSD_from_55DAI_95USDC_95USDT_15SUSD () public {
 
         uint256 shellsBurned = super.partialLowerAntiSlippage_0p0001DAI_41USDC_41USDT_1SUSD_from_55DAI_95USDC_95USDT_15SUSD();
 
@@ -68,7 +68,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_partialUpperAntiSlippage_50USDC_18SUSD_from_90DAI_145USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveWithdraw_partialUpperAntiSlippage_50USDC_18SUSD_from_90DAI_145USDC_90USDT_50SUSD () public {
 
         uint256 shellsBurned = super.partialUpperAntiSlippage_50USDC_18SUSD_from_90DAI_145USDC_90USDT_50SUSD();
 
@@ -76,7 +76,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_partialUpperAntiSlippage_50CUSDC_18SUSD_from_90DAI_145USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveWithdraw_partialUpperAntiSlippage_50CUSDC_18SUSD_from_90DAI_145USDC_90USDT_50SUSD () public {
 
         uint256 shellsBurned = super.partialUpperAntiSlippage_50CUSDC_18SUSD_from_90DAI_145USDC_90USDT_50SUSD();
 
@@ -84,7 +84,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_fullIndirectUpperSlippage_5DAI_5USDT_from90DAI_145USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveWithdraw_fullIndirectUpperSlippage_5DAI_5USDT_from90DAI_145USDC_90USDT_50SUSD () public {
 
         uint256 shellsBurned = super.fullIndirectUpperSlippage_5DAI_5USDT_from90DAI_145USDC_90USDT_50SUSD();
 
@@ -92,7 +92,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_fullUpperSlippage_8DAI_2USDC_8USDT_2SUSD_from_90DAI_145USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveWithdraw_fullUpperSlippage_8DAI_2USDC_8USDT_2SUSD_from_90DAI_145USDC_90USDT_50SUSD () public {
 
         uint256 shellsBurned = super.fullUpperSlippage_8DAI_2USDC_8USDT_2SUSD_from_90DAI_145USDC_90USDT_50SUSD();
 
@@ -100,7 +100,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_fullLowerSlippage_1USDC_7USDT_2SUSD_from_95DAI_95USDC_55USDT_15SUSD () public {
+    function test_s1_selectiveWithdraw_fullLowerSlippage_1USDC_7USDT_2SUSD_from_95DAI_95USDC_55USDT_15SUSD () public {
 
         uint256 shellsBurned = super.fullLowerSlippage_1USDC_7USDT_2SUSD_from_95DAI_95USDC_55USDT_15SUSD();
 
@@ -108,7 +108,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_fullIndirectLowerAntiSlippage_5CHAI_5CUSDC_from_95DAI_95USDC_55USDT_15SUSD () public {
+    function test_s1_selectiveWithdraw_fullIndirectLowerAntiSlippage_5CHAI_5CUSDC_from_95DAI_95USDC_55USDT_15SUSD () public {
 
         uint256 shellsBurned = super.fullIndirectLowerAntiSlippage_5CHAI_5CUSDC_from_95DAI_95USDC_55USDT_15SUSD();
 
@@ -116,7 +116,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_fullIndirectLowerAntiSlippage_5DAI_5USDC_from_95DAI_95USDC_55USDT_15SUSD () public {
+    function test_s1_selectiveWithdraw_fullIndirectLowerAntiSlippage_5DAI_5USDC_from_95DAI_95USDC_55USDT_15SUSD () public {
 
         uint256 shellsBurned = super.fullIndirectLowerAntiSlippage_5DAI_5USDC_from_95DAI_95USDC_55USDT_15SUSD();
 
@@ -124,7 +124,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD () public {
+    function test_s1_selectiveWithdraw_fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD () public {
 
         uint256 shellsBurned = super.fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD();
 
@@ -132,7 +132,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_fullUpperAntiSlippage_5CDAI_2ASUSD_from_145DAI_90USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveWithdraw_fullUpperAntiSlippage_5CDAI_2ASUSD_from_145DAI_90USDC_90USDT_50SUSD () public {
 
         uint256 shellsBurned = super.fullUpperAntiSlippage_5CDAI_2ASUSD_from_145DAI_90USDC_90USDT_50SUSD();
 
@@ -140,7 +140,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_fullUpperAntiSlippage_5DAI_2SUSD_from_145DAI_90USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveWithdraw_fullUpperAntiSlippage_5DAI_2SUSD_from_145DAI_90USDC_90USDT_50SUSD () public {
 
         uint256 shellsBurned = super.fullUpperAntiSlippage_5DAI_2SUSD_from_145DAI_90USDC_90USDT_50SUSD();
 
@@ -148,7 +148,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_megaUpperToLower_95USDT_35SUSD_from_90DAI_90USDC_145USDT_50SUSD () public {
+    function test_s1_selectiveWithdraw_megaUpperToLower_95USDT_35SUSD_from_90DAI_90USDC_145USDT_50SUSD () public {
 
         uint256 shellsBurned = super.megaUpperToLower_95USDT_35SUSD_from_90DAI_90USDC_145USDT_50SUSD();
 
@@ -156,7 +156,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_megaIndirectLowerToUpper_11DAI_74USDC_74USDT_from_55DAI_95USDC_95USDT_15SUSD () public {
+    function test_s1_selectiveWithdraw_megaIndirectLowerToUpper_11DAI_74USDC_74USDT_from_55DAI_95USDC_95USDT_15SUSD () public {
 
         uint256 shellsMinted = super.megaIndirectLowerToUpper_11DAI_74USDC_74USDT_from_55DAI_95USDC_95USDT_15SUSD();
 
@@ -164,7 +164,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    function testSelectiveWithdraw_megaIndirectWithdrawLowerToUpper_11DAI_74USDC_74USDT_0p0001SDUSD_from_55DAI_95USDC_95USDT_15SUSD () public {
+    function test_s1_selectiveWithdraw_megaIndirectWithdrawLowerToUpper_11DAI_74USDC_74USDT_0p0001SDUSD_from_55DAI_95USDC_95USDT_15SUSD () public {
 
         uint256 shellsBurned = super.megaIndirectWithdrawLowerToUpper_11DAI_74USDC_74USDT_0p0001SDUSD_from_55DAI_95USDC_95USDT_15SUSD();
 
@@ -243,43 +243,52 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     // }
 
-    // function testSelectiveWithdraw_excess () public {
+    function test_s1_selectiveWithdraw_smartHalt_upper_outOfBounds_to_outOfBounds () public {
 
-    //     l.proportionalDeposit(300e18);
+        bool success = super.smartHalt_upper_outOfBounds_to_outOfBounds();
 
-    //     uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
+        assertTrue(success);
 
-    //     emit log_named_uint("_rawCUsdc", _rawCUsdc);
+    }
 
-    //     cusdc.transfer(address(l), _rawCUsdc);
+    function test_s1_selectiveWithdraw_smartHalt_upper_outOfBounds_to_inBounds () public {
 
-    //     ( uint256 _totalReserves, uint256[] memory _reserves ) = l.totalReserves();
+        bool success = super.smartHalt_upper_outOfBounds_to_inBounds();
 
-    //     uint256 _totalSupply = l.totalSupply();
+        assertTrue(success);
 
-    //     emit log_named_uint("_totalReserves", _totalReserves);
+    }
 
-    //     // bool success = l.withdrawSuccess(address(usdc), 1e6);
-    //     uint256 _amount = l.withdraw(address(usdc), .000001e6);
-    //     _amount = l.withdraw(address(usdc), 1e6);
+    function test_s1_selectiveWithdraw_smartHalt_upper_unrelated () public {
 
-    //     emit log_named_uint("_amount", _amount);
-    //     emit log_named_uint("_totalSupply", _totalSupply);
+        bool success = super.smartHalt_upper_unrelated();
 
-    //     // assertTrue(success);
+        assertTrue(!success);
 
-    // }
+    }
 
-    // // function testSelectiveWithdraw_excess_to_within_halt () public {
+    function test_s1_selectiveWithdraw_smartHalt_lower_outOfBounds_to_outOfBounds () public {
 
-    // //     l.proportionalDeposit(300e18);
+        bool success = super.smartHalt_lower_outOfBounds_to_outOfBounds();
 
-    // //     usdc.transfer(address(l), 110e6);
+        assertTrue(success);
 
-    // //     bool success = l.withdrawSuccess(address(usdc), 100e6);
+    }
 
-    // //     assertTrue(success);
+    function test_s1_selectiveWithdraw_smartHalt_lower_outOfBounds_to_inBounds () public {
 
-    // // }
+        bool success = super.smartHalt_lower_outOfBounds_to_inBounds();
+
+        assertTrue(success);
+
+    }
+
+    function test_s1_selectiveWithdraw_smartHalt_lower_outOfBounds_exacerbated () public {
+
+        bool success = super.smartHalt_lower_outOfBounds_exacerbated();
+
+        assertTrue(!success);
+
+    }
 
 }
