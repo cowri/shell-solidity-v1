@@ -93,11 +93,16 @@ library Shells {
             int128 _threshold = _ideal.mul(ONE - _beta);
 
             if (_bal < _threshold) {
+
                 int128 _feeSection = _threshold.sub(_bal);
+
                 fee_ = _feeSection.div(_ideal);
                 fee_ = fee_.mul(_delta);
-                if (fee_ > 25e16) fee_ = 25e16;
+
+                if (fee_ > .25e18) fee_ = .25e18;
+
                 fee_ = fee_.mul(_feeSection);
+
             } else fee_ = 0;
 
         } else {
@@ -105,11 +110,16 @@ library Shells {
             int128 _threshold = _ideal.mul(ONE + _beta);
 
             if (_bal > _threshold) {
+
                 int128 _feeSection = _bal.sub(_threshold);
+
                 fee_ = _feeSection.div(_ideal);
                 fee_ = fee_.mul(_delta);
-                if (fee_ > 25e16) fee_ = 25e16;
+
+                if (fee_ > .25e18) fee_ = .25e18;
+
                 fee_ = fee_.mul(_feeSection);
+
             } else fee_ = 0;
 
         }
@@ -142,7 +152,7 @@ library Shells {
                     ? ( assims_[1].amt.sub(psi_.sub(_omega)) ).neg()
                     : ( assims_[1].amt.add(_lambda.mul(_omega.sub(psi_))) ).neg();
 
-                _nGLiq = _oGLiq.add(_prev).sub(_next);
+                _nGLiq = _oGLiq.add(assims_[1].amt).add(_next);
 
                 _nBals[_oIx] = _oBals[_oIx].add(_next);
 
@@ -185,7 +195,7 @@ library Shells {
                     ? ( assims_[0].amt + _omega - psi_ ).neg()
                     : ( assims_[0].amt + _lambda.mul(_omega - psi_) ).neg();
 
-                _nGLiq = _oGLiq + _prev - _next;
+                _nGLiq = _oGLiq + assims_[0].amt + _next;
 
                 _nBals[_tIx] = _oBals[_tIx].add(_next);
 
@@ -245,20 +255,6 @@ library Shells {
 
             }
 
-        }
-
-        for (uint i = 0; i < _assims.length; i++) {
-            emit log_int("_assis[i].amt", _assims[i].amt.muli(1e18));
-        }
-
-        emit log_uint("oGLiq_", oGLiq_.mulu(1e18));
-        for (uint i = 0; i < oBals_.length; i++) {
-            emit log_uint("oBals_[i]", oBals_[i].mulu(1e18));
-        }
-
-        emit log_uint("nGLiq_", nGLiq_.mulu(1e18));
-        for (uint i = 0; i < oBals_.length; i++) {
-            emit log_uint("nBals_[i]", nBals_[i].mulu(1e18));
         }
 
         return (oGLiq_, nGLiq_, oBals_, nBals_);
@@ -374,7 +370,7 @@ library Shells {
 
                     int128 _oHalt = _oGLiq.mul(shell.weights[i]).mul(_lowerAlpha);
 
-                    if (_oBals[i] < _oHalt) revert("Shell/lower-halt");
+                    if (_oBals[i] > _oHalt) revert("Shell/lower-halt");
                     if (_nHalt - _nBals[i] > _oHalt - _oBals[i]) revert("Shel/lower-halt");
 
                 }
