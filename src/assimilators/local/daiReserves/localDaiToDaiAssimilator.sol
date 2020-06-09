@@ -24,6 +24,8 @@ contract LocalDaiToDaiAssimilator is LoihiRoot {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
+    event log_uint(bytes32, uint256);
+
     constructor (address _dai) public {
 
         dai = IERC20(_dai);
@@ -46,7 +48,8 @@ contract LocalDaiToDaiAssimilator is LoihiRoot {
     // transfers numeraire amount of dai in, wraps it in cDai, returns raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = _amount.mulu(1e18);
+        // truncate stray decimals caused by conversion
+        amount_ = _amount.mulu(1e18) / 1e3 * 1e3;
 
         dai.transferFrom(msg.sender, address(this), amount_);
 

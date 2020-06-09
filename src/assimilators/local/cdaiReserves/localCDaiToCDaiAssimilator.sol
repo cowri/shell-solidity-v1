@@ -54,7 +54,7 @@ contract LocalCDaiToCDaiAssimilator is LoihiRoot {
 
         uint256 _rate = cdai.exchangeRateCurrent();
 
-        amount_ = ( ( _amount.mulu(1e18) * _rate ) / 1e18 );
+        amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
         bool success = cdai.transferFrom(msg.sender, address(this), amount_);
 
@@ -84,7 +84,7 @@ contract LocalCDaiToCDaiAssimilator is LoihiRoot {
 
         uint _rate = cdai.exchangeRateCurrent();
 
-        amount_ = ( ( _amount.mulu(1e18) * 1e18 ) / _rate );
+        amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
         bool success = cdai.transfer(_dst, amount_);
 
@@ -106,7 +106,7 @@ contract LocalCDaiToCDaiAssimilator is LoihiRoot {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        amount_ = ( _amount * _rate).divu(1e18);
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
 
     }
 

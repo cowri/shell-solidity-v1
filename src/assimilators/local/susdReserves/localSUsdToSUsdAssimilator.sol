@@ -28,7 +28,6 @@ contract LocalSUsdToSUsdAssimilator is LoihiRoot {
 
     }
 
-    // takes raw amount, transfers it in, wraps it in asusd, returns numeraire amount
     function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         susd.transferFrom(msg.sender, address(this), _amount);
@@ -41,21 +40,20 @@ contract LocalSUsdToSUsdAssimilator is LoihiRoot {
 
     }
 
-    // takes numeraire amount of susd, transfers it in, wraps it in asusd, returns raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = _amount.mulu(1e18);
+        // truncate stray decimals caused by conversion
+        amount_ = _amount.mulu(1e18) / 1e3 * 1e3;
 
         susd.transferFrom(msg.sender, address(this), amount_);
 
     }
 
-    // takes raw amount, transfers to destination, returns numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         susd.transfer(_dst, _amount);
 
-        uint256 _balance = asusd.balanceOf(address(this));
+        uint256 _balance = susd.balanceOf(address(this));
 
         amount_ = _amount.divu(1e18);
 

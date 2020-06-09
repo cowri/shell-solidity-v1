@@ -28,7 +28,6 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
     }
 
-    // takes raw amount of usdc, transfers it in, wraps it in cusdc, returns numeraire amount
     function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         usdc.transferFrom(msg.sender, address(this), _amount);
@@ -41,7 +40,6 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
     }
 
-    // takes numeraire amount of usdc, calculates raw amount, transfers it in and wraps it in cusdc, returns raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
@@ -50,10 +48,7 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
     }
 
-    // takes raw amount of usdc, unwraps it from cusdc, transfers that out, returns numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
-
-        cusdc.redeemUnderlying(_amount);
 
         usdc.transfer(_dst, _amount);
 
@@ -65,7 +60,6 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
     }
 
-    // takes numeraire amount of usdc, calculates raw amount, unwraps raw amount of cusdc, transfers that out, returns raw amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
@@ -74,21 +68,18 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
     }
 
-    // takes numeraire amount, returns raw amount
     function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
 
     }
 
-    // takes raw amount, returns numeraire amount
     function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         amount_ = _amount.divu(1e6);
 
     }
 
-    // returns numeraire amount of reserve asset, in this case cUsdc
     function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
         uint256 _balance = usdc.balanceOf(_addr);
