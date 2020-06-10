@@ -551,4 +551,210 @@ contract SelectiveWithdrawTemplate is Setup {
 
     }
 
+    function monotonicity_upper_outOfBand_outOfBounds_to_inBounds_noHalt_omegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        usdt.transfer(address(l), 9910e6);
+        ausdt.transfer(address(l), 9910e6);
+
+        l.prime();
+
+        l.setTestHalts(false);
+
+        shellsBurned_ = l.withdraw(address(usdt), 9910e6);
+
+    }
+
+    function monotonicity_upper_outOfBand_outOfBounds_to_inBounds_noHalt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        usdt.transfer(address(l), 9910e6);
+        ausdt.transfer(address(l), 9910e6);
+
+        l.setTestHalts(false);
+
+        shellsBurned_ = l.withdraw(address(usdt), 9910e6);
+
+    }
+
+    function monotonicity_upper_outOfBand_outOfBounds_to_inBounds_halt_omegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        usdt.transfer(address(l), 9910e6);
+        ausdt.transfer(address(l), 9910e6);
+
+        l.prime();
+
+        shellsBurned_ = l.withdraw(address(usdt), 9910e6);
+
+    }
+
+    function monotonicity_upper_outOfBand_outOfBounds_to_inBounds_halt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        usdt.transfer(address(l), 9910e6);
+        ausdt.transfer(address(l), 9910e6);
+
+        shellsBurned_ = l.withdraw(address(usdt), 9910e6);
+
+    }
+
+    function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_noHalt_omegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        susd.transfer(address(l), 9970e18);
+        asusd.transfer(address(l), 9970e18);
+
+        l.prime();
+
+        l.setTestHalts(false);
+
+        shellsBurned_ = l.withdraw(address(susd), 1e18);
+
+    }
+
+    function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_noHalt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        susd.transfer(address(l), 9970e18);
+        asusd.transfer(address(l), 9970e18);
+
+        l.setTestHalts(false);
+
+        shellsBurned_ = l.withdraw(address(susd), 1e18);
+
+    }
+
+    function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_halt_omegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        susd.transfer(address(l), 9970e18);
+        asusd.transfer(address(l), 9970e18);
+
+        l.prime();
+
+        shellsBurned_ = l.withdraw(address(susd), 1e18);
+
+    }
+
+    function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_halt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        susd.transfer(address(l), 9970e18);
+        asusd.transfer(address(l), 9970e18);
+
+        shellsBurned_ = l.withdraw(address(susd), 1e18);
+
+    }
+
+    function monotonicity_lower_inBounds_to_outOfBounds_halt () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(30000e18);
+
+        shellsBurned_ = l.withdraw(address(dai), 8910e18);
+
+    }
+
+    function monotonicity_lower_inBounds_to_outOfBounds_noHalt () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(30000e18);
+
+        l.setTestHalts(false);
+
+        shellsBurned_ = l.withdraw(address(dai), 8910e18);
+
+    }
+
+    function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_halt_omegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
+
+        cdai.transfer(address(l), _rawCDai);
+        dai.transfer(address(l), 8910e18);
+
+        usdt.transfer(address(l), 8910e6);
+        ausdt.transfer(address(l), 8910e6);
+
+        susd.transfer(address(l), 2970e18);
+        asusd.transfer(address(l), 2970e18);
+
+        l.prime();
+
+        shellsBurned_ = l.withdraw(address(usdc), 1e6);
+
+    }
+
+    function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_halt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
+
+        cdai.transfer(address(l), _rawCDai);
+        dai.transfer(address(l), 8910e18);
+
+        usdt.transfer(address(l), 8910e6);
+        ausdt.transfer(address(l), 8910e6);
+
+        susd.transfer(address(l), 2970e18);
+        asusd.transfer(address(l), 2970e18);
+
+        shellsBurned_ = l.withdraw(address(usdc), 1e6);
+
+    }
+
+    function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_noHalt_omegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
+
+        cdai.transfer(address(l), _rawCDai);
+        dai.transfer(address(l), 8910e18);
+
+        usdt.transfer(address(l), 8910e6);
+        ausdt.transfer(address(l), 8910e6);
+
+        susd.transfer(address(l), 2970e18);
+        asusd.transfer(address(l), 2970e18);
+
+        l.prime();
+
+        l.setTestHalts(false);
+
+        shellsBurned_ = l.withdraw(address(usdc), 1e6);
+
+    }
+
+    function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_noHalt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
+
+        cdai.transfer(address(l), _rawCDai);
+        dai.transfer(address(l), 8910e18);
+
+        usdt.transfer(address(l), 8910e6);
+        ausdt.transfer(address(l), 8910e6);
+
+        susd.transfer(address(l), 2970e18);
+        asusd.transfer(address(l), 2970e18);
+
+        l.setTestHalts(false);
+
+        shellsBurned_ = l.withdraw(address(usdc), 1e6);
+
+    }
+
 }
