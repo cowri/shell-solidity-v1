@@ -14,6 +14,7 @@
 pragma solidity ^0.5.15;
 
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20NoBool.sol";
 import "./interfaces/ICToken.sol";
 import "./interfaces/IAToken.sol";
 import "./interfaces/IChai.sol";
@@ -24,7 +25,7 @@ import "./Shells.sol";
 
 contract LoihiRoot {
 
-    int128 constant ZEN = 18446744073709551616000000;
+    int128 constant ONE = 0x10000000000000000;
 
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
@@ -43,33 +44,43 @@ contract LoihiRoot {
 
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Ownable: caller is not the owner");
+        require(msg.sender == owner, "Shell/caller-is-not-owner");
         _;
     }
 
+    event log(bytes32);
+
     modifier nonReentrant() {
-        require(notEntered, "re-entered");
+        require(notEntered, "Shell/re-entered");
+        emit log("entered");
         notEntered = false;
         _;
+        emit log("exited");
         notEntered = true;
     }
 
     modifier notFrozen () {
-        require(!frozen, "swaps, selective deposits and selective withdraws have been frozen.");
+        require(!frozen, "Shell/frozen-only-allowing-proportional-withdraw");
         _;
     }
 
-    // IERC20 dai; ICToken cdai; IChai chai; IPot pot;
-    // IERC20 usdc; ICToken cusdc;
-    // IERC20 usdt; IAToken ausdt;
-    // IERC20 susd; IAToken asusd;
+    IERC20 dai; ICToken cdai; IChai chai; IPot pot;
+    IERC20 usdc; ICToken cusdc;
+    IERC20NoBool usdt; IAToken ausdt;
+    IERC20 susd; IAToken asusd;
 
-    // function includeTestAdapterState(address _dai, address _cdai, address _chai, address _pot, address _usdc, address _cusdc, address _usdt, address _ausdt, address _susd, address _asusd) public {
-    //     dai = IERC20(_dai); cdai = ICToken(_cdai); chai = IChai(_chai); pot = IPot(_pot);
-    //     usdc = IERC20(_usdc); cusdc = ICToken(_cusdc);
-    //     usdt = IERC20(_usdt); ausdt = IAToken(_ausdt);
-    //     susd = IERC20(_susd); asusd = IAToken(_asusd);
-    // }
+    function includeTestAdapterState(IERC20 _dai, ICToken _cdai, IChai _chai, IPot _pot, IERC20 _usdc, ICToken _cusdc, IERC20NoBool _usdt, IAToken _ausdt, IERC20 _susd, IAToken _asusd) public {
+        dai = _dai; cdai = _cdai; chai = _chai; pot = _pot;
+        usdc = _usdc; cusdc = _cusdc;
+        usdt = _usdt; ausdt = _ausdt;
+        susd = _susd; asusd = _asusd;
+    }
+
+    function setTestHalts (bool _testOrNotToTest) public {
+
+        shell.testHalts = _testOrNotToTest;
+
+    }
 
 
 }

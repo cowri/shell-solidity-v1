@@ -59,8 +59,10 @@ library Shells {
         mapping (address => uint256) balances;
         mapping (address => mapping (address => uint256)) allowances;
         uint256 totalSupply;
+        bool testHalts;
     }
 
+    event log(bytes32);
     event log_int(bytes32, int256);
     event log_uint(bytes32, uint256);
 
@@ -257,6 +259,14 @@ library Shells {
 
         }
 
+        for (uint i = 0; i < _assims.length; i++) emit log_int("_assims[i]", _assims[i].amt.muli(1e18));
+
+        emit log_int("oGLiq_", oGLiq_.muli(1e18));
+        for (uint i = 0; i < oBals_.length; i++) emit log_int("oBals_[i]", oBals_[i].muli(1e18));
+
+        emit log_int("nGLiq_", nGLiq_.muli(1e18));
+        for (uint i = 0; i < nBals_.length; i++) emit log_int("nBals_[i]", nBals_[i].muli(1e18));
+
         return (oGLiq_, nGLiq_, oBals_, nBals_);
 
     }
@@ -288,6 +298,8 @@ library Shells {
         }
 
         if ( shell.totalSupply != 0 ) shells_ = shells_.mul(shell.totalSupply.divu(1e18));
+
+        emit log_int("shells_", shells_.muli(1e18));
 
     }
 
@@ -339,6 +351,8 @@ library Shells {
         int128[] memory _nBals
     ) internal {
 
+        if (!shell.testHalts) return;
+
         int128 _alpha = shell.alpha;
 
         for (uint i = 0; i < _nBals.length; i++) {
@@ -376,6 +390,9 @@ library Shells {
                 }
             }
         }
+
+        emit log("passed halts");
+
     }
 
     function burn (Shell storage shell, address account, uint256 amount) internal {

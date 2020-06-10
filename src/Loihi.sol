@@ -80,6 +80,8 @@ contract Loihi is LoihiRoot {
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
 
+        shell.testHalts = true;
+
         // shell = Shell();
 
         // shell.numeraires = [ dai, usdc, usdt, susd ];
