@@ -19,7 +19,7 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 library Controller {
 
-    int128 constant ZEN = 18446744073709551616000000;
+    int128 constant ONE = 0x10000000000000000;
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -28,66 +28,75 @@ library Controller {
 
     using Shells for Shells.Shell;
 
-    function setParams (Shells.Shell storage shell, uint256 __alpha, uint256 __beta, uint256 __epsilon, uint256 __max, uint256 __lambda, uint256 __omega) internal {
+    event log(bytes32);
+    event log_int(bytes32, int128);
+    event log_int(bytes32, int);
+    event log_uint(bytes32, uint);
+    event log_addr(bytes32, address);
 
-        int128 _alpha = __alpha.fromUInt();
-        int128 _beta = __beta.fromUInt();
-        int128 _epsilon = __epsilon.fromUInt();
-        int128 _lambda = __lambda.fromUInt();
-        int128 _max = __max.fromUInt();
+    function setParams (Shells.Shell storage shell, uint256 _alpha, uint256 _beta, uint256 _max, uint256 _epsilon, uint256 _lambda, uint256 _omega) internal {
 
-        require(_alpha < ZEN && _alpha > 0, "invalid-alpha");
-        require(_beta < _alpha && _beta > 0, "invalid-beta");
-        require(_epsilon > 0 && _epsilon < 1e16, "invalid-epsilon");
+        shell.max = _max.divu(1e18);
 
-        require(_max < ZEN.div(uint256(2).fromUInt()), "invalid-max-fee");
+        shell.alpha = _alpha.divu(1e18);
 
+        shell.beta = _beta.divu(1e18);
+        shell.delta = shell.max.div(uint256(2).fromUInt().mul(shell.alpha.sub(shell.beta)));
+        shell.epsilon = _epsilon.divu(1e18);
+        shell.lambda = _lambda.divu(1e18);
+
+        require(shell.alpha < ONE && shell.alpha > 0, "Shell/parameter-invalid-alpha");
+        require(shell.beta < shell.alpha && shell.beta > 0, "Shell/parameter-invalid-beta");
+        require(shell.epsilon > 0 && _epsilon < 1e16, "Shell/parameter-invalid-epsilon");
+
+        require(shell.max <= ONE.div(uint256(2).fromUInt()), "Shell/parameter-invalid-max-fee");
+
+        // emit log_uint("shell.weights.length", shell.weights.length);
         // int128 _totalBalance;
-        // for (uint i = 0; i > shell.weights.length; i++) {
+        // for (uint i = 0; i < shell.weights.length; i++) {
         //     _totalBalance += shell.reserves[i].viewNumeraireBalance();
         // }
 
-        // shell.alpha = _alpha;
-        // shell.beta = _beta;
-        // shell.delta = wdiv(_maxFee, wmul(2e18, sub(_alpha, _beta)));
-        // shell.epsilon = _epsilon;
-        // shell.lambda = _lambda;
-        // shell.max = _max;
-
-        // shell.omega = 0;
-        // for (uint i = 0; i < shell.weights.length; i++) {
-        //     uint256 _ideal = somul(_totalBalance, shell.weights[i]);
-        //     uint256 _balance = shell.reserves[i].viewNumeraireBalance();
-        //     require(bal > wmul(_ideal, WAD - _alpha), "parameter-set-lower-halt-check");
-        //     require(bal < wmul(_ideal, WAD + _alpha), "parameter-set-upper-halt-check");
-        //     require(1 > somul(shell.weights[i], WAD + _alpha), "alpha-check-failed");
-        //     shell.omega += makeFee(shell, _balance, _ideal);
-        // }
-
-    }
-
-    function includeNumeraireAsset (Shells.Shell storage shell, address _numeraire, address _reserve, uint256 _weight) internal {
-
-        shell.numeraires.push(_numeraire);
-
-        shell.reserves.push(Assimilators.Assimilator(_reserve, shell.reserves.length, 0));
-
-        shell.weights.push(_weight.fromUInt().div(ZEN));
-
-    }
-
-    function includeAssimilator (Shells.Shell storage shell, address _derivative, address _assimilator, address _reserve) internal {
-
-        for (uint8 i = 0; i < shell.reserves.length; i++) {
-
-            if (shell.reserves[i].addr == _reserve) {
-
-                shell.assimilators[_derivative] = Assimilators.Assimilator(_assimilator, i, 0);
-                break;
-
-            }
-
+        shell.omega = 0;
+        for (uint i = 0; i < shell.weights.length; i++) {
+            // int128 _ideal = _totalBalance.mul(shell.weights[i]);
+            // int128 _bal = shell.reserves[i].viewNumeraireBalance();
+            // require(_bal > _ideal.mul(ONE.sub(shell.alpha)), "Shell/parameter-lower-halt-check");
+            // require(_bal < _ideal.mul(ONE.add(shell.alpha)), "Shell/parameter-upper-halt-check");
+            // require(ONE > shell.weights[i].mul(ONE.add(shell.alpha)), "Shell/parameter-alpha-check-failed");
+            // shell.omega += Shells.calculateMicroFee(_bal, _ideal, shell.beta, shell.delta);
         }
+
+    }
+
+    function includeAsset (Shells.Shell storage shell, address _numeraire, address _numeraireAssim, address _reserve, address _reserveAssim, uint256 _weight) internal {
+
+        Assimilators.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
+
+        _numeraireAssimilator.addr = _numeraireAssim;
+
+        _numeraireAssimilator.ix = shell.numeraires.length;
+
+        shell.numeraires.push(_numeraireAssimilator);
+
+        Assimilators.Assimilator storage _reserveAssimilator = shell.assimilators[_reserve];
+
+        _reserveAssimilator.addr = _reserveAssim;
+
+        _reserveAssimilator.ix = shell.reserves.length;
+
+        shell.reserves.push(_reserveAssimilator);
+
+        shell.weights.push(_weight.divu(1e18).add(uint256(1).divu(1e18)));
+
+    }
+
+    function includeAssimilator (Shells.Shell storage shell, address _numeraire, address _derivative, address _assimilator) internal {
+
+        Assimilators.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
+
+        shell.assimilators[_derivative] = Assimilators.Assimilator(_assimilator, _numeraireAssim.ix, 0, 0);
+
     }
 
 }
