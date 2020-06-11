@@ -125,12 +125,12 @@ contract Loihi is LoihiRoot {
         shell.setParams(_alpha, _beta, _epsilon, _max, _lambda, _omega);
     }
 
-    function includeNumeraireAsset (address _numeraire, address _reserve, uint256 _weight) public onlyOwner {
-        shell.includeNumeraireAsset(_numeraire, _reserve, _weight);
+    function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint256 _weight) public onlyOwner {
+        shell.includeAsset(_numeraire, _nAssim, _reserve, _rAssim, _weight);
     }
 
-    function includeAssimilator (address _derivative, address _assimilator, address _reserve) public onlyOwner {
-        shell.includeAssimilator(_derivative, _assimilator, _reserve);
+    function includeAssimilator (address _numeraire, address _derivative, address _assimilator) public onlyOwner {
+        shell.includeAssimilator(_numeraire, _derivative, _assimilator);
     }
 
     function excludeAdapter (address _assimilator) external onlyOwner {
@@ -389,11 +389,23 @@ contract Loihi is LoihiRoot {
             _assims[i].outputRaw(msg.sender, _amts[i]);
         }
 
+        emit log_uint("shell.omega", shell.omega.mulu(1e18));
+ 
         ( shells_, shell.omega ) = shell.calculateSelectiveWithdraw(_assims);
+
+        emit log_uint("shells_", shells_);
+        emit log_uint("shell.omega", shell.omega.mulu(1e18));
+        emit log_uint("max shells", _maxShells);
 
         require(shells_ < _maxShells, "Shell/above-maximum-shells");
 
+        emit log("post require");
+
+        emit log_uint("balance of", shell.balances[msg.sender]);
+
         shell.burn(msg.sender, shells_);
+
+        emit log("post burn");
 
     }
 
