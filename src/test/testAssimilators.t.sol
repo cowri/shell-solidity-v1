@@ -91,7 +91,7 @@ contract AssimilatorSetOneTests is Setup, DSTest {
 
         assimBouncer = new AssimilatorBouncer();
 
-        assimBouncer.includeTestAdapterState(
+        assimBouncer.includeTestAssimilatorState(
             IERC20(dai),
             ICToken(cdai),
             IChai(chai),

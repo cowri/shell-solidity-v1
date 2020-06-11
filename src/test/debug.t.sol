@@ -34,36 +34,11 @@ contract DebugTest is Setup, DSMath, DSTest {
 
         int128 p3divu = p3.divu(1e18);
 
-        int128 onedivu = uint256(1).divu(1e18);
+        int128 onedivu = uint256(.25e18).divu(1e18);
 
-        int128 wad64x64 = uint256(1e18).fromUInt();
+        emit log_named_int("int128", onedivu);
 
-        int128 p3fromu = p3.fromUInt().div(wad64x64);
 
-        emit log_named_int("p3divu", p3divu.muli(1e18));
-        emit log_named_int("p3fromu", p3fromu.muli(1e18));
-
-        p3divu = p3divu.add(onedivu);
-        p3fromu = p3fromu.add(onedivu);
-
-        emit log_named_int("p3divu", p3divu.muli(1e18));
-        emit log_named_int("p3fromu", p3fromu.muli(1e18));
-
-        uint256 startingShells = l.proportionalDeposit(300e18);
-
-        ( uint256 totalReserves, uint256[] memory reserves ) = l.totalReserves();
-
-        uint256 newShells = l.deposit(
-            address(dai), 10e18,
-            address(usdc), 10e6,
-            address(usdt), 10e6,
-            address(susd), 2.5e18
-        );
-
-        emit log_named_uint("total reserves", totalReserves);
-        emit log_uints("reserves", reserves);
-
-        assertEq(newShells, 32499999216641686631);
 
     }
     

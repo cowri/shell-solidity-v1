@@ -49,6 +49,23 @@ import "../../assimilators/local/susdReserves/LocalASUsdToSUsdAssimilator.sol";
 contract AssimilatorSetup is StorageSetup {
 
     event log_bytes(bytes32, bytes4);
+    
+    function setupAssimilatorsSetOneLocal () public {
+
+        daiAssimilator = IAssimilator(address(new LocalDaiToDaiAssimilator(address(dai))));
+        cdaiAssimilator = IAssimilator(address(new LocalCDaiToDaiAssimilator(address(dai), address(cdai))));
+        chaiAssimilator = IAssimilator(address(new LocalChaiToDaiAssimilator(address(dai), address(chai), address(pot))));
+
+        usdcAssimilator = IAssimilator(address(new LocalUsdcToUsdcAssimilator(address(usdc))));
+        cusdcAssimilator = IAssimilator(address(new LocalCUsdcToUsdcAssimilator(address(usdc), address(cusdc))));
+
+        usdtAssimilator = IAssimilator(address(new LocalUsdtToUsdtAssimilator(address(usdt))));
+        ausdtAssimilator = IAssimilator(address(new LocalAUsdtToUsdtAssimilator(address(usdt), address(ausdt))));
+
+        susdAssimilator = IAssimilator(address(new LocalSUsdToSUsdAssimilator(address(susd))));
+        asusdAssimilator = IAssimilator(address(new LocalASUsdToSUsdAssimilator(address(susd), address(asusd))));
+
+    }
 
     function setupAssimilatorsSetTwoLocal () public {
 
@@ -64,23 +81,6 @@ contract AssimilatorSetup is StorageSetup {
 
         susdAssimilator = IAssimilator(address(new LocalSUsdToASUsdAssimilator(address(susd), address(asusd))));
         asusdAssimilator = IAssimilator(address(new LocalASUsdToASUsdAssimilator(address(asusd))));
-
-    }
-
-    function setupAssimilatorsSetOneLocal () public {
-
-        daiAssimilator = IAssimilator(address(new LocalDaiToDaiAssimilator(address(dai))));
-        cdaiAssimilator = IAssimilator(address(new LocalCDaiToDaiAssimilator(address(dai), address(cdai))));
-        chaiAssimilator = IAssimilator(address(new LocalChaiToDaiAssimilator(address(dai), address(chai), address(pot))));
-
-        usdcAssimilator = IAssimilator(address(new LocalUsdcToUsdcAssimilator(address(usdc))));
-        cusdcAssimilator = IAssimilator(address(new LocalCUsdcToUsdcAssimilator(address(usdc), address(cusdc))));
-
-        usdtAssimilator = IAssimilator(address(new LocalUsdtToUsdtAssimilator(address(usdt))));
-        ausdtAssimilator = IAssimilator(address(new LocalAUsdtToUsdtAssimilator(address(usdt), address(ausdt))));
-
-        susdAssimilator = IAssimilator(address(new LocalSUsdToSUsdAssimilator(address(susd))));
-        asusdAssimilator = IAssimilator(address(new LocalASUsdToSUsdAssimilator(address(susd), address(asusd))));
 
     }
 
