@@ -69,7 +69,7 @@ contract LoihiRoot {
     IERC20NoBool usdt; IAToken ausdt;
     IERC20 susd; IAToken asusd;
 
-    function includeTestAdapterState(IERC20 _dai, ICToken _cdai, IChai _chai, IPot _pot, IERC20 _usdc, ICToken _cusdc, IERC20NoBool _usdt, IAToken _ausdt, IERC20 _susd, IAToken _asusd) public {
+    function includeTestAssimilatorState(IERC20 _dai, ICToken _cdai, IChai _chai, IPot _pot, IERC20 _usdc, ICToken _cusdc, IERC20NoBool _usdt, IAToken _ausdt, IERC20 _susd, IAToken _asusd) public {
         dai = _dai; cdai = _cdai; chai = _chai; pot = _pot;
         usdc = _usdc; cusdc = _cusdc;
         usdt = _usdt; ausdt = _ausdt;
