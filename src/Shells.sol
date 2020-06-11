@@ -32,6 +32,7 @@ library SafeERC20Arithmetic {
 library Shells {
 
     int128 constant ONE = 0x10000000000000000;
+    int128 constant MAX = 0x4000000000000000;
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -101,7 +102,7 @@ library Shells {
                 fee_ = _feeSection.div(_ideal);
                 fee_ = fee_.mul(_delta);
 
-                if (fee_ > .25e18) fee_ = .25e18;
+                if (fee_ > MAX) fee_ = MAX;
 
                 fee_ = fee_.mul(_feeSection);
 
@@ -118,7 +119,7 @@ library Shells {
                 fee_ = _feeSection.div(_ideal);
                 fee_ = fee_.mul(_delta);
 
-                if (fee_ > .25e18) fee_ = .25e18;
+                if (fee_ > MAX) fee_ = MAX;
 
                 fee_ = fee_.mul(_feeSection);
 
@@ -299,8 +300,6 @@ library Shells {
 
         if ( shell.totalSupply != 0 ) shells_ = shells_.mul(shell.totalSupply.divu(1e18));
 
-        emit log_int("shells_", shells_.muli(1e18));
-
     }
 
     function calculateSelectiveDeposit (
@@ -341,6 +340,8 @@ library Shells {
 
         shells_ = _shells.abs().mul(ONE.add(shell.epsilon)).mulu(1e18);
 
+        emit log_uint("shells_", shells_);
+
     }
 
     function enforceHalts (
@@ -351,7 +352,10 @@ library Shells {
         int128[] memory _nBals
     ) internal {
 
-        if (!shell.testHalts) return;
+        if (!shell.testHalts) {
+            emit log("skipping halts");
+            return;
+        }
 
         int128 _alpha = shell.alpha;
 
