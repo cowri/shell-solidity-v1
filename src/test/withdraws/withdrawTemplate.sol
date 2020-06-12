@@ -757,4 +757,70 @@ contract SelectiveWithdrawTemplate is Setup {
 
     }
 
+    function monotonicity_proportional_upper_outOfBand () public returns (
+        uint256 dai_,
+        uint256 usdc_,
+        uint256 usdt_,
+        uint256 susd_
+    ) {
+
+        l.proportionalDeposit(300e18);
+
+        usdt.transfer(address(l), 9910e6);
+        ausdt.transfer(address(l), 9910e6);
+
+        uint256 _daiBal = dai.balanceOf(address(this));
+        uint256 _usdcBal = usdc.balanceOf(address(this));
+        uint256 _usdtBal = usdt.balanceOf(address(this));
+        uint256 _susdBal = susd.balanceOf(address(this));
+
+        l.setTestHalts(false);
+
+        l.proportionalWithdraw(1e18);
+
+        dai_ = dai.balanceOf(address(this)) - _daiBal;
+        usdc_ = usdc.balanceOf(address(this)) - _usdcBal;
+        usdt_ = usdt.balanceOf(address(this)) - _usdtBal;
+        susd_ = susd.balanceOf(address(this)) - _susdBal;
+
+    }
+
+    event log(bytes32);
+
+    function monotonicity_proportional_lower_outOfBand () public returns (
+        uint256 dai_,
+        uint256 usdc_,
+        uint256 usdt_,
+        uint256 susd_
+    ) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(9910e18).divu(1e18));
+
+        dai.transfer(address(l), 9910e18);
+        cdai.transfer(address(l), _rawCDai);
+
+        usdt.transfer(address(l), 9910e6);
+        ausdt.transfer(address(l), 9910e6);
+
+        susd.transfer(address(l), 2970e18);
+        asusd.transfer(address(l), 2970e18);
+
+        uint256 _daiBal = dai.balanceOf(address(this));
+        uint256 _usdcBal = usdc.balanceOf(address(this));
+        uint256 _usdtBal = usdt.balanceOf(address(this));
+        uint256 _susdBal = susd.balanceOf(address(this));
+
+        l.proportionalWithdraw(1e18);
+
+        dai_ = dai.balanceOf(address(this)) - _daiBal;
+        usdc_ = usdc.balanceOf(address(this)) - _usdcBal;
+        usdt_ = usdt.balanceOf(address(this)) - _usdtBal;
+        susd_ = susd.balanceOf(address(this)) - _susdBal;
+
+        emit log("its really here");
+
+    }
+
 }

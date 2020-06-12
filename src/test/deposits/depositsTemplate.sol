@@ -665,7 +665,7 @@ contract SelectiveDepositTemplate is Setup {
 
         l.prime();
 
-        mintedShells_ = l.deposit(address(usdc), 1e6);
+        mintedShells_ = l.deposit(address(usdt), 1e6);
 
     }
 
@@ -678,7 +678,7 @@ contract SelectiveDepositTemplate is Setup {
 
         l.setTestHalts(false);
 
-        mintedShells_ = l.deposit(address(usdc), 1e6);
+        mintedShells_ = l.deposit(address(usdt), 1e6);
 
     }
 
@@ -879,6 +879,68 @@ contract SelectiveDepositTemplate is Setup {
         l.setTestHalts(false);
 
         mintedShells_ = l.deposit(address(usdt), 1e6);
+
+    }
+
+    function monotonicity_proportional_lower_outOfBand () public returns (
+        uint256 dai_,
+        uint256 usdc_,
+        uint256 usdt_,
+        uint256 susd_
+    ) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
+
+        usdc.transfer(address(l), 8910e6);
+        cusdc.transfer(address(l), _rawCUsdc);
+
+        usdt.transfer(address(l), 8910e6);
+        ausdt.transfer(address(l), 8910e6);
+
+        susd.transfer(address(l), 2970e18);
+        asusd.transfer(address(l), 2970e18);
+
+        uint256 _daiBal = dai.balanceOf(address(this));
+        uint256 _usdcBal = usdc.balanceOf(address(this));
+        uint256 _usdtBal = usdt.balanceOf(address(this));
+        uint256 _susdBal = susd.balanceOf(address(this));
+
+        l.proportionalDeposit(1e18);
+
+        dai_ = _daiBal - dai.balanceOf(address(this));
+        usdc_ = _usdcBal - usdc.balanceOf(address(this));
+        usdt_ = _usdtBal - usdt.balanceOf(address(this));
+        susd_ = _susdBal - susd.balanceOf(address(this));
+
+    }
+
+    function monotonicity_proportional_upper_outOfBand () public returns (
+        uint256 dai_,
+        uint256 usdc_,
+        uint256 usdt_,
+        uint256 susd_
+    ) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(9910e18).divu(1e18));
+
+        usdc.transfer(address(l), 9910e6);
+        cusdc.transfer(address(l), _rawCDai);
+
+        uint256 _daiBal = dai.balanceOf(address(this));
+        uint256 _usdcBal = usdc.balanceOf(address(this));
+        uint256 _usdtBal = usdt.balanceOf(address(this));
+        uint256 _susdBal = susd.balanceOf(address(this));
+
+        l.proportionalDeposit(1e18);
+
+        dai_ = _daiBal - dai.balanceOf(address(this));
+        usdc_ = _usdcBal - usdc.balanceOf(address(this));
+        usdt_ = _usdtBal - usdt.balanceOf(address(this));
+        susd_ = _susdBal - susd.balanceOf(address(this));
 
     }
 

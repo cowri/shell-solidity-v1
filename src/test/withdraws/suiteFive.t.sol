@@ -124,6 +124,33 @@ contract SelectiveWithdrawSuiteFive is SelectiveWithdrawTemplate, DSTest {
 
     }
 
+    function test_s5_proportionalWithdraw_monotonicity_upper_outOfBand () public {
+
+        (   uint256 _dai,
+            uint256 _usdc,
+            uint256 _usdt,
+            uint256 _susd ) = super.monotonicity_proportional_upper_outOfBand();
+
+        emit log_named_uint("dai", _dai);
+        emit log_named_uint("usdc", _usdc);
+        emit log_named_uint("usdt", _usdt);
+        emit log_named_uint("susd", _susd);
+
+    }
+
+    function test_s5_proportionalWithdraw_monotonicity_lower_outOfBand () public {
+
+        (   uint256 _dai,
+            uint256 _usdc,
+            uint256 _usdt,
+            uint256 _susd ) = super.monotonicity_proportional_lower_outOfBand();
+
+        emit log_named_uint("dai", _dai);
+        emit log_named_uint("usdc", _usdc);
+        emit log_named_uint("usdt", _usdt);
+        emit log_named_uint("susd", _susd);
+
+    }
 
 
 

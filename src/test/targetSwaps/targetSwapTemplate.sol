@@ -615,5 +615,148 @@ contract TargetSwapTemplate is Setup {
         );
 
     }
+    
+    function monotonicity_mutuallyInBounds_to_mutuallyOutOfBounds_noHalts () public returns (uint256 originAmount_) {
+
+        l.deposit(
+            address(dai), 2000e18,
+            address(usdc), 5000e6,
+            address(usdt), 5000e6,
+            address(susd), 800e18
+        );
+
+        l.setTestHalts(false);
+
+        originAmount_ = l.targetSwap(
+            address(usdc),
+            address(usdt),
+            4900e6
+        );
+
+    }
+
+    function monotonicity_mutuallyInBounds_to_mutuallyOutOfBounds_halts () public returns (uint256 originAmount_) {
+
+        l.deposit(
+            address(dai), 2000e18,
+            address(usdc), 5000e6,
+            address(usdt), 5000e6,
+            address(susd), 800e18
+        );
+
+        originAmount_ = l.targetSwap(
+            address(usdc),
+            address(usdt),
+            4900e6
+        );
+
+    }
+
+    function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyOutOfBounds_noHalts_omegaUpdate () public returns (uint256 originAmount_) {
+
+        l.proportionalDeposit(300e18);
+
+        usdt.transfer(address(l), 4910e6);
+        ausdt.transfer(address(l), 4910e6);
+
+        l.prime();
+
+        l.setTestHalts(false);
+
+        originAmount_ = l.targetSwap(
+            address(usdt),
+            address(dai),
+            1e18
+        );
+
+    }
+
+    function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyOutOfBounds_noHalts_noOmegaUpdate () public returns (uint256 originAmount_) {
+
+        l.proportionalDeposit(300e18);
+
+        usdt.transfer(address(l), 4910e6);
+        ausdt.transfer(address(l), 4910e6);
+
+        l.setTestHalts(false);
+
+        originAmount_ = l.targetSwap(
+            address(usdt),
+            address(dai),
+            1e18
+        );
+
+    }
+
+    function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyInBounds_noHalts_updateOmega () public returns (uint256 originAmount_) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(4910e18).divu(1e18));
+
+        usdc.transfer(address(l), 4910e6);
+        cusdc.transfer(address(l), _rawCUsdc);
+
+        usdt.transfer(address(l), 9910e6);
+        ausdt.transfer(address(l), 9910e6);
+
+        susd.transfer(address(l), 1970e18);
+        asusd.transfer(address(l), 1970e18);
+
+        l.setTestHalts(false);
+
+        l.prime();
+
+        originAmount_ = l.targetSwap(
+            address(dai),
+            address(usdt),
+            5000e6
+        );
+
+    }
+
+    function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyInBounds_noHalts_noUpdateOmega () public returns (uint256 originAmount_) {
+
+        l.proportionalDeposit(300e18);
+
+        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(4910e18).divu(1e18));
+
+        usdc.transfer(address(l), 4910e6);
+        cusdc.transfer(address(l), _rawCUsdc);
+
+        usdt.transfer(address(l), 9910e6);
+        ausdt.transfer(address(l), 9910e6);
+
+        susd.transfer(address(l), 1970e18);
+        asusd.transfer(address(l), 1970e18);
+
+        l.setTestHalts(false);
+
+        originAmount_ = l.targetSwap(
+            address(dai),
+            address(usdt),
+            5000e6
+        );
+
+    }
+
+    function monotonicity_outOfBand_mutuallyOutOfBound_towards_mutuallyInBound_noHalts_omegaUpdate () public returns (uint256 originAmount_) {
+
+        l.proportionalDeposit(300e18);
+
+        susd.transfer(address(l), 4970e18);
+        asusd.transfer(address(l), 4970e18);
+
+        l.prime();
+
+        l.setTestHalts(false);
+
+        originAmount_ = l.targetSwap(
+            address(usdt),
+            address(susd),
+            1e18
+        );
+
+    }
 
 }
