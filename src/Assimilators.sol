@@ -105,6 +105,14 @@ library Assimilators {
 
     }
 
+    function intakeRawHack (Assimilator memory _assim, uint256 _amount) internal returns (int128 amt_, int128 bal_) {
+
+        bytes memory data = abi.encodeWithSelector(iAsmltr.intakeRaw.selector, _amount); // encoded selector of "intakeRaw(uint256)";
+
+        ( amt_, bal_ ) = abi.decode(_assim.addr.delegate(data), (int128,int128));
+
+    }
+
     function intakeNumeraire (Assimilator memory _assim) internal returns (uint256 rawAmt_) {
 
         rawAmt_ = intakeNumeraire(_assim, _assim.amt);
@@ -126,6 +134,21 @@ library Assimilators {
         ( _assim.amt, _assim.bal ) = abi.decode(_assim.addr.delegate(data), (int128,int128));
 
         _assim.amt = _assim.amt.neg();
+
+    }
+
+    event log_uint(bytes32, uint256);
+    event log_int(bytes32, int256);
+
+    function outputNumeraireHack (Assimilator memory _assim, address _dst, int128 _amt) internal returns (uint256 rawAmt_) {
+
+        // emit log_uint("Raw Amount", rawAmt_);
+
+        // emit log_int("_amt", _amt.muli(1e18));
+        
+        rawAmt_ = outputNumeraire(_assim, _dst, _amt.abs());
+
+        // emit log_uint("Raw Amount", rawAmt_);
 
     }
 

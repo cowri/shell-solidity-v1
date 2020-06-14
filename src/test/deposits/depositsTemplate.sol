@@ -17,9 +17,13 @@ contract SelectiveDepositTemplate is Setup {
 
     Loihi l;
 
+    event log_uint(bytes32, uint256);
+
     function noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD () public returns (uint256 shellsMinted_) {
 
         uint256 startingShells = l.proportionalDeposit(300e18);
+
+        uint256 gas = gasleft();
 
         shellsMinted_ = l.deposit(
             address(dai), 10e18,
@@ -27,6 +31,26 @@ contract SelectiveDepositTemplate is Setup {
             address(usdt), 10e6,
             address(susd), 2.5e18
         );
+
+        emit log_uint("gas for deposit", gas - gasleft());
+
+    }
+
+    function noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_HACK () public returns (uint256 shellsMinted_) {
+
+        uint256 startingShells = l.proportionalDeposit(300e18);
+
+        uint256 gas = gasleft();
+
+        shellsMinted_ = l.depositHack(
+            address(dai), 10e18,
+            address(usdc), 10e6,
+            address(usdt), 10e6,
+            address(susd), 2.5e18
+        );
+
+        emit log_uint("gas for deposit", gas - gasleft());
+
 
     }
 
@@ -263,6 +287,8 @@ contract SelectiveDepositTemplate is Setup {
 
     function fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD () public returns (uint256 shellsMinted_) {
 
+        uint256 gas = gasleft();
+
         uint256 startingShells = l.deposit(
             address(dai), 90e18,
             address(usdc), 90e6,
@@ -270,10 +296,40 @@ contract SelectiveDepositTemplate is Setup {
             address(susd), 50e18
         );
 
+        emit log_uint("gas on first deposit", gas - gasleft());
+
+        gas = gasleft();
+
         shellsMinted_ = l.deposit(
             address(dai), 5e18,
             address(usdc), 5e6
         );
+
+        emit log_uint("gas on second deposit", gas - gasleft());
+
+    }
+
+    function fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_HACK () public returns (uint256 shellsMinted_) {
+
+        uint256 gas = gasleft();
+
+        uint256 startingShells = l.depositHack(
+            address(dai), 90e18,
+            address(usdc), 90e6,
+            address(usdt), 145e6,
+            address(susd), 50e18
+        );
+
+        emit log_uint("gas on first deposit", gas - gasleft());
+
+        gas = gasleft();
+
+        shellsMinted_ = l.depositHack(
+            address(dai), 5e18,
+            address(usdc), 5e6
+        );
+
+        emit log_uint("gas on second deposit", gas - gasleft());
 
     }
 
