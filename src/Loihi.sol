@@ -435,9 +435,9 @@ contract Loihi is LoihiRoot {
 
         ( int128 _oGLiq, , int128[] memory _oBals, ) = shell.getPoolData(shell.reserves);
 
-        int128 _multiplier = _withdrawal.fromUInt()
+        int128 _multiplier = _withdrawal.divu(1e18)
             .mul(ONE.sub(shell.epsilon))
-            .div(shell.totalSupply.fromUInt());
+            .div(shell.totalSupply.divu(1e18));
 
         for (uint8 i = 0; i < shell.reserves.length; i++) {
 
