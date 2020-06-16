@@ -189,6 +189,7 @@ contract Loihi is LoihiRoot {
 
     function transferByOrigin (address _o, address _t, uint256 _dline, uint256 _mTAmt, uint256 _oAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
 
+
         uint _length = shell.reserves.length;
         Assimilators.Assimilator memory _origin = shell.assimilators[_o];
         Assimilators.Assimilator memory _target = shell.assimilators[_t];
@@ -281,7 +282,7 @@ contract Loihi is LoihiRoot {
     /// @return oAmt_ the amount of origin that has been swapped for the target
     function swapByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) public notFrozen returns (uint256) {
 
-        return transferByTarget(_o, _t, _mOAmt, _tAmt, _dline, msg.sender);
+        return transferByTarget(_o, _t, _mOAmt, _dline, _tAmt, msg.sender);
 
     }
 
@@ -345,6 +346,10 @@ contract Loihi is LoihiRoot {
     /// @param _rcpnt the address of the recipient of the target
     /// @return oAmt_ the amount of origin that has been swapped for the target
     function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _dline, uint256 _tAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 oAmt_) {
+
+        emit log_uint("_dline", _dline);
+        emit log_uint("_oTAmt", _mOAmt);
+        emit log_uint("_tAmt", _tAmt);
 
         uint _length = shell.reserves.length;
         Assimilators.Assimilator memory _origin = shell.assimilators[_o];

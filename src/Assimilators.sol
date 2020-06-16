@@ -134,17 +134,10 @@ library Assimilators {
 
     }
 
-    // function outputRaw (Assimilator memory _assim, address _dst, uint256 _amount) internal {
-
-    //     bytes memory data = abi.encodeWithSelector(iAsmltr.outputRaw.selector, _dst, _amount);
-
-    //     ( _assim.amt, _assim.bal ) = abi.decode(_assim.addr.delegate(data), (int128,int128));
-
-    //     _assim.amt = _assim.amt.neg();
-
-    // }
-
     function outputRaw (Assimilator memory _assim, address _dst, uint256 _amount) internal returns (int128 amt_, int128 bal_) {
+        
+        emit log_uint("_amount", _amount);
+        emit log_addr("_dst", _dst);
 
         bytes memory data = abi.encodeWithSelector(iAsmltr.outputRaw.selector, _dst, _amount);
 
@@ -153,6 +146,19 @@ library Assimilators {
         amt_ = amt_.neg();
 
     }
+
+    // function outputRaw (Assimilator memory _assim, address _dst, uint256 _amount) internal returns (int128 amt_, int128 bal_) {
+
+    //     emit log_uint("_amount", _amount);
+    //     emit log_addr("_dst", _dst);
+
+    //     bytes memory data = abi.encodeWithSelector(iAsmltr.outputRaw.selector, _dst, _amount);
+
+    //     ( amt_, bal_ ) = abi.decode(_assim.addr.delegate(data), (int128,int128));
+
+    //     amt_ = amt_.neg();
+
+    // }
 
     event log(bytes32);
 

@@ -58,14 +58,24 @@ contract LocalDaiToDaiAssimilator is LoihiRoot {
     // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
+        emit log("inside output raw");
+
         dai.transfer(_dst, _amount);
 
+        emit log("after dai transfer");
+
         uint256 _balance = dai.balanceOf(address(this));
+        
+        emit log("after dai balanceof");
 
         amount_ = _amount.divu(1e18);
 
+        emit log("after amount divu");
+
         balance_ = _balance.divu(1e18);
 
+        emit log("after balance divu");
+        
     }
 
     // takes numeraire amount of dai, unwraps corresponding amount of cDai, transfers that out, returns numeraire amount
