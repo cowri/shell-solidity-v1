@@ -132,32 +132,77 @@ library Shells {
     }
 
 
+    // function calculateTargetTrade (
+    //     Shell storage shell,
+    //     Assimilators.Assimilator[] memory assims_
+    // ) internal returns (Assimilators.Assimilator[] memory, int128 psi_) {
+
+    //     (   int128 _oGLiq,
+    //         int128 _nGLiq,
+    //         int128[] memory _oBals,
+    //         int128[] memory _nBals  ) = shell.getPoolData(assims_);
+
+    //     {
+
+    //         int128 _lambda = shell.lambda;
+    //         int128 _omega = shell.omega;
+    //         uint256 _oIx = assims_[0].ix;
+
+    //         for (uint i = 0; i < 10; i++) {
+
+    //             psi_ = shell.calculateFee(_nBals, _nGLiq);
+
+    //             int128 _prev = assims_[0].amt;
+    //             int128 _next = assims_[0].amt = _omega < psi_
+    //                 ? ( assims_[1].amt.sub(psi_.sub(_omega))).neg()
+    //                 : ( assims_[1].amt.add(_lambda.mul(_omega.sub(psi_)))).neg();
+
+    //             _nGLiq = _oGLiq.add(assims_[1].amt).add(_next);
+
+    //             _nBals[_oIx] = _oBals[_oIx].add(_next);
+
+    //             if (_prev / 1e14 == _next / 1e14) break;
+
+    //         }
+
+
+    //     }
+
+    //     shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+
+    //     assims_[0].amt = assims_[0].amt.mul(ONE.add(shell.epsilon));
+
+    //     return (assims_, psi_);
+
+    // }
+
     function calculateTargetTrade (
         Shell storage shell,
-        Assimilators.Assimilator[] memory assims_
-    ) internal returns (Assimilators.Assimilator[] memory, int128 psi_) {
+        uint _oIx,
+        int128 _tAmt,
+        int128 _oGLiq,
+        int128 _nGLiq,
+        int128[] memory _oBals,
+        int128[] memory _nBals
+    ) internal returns (int128 oAmt_ , int128 psi_) {
 
-        (   int128 _oGLiq,
-            int128 _nGLiq,
-            int128[] memory _oBals,
-            int128[] memory _nBals  ) = shell.getPoolData(assims_);
+        oAmt_ = _tAmt;
 
         {
 
             int128 _lambda = shell.lambda;
             int128 _omega = shell.omega;
-            uint256 _oIx = assims_[0].ix;
 
             for (uint i = 0; i < 10; i++) {
 
                 psi_ = shell.calculateFee(_nBals, _nGLiq);
 
-                int128 _prev = assims_[0].amt;
-                int128 _next = assims_[0].amt = _omega < psi_
-                    ? ( assims_[1].amt.sub(psi_.sub(_omega))).neg()
-                    : ( assims_[1].amt.add(_lambda.mul(_omega.sub(psi_)))).neg();
+                int128 _prev = oAmt_;
+                int128 _next = oAmt_ = _omega < psi_
+                    ? ( _tAmt.sub(psi_.sub(_omega))).neg()
+                    : ( _tAmt.add(_lambda.mul(_omega.sub(psi_)))).neg();
 
-                _nGLiq = _oGLiq.add(assims_[1].amt).add(_next);
+                _nGLiq = _oGLiq.add(_tAmt).add(_next);
 
                 _nBals[_oIx] = _oBals[_oIx].add(_next);
 
@@ -170,62 +215,55 @@ library Shells {
 
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
 
-        assims_[0].amt = assims_[0].amt.mul(ONE.add(shell.epsilon));
-
-        return (assims_, psi_);
+        oAmt_ = oAmt_.mul(ONE + shell.epsilon);
 
     }
-    
+
+
+    // function calculateOriginTrade (
+    //     Shell storage shell,
+    //     Assimilators.Assimilator[] memory assims_
+    // ) internal returns (Assimilators.Assimilator[] memory, int128 psi_) {
+
+    //     (   int128 _oGLiq,
+    //         int128 _nGLiq,
+    //         int128[] memory _oBals,
+    //         int128[] memory _nBals  ) = shell.getPoolData(assims_);
+
+    //     {
+    //         int128 _lambda = shell.lambda;
+    //         int128 _omega = shell.omega;
+    //         uint256 _tIx = assims_[1].ix;
+
+    //         for (uint i = 0; i < 10; i++) {
+
+    //             psi_ = shell.calculateFee(_nBals, _nGLiq);
+
+    //             int128 _prev = assims_[1].amt;
+    //             int128 _next = assims_[1].amt = _omega < psi_
+    //                 ? ( assims_[0].amt + _omega - psi_ ).neg()
+    //                 : ( assims_[0].amt + _lambda.mul(_omega - psi_) ).neg();
+
+    //             _nGLiq = _oGLiq + assims_[0].amt + _next;
+
+    //             _nBals[_tIx] = _oBals[_tIx].add(_next);
+
+    //             if (_prev / 1e14 == _next / 1e14) break;
+
+
+    //         }
+
+    //     }
+
+    //     shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+
+    //     assims_[1].amt = assims_[1].amt.mul(ONE.sub(shell.epsilon));
+
+    //     return (assims_, psi_);
+
+    // }
+
     function calculateOriginTrade (
-        Shell storage shell,
-        Assimilators.Assimilator[] memory assims_
-    ) internal returns (Assimilators.Assimilator[] memory, int128 psi_) {
-
-        (   int128 _oGLiq,
-            int128 _nGLiq,
-            int128[] memory _oBals,
-            int128[] memory _nBals  ) = shell.getPoolData(assims_);
-
-        {
-            int128 _lambda = shell.lambda;
-            int128 _omega = shell.omega;
-            uint256 _tIx = assims_[1].ix;
-
-            for (uint i = 0; i < 10; i++) {
-
-                emit log_uint("start gas", gasleft());
-
-                psi_ = shell.calculateFee(_nBals, _nGLiq);
-
-                int128 _prev = assims_[1].amt;
-                int128 _next = assims_[1].amt = _omega < psi_
-                    ? ( assims_[0].amt + _omega - psi_ ).neg()
-                    : ( assims_[0].amt + _lambda.mul(_omega - psi_) ).neg();
-
-                _nGLiq = _oGLiq + assims_[0].amt + _next;
-
-                _nBals[_tIx] = _oBals[_tIx].add(_next);
-
-                if (_prev / 1e14 == _next / 1e14) break;
-
-
-                emit log_uint("end gas ", gasleft());
-                emit log_int("_assims[1].amt", assims_[1].amt.muli(1e18));
-
-            }
-                emit log_uint("end gas ", gasleft());
-
-        }
-
-        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
-
-        assims_[1].amt = assims_[1].amt.mul(ONE.sub(shell.epsilon));
-
-        return (assims_, psi_);
-
-    }
-
-    function calculateOriginTradeHack (
         Shell storage shell,
         uint _tIx,
         int128 _oAmt,
@@ -244,8 +282,6 @@ library Shells {
 
             for (uint i = 0; i < 10; i++) {
 
-                emit log_uint("start gas", gasleft());
-
                 psi_ = shell.calculateFee(_nBals, _nGLiq);
 
                 int128 _prev = tAmt_;
@@ -259,17 +295,13 @@ library Shells {
 
                 if (_prev / 1e14 == _next / 1e14) break;
 
-                emit log_uint("end gas", gasleft());
             }
-                emit log_uint("end gas", gasleft());
 
         }
 
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
 
         tAmt_ = tAmt_.mul(ONE.sub(shell.epsilon));
-
-        return (tAmt_, psi_);
 
     }
 
@@ -292,16 +324,16 @@ library Shells {
 
                     if (nBals_[j] == 0) {
 
-                        int128 _bal = _assims[i].bal;
-                        nBals_[j] = oBals_[j] = _bal;
-                        oGLiq_ = oGLiq_.add(_bal);
-                        nGLiq_ = nGLiq_.add(_bal);
+                        // int128 _bal = _assims[i].bal;
+                        // nBals_[j] = oBals_[j] = _bal;
+                        // oGLiq_ = oGLiq_.add(_bal);
+                        // nGLiq_ = nGLiq_.add(_bal);
 
                     }
 
-                    int128 _amt = _assims[i].amt;
-                    oGLiq_ = oGLiq_.sub(_amt);
-                    oBals_[j] = oBals_[j].sub(_amt);
+                    // int128 _amt = _assims[i].amt;
+                    // oGLiq_ = oGLiq_.sub(_amt);
+                    // oBals_[j] = oBals_[j].sub(_amt);
 
                     break;
 
@@ -361,27 +393,27 @@ library Shells {
 
     }
 
+    // function calculateSelectiveDeposit (
+    //     Shells.Shell storage shell,
+    //     Assimilators.Assimilator[] memory _assims
+    // ) internal returns (uint256 shells_, int128 omega_) {
+
+    //     (   int128 _oGLiq,
+    //         int128 _nGLiq,
+    //         int128[] memory _oBals,
+    //         int128[] memory _nBals  ) = shell.getPoolData(_assims);
+
+    //     shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+
+    //     int128 _shells;
+
+    //     ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
+
+    //     shells_ = _shells.mulu(1e18);
+
+    // }
+
     function calculateSelectiveDeposit (
-        Shells.Shell storage shell,
-        Assimilators.Assimilator[] memory _assims
-    ) internal returns (uint256 shells_, int128 omega_) {
-
-        (   int128 _oGLiq,
-            int128 _nGLiq,
-            int128[] memory _oBals,
-            int128[] memory _nBals  ) = shell.getPoolData(_assims);
-
-        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
-
-        int128 _shells;
-
-        ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
-
-        shells_ = _shells.mulu(1e18);
-
-    }
-
-    function calculateSelectiveDepositHack (
         Shells.Shell storage shell,
         int128 _oGLiq,
         int128 _nGLiq,
@@ -407,15 +439,35 @@ library Shells {
 
     }
 
+    // function calculateSelectiveWithdraw (
+    //     Shells.Shell storage shell,
+    //     Assimilators.Assimilator[] memory _assims
+    // ) internal returns (uint256 shells_, int128 omega_) {
+
+    //     (   int128 _oGLiq,
+    //         int128 _nGLiq,
+    //         int128[] memory _oBals,
+    //         int128[] memory _nBals  ) = shell.getPoolData(_assims);
+
+    //     shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+
+    //     int128 _shells;
+
+    //     ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
+
+    //     shells_ = _shells.abs().mul(ONE.add(shell.epsilon)).mulu(1e18);
+
+    //     // emit log_uint("shells_", shells_);
+
+    // }
+
     function calculateSelectiveWithdraw (
         Shells.Shell storage shell,
-        Assimilators.Assimilator[] memory _assims
+        int128 _oGLiq,
+        int128 _nGLiq,
+        int128[] memory _oBals,
+        int128[] memory _nBals
     ) internal returns (uint256 shells_, int128 omega_) {
-
-        (   int128 _oGLiq,
-            int128 _nGLiq,
-            int128[] memory _oBals,
-            int128[] memory _nBals  ) = shell.getPoolData(_assims);
 
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
 
@@ -424,8 +476,6 @@ library Shells {
         ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
 
         shells_ = _shells.abs().mul(ONE.add(shell.epsilon)).mulu(1e18);
-
-        // emit log_uint("shells_", shells_);
 
     }
 

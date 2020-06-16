@@ -125,6 +125,22 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
 
     }
 
+    // function test_s1_targetSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight_HACK () public {
+
+    //     uint256 originAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight_HACK();
+
+    //     assertEq(originAmount, 29929682);
+
+    // }
+
+    // function test_s1_targetSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight_NO_HACK () public {
+
+    //     uint256 originAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight_NO_HACK();
+
+    //     assertEq(originAmount, 29929682);
+
+    // }
+
     function test_s1_targetSwap_partialUpperAndLowerAntiSlippage_unbalanced_CHAI_10PctWeight_to_30PctWeight () public {
 
         uint256 originAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_CHAI_10PctWeight_to_30PctWeight();

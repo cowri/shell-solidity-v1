@@ -19,7 +19,7 @@ contract LoihiSetup is StorageSetup {
 
         uint256 _alpha = .5e18;
         uint256 _beta = .25e18;
-        uint256 _max = .5e18;
+        uint256 _max = .05e18;
         uint256 _epsilon = 2.5e14;
         uint256 _lambda = .2e18;
 
@@ -64,6 +64,7 @@ contract LoihiSetup is StorageSetup {
         uint256 _max = .49e18;
         uint256 _epsilon = 2.5e14;
         uint256 _lambda = .2e18;
+
         emit log_uint("_alpha", _alpha);
         emit log_uint("_beta", _beta);
         emit log_uint("_max", _max);

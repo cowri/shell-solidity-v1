@@ -12,21 +12,21 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_NO_HACK () public logs_gas {
+    // function test_s1_selectiveDeposit_noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_NO_HACK () public logs_gas {
 
-        uint256 newShells = super.noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD();
+    //     uint256 newShells = super.noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD();
 
-        assertEq(newShells, 32499999216641686631);
+    //     assertEq(newShells, 32499999216641686631);
 
-    }
+    // }
 
-    function test_s1_selectiveDeposit_noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_HACK () public logs_gas {
+    // function test_s1_selectiveDeposit_noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_HACK () public logs_gas {
 
-        uint256 newShells = super.noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_HACK();
+    //     uint256 newShells = super.noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_HACK();
 
-        assertEq(newShells, 32499999216641686631);
+    //     assertEq(newShells, 32499999216641686631);
 
-    }
+    // }
 
     function test_s1_selectiveDeposit_balanced_5DAI_1USDC3_USDT_1SUSD () public {
 
@@ -148,21 +148,21 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_NO_HACK () public {
+    // function test_s1_selectiveDeposit_fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_NO_HACK () public {
 
-        uint256 newShells = super.fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD();
+    //     uint256 newShells = super.fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD();
 
-        assertEq(newShells, 10006716145229473334);
+    //     assertEq(newShells, 10006716145229473334);
 
-    }
+    // }
 
-    function test_s1_selectiveDeposit_fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_HACK () public {
+    // function test_s1_selectiveDeposit_fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_HACK () public {
 
-        uint256 newShells = super.fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_HACK();
+    //     uint256 newShells = super.fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_HACK();
 
-        assertEq(newShells, 10006716145229473334);
+    //     assertEq(newShells, 10006716145229473334);
 
-    }
+    // }
 
     function test_s1_selectiveDeposit_fullUpperAntiSlippage_8DAI_12USDC_10USDT_2SUSD_into_145DAI_90USDC_90USDT_50SUSD () public {
 

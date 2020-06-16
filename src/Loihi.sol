@@ -152,73 +152,76 @@ contract Loihi is LoihiRoot {
 
     function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) public notFrozen returns (uint256 tAmt_) {
 
-        return transferByOrigin(_o, _t, _oAmt, _mTAmt, _dline, msg.sender);
+        return transferByOrigin(_o, _t, _dline, _mTAmt, _oAmt, msg.sender);
 
     }
 
-    function swapByOriginHack (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) public notFrozen returns (uint256 tAmt_) {
+    // function swapByOriginHack (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) public notFrozen returns (uint256 tAmt_) {
 
-        return transferByOriginHack(_o, _t, _oAmt, _mTAmt, _dline, msg.sender);
+    //     return transferByOriginHack(_o, _t, _dline, _mTAmt, _oAmt, msg.sender);
 
-    }
+    // }
 
-    function transferByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
+    // function transferByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
 
-        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
-        _assims[0] = shell.assimilators[_o];
-        _assims[1] = shell.assimilators[_t];
+    //     Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
+    //     _assims[0] = shell.assimilators[_o];
+    //     _assims[1] = shell.assimilators[_t];
 
-        _assims[0].intakeRaw(_oAmt);
-        _assims[1].viewNumeraireBalance(_assims[0].amt);
+    //     _assims[0].intakeRaw(_oAmt);
+    //     _assims[1].viewNumeraireBalance(_assims[0].amt);
 
-        if (_assims[0].ix == _assims[1].ix) {
+    //     if (_assims[0].ix == _assims[1].ix) {
 
-            require((tAmt_ = _assims[1].outputNumeraire(_rcpnt)) > _mTAmt, "Shell/below-min-target-amount");
+    //         require((tAmt_ = _assims[1].outputNumeraire(_rcpnt)) > _mTAmt, "Shell/below-min-target-amount");
 
-            return tAmt_;
+    //         return tAmt_;
 
-        }
+    //     }
 
-        ( _assims, shell.omega ) = shell.calculateOriginTrade(_assims);
+    //     ( _assims, shell.omega ) = shell.calculateOriginTrade(_assims);
 
-        require((tAmt_ = _assims[1].outputNumeraire(_rcpnt)) > _mTAmt, "Shell/below-min-target-amount");
+    //     require((tAmt_ = _assims[1].outputNumeraire(_rcpnt)) > _mTAmt, "Shell/below-min-target-amount");
 
-        emit Trade(msg.sender, _o, _t, _oAmt, tAmt_);
+    //     emit Trade(msg.sender, _o, _t, _oAmt, tAmt_);
 
-    }
+    // }
 
-    function transferByOriginHack (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
+    function transferByOrigin (address _o, address _t, uint256 _dline, uint256 _mTAmt, uint256 _oAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
 
+        uint _length = shell.reserves.length;
         Assimilators.Assimilator memory _origin = shell.assimilators[_o];
         Assimilators.Assimilator memory _target = shell.assimilators[_t];
 
+        int128 _amt;
         int128 _oGLiq;
         int128 _nGLiq;
-
-        int128[] memory _nBals = new int128[](shell.reserves.length);
-        int128[] memory _oBals = new int128[](shell.reserves.length);
+        int128[] memory _nBals = new int128[](_length);
+        int128[] memory _oBals = new int128[](_length);
 
         for (uint i = 0; i < _oBals.length; i++) {
 
             if (i != _origin.ix) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
+            else {
+
+                int128 _bal;
+                // emit log("before");
+                // emit log_uint("_oAmt", _oAmt);
+                ( _amt, _bal ) = _origin.intakeRaw(_oAmt);
+                // emit log("after");
+
+                _oBals[i] = _bal.sub(_amt);
+                _nBals[i] = _bal;
+
+            }
 
             _oGLiq += _oBals[i];
             _nGLiq += _nBals[i];
 
         }
 
-        int128 _amt;
-
-        ( _amt, _nBals[_origin.ix] ) = _origin.intakeRawHack(_oAmt);
-
+        _nGLiq = _nGLiq.sub(_amt);
         _nBals[_target.ix] = _nBals[_target.ix].sub(_amt);
-
-        _oBals[_origin.ix] = _nBals[_origin.ix].sub(_amt);
-
-        _nGLiq += _nBals[_origin.ix];
-        _nGLiq -= _amt;
-
-        _oGLiq += _oBals[_origin.ix];
 
         // emit log_int("_amt", _amt.muli(1e18));
         // emit log_int("_oGLiq", _oGLiq.muli(1e18));
@@ -227,9 +230,9 @@ contract Loihi is LoihiRoot {
         // for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
         // for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
 
-        ( _amt, shell.omega ) = shell.calculateOriginTradeHack(_target.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, shell.omega ) = shell.calculateOriginTrade(_target.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
 
-        require((tAmt_ = _target.outputNumeraireHack(_rcpnt, _amt)) > _mTAmt, "Shell/below-min-target-amount");
+        require((tAmt_ = _target.outputNumeraire(_rcpnt, _amt)) > _mTAmt, "Shell/below-min-target-amount");
 
         emit Trade(msg.sender, _o, _t, _oAmt, tAmt_);
 
@@ -253,18 +256,18 @@ contract Loihi is LoihiRoot {
     /// @return tAmt_ the amount of target that has been swapped for the origin
     function viewOriginTrade (address _o, address _t, uint256 _oAmt) public notFrozen returns (uint256) {
 
-        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
-        _assims[0] = shell.assimilators[_o];
-        _assims[1] = shell.assimilators[_t];
+        // Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
+        // _assims[0] = shell.assimilators[_o];
+        // _assims[1] = shell.assimilators[_t];
 
-        _assims[0].viewNumeraireAmount(_oAmt);
-        _assims[1].viewNumeraireBalance(_assims[0].amt.neg());
+        // _assims[0].viewNumeraireAmount(_oAmt);
+        // _assims[1].viewNumeraireBalance(_assims[0].amt.neg());
 
-        if (_assims[0].ix == _assims[1].ix) return _assims[1].viewRawAmount();
+        // if (_assims[0].ix == _assims[1].ix) return _assims[1].viewRawAmount();
 
-        ( _assims, ) = shell.calculateOriginTrade(_assims);
+        // ( _assims, ) = shell.calculateOriginTrade(_assims);
 
-        return  _assims[1].viewRawAmount();
+        // return  _assims[1].viewRawAmount();
 
     }
 
@@ -282,6 +285,56 @@ contract Loihi is LoihiRoot {
 
     }
 
+    // /// @author james foley http://github.com/realisation
+    // /// @notice swap a dynamic origin amount for a fixed target amount
+    // /// @param _o the address of the origin
+    // /// @param _t the address of the target
+    // /// @param _mOAmt the maximum origin amount
+    // /// @param _tAmt the target amount
+    // /// @param _dline deadline in block number after which the trade will not execute
+    // /// @return oAmt_ the amount of origin that has been swapped for the target
+    // function swapByTargetHack (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) public notFrozen returns (uint256) {
+
+    //     return transferByTargetHack(_o, _t, _mOAmt, _dline, _tAmt, msg.sender);
+
+    // }
+
+    // /// @author james foley http://github.com/realisation
+    // /// @notice transfer a dynamic origin amount into a fixed target amount at the recipients address
+    // /// @param _o the address of the origin
+    // /// @param _t the address of the target
+    // /// @param _mOAmt the maximum origin amount
+    // /// @param _tAmt the target amount
+    // /// @param _dline deadline in block number after which the trade will not execute
+    // /// @param _rcpnt the address of the recipient of the target
+    // /// @return oAmt_ the amount of origin that has been swapped for the target
+    // function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline, address _rcpnt) public notFrozen nonReentrant returns (uint256 oAmt_) {
+
+    //     Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
+    //     _assims[0] = shell.assimilators[_o];
+    //     _assims[1] = shell.assimilators[_t];
+
+    //     _assims[1].outputRaw(_rcpnt, _tAmt);
+    //     _assims[0].viewNumeraireBalance(_assims[1].amt);
+
+    //     if (_assims[0].ix == _assims[1].ix) {
+
+    //         require((oAmt_ = _assims[0].intakeNumeraire()) < _mOAmt, "above-maximum-origin-amount");
+
+    //         return oAmt_;
+
+    //     }
+
+    //     ( _assims, shell.omega ) = shell.calculateTargetTrade(_assims);
+
+    //     require((oAmt_ = _assims[0].intakeNumeraire()) < _mOAmt, "above-maximum-origin-amount");
+
+    //     emit Trade(msg.sender, _o, _t, oAmt_, _tAmt);
+
+    //     emit log_uint("target swap", 0);
+
+    // }
+
     /// @author james foley http://github.com/realisation
     /// @notice transfer a dynamic origin amount into a fixed target amount at the recipients address
     /// @param _o the address of the origin
@@ -291,30 +344,44 @@ contract Loihi is LoihiRoot {
     /// @param _dline deadline in block number after which the trade will not execute
     /// @param _rcpnt the address of the recipient of the target
     /// @return oAmt_ the amount of origin that has been swapped for the target
-    function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline, address _rcpnt) public notFrozen nonReentrant returns (uint256 oAmt_) {
+    function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _dline, uint256 _tAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 oAmt_) {
 
-        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
-        _assims[0] = shell.assimilators[_o];
-        _assims[1] = shell.assimilators[_t];
+        uint _length = shell.reserves.length;
+        Assimilators.Assimilator memory _origin = shell.assimilators[_o];
+        Assimilators.Assimilator memory _target = shell.assimilators[_t];
 
-        _assims[1].outputRaw(_rcpnt, _tAmt);
-        _assims[0].viewNumeraireBalance(_assims[1].amt);
+        int128 _amt;
+        int128 _oGLiq;
+        int128 _nGLiq;
+        int128[] memory _nBals = new int128[](_length);
+        int128[] memory _oBals = new int128[](_length);
 
-        if (_assims[0].ix == _assims[1].ix) {
+        for (uint i = 0; i < _oBals.length; i++) {
 
-            require((oAmt_ = _assims[0].intakeNumeraire()) < _mOAmt, "above-maximum-origin-amount");
+            if (i != _target.ix) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
+            else {
 
-            return oAmt_;
+                int128 _bal;
+                ( _amt, _bal ) = _target.outputRaw(_rcpnt, _tAmt);
+
+                _oBals[i] = _bal.sub(_amt);
+                _nBals[i] = _bal;
+
+            }
+
+            _oGLiq += _oBals[i];
+            _nGLiq += _nBals[i];
 
         }
 
-        ( _assims, shell.omega ) = shell.calculateTargetTrade(_assims);
+        _nBals[_origin.ix] = _nBals[_origin.ix].sub(_amt);
+        _nGLiq = _nGLiq.sub(_amt);
 
-        require((oAmt_ = _assims[0].intakeNumeraire()) < _mOAmt, "above-maximum-origin-amount");
+        ( _amt, shell.omega ) = shell.calculateTargetTrade(_origin.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+                                // intakeNumeraire
+        require((oAmt_ = _origin.intakeNumeraire(_amt)) < _mOAmt, "above-maximum-origin-amount");
 
         emit Trade(msg.sender, _o, _t, oAmt_, _tAmt);
-
-        emit log_uint("target swap", 0);
 
     }
 
@@ -326,23 +393,48 @@ contract Loihi is LoihiRoot {
     /// @return oAmt_ the amount of target that has been swapped for the origin
     function viewTargetTrade (address _o, address _t, uint256 _tAmt) public notFrozen returns (uint256) {
 
-        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
-        _assims[0] = shell.assimilators[_o];
-        _assims[1] = shell.assimilators[_t];
+        // Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
+        // _assims[0] = shell.assimilators[_o];
+        // _assims[1] = shell.assimilators[_t];
 
-        _assims[1].viewNumeraireAmount(_tAmt);
-        _assims[1].amt = _assims[1].amt.neg();
-        _assims[0].viewNumeraireBalance(_assims[1].amt);
+        // _assims[1].viewNumeraireAmount(_tAmt);
+        // _assims[1].amt = _assims[1].amt.neg();
+        // _assims[0].viewNumeraireBalance(_assims[1].amt);
 
-        if (_assims[0].ix == _assims[1].ix) return _assims[0].intakeNumeraire();
+        // if (_assims[0].ix == _assims[1].ix) return _assims[0].intakeNumeraire();
 
-        ( _assims, ) = shell.calculateTargetTrade(_assims);
+        // ( _assims, ) = shell.calculateTargetTrade(_assims);
 
-        _assims[0].amt = _assims[0].amt.mul(ONE.add(shell.epsilon));
+        // _assims[0].amt = _assims[0].amt.mul(ONE.add(shell.epsilon));
 
-        return _assims[0].viewRawAmount();
+        // return _assims[0].viewRawAmount();
 
     }
+
+    // /// @author james foley http://github.com/realisation
+    // /// @notice selectively deposit any supported stablecoin flavor into the contract in return for corresponding amount of shell tokens
+    // /// @param _flvrs an array containing the addresses of the flavors being deposited into
+    // /// @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
+    // /// @param _minShells minimum acceptable amount of shells
+    // /// @param _dline deadline for tx
+    // /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
+    // function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external notFrozen nonReentrant returns (uint256 shells_) {
+    //     require(block.timestamp < _dline, "Shell/tx-deadline-passed");
+
+    //     Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](_flvrs.length);
+
+    //     for (uint i = 0; i < _flvrs.length; i++) {
+    //         _assims[i] = shell.assimilators[_flvrs[i]];
+    //         _assims[i].intakeRaw(_amts[i]);
+    //     }
+
+    //     ( shells_, shell.omega ) = shell.calculateSelectiveDeposit(_assims);
+
+    //     require(_minShells < shells_, "Shell/under-minimum-shells");
+
+    //     shell.mint(msg.sender, shells_);
+
+    // }
 
     /// @author james foley http://github.com/realisation
     /// @notice selectively deposit any supported stablecoin flavor into the contract in return for corresponding amount of shell tokens
@@ -352,31 +444,6 @@ contract Loihi is LoihiRoot {
     /// @param _dline deadline for tx
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external notFrozen nonReentrant returns (uint256 shells_) {
-        require(block.timestamp < _dline, "Shell/tx-deadline-passed");
-
-        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](_flvrs.length);
-
-        for (uint i = 0; i < _flvrs.length; i++) {
-            _assims[i] = shell.assimilators[_flvrs[i]];
-            _assims[i].intakeRaw(_amts[i]);
-        }
-
-        ( shells_, shell.omega ) = shell.calculateSelectiveDeposit(_assims);
-
-        require(_minShells < shells_, "Shell/under-minimum-shells");
-
-        shell.mint(msg.sender, shells_);
-
-    }
-
-    /// @author james foley http://github.com/realisation
-    /// @notice selectively deposit any supported stablecoin flavor into the contract in return for corresponding amount of shell tokens
-    /// @param _flvrs an array containing the addresses of the flavors being deposited into
-    /// @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
-    /// @param _minShells minimum acceptable amount of shells
-    /// @param _dline deadline for tx
-    /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
-    function selectiveDepositHack (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external notFrozen nonReentrant returns (uint256 shells_) {
         require(block.timestamp < _dline, "Shell/tx-deadline-passed");
 
         uint _length = shell.reserves.length;
@@ -390,10 +457,7 @@ contract Loihi is LoihiRoot {
 
             Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
 
-            ( int128 _amount, int128 _balance ) = _assim.intakeRawHack(_amts[i]);
-
-            // emit log_int("_amount", _amount.muli(1e18));
-            // emit log_int("_balance", _balance.muli(1e18));
+            ( int128 _amount, int128 _balance ) = _assim.intakeRaw(_amts[i]);
 
             _nBals[_assim.ix] = _balance;
             _oBals[_assim.ix] = _balance.sub(_amount);
@@ -421,7 +485,7 @@ contract Loihi is LoihiRoot {
         // for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
         // for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
 
-        ( shells_, shell.omega ) = shell.calculateSelectiveDepositHack(_oGLiq, _nGLiq, _oBals, _nBals);
+        ( shells_, shell.omega ) = shell.calculateSelectiveDeposit(_oGLiq, _nGLiq, _oBals, _nBals);
 
         require(_minShells < shells_, "Shell/under-minimum-shells");
 
@@ -488,6 +552,30 @@ contract Loihi is LoihiRoot {
 
     }
 
+    // /// @author james foley http://github.com/realisation
+    // /// @notice selectively withdrawal any supported stablecoin flavor from the contract by burning a corresponding amount of shell tokens
+    // /// @param _flvrs an array of flavors to withdraw from the reserves
+    // /// @param _amts an array of amounts to withdraw that maps to _flavors
+    // /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
+    // function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _dline) external notFrozen nonReentrant returns (uint256 shells_) {
+    //     require(block.timestamp < _dline, "Shell/tx-deadline-passed");
+
+    //     Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](_flvrs.length);
+
+    //     for (uint i = 0; i < _flvrs.length; i++) {
+    //         _assims[i] = shell.assimilators[_flvrs[i]];
+    //         _assims[i].outputRaw(msg.sender, _amts[i]);
+    //     }
+
+    //     ( shells_, shell.omega ) = shell.calculateSelectiveWithdraw(_assims);
+
+    //     require(shells_ < _maxShells, "Shell/above-maximum-shells");
+
+    //     shell.burn(msg.sender, shells_);
+
+    // }
+
+
     /// @author james foley http://github.com/realisation
     /// @notice selectively withdrawal any supported stablecoin flavor from the contract by burning a corresponding amount of shell tokens
     /// @param _flvrs an array of flavors to withdraw from the reserves
@@ -496,30 +584,50 @@ contract Loihi is LoihiRoot {
     function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _dline) external notFrozen nonReentrant returns (uint256 shells_) {
         require(block.timestamp < _dline, "Shell/tx-deadline-passed");
 
-        Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](_flvrs.length);
+        uint _length = shell.reserves.length;
+
+        int128 _oGLiq;
+        int128 _nGLiq;
+        int128[] memory _oBals = new int128[](_length);
+        int128[] memory _nBals = new int128[](_length);
 
         for (uint i = 0; i < _flvrs.length; i++) {
-            _assims[i] = shell.assimilators[_flvrs[i]];
-            _assims[i].outputRaw(msg.sender, _amts[i]);
+
+            Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
+
+            ( int128 _amount, int128 _balance ) = _assim.outputRaw(msg.sender, _amts[i]);
+
+            _nBals[_assim.ix] = _balance;
+            _oBals[_assim.ix] = _balance.sub(_amount);
+
         }
 
-        emit log_uint("shell.omega", shell.omega.mulu(1e18));
- 
-        ( shells_, shell.omega ) = shell.calculateSelectiveWithdraw(_assims);
+        // emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        // emit log_int("_nGLiq", _nGLiq.muli(1e18));
 
-        emit log_uint("shells_", shells_);
-        emit log_uint("shell.omega", shell.omega.mulu(1e18));
-        emit log_uint("max shells", _maxShells);
+        // for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
+        // for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
+
+        for (uint i = 0; i < _length; i++) {
+
+            if (_oBals[i] == 0 && _nBals[i] == 0) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
+
+            _oGLiq += _oBals[i];
+            _nGLiq += _nBals[i];
+
+        }
+
+        // emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        // emit log_int("_nGLiq", _nGLiq.muli(1e18));
+
+        // for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
+        // for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
+
+        ( shells_, shell.omega ) = shell.calculateSelectiveWithdraw(_oGLiq, _nGLiq, _oBals, _nBals);
 
         require(shells_ < _maxShells, "Shell/above-maximum-shells");
 
-        emit log("post require");
-
-        emit log_uint("balance of", shell.balances[msg.sender]);
-
         shell.burn(msg.sender, shells_);
-
-        emit log("post burn");
 
     }
 

@@ -41,36 +41,37 @@ library Assimilators {
 
     struct Assimilator {
         address addr;
-        uint256 ix;
-        int128 amt;
-        int128 bal;
+        uint8 ix;
+        // uint ix;
+        // int128 amt;
+        // int128 bal;
     }
 
-    function flip (Assimilator memory _assim) internal view {
+    // function flip (Assimilator memory _assim) internal view {
 
-        _assim.amt = _assim.amt.neg();
+    //     _assim.amt = _assim.amt.neg();
 
-    }
+    // }
 
-    function viewRawAmount (Assimilator memory _assim) internal returns (uint256 amount_) {
+    // function viewRawAmount (Assimilator memory _assim) internal returns (uint256 amount_) {
 
-        // amount_ = IAssimilator(_assim.addr).viewRawAmount(_assim.amt);
+    //     // amount_ = IAssimilator(_assim.addr).viewRawAmount(_assim.amt);
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewRawAmount.selector, _assim.amt);
+    //     bytes memory data = abi.encodeWithSelector(iAsmltr.viewRawAmount.selector, _assim.amt);
 
-        amount_ = abi.decode(_assim.addr.delegate(data), (uint256));
+    //     amount_ = abi.decode(_assim.addr.delegate(data), (uint256));
 
-    }
+    // }
 
-    function viewNumeraireAmount (Assimilator memory _assim, uint256 _amt) internal {
+    // function viewNumeraireAmount (Assimilator memory _assim, uint256 _amt) internal {
 
-        // amount_ = IAssimilator(_assim.addr).viewNumeraireAmount(_amt);
+    //     // amount_ = IAssimilator(_assim.addr).viewNumeraireAmount(_amt);
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireAmount.selector, _amt);
+    //     bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireAmount.selector, _amt);
 
-        _assim.amt = abi.decode(_assim.addr.delegate(data), (int128));
+    //     _assim.amt = abi.decode(_assim.addr.delegate(data), (int128));
 
-    }
+    // }
 
     event log_addr(bytes32, address);
 
@@ -84,28 +85,28 @@ library Assimilators {
 
     }
 
-    function viewNumeraireBalance (Assimilator memory _assim, int128 _amt) internal {
+    // function viewNumeraireBalance (Assimilator memory _assim, int128 _amt) internal {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireBalance.selector, address(this));
+    //     bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireBalance.selector, address(this));
 
-        _assim.amt = _amt.neg();
+    //     _assim.amt = _amt.neg();
 
-        _assim.bal = abi.decode(_assim.addr.delegate(data), (int128));
+    //     _assim.bal = abi.decode(_assim.addr.delegate(data), (int128));
 
-        _assim.bal = _assim.bal.add(_assim.amt);
+    //     _assim.bal = _assim.bal.add(_assim.amt);
 
 
-    }
+    // }
 
-    function intakeRaw (Assimilator memory _assim, uint256 _amount) internal {
+    // function intakeRaw (Assimilator memory _assim, uint256 _amount) internal {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.intakeRaw.selector, _amount); // encoded selector of "intakeRaw(uint256)";
+    //     bytes memory data = abi.encodeWithSelector(iAsmltr.intakeRaw.selector, _amount); // encoded selector of "intakeRaw(uint256)";
 
-        ( _assim.amt, _assim.bal ) = abi.decode(_assim.addr.delegate(data), (int128,int128));
+    //     ( _assim.amt, _assim.bal ) = abi.decode(_assim.addr.delegate(data), (int128,int128));
 
-    }
+    // }
 
-    function intakeRawHack (Assimilator memory _assim, uint256 _amount) internal returns (int128 amt_, int128 bal_) {
+    function intakeRaw (Assimilator memory _assim, uint256 _amount) internal returns (int128 amt_, int128 bal_) {
 
         bytes memory data = abi.encodeWithSelector(iAsmltr.intakeRaw.selector, _amount); // encoded selector of "intakeRaw(uint256)";
 
@@ -113,11 +114,17 @@ library Assimilators {
 
     }
 
-    function intakeNumeraire (Assimilator memory _assim) internal returns (uint256 rawAmt_) {
+    // function intakeNumeraire (Assimilator memory _assim) internal returns (uint256 rawAmt_) {
 
-        rawAmt_ = intakeNumeraire(_assim, _assim.amt);
+    //     rawAmt_ = intakeNumeraire(_assim, _assim.amt);
 
-    }
+    // }
+
+    // function intakeNumeraire (Assimilator memory _assim, int128 _amt) internal returns (uint256 rawAmt_) {
+
+    //     rawAmt_ = intakeNumeraire(_assim, _amt);
+
+    // }
 
     function intakeNumeraire (Assimilator memory _assim, int128 _amt) internal returns (uint256 rawAmt_) {
 
@@ -127,15 +134,46 @@ library Assimilators {
 
     }
 
-    function outputRaw (Assimilator memory _assim, address _dst, uint256 _amount) internal {
+    // function outputRaw (Assimilator memory _assim, address _dst, uint256 _amount) internal {
+
+    //     bytes memory data = abi.encodeWithSelector(iAsmltr.outputRaw.selector, _dst, _amount);
+
+    //     ( _assim.amt, _assim.bal ) = abi.decode(_assim.addr.delegate(data), (int128,int128));
+
+    //     _assim.amt = _assim.amt.neg();
+
+    // }
+
+    function outputRaw (Assimilator memory _assim, address _dst, uint256 _amount) internal returns (int128 amt_, int128 bal_) {
 
         bytes memory data = abi.encodeWithSelector(iAsmltr.outputRaw.selector, _dst, _amount);
 
-        ( _assim.amt, _assim.bal ) = abi.decode(_assim.addr.delegate(data), (int128,int128));
+        ( amt_, bal_ ) = abi.decode(_assim.addr.delegate(data), (int128,int128));
 
-        _assim.amt = _assim.amt.neg();
+        amt_ = amt_.neg();
 
     }
+
+    event log(bytes32);
+
+    // function outputRawHack (Assimilator memory _assim, address _dst, uint256 _amount) internal returns (int128, int128) {
+
+    //     emit log("output raw hack");
+    //     emit log_uint("_amount", _amount);
+    //     emit log_addr("_dst", _dst);
+
+    //     bytes memory data = abi.encodeWithSelector(iAsmltr.outputRaw.selector, _dst, _amount);
+    //     emit log("raw hack");
+
+    //     ( int128 amt_, int128 bal_ ) = abi.decode(_assim.addr.delegate(data), (int128,int128));
+
+    //     emit log("hack");
+
+    //     amt_ = amt_.neg();
+
+    //     return (amt_, bal_);
+
+    // }
 
     event log_uint(bytes32, uint256);
     event log_int(bytes32, int256);
@@ -145,22 +183,22 @@ library Assimilators {
         // emit log_uint("Raw Amount", rawAmt_);
 
         // emit log_int("_amt", _amt.muli(1e18));
-        
+
         rawAmt_ = outputNumeraire(_assim, _dst, _amt.abs());
 
         // emit log_uint("Raw Amount", rawAmt_);
 
     }
 
-    function outputNumeraire (Assimilator memory _assim, address _dst) internal returns (uint256 rawAmt_) {
+    // function outputNumeraire (Assimilator memory _assim, address _dst) internal returns (uint256 rawAmt_) {
 
-        rawAmt_ = outputNumeraire(_assim, _dst, _assim.amt.abs());
+    //     rawAmt_ = outputNumeraire(_assim, _dst, _assim.amt.abs());
 
-    }
+    // }
 
     function outputNumeraire (Assimilator memory _assim, address _dst, int128 _amt) internal returns (uint256 rawAmt_) {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.outputNumeraire.selector, _dst, _amt);
+        bytes memory data = abi.encodeWithSelector(iAsmltr.outputNumeraire.selector, _dst, _amt.abs());
 
         rawAmt_ = abi.decode(_assim.addr.delegate(data), (uint256));
 

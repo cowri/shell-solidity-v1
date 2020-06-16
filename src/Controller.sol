@@ -75,7 +75,7 @@ library Controller {
 
         _numeraireAssimilator.addr = _numeraireAssim;
 
-        _numeraireAssimilator.ix = shell.numeraires.length;
+        _numeraireAssimilator.ix = uint8(shell.numeraires.length);
 
         shell.numeraires.push(_numeraireAssimilator);
 
@@ -83,7 +83,7 @@ library Controller {
 
         _reserveAssimilator.addr = _reserveAssim;
 
-        _reserveAssimilator.ix = shell.reserves.length;
+        _reserveAssimilator.ix = uint8(shell.reserves.length);
 
         shell.reserves.push(_reserveAssimilator);
 
@@ -95,7 +95,8 @@ library Controller {
 
         Assimilators.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
-        shell.assimilators[_derivative] = Assimilators.Assimilator(_assimilator, _numeraireAssim.ix, 0, 0);
+        shell.assimilators[_derivative] = Assimilators.Assimilator(_assimilator, _numeraireAssim.ix);
+        // shell.assimilators[_derivative] = Assimilators.Assimilator(_assimilator, _numeraireAssim.ix, 0, 0);
 
     }
 

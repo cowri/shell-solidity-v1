@@ -166,47 +166,47 @@ contract OriginSwapTemplate is Setup {
 
     }
 
-    function fullUpperAndLowerSlippage_unbalanced_30PctWeight_NO_HACK () public returns (uint256 targetAmount_) {
+    // function fullUpperAndLowerSlippage_unbalanced_30PctWeight_NO_HACK () public returns (uint256 targetAmount_) {
 
-        l.deposit(
-            address(dai), 135e18,
-            address(usdc), 90e6,
-            address(usdt), 60e6,
-            address(susd), 30e18
-        );
+    //     l.deposit(
+    //         address(dai), 135e18,
+    //         address(usdc), 90e6,
+    //         address(usdt), 60e6,
+    //         address(susd), 30e18
+    //     );
 
-        uint256 gas = gasleft();
+    //     uint256 gas = gasleft();
 
-        targetAmount_ = l.originSwap(
-            address(dai),
-            address(usdt),
-            5e18
-        );
+    //     targetAmount_ = l.originSwap(
+    //         address(dai),
+    //         address(usdt),
+    //         5e18
+    //     );
 
-        emit log_uint("gas for swap", gas - gasleft());
+    //     emit log_uint("gas for swap", gas - gasleft());
 
-    }
+    // }
 
-    function fullUpperAndLowerSlippage_unbalanced_30PctWeight_HACK () public returns (uint256 targetAmount_) {
+    // function fullUpperAndLowerSlippage_unbalanced_30PctWeight_HACK () public returns (uint256 targetAmount_) {
 
-        l.deposit(
-            address(dai), 135e18,
-            address(usdc), 90e6,
-            address(usdt), 60e6,
-            address(susd), 30e18
-        );
+    //     l.deposit(
+    //         address(dai), 135e18,
+    //         address(usdc), 90e6,
+    //         address(usdt), 60e6,
+    //         address(susd), 30e18
+    //     );
 
-        uint256 gas = gasleft();
+    //     uint256 gas = gasleft();
 
-        targetAmount_ = l.originSwapHack(
-            address(dai),
-            address(usdt),
-            5e18
-        );
+    //     targetAmount_ = l.originSwapHack(
+    //         address(dai),
+    //         address(usdt),
+    //         5e18
+    //     );
 
-        emit log_uint("gas for swap", gas - gasleft());
+    //     emit log_uint("gas for swap", gas - gasleft());
 
-    }
+    // }
 
     function fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight () public returns (uint256 targetAmount_) {
 
@@ -255,11 +255,15 @@ contract OriginSwapTemplate is Setup {
             address(susd), 35e18
         );
 
+        uint gas = gasleft();
+
         targetAmount_ = l.originSwap(
             address(susd),
             address(usdc),
             2.8e18
         );
+
+        emit log_uint("gas used", gas - gasleft());
 
     }
 
@@ -297,47 +301,47 @@ contract OriginSwapTemplate is Setup {
 
     }
 
-    function partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight_NO_HACK () public returns (uint256 targetAmount_) {
+    // function partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight_NO_HACK () public returns (uint256 targetAmount_) {
 
-        l.deposit(
-            address(dai), 135e18,
-            address(usdc), 90e6,
-            address(usdt), 90e6,
-            address(susd), 25e18
-        );
+    //     l.deposit(
+    //         address(dai), 135e18,
+    //         address(usdc), 90e6,
+    //         address(usdt), 90e6,
+    //         address(susd), 25e18
+    //     );
 
-        uint256 gas = gasleft();
+    //     uint256 gas = gasleft();
 
-        targetAmount_ = l.originSwap(
-            address(susd),
-            address(dai),
-            10e18
-        );
+    //     targetAmount_ = l.originSwap(
+    //         address(susd),
+    //         address(dai),
+    //         10e18
+    //     );
 
-        emit log_uint("gas for swap", gas - gasleft());
+    //     emit log_uint("gas for swap", gas - gasleft());
 
-    }
+    // }
 
-    function partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight_HACK () public returns (uint256 targetAmount_) {
+    // function partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight_HACK () public returns (uint256 targetAmount_) {
 
-        l.deposit(
-            address(dai), 135e18,
-            address(usdc), 90e6,
-            address(usdt), 90e6,
-            address(susd), 25e18
-        );
+    //     l.deposit(
+    //         address(dai), 135e18,
+    //         address(usdc), 90e6,
+    //         address(usdt), 90e6,
+    //         address(susd), 25e18
+    //     );
 
-        uint256 gas = gasleft();
+    //     uint256 gas = gasleft();
 
-        targetAmount_ = l.originSwapHack(
-            address(susd),
-            address(dai),
-            10e18
-        );
+    //     targetAmount_ = l.originSwapHack(
+    //         address(susd),
+    //         address(dai),
+    //         10e18
+    //     );
 
-        emit log_uint("gas for swap", gas - gasleft());
+    //     emit log_uint("gas for swap", gas - gasleft());
 
-    }
+    // }
 
     function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight () public returns (uint256 targetAmount_) {
 
@@ -365,11 +369,15 @@ contract OriginSwapTemplate is Setup {
             address(susd), 30e18
         );
 
+        uint256 gas = gasleft();
+
         targetAmount_ = l.originSwap(
             address(usdt),
             address(usdc),
             5e6
         );
+
+        emit log_uint("gas used", gas - gasleft());
 
     }
 
