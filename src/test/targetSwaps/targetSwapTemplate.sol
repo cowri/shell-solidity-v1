@@ -17,6 +17,7 @@ contract TargetSwapTemplate is Setup {
     using LoihiMethods for Loihi;
 
     Loihi l;
+    Loihi l2;
 
     function noSlippage_balanced_DAI_to_10USDC_300Proportional () public returns (uint256 originAmount_) {
 
@@ -755,6 +756,25 @@ contract TargetSwapTemplate is Setup {
             address(usdt),
             address(susd),
             1e18
+        );
+
+    }
+
+    function monotonicity_outOfBand_mutuallyOutOfBound_zero_noHalts_omegaUpdate () public returns (uint256 originAmount_) {
+
+        l.proportionalDeposit(300e18);
+
+        susd.transfer(address(l), 4970e18);
+        asusd.transfer(address(l), 4970e18);
+
+        l.prime();
+
+        l.setTestHalts(false);
+
+        originAmount_ = l.targetSwap(
+            address(usdt),
+            address(susd),
+            0
         );
 
     }

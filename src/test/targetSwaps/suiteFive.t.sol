@@ -69,5 +69,12 @@ contract TargetSwapSuiteFiveTest is TargetSwapTemplate, DSTest {
 
     }
 
+    function test_s5_targetSwap_monotonicity_outOfBand_mutuallyOutOfBound_zero_noHalts_omegaUpdate () public {
+
+        uint256 originAmount = super.monotonicity_outOfBand_mutuallyOutOfBound_zero_noHalts_omegaUpdate();
+
+        emit log_named_uint("originAmount", originAmount);
+
+    }
 
 }

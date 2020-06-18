@@ -64,12 +64,18 @@ contract LoihiSetup is StorageSetup {
         uint256 _max = .49e18;
         uint256 _epsilon = 2.5e14;
         uint256 _lambda = .2e18;
-        emit log_uint("_alpha", _alpha);
-        emit log_uint("_beta", _beta);
-        emit log_uint("_max", _max);
-        emit log_uint("_epsilon", _epsilon);
-        emit log_uint("_lambda", _lambda);
 
+        _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda, 0);
+
+    }
+
+    function setParamsSetFive (Loihi _loihi) public {
+
+        uint256 _alpha = .9e18;
+        uint256 _beta = .4e18;
+        uint256 _max = .15e18;
+        uint256 _epsilon = 3.5e14;
+        uint256 _lambda = .5e18;
 
         _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda, 0);
 

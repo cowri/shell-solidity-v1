@@ -34,6 +34,18 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
     }
 
+    function getLoihiSuiteSix () public returns (Loihi loihi_) {
+
+        loihi_ = getLoihiSuiteSixLocal();
+
+    }
+
+    function getLoihiSuiteSixClone () public returns (Loihi loihi_) {
+
+        loihi_ = getLoihiSuiteSixLocalClone();
+
+    }
+
     event log(bytes32);
 
     function getLoihiSuiteOneLocal () public returns (Loihi loihi_) {
@@ -46,11 +58,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         includeAssetsSetOne(loihi_);
         includeAssimilatorsSetOne(loihi_);
 
-        emit log("before params set");
-
         setParamsSetOne(loihi_);
-
-        emit log("after params set");
 
         approveStablecoins(address(loihi_));
         interApproveStablecoinsLocal(address(loihi_));
@@ -171,4 +179,48 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         );
 
     }
+
+    function getLoihiSuiteSixLocal () public returns (Loihi loihi_) {
+
+        setupStablecoinsLocal();
+        setupAssimilatorsSetOneLocal();
+
+        loihi_ = new Loihi();
+
+        includeAssetsSetOne(loihi_);
+        includeAssimilatorsSetOne(loihi_);
+        setParamsSetThree(loihi_);
+
+        approveStablecoins(address(loihi_));
+        interApproveStablecoinsLocal(address(loihi_));
+
+        loihi_.includeTestAssimilatorState(
+            dai, cdai, chai, pot,
+            usdc, cusdc,
+            usdt, ausdt,
+            susd, asusd
+        );
+
+    }
+
+    function getLoihiSuiteSixLocalClone () public returns (Loihi loihi_) {
+
+        loihi_ = new Loihi();
+
+        includeAssetsSetOne(loihi_);
+        includeAssimilatorsSetOne(loihi_);
+        setParamsSetThree(loihi_);
+
+        approveStablecoins(address(loihi_));
+        interApproveStablecoinsLocal(address(loihi_));
+
+        loihi_.includeTestAssimilatorState(
+            dai, cdai, chai, pot,
+            usdc, cusdc,
+            usdt, ausdt,
+            susd, asusd
+        );
+
+    }
+
 }

@@ -16,6 +16,7 @@ contract SelectiveDepositTemplate is Setup {
     using LoihiMethods for Loihi;
 
     Loihi l;
+    Loihi l2;
 
     function noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD () public returns (uint256 shellsMinted_) {
 

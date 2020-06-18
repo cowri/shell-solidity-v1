@@ -16,6 +16,7 @@ contract SelectiveWithdrawTemplate is Setup {
     using LoihiMethods for Loihi;
 
     Loihi l;
+    Loihi l2;
 
     event log_uint(bytes32, uint256);
     event log_uints(bytes32, uint256[]);
