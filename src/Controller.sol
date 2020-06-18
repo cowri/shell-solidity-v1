@@ -47,7 +47,7 @@ library Controller {
 
         require(shell.alpha < ONE && shell.alpha > 0, "Shell/parameter-invalid-alpha");
         require(shell.beta < shell.alpha && shell.beta > 0, "Shell/parameter-invalid-beta");
-        require(shell.epsilon > 0 && _epsilon < 1e16, "Shell/parameter-invalid-epsilon");
+        require(shell.epsilon >= 0 && _epsilon < 1e16, "Shell/parameter-invalid-epsilon");
 
         require(shell.max <= ONE.div(uint256(2).fromUInt()), "Shell/parameter-invalid-max-fee");
 
