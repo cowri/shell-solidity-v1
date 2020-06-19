@@ -52,7 +52,6 @@ library Shells {
         int128 epsilon;
         int128 lambda;
         int128 omega;
-        int128 max;
         int128[] weights;
         Assimilators.Assimilator[] numeraires;
         Assimilators.Assimilator[] reserves;

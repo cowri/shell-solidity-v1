@@ -34,38 +34,38 @@ library Controller {
     event log_uint(bytes32, uint);
     event log_addr(bytes32, address);
 
-    function setParams (Shells.Shell storage shell, uint256 _alpha, uint256 _beta, uint256 _max, uint256 _epsilon, uint256 _lambda, uint256 _omega) internal {
+    function setParams (Shells.Shell storage shell, uint256 _alpha, uint256 _beta, uint256 _max, uint256 _epsilon, uint256 _lambda) internal returns (uint256 max_) {
 
-        shell.max = _max.divu(1e18);
+        require(_max <= .5e18, "Shell/parameter-invalid-max");
+        int128 max_ = _max.divu(1e18);
+
+        int128 _gLiq;
+        int128[] memory _bals = new int128[](shell.reserves.length);
+        for (uint i = 0; i < _bals.length; i++) {
+            int128 _bal = shell.reserves[i].viewNumeraireBalance();
+            _gLiq += _bal;
+            _bals[i] = _bal;
+        }
+ 
+        int128 _omega = shell.calculateFee(_bals, _gLiq);
 
         shell.alpha = _alpha.divu(1e18);
-
         shell.beta = _beta.divu(1e18);
-        shell.delta = shell.max.div(uint256(2).fromUInt().mul(shell.alpha.sub(shell.beta)));
+        shell.delta = _max.divu(1e18).div(uint(2).fromUInt().mul(shell.alpha.sub(shell.beta)));
         shell.epsilon = _epsilon.divu(1e18);
         shell.lambda = _lambda.divu(1e18);
 
         require(shell.alpha < ONE && shell.alpha > 0, "Shell/parameter-invalid-alpha");
-        require(shell.beta < shell.alpha && shell.beta > 0, "Shell/parameter-invalid-beta");
+        require(shell.beta <= shell.alpha && shell.beta >= 0, "Shell/parameter-invalid-beta");
         require(shell.epsilon >= 0 && _epsilon < 1e16, "Shell/parameter-invalid-epsilon");
+        require(shell.lambda >= 0 && shell.lambda <= ONE, "Shell/parameter-invalid-lambda");
 
-        require(shell.max <= ONE.div(uint256(2).fromUInt()), "Shell/parameter-invalid-max-fee");
+        int128 _psi = shell.calculateFee(_bals, _gLiq);
+        shell.omega = _psi;
 
-        // emit log_uint("shell.weights.length", shell.weights.length);
-        // int128 _totalBalance;
-        // for (uint i = 0; i < shell.weights.length; i++) {
-        //     _totalBalance += shell.reserves[i].viewNumeraireBalance();
-        // }
+        require(_omega >= _psi, "Shell/paramter-invalid-psi");
 
-        shell.omega = 0;
-        for (uint i = 0; i < shell.weights.length; i++) {
-            // int128 _ideal = _totalBalance.mul(shell.weights[i]);
-            // int128 _bal = shell.reserves[i].viewNumeraireBalance();
-            // require(_bal > _ideal.mul(ONE.sub(shell.alpha)), "Shell/parameter-lower-halt-check");
-            // require(_bal < _ideal.mul(ONE.add(shell.alpha)), "Shell/parameter-upper-halt-check");
-            // require(ONE > shell.weights[i].mul(ONE.add(shell.alpha)), "Shell/parameter-alpha-check-failed");
-            // shell.omega += Shells.calculateMicroFee(_bal, _ideal, shell.beta, shell.delta);
-        }
+        max_ = _max;
 
     }
 

@@ -37,6 +37,8 @@ contract LoihiRoot {
     bool internal notEntered = true;
     bool public frozen = false;
 
+    uint maxFee; 
+
     bytes4 constant internal ERC20ID = 0x36372b07;
     bytes4 constant internal ERC165ID = 0x01ffc9a7;
 
