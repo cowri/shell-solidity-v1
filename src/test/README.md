@@ -32,17 +32,22 @@ The tests are divided into suites. Suites are composed asset sets and parameter 
     * Assimilator Set One
     * Asset Set One
     * Param Set Three
+
+* Suite Seven - real life:
+    * Assimilator Set One
+    * Asset Set One
+    * Param Set Five
     
 ### Pool Parameter Sets
 
-*   Set One - standard with 2.5 bps base fee:
+*   Set One - standard testing with 2.5 bps base fee:
     * alpha = .5e18;
     * beta = .25e18;
     * max = .5e18;
     * epsilon = 2.5e14;
     * lambda = .2e18;
 
-*   Set Two - standard with 5bps base fee:
+*   Set Two - standard testing with 5bps base fee:
     * alpha = .5e18;
     * beta = .25e18;
     * max = .05e18;
@@ -63,7 +68,12 @@ The tests are divided into suites. Suites are composed asset sets and parameter 
     * epsilon = 2.5e14;
     * lambda = .2e18;
 
-        
+* Set Five:
+    * alpha = .9e18;
+    * beta = .4e18;
+    * max = .05e18;
+    * epsilon = 3.5e14;
+    * lambda = .5e18;
 
 ### Pool Asset Sets
 

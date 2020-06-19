@@ -166,16 +166,16 @@ contract OriginSwapTemplate is Setup {
     function fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight () public returns (uint256 targetAmount_) {
 
         l.deposit(
-            address(dai), 135e18,
-            address(usdc), 90e6,
-            address(usdt), 65e6,
-            address(susd), 25e18
+            address(dai), 13500000e18,
+            address(usdc), 9000000e6,
+            address(usdt), 6500000e6,
+            address(susd), 2500000e18
         );
 
         targetAmount_ = l.originSwap(
             address(dai),
-            address(susd),
-            3e18
+            address(usdt),
+            3000000e18
         );
 
     }
@@ -647,14 +647,14 @@ contract OriginSwapTemplate is Setup {
         );
 
     }
-    
+
     function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyOutOfBounds_noHalts_omegaUpdate () public returns (uint256 targetAmount_) {
 
         l.proportionalDeposit(300e18);
 
         usdt.transfer(address(l), 4910e6);
         ausdt.transfer(address(l), 4910e6);
-        
+
         l.prime();
 
         l.setTestHalts(false);

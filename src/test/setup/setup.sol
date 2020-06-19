@@ -223,4 +223,27 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
     }
 
+    function getLoihiSuiteSeven () public returns (Loihi loihi_) {
+
+        setupStablecoinsLocal();
+        setupAssimilatorsSetOneLocal();
+
+        loihi_ = new Loihi();
+
+        includeAssetsSetOne(loihi_);
+        includeAssimilatorsSetOne(loihi_);
+        setParamsSetFive(loihi_);
+
+        approveStablecoins(address(loihi_));
+        interApproveStablecoinsLocal(address(loihi_));
+
+        loihi_.includeTestAssimilatorState(
+            dai, cdai, chai, pot,
+            usdc, cusdc,
+            usdt, ausdt,
+            susd, asusd
+        );
+
+    }
+
 }
