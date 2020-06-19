@@ -17,6 +17,7 @@ contract OriginSwapTemplate is Setup {
     using LoihiMethods for Loihi;
 
     Loihi l;
+    Loihi l2;
 
     function noSlippage_balanced_10DAI_to_USDC_300Proportional () public returns (uint256 targetAmount_) {
 
@@ -710,10 +711,10 @@ contract OriginSwapTemplate is Setup {
     function monotonicity_mutuallyInBounds_to_mutuallyOutOfBounds_noHalts () public returns (uint256 targetAmount_) {
 
         l.deposit(
-            address(dai), 2000e18,
-            address(usdc), 5000e6,
-            address(usdt), 5000e6,
-            address(susd), 800e18
+            address(dai), 2000e18 / 100,
+            address(usdc), 5000e6 / 100,
+            address(usdt), 5000e6 / 100,
+            address(susd), 800e18 / 100
         );
 
         l.setTestHalts(false);
@@ -721,7 +722,7 @@ contract OriginSwapTemplate is Setup {
         targetAmount_ = l.originSwap(
             address(usdc),
             address(usdt),
-            4900e6
+            4900e6 / 100
         );
 
     }
@@ -842,10 +843,29 @@ contract OriginSwapTemplate is Setup {
 
         l.setTestHalts(false);
 
-        targetAmount_ = l.targetSwap(
+        targetAmount_ = l.originSwap(
             address(usdt),
             address(susd),
-            1e18
+            1e6
+        );
+
+    }
+
+    function monotonicity_outOfBand_mutuallyOutOfBound_zero_noHalts_omegaUpdate () public returns (uint256 targetAmount_) {
+
+        l.proportionalDeposit(300e18);
+
+        susd.transfer(address(l), 4970e18);
+        asusd.transfer(address(l), 4970e18);
+
+        l.prime();
+
+        l.setTestHalts(false);
+
+        targetAmount_ = l.originSwap(
+            address(usdt),
+            address(susd),
+            0
         );
 
     }

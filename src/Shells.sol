@@ -131,51 +131,6 @@ library Shells {
 
     }
 
-
-    // function calculateTargetTrade (
-    //     Shell storage shell,
-    //     Assimilators.Assimilator[] memory assims_
-    // ) internal returns (Assimilators.Assimilator[] memory, int128 psi_) {
-
-    //     (   int128 _oGLiq,
-    //         int128 _nGLiq,
-    //         int128[] memory _oBals,
-    //         int128[] memory _nBals  ) = shell.getPoolData(assims_);
-
-    //     {
-
-    //         int128 _lambda = shell.lambda;
-    //         int128 _omega = shell.omega;
-    //         uint256 _oIx = assims_[0].ix;
-
-    //         for (uint i = 0; i < 10; i++) {
-
-    //             psi_ = shell.calculateFee(_nBals, _nGLiq);
-
-    //             int128 _prev = assims_[0].amt;
-    //             int128 _next = assims_[0].amt = _omega < psi_
-    //                 ? ( assims_[1].amt.sub(psi_.sub(_omega))).neg()
-    //                 : ( assims_[1].amt.add(_lambda.mul(_omega.sub(psi_)))).neg();
-
-    //             _nGLiq = _oGLiq.add(assims_[1].amt).add(_next);
-
-    //             _nBals[_oIx] = _oBals[_oIx].add(_next);
-
-    //             if (_prev / 1e14 == _next / 1e14) break;
-
-    //         }
-
-
-    //     }
-
-    //     shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
-
-    //     assims_[0].amt = assims_[0].amt.mul(ONE.add(shell.epsilon));
-
-    //     return (assims_, psi_);
-
-    // }
-
     function calculateTargetTrade (
         Shell storage shell,
         uint _oIx,
@@ -220,49 +175,6 @@ library Shells {
     }
 
 
-    // function calculateOriginTrade (
-    //     Shell storage shell,
-    //     Assimilators.Assimilator[] memory assims_
-    // ) internal returns (Assimilators.Assimilator[] memory, int128 psi_) {
-
-    //     (   int128 _oGLiq,
-    //         int128 _nGLiq,
-    //         int128[] memory _oBals,
-    //         int128[] memory _nBals  ) = shell.getPoolData(assims_);
-
-    //     {
-    //         int128 _lambda = shell.lambda;
-    //         int128 _omega = shell.omega;
-    //         uint256 _tIx = assims_[1].ix;
-
-    //         for (uint i = 0; i < 10; i++) {
-
-    //             psi_ = shell.calculateFee(_nBals, _nGLiq);
-
-    //             int128 _prev = assims_[1].amt;
-    //             int128 _next = assims_[1].amt = _omega < psi_
-    //                 ? ( assims_[0].amt + _omega - psi_ ).neg()
-    //                 : ( assims_[0].amt + _lambda.mul(_omega - psi_) ).neg();
-
-    //             _nGLiq = _oGLiq + assims_[0].amt + _next;
-
-    //             _nBals[_tIx] = _oBals[_tIx].add(_next);
-
-    //             if (_prev / 1e14 == _next / 1e14) break;
-
-
-    //         }
-
-    //     }
-
-    //     shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
-
-    //     assims_[1].amt = assims_[1].amt.mul(ONE.sub(shell.epsilon));
-
-    //     return (assims_, psi_);
-
-    // }
-
     function calculateOriginTrade (
         Shell storage shell,
         uint _tIx,
@@ -306,63 +218,6 @@ library Shells {
     }
 
 
-    function getPoolData (
-        Shell storage shell,
-        Assimilators.Assimilator[] memory _assims
-    ) internal returns (int128 oGLiq_, int128 nGLiq_, int128[] memory, int128[] memory) {
-
-        uint _assimsLength = _assims.length;
-
-        int128[] memory oBals_ = new int128[](shell.reserves.length);
-        int128[] memory nBals_ = new int128[](shell.reserves.length);
-
-        for (uint i = 0; i <= _assimsLength; i++) {
-
-            for (uint j = 0; j < shell.reserves.length; j++) {
-
-                if (i < _assims.length && _assims[i].ix == j) {
-
-                    if (nBals_[j] == 0) {
-
-                        // int128 _bal = _assims[i].bal;
-                        // nBals_[j] = oBals_[j] = _bal;
-                        // oGLiq_ = oGLiq_.add(_bal);
-                        // nGLiq_ = nGLiq_.add(_bal);
-
-                    }
-
-                    // int128 _amt = _assims[i].amt;
-                    // oGLiq_ = oGLiq_.sub(_amt);
-                    // oBals_[j] = oBals_[j].sub(_amt);
-
-                    break;
-
-                } else if (i == _assims.length && nBals_[j] == 0 && oBals_[j] == 0) {
-
-                    int128 _bal = shell.reserves[j].viewNumeraireBalance();
-
-                    nBals_[j] = oBals_[j] = _bal;
-                    nGLiq_ = nGLiq_.add(_bal);
-                    oGLiq_ = oGLiq_.add(_bal);
-
-                }
-
-            }
-
-        }
-
-        // for (uint i = 0; i < _assims.length; i++) emit log_int("_assims[i]", _assims[i].amt.muli(1e18));
-
-        // emit log_int("oGLiq_", oGLiq_.muli(1e18));
-        // for (uint i = 0; i < oBals_.length; i++) emit log_int("oBals_[i]", oBals_[i].muli(1e18));
-
-        // emit log_int("nGLiq_", nGLiq_.muli(1e18));
-        // for (uint i = 0; i < nBals_.length; i++) emit log_int("nBals_[i]", nBals_[i].muli(1e18));
-
-        return (oGLiq_, nGLiq_, oBals_, nBals_);
-
-    }
-
     function calculateLiquidityMembrane (
         Shell storage shell,
         int128 _oGLiq,
@@ -393,26 +248,6 @@ library Shells {
 
     }
 
-    // function calculateSelectiveDeposit (
-    //     Shells.Shell storage shell,
-    //     Assimilators.Assimilator[] memory _assims
-    // ) internal returns (uint256 shells_, int128 omega_) {
-
-    //     (   int128 _oGLiq,
-    //         int128 _nGLiq,
-    //         int128[] memory _oBals,
-    //         int128[] memory _nBals  ) = shell.getPoolData(_assims);
-
-    //     shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
-
-    //     int128 _shells;
-
-    //     ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
-
-    //     shells_ = _shells.mulu(1e18);
-
-    // }
-
     function calculateSelectiveDeposit (
         Shells.Shell storage shell,
         int128 _oGLiq,
@@ -423,43 +258,13 @@ library Shells {
 
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
 
-        // emit log("after enforcement");
-
         int128 _shells;
-
-        // emit log_int("_oGLiq", _oGLiq.muli(1e18));
-        // emit log_int("_nGLiq", _nGLiq.muli(1e18));
-
-        // for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
-        // for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
 
         ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
 
         shells_ = _shells.mulu(1e18);
 
     }
-
-    // function calculateSelectiveWithdraw (
-    //     Shells.Shell storage shell,
-    //     Assimilators.Assimilator[] memory _assims
-    // ) internal returns (uint256 shells_, int128 omega_) {
-
-    //     (   int128 _oGLiq,
-    //         int128 _nGLiq,
-    //         int128[] memory _oBals,
-    //         int128[] memory _nBals  ) = shell.getPoolData(_assims);
-
-    //     shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
-
-    //     int128 _shells;
-
-    //     ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
-
-    //     shells_ = _shells.abs().mul(ONE.add(shell.epsilon)).mulu(1e18);
-
-    //     // emit log_uint("shells_", shells_);
-
-    // }
 
     function calculateSelectiveWithdraw (
         Shells.Shell storage shell,
@@ -529,8 +334,6 @@ library Shells {
                 }
             }
         }
-
-        // emit log("passed halts");
 
     }
 

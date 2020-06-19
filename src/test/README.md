@@ -23,10 +23,15 @@ The tests are divided into suites. Suites are composed asset sets and parameter 
     * Asset Set Two
     * Param Set Two
 
-* Suite Five:
+* Suite Five - monotonicity tests:
     * Assimilator Set One
     * Asset Set One
     * Param Set Four
+
+* Suite Six - continuity tests:
+    * Assimilator Set One
+    * Asset Set One
+    * Param Set Three
     
 ### Pool Parameter Sets
 
