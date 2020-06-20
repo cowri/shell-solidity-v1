@@ -2,9 +2,16 @@ pragma solidity ^0.5.0;
 
 import "ds-test/test.sol";
 
-import "./depositsTemplate.sol";
+import "../setup/setup.sol";
 
-contract SelectiveDepositSuiteSix is SelectiveDepositTemplate, DSTest {
+import "../setup/methods.sol";
+
+contract ContinuitySuiteSix is Setup, DSTest {
+
+    using LoihiMethods for Loihi;
+
+    Loihi l;
+    Loihi l2;
 
     function setUp() public {
 
@@ -98,7 +105,7 @@ contract SelectiveDepositSuiteSix is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s6_selectiveDeposit_continuity_reversal () public {
+    function test_s6_selectiveDeposit_continuity_slippage_reversal () public {
 
         l.deposit(
             address(dai), 135e18,
@@ -107,12 +114,90 @@ contract SelectiveDepositSuiteSix is SelectiveDepositTemplate, DSTest {
             address(susd), 30e18
         );
 
-        uint256 firstShells = l.deposit(address(dai), 5e18);
+        uint256 depositedShells = l.deposit(address(dai), 5e18);
 
-        uint256 secondShells = l.withdraw(address(dai), 5e18);
+        uint256 withdrawnShells = l.withdraw(address(dai), 5e18);
 
-        assertEq(firstShells / 1e5, secondShells / 1e5);
+        assertEq(depositedShells / 1e5, withdrawnShells / 1e5);
 
     }
+
+    function test_s6_selectiveWithdraw_continuity_slippage_reversal () public {
+
+        l.deposit(
+            address(dai), 135e18,
+            address(usdc), 90e6,
+            address(usdt), 60e6,
+            address(susd), 30e18
+        );
+
+        uint256 withdrawnShells = l.withdraw(address(dai), 5e18);
+
+        uint256 depositedShells = l.deposit(address(dai), 5e18);
+
+        assertEq(withdrawnShells / 1e5, depositedShells / 1e5);
+
+    }
+
+    // TODO: this one.
+    function test_s6_selectiveWithdraw_continuity_antiSlippage_reversal () public {
+
+    }
+
+    // TODO: this one.
+    function test_s6_selectiveDeposit_continuity_antiSlippage_reversal () public {
+
+    }
+
+
+    function test_s6_continuity_swap_reversals () public {
+
+        l.deposit(
+            address(dai), 90e18,
+            address(usdc), 135e6,
+            address(usdt), 60e6,
+            address(susd), 30e18
+        );
+
+        uint256 targetAmount = l.originSwap(
+            address(usdc),
+            address(usdt),
+            5e6
+        );
+
+        uint256 originAmount = l.originSwap(
+            address(usdt),
+            address(usdc),
+            targetAmount
+        );
+
+        assertEq(originAmount, 5e6 - 1);
+
+    }
+
+    function test_s6_continuity_synthesizedSwap_slippage () public {
+
+        doubleDeposit(
+            address(dai), 90000e18,
+            address(usdc), 135000e6,
+            address(usdt), 60000e6,
+            address(susd), 30000e18
+        );
+
+        uint256 targetAmount = l.originSwap(
+            address(usdc),
+            address(usdt),
+            5000e6
+        );
+
+        uint256 depositShells = l2.deposit(address(usdc), 5000e6);
+
+        uint256 withdrawShells = l2.withdraw(address(usdt), targetAmount);
+
+        assertEq(depositShells, withdrawShells);
+
+
+    }
+
 
 }
