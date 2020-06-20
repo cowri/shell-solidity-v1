@@ -37,8 +37,6 @@ library Shells {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    using Assimilators for Assimilators.Assimilator;
-
     using Shells for Shell;
 
     using SafeERC20Arithmetic for uint256;
@@ -83,6 +81,8 @@ library Shells {
             int128 _ideal = _grossLiq.mul(_weights[i]);
             psi_ += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
         }
+        
+        emit log('~<>~<>~<>~<>~<>~<>~<>~');
 
     }
 
@@ -92,6 +92,13 @@ library Shells {
         int128 _beta,
         int128 _delta
     ) internal returns (int128 fee_) {
+
+        emit log('~<>~<>~<>~<>~<>~<>~<>~');
+
+        emit log_int("_bal", _bal.muli(1e6));
+        emit log_int("_ideal", _ideal.muli(1e6));
+        emit log_int("_beta", _beta.muli(1e6));
+        emit log_int("_delta", _delta.muli(1e6));
 
         if (_bal < _ideal) {
 
@@ -128,6 +135,8 @@ library Shells {
             } else fee_ = 0;
 
         }
+
+        emit log_int("fee_", fee_.muli(1e6));
 
     }
 
@@ -187,6 +196,8 @@ library Shells {
 
         tAmt_ = _oAmt;
 
+        emit log_int("tAmt_", tAmt_.muli(1e18));
+
         {
 
             int128 _lambda = shell.lambda;
@@ -194,16 +205,28 @@ library Shells {
 
             for (uint i = 0; i < 10; i++) {
 
+                emit log_uint("i", i);
+
+                emit log(">>>>>>>>>>>>>>>>");
+
                 psi_ = shell.calculateFee(_nBals, _nGLiq);
+
+                emit log_int("psi_", psi_.muli(1e18));
+                emit log_int("omega_", _omega.muli(1e18));
 
                 int128 _prev = tAmt_;
                 int128 _next = tAmt_ = _omega < psi_
-                    ? ( _oAmt + _omega - psi_ ).neg()
+                    ? ( _oAmt + _omega - psi_).neg()
                     : ( _oAmt + _lambda.mul(_omega - psi_)).neg();
 
                 _nGLiq = _oGLiq + _oAmt + _next;
 
                 _nBals[_tIx] = _oBals[_tIx].add(_next);
+
+                emit log_int("prev", _prev.muli(1e18));
+                emit log_int("next", _next.muli(1e18));
+
+                emit log("<<<<<<<<<<<<<<<<<");
 
                 if (_prev / 1e14 == _next / 1e14) break;
 
@@ -211,7 +234,11 @@ library Shells {
 
         }
 
+        emit log_int("tAmt..._", tAmt_.muli(1e18));
+
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+
+        emit log("passed halts");
 
         tAmt_ = tAmt_.mul(ONE.sub(shell.epsilon));
 
@@ -291,6 +318,14 @@ library Shells {
         int128[] memory _oBals,
         int128[] memory _nBals
     ) internal {
+
+        emit log("enforce halts");
+        emit log_int("MAX", MAX.muli(1e18));
+
+        emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
+        emit log_int("_nGLiq", _nGLiq.muli(1e18));
+        for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
 
         if (!shell.testHalts) {
             // emit log("skipping halts");

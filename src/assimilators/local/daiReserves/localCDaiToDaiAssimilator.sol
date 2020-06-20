@@ -33,7 +33,7 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
     }
 
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         cdai.transferFrom(msg.sender, address(this), _amount);
 
@@ -46,6 +46,21 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
         uint256 _balance = dai.balanceOf(address(this));
 
         balance_ = _balance.divu(1e18);
+
+        amount_ = _amount.divu(1e18);
+
+    }
+
+    // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        cdai.transferFrom(msg.sender, address(this), _amount);
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        _amount = ( _amount * _rate ) / 1e18;
+
+        cdai.redeemUnderlying(_amount);
 
         amount_ = _amount.divu(1e18);
 
@@ -67,8 +82,8 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
     }
 
     // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
-        
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
         uint256 _rate = cdai.exchangeRateStored();
 
         uint256 _daiAmount = ( _amount * _rate ) / 1e18;
@@ -82,6 +97,21 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
         amount_ = _daiAmount.divu(1e18);
 
         balance_ = _balance.divu(1e18);
+
+    }
+
+    // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        uint256 _daiAmount = ( _amount * _rate ) / 1e18;
+
+        cdai.mint(_daiAmount);
+
+        cdai.transfer(_dst, _amount);
+
+        amount_ = _daiAmount.divu(1e18);
 
     }
 
@@ -115,6 +145,21 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
         uint256 _rate = cdai.exchangeRateStored();
 
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
+    // views the numeraire value of the current balance of the reserve, in this case CDai
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
+
+        uint256 _balance = dai.balanceOf(address(this));
+
+        if (_balance == 0) return ( amount_, ABDKMath64x64.fromUInt(0));
+
+        balance_ = _balance.divu(1e18);
 
     }
 

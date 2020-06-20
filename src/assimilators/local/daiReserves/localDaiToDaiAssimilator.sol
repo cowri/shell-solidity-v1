@@ -24,7 +24,9 @@ contract LocalDaiToDaiAssimilator is LoihiRoot {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
+    event log_int(bytes32, int256);
     event log_uint(bytes32, uint256);
+    event log_addr(bytes32, address);
 
     constructor (address _dai) public {
 
@@ -33,7 +35,7 @@ contract LocalDaiToDaiAssimilator is LoihiRoot {
     }
 
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         dai.transferFrom(msg.sender, address(this), _amount);
 
@@ -42,6 +44,15 @@ contract LocalDaiToDaiAssimilator is LoihiRoot {
         amount_ = _amount.divu(1e18);
 
         balance_ = _balance.divu(1e18);
+
+    }
+
+    // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
+    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        dai.transferFrom(msg.sender, address(this), _amount);
+
+        amount_ = _amount.divu(1e18);
 
     }
 
@@ -56,26 +67,25 @@ contract LocalDaiToDaiAssimilator is LoihiRoot {
     }
 
     // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
-
-        emit log("inside output raw");
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         dai.transfer(_dst, _amount);
 
-        emit log("after dai transfer");
-
         uint256 _balance = dai.balanceOf(address(this));
-        
-        emit log("after dai balanceof");
 
         amount_ = _amount.divu(1e18);
 
-        emit log("after amount divu");
-
         balance_ = _balance.divu(1e18);
 
-        emit log("after balance divu");
-        
+    }
+
+    // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        dai.transfer(_dst, _amount);
+
+        amount_ = _amount.divu(1e18);
+
     }
 
     // takes numeraire amount of dai, unwraps corresponding amount of cDai, transfers that out, returns numeraire amount
@@ -106,7 +116,27 @@ contract LocalDaiToDaiAssimilator is LoihiRoot {
     // returns current balance in numeraire
     function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
+        emit log_addr("address", _addr);
+
         uint256 _balance = dai.balanceOf(_addr);
+
+        // if (_balance == 0) return ZERO;
+
+        emit log_uint("_balance", _balance);
+
+        balance_ = _balance.divu(1e18);
+
+        emit log_int("balance_", balance_.muli(1e18));
+        emit log_int("balance_", balance_);
+
+    }
+
+    // takes raw amount and returns numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        amount_ = _amount.divu(1e18);
+
+        uint256 _balance = dai.balanceOf(address(this));
 
         balance_ = _balance.divu(1e18);
 

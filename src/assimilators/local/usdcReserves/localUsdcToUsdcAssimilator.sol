@@ -28,7 +28,7 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
     }
 
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         usdc.transferFrom(msg.sender, address(this), _amount);
 
@@ -40,6 +40,14 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
     }
 
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        usdc.transferFrom(msg.sender, address(this), _amount);
+
+        amount_ = _amount.divu(1e6);
+
+    }
+
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
@@ -48,7 +56,7 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
 
     }
 
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         usdc.transfer(_dst, _amount);
 
@@ -57,6 +65,14 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
         amount_ = _amount.divu(1e6);
 
         balance_ = _balance.divu(1e6);
+
+    }
+
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        usdc.transfer(_dst, _amount);
+
+        amount_ = _amount.divu(1e6);
 
     }
 
@@ -77,6 +93,16 @@ contract LocalUsdcToUsdcAssimilator is LoihiRoot {
     function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         amount_ = _amount.divu(1e6);
+
+    }
+
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        amount_ = _amount.divu(1e6);
+
+        uint256 _balance = usdc.balanceOf(address(this));
+
+        balance_ = _balance.divu(1e6);
 
     }
 

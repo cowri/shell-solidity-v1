@@ -28,13 +28,21 @@ contract LocalSUsdToSUsdAssimilator is LoihiRoot {
 
     }
 
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         susd.transferFrom(msg.sender, address(this), _amount);
 
         uint256 _balance = susd.balanceOf(address(this));
 
         balance_ = _balance.divu(1e18);
+
+        amount_ = _amount.divu(1e18);
+
+    }
+
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        susd.transferFrom(msg.sender, address(this), _amount);
 
         amount_ = _amount.divu(1e18);
 
@@ -49,7 +57,7 @@ contract LocalSUsdToSUsdAssimilator is LoihiRoot {
 
     }
 
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         susd.transfer(_dst, _amount);
 
@@ -58,6 +66,14 @@ contract LocalSUsdToSUsdAssimilator is LoihiRoot {
         amount_ = _amount.divu(1e18);
 
         balance_ = _balance.divu(1e18);
+
+    }
+
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        susd.transfer(_dst, _amount);
+
+        amount_ = _amount.divu(1e18);
 
     }
 
@@ -81,6 +97,17 @@ contract LocalSUsdToSUsdAssimilator is LoihiRoot {
     function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         amount_ = _amount.divu(1e18);
+
+    }
+
+    // takes raw amount, returns numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        amount_ = _amount.divu(1e18);
+
+        uint256 _balance = susd.balanceOf(address(this));
+
+        balance_ = _balance.divu(1e18);
 
     }
 

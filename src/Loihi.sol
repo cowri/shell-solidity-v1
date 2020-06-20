@@ -32,7 +32,7 @@ contract Loihi is LoihiRoot {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    using Assimilators for Assimilators.Assimilator;
+    using Assimilators for address;
     using Shells for Shells.Shell;
     using ShellsExternal for Shells.Shell;
     using Controller for Shells.Shell;
@@ -156,80 +156,132 @@ contract Loihi is LoihiRoot {
 
     }
 
-    // function transferByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
-
-    //     Assimilators.Assimilator[] memory _assims = new Assimilators.Assimilator[](2);
-    //     _assims[0] = shell.assimilators[_o];
-    //     _assims[1] = shell.assimilators[_t];
-
-    //     _assims[0].intakeRaw(_oAmt);
-    //     _assims[1].viewNumeraireBalance(_assims[0].amt);
-
-    //     if (_assims[0].ix == _assims[1].ix) {
-
-    //         require((tAmt_ = _assims[1].outputNumeraire(_rcpnt)) > _mTAmt, "Shell/below-min-target-amount");
-
-    //         return tAmt_;
-
-    //     }
-
-    //     ( _assims, shell.omega ) = shell.calculateOriginTrade(_assims);
-
-    //     require((tAmt_ = _assims[1].outputNumeraire(_rcpnt)) > _mTAmt, "Shell/below-min-target-amount");
-
-    //     emit Trade(msg.sender, _o, _t, _oAmt, tAmt_);
-
-    // }
-
-    function transferByOrigin (address _o, address _t, uint256 _dline, uint256 _mTAmt, uint256 _oAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
+    function getSwapData (
+        uint _lIx,
+        uint _rIx,
+        uint _amt,
+        address _assim,
+        bool _isOrigin,
+        address _rcpnt
+    ) internal returns (
+        int128 amt_,
+        int128 oGLiq_,
+        int128 nGLiq_,
+        int128[] memory,
+        int128[] memory
+    ) {
 
         uint _length = shell.reserves.length;
-        Assimilators.Assimilator memory _origin = shell.assimilators[_o];
-        Assimilators.Assimilator memory _target = shell.assimilators[_t];
 
-        int128 _amt;
+        int128[] memory oBals_ = new int128[](_length);
+        int128[] memory nBals_ = new int128[](_length);
 
-        if (_origin.ix == _target.ix) {
+        for (uint i = 0; i < _length; i++) {
 
-            _amt = _origin.intakeRaw(_oAmt);
-
-            require((tAmt_ = _target.outputNumeraire(_rcpnt, _amt)) > _mTAmt, "Shell/below-min-target-amount");
-
-            return tAmt_;
-
-        }
-
-        int128 _oGLiq;
-        int128 _nGLiq;
-        int128[] memory _nBals = new int128[](_length);
-        int128[] memory _oBals = new int128[](_length);
-
-        for (uint i = 0; i < _oBals.length; i++) {
-
-            if (i != _origin.ix) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
+            if (i != _lIx) nBals_[i] = oBals_[i] = shell.reserves[i].addr.viewNumeraireBalance();
             else {
 
                 int128 _bal;
-                ( _amt, _bal ) = _origin.intakeRaw(_oAmt);
+                if (_isOrigin) ( amt_, _bal ) = _assim.intakeRawAndGetBalance(_amt);
+                else ( amt_, _bal ) = _assim.outputRawAndGetBalance(_rcpnt, _amt);
 
-                _oBals[i] = _bal.sub(_amt);
-                _nBals[i] = _bal;
+                oBals_[i] = _bal.sub(amt_);
+                nBals_[i] = _bal;
 
             }
 
-            _oGLiq += _oBals[i];
-            _nGLiq += _nBals[i];
+            oGLiq_ += oBals_[i];
+            nGLiq_ += nBals_[i];
 
         }
 
-        _nGLiq = _nGLiq.sub(_amt);
-        _nBals[_target.ix] = _nBals[_target.ix].sub(_amt);
+        nGLiq_ = nGLiq_.sub(amt_);
+        nBals_[_rIx] = nBals_[_rIx].sub(amt_);
 
-        ( _amt, shell.omega ) = shell.calculateOriginTrade(_target.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        emit log_int("amt_", amt_.muli(1e18));
+        emit log_int("oGLiq_", oGLiq_.muli(1e18));
+        for (uint i = 0; i < oBals_.length; i++) emit log_int("oBals_ from getSwapData", oBals_[i].muli(1e18));
+        emit log_int("nGLiq_", nGLiq_.muli(1e18));
+        for (uint i = 0; i < nBals_.length; i++) emit log_int("nBals_ from getSwapData", nBals_[i].muli(1e18));
 
-        require((tAmt_ = _target.outputNumeraire(_rcpnt, _amt)) > _mTAmt, "Shell/below-min-target-amount");
+        return ( amt_, oGLiq_, nGLiq_, oBals_, nBals_ );
 
-        emit Trade(msg.sender, _o, _t, _oAmt, tAmt_);
+    }
+
+    function viewSwapData (
+        uint _lIx,
+        uint _rIx,
+        uint _amt,
+        bool _isOrigin,
+        address _assim
+    ) internal returns (
+        int128 amt_,
+        int128 oGLiq_,
+        int128 nGLiq_,
+        int128[] memory,
+        int128[] memory
+    ) {
+
+        uint _length = shell.reserves.length;
+        int128[] memory nBals_ = new int128[](_length);
+        int128[] memory oBals_ = new int128[](_length);
+
+        for (uint i = 0; i < _length; i++) {
+
+            if (i != _lIx) nBals_[i] = oBals_[i] = shell.reserves[i].addr.viewNumeraireBalance();
+            else {
+
+                int128 _bal;
+                ( amt_, _bal ) = _assim.viewNumeraireAmountAndBalance(_amt);
+                if (!_isOrigin) amt_ = amt_.neg();
+
+                oBals_[i] = _bal;
+                nBals_[i] = _bal.add(amt_);
+
+            }
+
+            oGLiq_ += oBals_[i];
+            nGLiq_ += nBals_[i];
+
+        }
+
+        nGLiq_ = nGLiq_.sub(amt_);
+        nBals_[_rIx] = nBals_[_rIx].sub(amt_);
+
+        return ( amt_, oGLiq_, nGLiq_, nBals_, oBals_ );
+
+    }
+
+    function transferByOrigin (address _origin, address _target, uint256 _dline, uint256 _mTAmt, uint256 _oAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
+
+        uint _length = shell.reserves.length;
+        Assimilators.Assimilator memory _o = shell.assimilators[_origin];
+        Assimilators.Assimilator memory _t = shell.assimilators[_target];
+
+        // TODO: how to include min target amount
+        if (_o.ix == _t.ix) return _t.addr.outputNumeraire(_rcpnt, _o.addr.intakeRaw(_oAmt));
+
+        (   int128 _amt,
+            int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _oBals,
+            int128[] memory _nBals ) = getSwapData(_o.ix, _t.ix, _oAmt, _o.addr, true, address(0));
+
+        emit log_int("shell.omega", shell.omega.muli(1e18));
+        emit log_int("_amt", _amt.muli(1e18));
+        emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals from transferByOrigin", _oBals[i].muli(1e18));
+        emit log_int("_nGLiq", _nGLiq.muli(1e18));
+        for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals from transferByOrigin", _nBals[i].muli(1e18));
+
+        ( _amt, shell.omega ) = shell.calculateOriginTrade(_t.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+
+        emit log_int("shell.omega", shell.omega.muli(1e18));
+        emit log_int("_amt", _amt.muli(1e18));
+
+        require((tAmt_ = _t.addr.outputNumeraire(_rcpnt, _amt)) > _mTAmt, "Shell/below-min-target-amount");
+
+        emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
 
     }
 
@@ -240,7 +292,7 @@ contract Loihi is LoihiRoot {
         uint256 _length = shell.reserves.length;
 
         for (uint i = 0; i < _length; i++) {
-            int128 _bal = shell.reserves[i].viewNumeraireBalance();
+            int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
             _oGLiq += _bal;
             _oBals[i] = _bal;
         }
@@ -251,53 +303,24 @@ contract Loihi is LoihiRoot {
 
     /// @author james foley http://github.com/realisation
     /// @notice view how much of the target currency the origin currency will provide
-    /// @param _o the address of the origin
-    /// @param _t the address of the target
+    /// @param _origin the address of the origin
+    /// @param _target the address of the target
     /// @param _oAmt the origin amount
     /// @return tAmt_ the amount of target that has been swapped for the origin
-    function viewOriginTrade (address _o, address _t, uint256 _oAmt) public notFrozen returns (uint256) {
+    function viewOriginTrade (address _origin, address _target, uint256 _oAmt) public notFrozen returns (uint256) {
 
+        Assimilators.Assimilator memory _o = shell.assimilators[_origin];
+        Assimilators.Assimilator memory _t = shell.assimilators[_target];
 
-        uint _length = shell.reserves.length;
-        Assimilators.Assimilator memory _origin = shell.assimilators[_o];
-        Assimilators.Assimilator memory _target = shell.assimilators[_t];
-        int128 _amt;
+        if (_o.ix == _t.ix) return _t.addr.viewRawAmount(_o.addr.viewNumeraireAmount(_oAmt));
 
-        if (_origin.ix == _target.ix) {
+        (   int128 _amt,
+            int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _nBals,
+            int128[] memory _oBals ) = viewSwapData(_o.ix, _t.ix, _oAmt, true, _o.addr);
 
-            _amt = _origin.viewNumeraireAmount(_oAmt);
-
-            return _target.viewRawAmount(_amt);
-
-        }
-
-        int128 _oGLiq;
-        int128 _nGLiq;
-        int128[] memory _nBals = new int128[](_length);
-        int128[] memory _oBals = new int128[](_length);
-
-        for (uint i = 0; i < _oBals.length; i++) {
-
-            if (i != _origin.ix) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
-            else {
-
-                int128 _bal;
-                ( _amt, _bal ) = _origin.viewNumeraireBalance(_oAmt);
-
-                _oBals[i] = _bal.sub(_amt);
-                _nBals[i] = _bal;
-
-            }
-
-            _oGLiq += _oBals[i];
-            _nGLiq += _nBals[i];
-
-        }
-
-        _nGLiq = _nGLiq.sub(_amt);
-        _nBals[_target.ix] = _nBals[_target.ix].sub(_amt);
-
-        ( _amt, ) = shell.calculateOriginTrade(_target.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, ) = shell.calculateOriginTrade(_t.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
 
         return  _target.viewRawAmount(_amt);
 
@@ -305,119 +328,185 @@ contract Loihi is LoihiRoot {
 
     /// @author james foley http://github.com/realisation
     /// @notice swap a dynamic origin amount for a fixed target amount
-    /// @param _o the address of the origin
-    /// @param _t the address of the target
+    /// @param _origin the address of the origin
+    /// @param _target the address of the target
     /// @param _mOAmt the maximum origin amount
     /// @param _tAmt the target amount
     /// @param _dline deadline in block number after which the trade will not execute
     /// @return oAmt_ the amount of origin that has been swapped for the target
-    function swapByTarget (address _o, address _t, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) public notFrozen returns (uint256) {
+    function swapByTarget (address _origin, address _target, uint256 _mOAmt, uint256 _tAmt, uint256 _dline) public notFrozen returns (uint256) {
 
-        return transferByTarget(_o, _t, _mOAmt, _dline, _tAmt, msg.sender);
+        return transferByTarget(_origin, _target, _mOAmt, _dline, _tAmt, msg.sender);
 
     }
 
     /// @author james foley http://github.com/realisation
     /// @notice transfer a dynamic origin amount into a fixed target amount at the recipients address
-    /// @param _o the address of the origin
-    /// @param _t the address of the target
+    /// @param _origin the address of the origin
+    /// @param _target the address of the target
     /// @param _mOAmt the maximum origin amount
     /// @param _tAmt the target amount
     /// @param _dline deadline in block number after which the trade will not execute
     /// @param _rcpnt the address of the recipient of the target
     /// @return oAmt_ the amount of origin that has been swapped for the target
-    function transferByTarget (address _o, address _t, uint256 _mOAmt, uint256 _dline, uint256 _tAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 oAmt_) {
+    function transferByTarget (address _origin, address _target, uint256 _mOAmt, uint256 _dline, uint256 _tAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 oAmt_) {
 
         uint _length = shell.reserves.length;
-        Assimilators.Assimilator memory _origin = shell.assimilators[_o];
-        Assimilators.Assimilator memory _target = shell.assimilators[_t];
+        Assimilators.Assimilator memory _o = shell.assimilators[_origin];
+        Assimilators.Assimilator memory _t = shell.assimilators[_target];
 
-        int128 _amt;
-        int128 _oGLiq;
-        int128 _nGLiq;
-        int128[] memory _nBals = new int128[](_length);
-        int128[] memory _oBals = new int128[](_length);
+        // TODO: how to incorporate max origin amount
+        if (_o.ix == _t.ix) return _o.addr.intakeNumeraire(_t.addr.outputRaw(_rcpnt, _tAmt));
 
-        for (uint i = 0; i < _oBals.length; i++) {
+        (   int128 _amt,
+            int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _oBals,
+            int128[] memory _nBals) = getSwapData(_t.ix, _o.ix, _tAmt, _t.addr, false, _rcpnt);
 
-            if (i != _target.ix) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
-            else {
+        ( _amt, shell.omega ) = shell.calculateTargetTrade(_o.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
 
-                int128 _bal;
-                ( _amt, _bal ) = _target.outputRaw(_rcpnt, _tAmt);
+        require((oAmt_ = _o.addr.intakeNumeraire(_amt)) < _mOAmt, "above-maximum-origin-amount");
 
-                _oBals[i] = _bal.sub(_amt);
-                _nBals[i] = _bal;
-
-            }
-
-            _oGLiq += _oBals[i];
-            _nGLiq += _nBals[i];
-
-        }
-
-        _nBals[_origin.ix] = _nBals[_origin.ix].sub(_amt);
-        _nGLiq = _nGLiq.sub(_amt);
-
-        ( _amt, shell.omega ) = shell.calculateTargetTrade(_origin.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
-                                // intakeNumeraire
-        require((oAmt_ = _origin.intakeNumeraire(_amt)) < _mOAmt, "above-maximum-origin-amount");
-
-        emit Trade(msg.sender, _o, _t, oAmt_, _tAmt);
+        emit Trade(msg.sender, _origin, _target, oAmt_, _tAmt);
 
     }
 
     /// @author james foley http://github.com/realisation
     /// @notice view how much of the origin currency the target currency will take
-    /// @param _o the address of the origin
-    /// @param _t the address of the target
+    /// @param _origin the address of the origin
+    /// @param _target the address of the target
     /// @param _tAmt the target amount
     /// @return oAmt_ the amount of target that has been swapped for the origin
-    function viewTargetTrade (address _o, address _t, uint256 _tAmt) public notFrozen returns (uint256 oAmt_) {
+    function viewTargetTrade (address _origin, address _target, uint256 _tAmt) public notFrozen returns (uint256 oAmt_) {
 
-        uint _length = shell.reserves.length;
-        Assimilators.Assimilator memory _origin = shell.assimilators[_o];
-        Assimilators.Assimilator memory _target = shell.assimilators[_t];
-        int128 _amt;
+        Assimilators.Assimilator memory _o = shell.assimilators[_origin];
+        Assimilators.Assimilator memory _t = shell.assimilators[_target];
 
-        if (_origin.ix == _target.ix) {
+        if (_o.ix == _t.ix) return _o.addr.viewRawAmount(_t.addr.viewNumeraireAmount(_tAmt));
 
-            _amt = _target.viewNumeraireAmount(_tAmt);
+        (   int128 _amt,
+            int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _nBals,
+            int128[] memory _oBals ) = viewSwapData(_t.ix, _o.ix, _tAmt, false, _t.addr);
 
-            return _origin.viewRawAmount(_amt);
-
-        }
-
-        int128 _oGLiq; int128 _nGLiq;
-        int128[] memory _nBals = new int128[](_length);
-        int128[] memory _oBals = new int128[](_length);
-
-        for (uint i = 0; i < _oBals.length; i++) {
-
-            if (i != _target.ix) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
-            else {
-
-                int128 _bal;
-                ( _amt, _bal ) = _target.viewNumeraireBalance(_tAmt);
-
-                _oBals[i] = _bal.sub(_amt);
-                _nBals[i] = _bal;
-
-            }
-
-            _oGLiq += _oBals[i];
-            _nGLiq += _nBals[i];
-
-        }
-
-        _nBals[_origin.ix] = _nBals[_origin.ix].sub(_amt);
-        _nGLiq = _nGLiq.sub(_amt);
-
-        ( _amt, ) = shell.calculateTargetTrade(_origin.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, ) = shell.calculateTargetTrade(_o.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
 
         _amt = _amt.mul(ONE.add(shell.epsilon));
 
         oAmt_ = _origin.viewRawAmount(_amt);
+
+    }
+
+    function getLiquidityData (
+        address[] memory _flvrs,
+        uint256[] memory _amts,
+        bool _isDeposit,
+        address _rcpnt
+    ) internal returns (
+        int128 oGLiq_,
+        int128 nGLiq_,
+        int128[] memory,
+        int128[] memory
+    ) {
+
+
+        emit log_uints("_amts", _amts);
+        emit log_addrs("_flvrs", _flvrs);
+        uint _length = shell.reserves.length;
+        emit log_uint("_length", _length);
+        int128[] memory oBals_ = new int128[](_length);
+        int128[] memory nBals_ = new int128[](_length);
+
+        for (uint i = 0; i < _flvrs.length; i++) {
+
+            Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
+
+            if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {
+
+                emit log("ping");
+
+                int128 _amount; int128 _balance;
+
+                if (_isDeposit) ( _amount, _balance ) = _assim.addr.intakeRawAndGetBalance(_amts[i]);
+                else ( _amount, _balance ) = _assim.addr.outputRawAndGetBalance(_rcpnt, _amts[i]);
+
+                nBals_[_assim.ix] = _balance;
+                oBals_[_assim.ix] = _balance.sub(_amount);
+
+            } else {
+
+                int128 _amount;
+
+                if (_isDeposit) _amount = _assim.addr.intakeRaw(_amts[i]);
+                else _amount = _assim.addr.outputRaw(_rcpnt, _amts[i]);
+
+                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount);
+
+            }
+
+        }
+
+        for (uint i = 0; i < _length; i++) {
+
+            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = shell.reserves[i].addr.viewNumeraireBalance();
+
+            oGLiq_ += oBals_[i];
+            nGLiq_ += nBals_[i];
+
+        }
+
+        return ( oGLiq_, nGLiq_, oBals_, nBals_ );
+
+    }
+
+    function viewLiquidityData (address[] memory _flvrs, uint[] memory _amts, bool _isDeposit) internal returns (
+        int128 oGLiq_,
+        int128 nGLiq_,
+        int128[] memory,
+        int128[] memory
+    ) {
+
+        uint _length = shell.reserves.length;
+        int128[] memory oBals_ = new int128[](_length);
+        int128[] memory nBals_ = new int128[](_length);
+
+        for (uint i = 0; i < _flvrs.length; i++) {
+
+            Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
+
+            if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {
+
+                ( int128 _amount, int128 _balance ) = _assim.addr.viewNumeraireAmountAndBalance(_amts[i]);
+                if (!_isDeposit) _amount = _amount.neg();
+                nBals_[_assim.ix] = _balance.sub(_amount);
+                oBals_[_assim.ix] = _balance;
+
+
+            } else {
+
+                int128 _amount = _assim.addr.viewNumeraireAmount(_amts[i]);
+                if (!_isDeposit) _amount = _amount.neg();
+
+                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount);
+
+            }
+
+        }
+
+        for (uint i = 0; i < _length; i++) {
+
+            int128 _bal;
+
+            if (oBals_[i] == 0 && nBals_[i] == 0) _bal = nBals_[i] = oBals_[i] = shell.reserves[i].addr.viewNumeraireBalance();
+
+            oGLiq_ += _bal;
+            nGLiq_ += _bal;
+
+        }
+
+        return ( oGLiq_, nGLiq_, oBals_, nBals_ );
 
     }
 
@@ -431,33 +520,15 @@ contract Loihi is LoihiRoot {
     function selectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _minShells, uint256 _dline) external notFrozen nonReentrant returns (uint256 shells_) {
         require(block.timestamp < _dline, "Shell/tx-deadline-passed");
 
-        uint _length = shell.reserves.length;
+        (   int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _oBals,
+            int128[] memory _nBals ) = getLiquidityData(_flvrs, _amts, true, address(0));
 
-        int128 _oGLiq;
-        int128 _nGLiq;
-        int128[] memory _oBals = new int128[](_length);
-        int128[] memory _nBals = new int128[](_length);
-
-        for (uint i = 0; i < _flvrs.length; i++) {
-
-            Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
-
-            // TODO: detect if balance has already been found
-            ( int128 _amount, int128 _balance ) = _assim.intakeRaw(_amts[i]);
-
-            _nBals[_assim.ix] = _balance;
-            _oBals[_assim.ix] = _balance.sub(_amount);
-
-        }
-
-        for (uint i = 0; i < _length; i++) {
-
-            if (_oBals[i] == 0 && _nBals[i] == 0) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
-
-            _oGLiq += _oBals[i];
-            _nGLiq += _nBals[i];
-
-        }
+        emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        emit log_int("_nGLiq", _nGLiq.muli(1e18));
+        emit log_ints("_oBals", _oBals);
+        emit log_ints("_nBals", _nBals);
 
         ( shells_, shell.omega ) = shell.calculateSelectiveDeposit(_oGLiq, _nGLiq, _oBals, _nBals);
 
@@ -467,47 +538,27 @@ contract Loihi is LoihiRoot {
 
     }
 
-    /// @author james foley http://github.com/realisation
+    /// @author james folew http://github.com/realisation
     /// @notice view how many shell tokens a deposit will mint
     /// @param _flvrs an array containing the addresses of the flavors being deposited into
     /// @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     /// @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function viewSelectiveDeposit (address[] calldata _flvrs, uint256[] calldata _amts) external notFrozen returns (uint256 shells_) {
 
-        uint _length = shell.reserves.length;
-
-        int128 _oGLiq;
-        int128 _nGLiq;
-        int128[] memory _oBals = new int128[](_length);
-        int128[] memory _nBals = new int128[](_length);
-
-        for (uint i = 0; i < _flvrs.length; i++) {
-
-            Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
-
-            // TODO: Detect if balance has already been found
-            ( int128 _amount, int128 _balance ) = _assim.viewNumeraireAmount(_amts[i]);
-
-            _nBals[_assim.ix] = _balance;
-            _oBals[_assim.ix] = _balance.sub(_amount);
-
-        }
-
-        for (uint i = 0; i < _length; i++) {
-
-            if (_oBals[i] == 0 && _nBals[i] == 0) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
-
-            _oGLiq += _oBals[i];
-            _nGLiq += _nBals[i];
-
-        }
+        (   int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _oBals,
+            int128[] memory _nBals ) = viewLiquidityData(_flvrs, _amts, true);
 
         ( shells_, ) = shell.calculateSelectiveDeposit(_oGLiq, _nGLiq, _oBals, _nBals);
 
     }
 
     event log_int(bytes32, int);
+    event log_ints(bytes32, int128[]);
     event log_uint(bytes32, uint);
+    event log_uints(bytes32, uint[]);
+    event log_addrs(bytes32, address[]);
 
     /// @author james foley http://github.com/realisation
     /// @notice deposit into the pool with no slippage from the numeraire assets the pool supports
@@ -518,18 +569,19 @@ contract Loihi is LoihiRoot {
         int128 _shells = _deposit.divu(1e18);
 
         uint _length = shell.reserves.length;
-        int128 _oGLiq; int128[] memory _oBals;
+        int128 _oGLiq;
+        int128[] memory _oBals = new int128[](_length);
         for (uint i = 0; i < _length; i++) {
-            int128 _bal = shell.reserves[i].viewNumeraireBalance();
+            int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
             _oBals[i] = _bal;
             _oGLiq += _bal;
         }
 
         if (_oGLiq == 0) {
 
-            for (uint8 i = 0; i < shell.reserves.length; i++) {
+            for (uint8 i = 0; i < _length; i++) {
 
-                shell.numeraires[i].intakeNumeraire(_shells.mul(shell.weights[i]));
+                shell.numeraires[i].addr.intakeNumeraire(_shells.mul(shell.weights[i]));
 
             }
 
@@ -539,9 +591,9 @@ contract Loihi is LoihiRoot {
 
             shell.omega = shell.omega.mul(ONE.add(_multiplier));
 
-            for (uint8 i = 0; i < shell.reserves.length; i++) {
+            for (uint8 i = 0; i < _length; i++) {
 
-                shell.numeraires[i].intakeNumeraire(_oBals[i].mul(_multiplier));
+                shell.numeraires[i].addr.intakeNumeraire(_oBals[i].mul(_multiplier));
 
             }
 
@@ -561,43 +613,10 @@ contract Loihi is LoihiRoot {
     function selectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts, uint256 _maxShells, uint256 _dline) external notFrozen nonReentrant returns (uint256 shells_) {
         require(block.timestamp < _dline, "Shell/tx-deadline-passed");
 
-        uint _length = shell.reserves.length;
-
-        int128 _oGLiq;
-        int128 _nGLiq;
-        int128[] memory _oBals = new int128[](_length);
-        int128[] memory _nBals = new int128[](_length);
-
-        for (uint i = 0; i < _flvrs.length; i++) {
-
-            Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
-
-            int128 _amount; int128 _balance;
-
-            // TODO detect if balance has already been found
-            if (_oBals[i] == 0 && _nBals[i] == 0) {
-
-                ( int128 _amount, int128 _balance ) = _assim.outputRawAndGetBalance(msg.sender, _amts[i]);
-                _nBals[_assim.ix] = _balance;
-                _oBals[_assim.ix] = _balance.sub(_amount);
-
-            } else {
-
-                int128 _amount = _assim.outputRaw(msg.sender, _amts[i]);
-                _nBals[_assim.ix] = _nBals[_assim.ix].sub(_amount);
-
-            }
-
-        }
-
-        for (uint i = 0; i < _length; i++) {
-
-            if (_oBals[i] == 0 && _nBals[i] == 0) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
-
-            _oGLiq += _oBals[i];
-            _nGLiq += _nBals[i];
-
-        }
+        (   int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _oBals,
+            int128[] memory _nBals ) = getLiquidityData(_flvrs, _amts, false, msg.sender);
 
         ( shells_, shell.omega ) = shell.calculateSelectiveWithdraw(_oGLiq, _nGLiq, _oBals, _nBals);
 
@@ -614,33 +633,10 @@ contract Loihi is LoihiRoot {
     /// @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function viewSelectiveWithdraw (address[] calldata _flvrs, uint256[] calldata _amts) external notFrozen returns (uint256 shells_) {
 
-        uint256 _length = shell.reserves.length;
-
-        int128 _oGLiq;
-        int128 _nGLiq;
-        int128[] memory _oBals = new int128[](_length);
-        int128[] memory _nBals = new int128[](_length);
-
-        for (uint i = 0; i < _flvrs.length; i++) {
-
-            Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
-
-            // TODO detect if balance has already been found
-            ( int128 _amount, int128 _balance ) = _assim.viewNumeraireAmountAndBalance(_amts[i]);
-
-            _nBals[_assim.ix] = _balance;
-            _oBals[_assim.ix] = _balance.sub(_amount);
-
-        }
-
-        for (uint i = 0; i < _length; i++) {
-
-            if (_oBals[i] == 0 && _nBals[i] == 0) _nBals[i] = _oBals[i] = shell.reserves[i].viewNumeraireBalance();
-
-            _oGLiq += _oBals[i];
-            _nGLiq += _nBals[i];
-
-        }
+        (   int128 _oGLiq,
+            int128 _nGLiq,
+            int128[] memory _oBals,
+            int128[] memory _nBals ) = viewLiquidityData(_flvrs, _amts, false);
 
         ( shells_, ) = shell.calculateSelectiveWithdraw(_oGLiq, _nGLiq, _oBals, _nBals);
 
@@ -654,7 +650,7 @@ contract Loihi is LoihiRoot {
         uint _length = shell.reserves.length;
         int128 _oGLiq; int128[] memory _oBals;
         for (uint i = 0; i < _length; i++) {
-            int128 _bal = shell.reserves[i].viewNumeraireBalance();
+            int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
             _oGLiq += _bal;
             _oBals[i] = _bal;
         }
@@ -665,7 +661,7 @@ contract Loihi is LoihiRoot {
 
         for (uint8 i = 0; i < shell.reserves.length; i++) {
 
-            shell.reserves[i].outputNumeraire(msg.sender, _oBals[i].mul(_multiplier));
+            shell.reserves[i].addr.outputNumeraire(msg.sender, _oBals[i].mul(_multiplier));
 
         }
 
@@ -708,12 +704,13 @@ contract Loihi is LoihiRoot {
     }
 
     function totalReserves () public returns (uint256, uint256[] memory) {
-        uint256 totalBalance_;
-        uint256[] memory balances_ = new uint256[](shell.reserves.length);
-        for (uint i = 0; i < shell.reserves.length; i++) {
-            uint256 _bal = shell.reserves[i].viewNumeraireBalance().mulu(1e18);
+
+        uint _length;
+        uint totalBalance_;
+        uint[] memory balances_ = new uint256[](_length);
+        for (uint i = 0; i < _length; i++) {
+            uint256 _bal = shell.reserves[i].addr.viewNumeraireBalance().mulu(1e18);
             balances_[i] = _bal;
-            // balances_[i] = shell.reserves[i].viewNumeraireBalance(address(this));
             totalBalance_ += _bal;
         }
         return (totalBalance_, balances_);

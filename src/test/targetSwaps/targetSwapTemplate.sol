@@ -167,7 +167,7 @@ contract TargetSwapTemplate is Setup {
         l.deposit(
             address(dai), 135e18,
             address(usdc), 90e6,
-            address(usdt), 60e6,
+            address(usdt), 65e6,
             address(susd), 30e18
         );
 

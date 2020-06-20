@@ -55,7 +55,7 @@ contract SelectiveDepositTemplate is Setup {
 
     // }
 
-    function balanced_5DAI_1USDC3_USDT_1SUSD () public returns (uint256 shellsMinted_) {
+    function balanced_5DAI_1USDC_3USDT_1SUSD () public returns (uint256 shellsMinted_) {
 
         uint256 startingShells = l.deposit(
             address(dai), 80e18,

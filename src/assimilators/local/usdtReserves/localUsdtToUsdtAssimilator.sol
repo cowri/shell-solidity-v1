@@ -27,9 +27,9 @@ contract LocalUsdtToUsdtAssimilator is LoihiRoot {
         usdt = IERC20NoBool(_usdt);
 
     }
-
+    
     // takes raw amount, transfers it in, wraps that in aUsdt, returns numeraire amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         safeTransferFrom(usdt, msg.sender, address(this), _amount);
 
@@ -38,6 +38,15 @@ contract LocalUsdtToUsdtAssimilator is LoihiRoot {
         amount_ = _amount.divu(1e6);
 
         balance_ = _balance.divu(1e6);
+
+    }
+
+    // takes raw amount, transfers it in, wraps that in aUsdt, returns numeraire amount
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        safeTransferFrom(usdt, msg.sender, address(this), _amount);
+
+        amount_ = _amount.divu(1e6);
 
     }
 
@@ -51,13 +60,22 @@ contract LocalUsdtToUsdtAssimilator is LoihiRoot {
     }
 
     // takes raw amount, redeems that from aUsdt, transfers it out, returns numeraire amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         safeTransfer(usdt, _dst, _amount);
 
         uint256 _balance = usdt.balanceOf(address(this));
 
         balance_ = _balance.divu(1e6);
+
+        amount_ = _amount.divu(1e6);
+
+    }
+
+    // takes raw amount, redeems that from aUsdt, transfers it out, returns numeraire amount
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        safeTransfer(usdt, _dst, _amount);
 
         amount_ = _amount.divu(1e6);
 
@@ -83,6 +101,17 @@ contract LocalUsdtToUsdtAssimilator is LoihiRoot {
     function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         amount_ = _amount.divu(1e6);
+
+    }
+
+    // takes raw amount, returns numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        uint256 _balance = usdt.balanceOf(address(this));
+
+        amount_ = _amount.divu(1e6);
+
+        balance_ = _balance.divu(1e6);
 
     }
 

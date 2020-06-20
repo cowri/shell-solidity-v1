@@ -43,6 +43,7 @@ library Controller {
         shell.beta = _beta.divu(1e18);
         shell.delta = shell.max.div(uint256(2).fromUInt().mul(shell.alpha.sub(shell.beta)));
         shell.epsilon = _epsilon.divu(1e18);
+        if (shell.epsilon.mulu(1e18) < _epsilon) shell.epsilon = shell.epsilon.add(uint(1).divu(1e18));
         shell.lambda = _lambda.divu(1e18);
 
         require(shell.alpha < ONE && shell.alpha > 0, "Shell/parameter-invalid-alpha");
