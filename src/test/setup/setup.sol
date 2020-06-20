@@ -54,6 +54,13 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         setupAssimilatorsSetOneLocal();
 
         loihi_ = new Loihi();
+        
+        loihi_.includeTestAssimilatorState(
+            dai, cdai, chai, pot,
+            usdc, cusdc,
+            usdt, ausdt,
+            susd, asusd
+        );
 
         includeAssetsSetOne(loihi_);
         includeAssimilatorsSetOne(loihi_);
@@ -63,12 +70,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         approveStablecoins(address(loihi_));
         interApproveStablecoinsLocal(address(loihi_));
 
-        loihi_.includeTestAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
 
     }
 
@@ -95,19 +96,19 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
-        setParamsSetTwo(loihi_);
-
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
-
         loihi_.includeTestAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
             susd, asusd
         );
+
+        includeAssetsSetOne(loihi_);
+        includeAssimilatorsSetOne(loihi_);
+        setParamsSetTwo(loihi_);
+
+        approveStablecoins(address(loihi_));
+        interApproveStablecoinsLocal(address(loihi_));
 
     }
 
@@ -117,6 +118,13 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         setupAssimilatorsSetTwoLocal();
 
         loihi_ = new Loihi();
+        
+        loihi_.includeTestAssimilatorState(
+            dai, cdai, chai, pot,
+            usdc, cusdc,
+            usdt, ausdt,
+            susd, asusd
+        );
 
         includeAssetsSetTwo(loihi_);
         includeAssimilatorsSetTwo(loihi_);
@@ -124,13 +132,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         approveStablecoins(address(loihi_));
         interApproveStablecoinsLocal(address(loihi_));
-
-        loihi_.includeTestAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
 
     }
 
@@ -141,19 +142,19 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
 
-        includeAssetsSetTwo(loihi_);
-        includeAssimilatorsSetTwo(loihi_);
-        setParamsSetTwo(loihi_);
-
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
-
         loihi_.includeTestAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
             susd, asusd
         );
+
+        includeAssetsSetTwo(loihi_);
+        includeAssimilatorsSetTwo(loihi_);
+        setParamsSetTwo(loihi_);
+
+        approveStablecoins(address(loihi_));
+        interApproveStablecoinsLocal(address(loihi_));
 
     }
 
@@ -163,6 +164,13 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         setupAssimilatorsSetOneLocal();
 
         loihi_ = new Loihi();
+        
+        loihi_.includeTestAssimilatorState(
+            dai, cdai, chai, pot,
+            usdc, cusdc,
+            usdt, ausdt,
+            susd, asusd
+        );
 
         includeAssetsSetOne(loihi_);
         includeAssimilatorsSetOne(loihi_);
@@ -170,13 +178,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         approveStablecoins(address(loihi_));
         interApproveStablecoinsLocal(address(loihi_));
-
-        loihi_.includeTestAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
 
     }
 
@@ -187,19 +188,19 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
-        setParamsSetThree(loihi_);
-
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
-
         loihi_.includeTestAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
             susd, asusd
         );
+
+        includeAssetsSetOne(loihi_);
+        includeAssimilatorsSetOne(loihi_);
+        setParamsSetThree(loihi_);
+
+        approveStablecoins(address(loihi_));
+        interApproveStablecoinsLocal(address(loihi_));
 
     }
 
@@ -207,19 +208,19 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
-        setParamsSetThree(loihi_);
-
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
-
         loihi_.includeTestAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
             susd, asusd
         );
+
+        includeAssetsSetOne(loihi_);
+        includeAssimilatorsSetOne(loihi_);
+        setParamsSetThree(loihi_);
+
+        approveStablecoins(address(loihi_));
+        interApproveStablecoinsLocal(address(loihi_));
 
     }
 
@@ -230,19 +231,19 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
-        setParamsSetFive(loihi_);
-
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
-
         loihi_.includeTestAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
             susd, asusd
         );
+
+        includeAssetsSetOne(loihi_);
+        includeAssimilatorsSetOne(loihi_);
+        setParamsSetFive(loihi_);
+
+        approveStablecoins(address(loihi_));
+        interApproveStablecoinsLocal(address(loihi_));
 
     }
 
