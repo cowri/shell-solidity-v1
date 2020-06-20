@@ -251,6 +251,50 @@ contract SelectiveWithdrawTemplate is Setup {
 
     }
 
+    // function fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD_NO_HACK () public returns (uint256 shellsBurned_) {
+
+    //     uint256 _startingShells = l.deposit(
+    //         address(dai), 95e18,
+    //         address(usdc), 95e6,
+    //         address(usdt), 55e6,
+    //         address(susd), 15e18
+    //     );
+
+    //     uint256 gas = gasleft();
+
+    //     shellsBurned_ = l.withdraw(
+    //         address(dai), 5e18,
+    //         address(usdc), 5e6,
+    //         address(usdt), 0.5e6,
+    //         address(susd), 0.2e18
+    //     );
+
+    //     emit log_uint("gas used", gas - gasleft());
+
+    // }
+
+    // function fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD_HACK () public returns (uint256 shellsBurned_) {
+
+    //     uint256 _startingShells = l.deposit(
+    //         address(dai), 95e18,
+    //         address(usdc), 95e6,
+    //         address(usdt), 55e6,
+    //         address(susd), 15e18
+    //     );
+
+    //     uint256 gas = gasleft();
+
+    //     shellsBurned_ = l.withdrawHack(
+    //         address(dai), 5e18,
+    //         address(usdc), 5e6,
+    //         address(usdt), 0.5e6,
+    //         address(susd), 0.2e18
+    //     );
+
+    //     emit log_uint("gas used", gas - gasleft());
+
+    // }
+
     function fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD () public returns (uint256 shellsBurned_) {
 
         uint256 _startingShells = l.deposit(

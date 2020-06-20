@@ -20,9 +20,9 @@ contract SelectiveDepositSuiteTwo is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s2_selectiveDeposit_balanced_5DAI_1USDC3_USDT_1SUSD () public {
+    function test_s2_selectiveDeposit_balanced_5DAI_1USDC_3USDT_1SUSD () public {
 
-        uint256 newShells = super.balanced_5DAI_1USDC3_USDT_1SUSD();
+        uint256 newShells = super.balanced_5DAI_1USDC_3USDT_1SUSD();
 
         assertEq(newShells, 9999998966167174500);
 

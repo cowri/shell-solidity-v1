@@ -39,7 +39,7 @@ contract LocalASUsdToSUsdAssimilator is LoihiRoot {
     }
 
     // intakes raw amount of ASUsd and returns the corresponding raw amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         asusd.transferFrom(msg.sender, address(this), _amount);
 
@@ -50,6 +50,17 @@ contract LocalASUsdToSUsdAssimilator is LoihiRoot {
         amount_ = _amount.divu(1e18);
 
         balance_ = _balance.divu(1e18);
+
+    }
+
+    // intakes raw amount of ASUsd and returns the corresponding raw amount
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        asusd.transferFrom(msg.sender, address(this), _amount);
+
+        asusd.redeem(_amount);
+
+        amount_ = _amount.divu(1e18);
 
     }
 
@@ -65,7 +76,7 @@ contract LocalASUsdToSUsdAssimilator is LoihiRoot {
     }
 
     // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         asusd.deposit(_amount);
 
@@ -76,6 +87,17 @@ contract LocalASUsdToSUsdAssimilator is LoihiRoot {
         amount_ = _amount.divu(1e18);
 
         balance_ = _balance.divu(1e18);
+
+    }
+
+    // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        asusd.deposit(_amount);
+
+        asusd.transfer(_dst, _amount);
+
+        amount_ = _amount.divu(1e18);
 
     }
 
@@ -101,6 +123,17 @@ contract LocalASUsdToSUsdAssimilator is LoihiRoot {
     function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         amount_ = _amount.divu(1e18);
+
+    }
+
+    // takes a raw amount and returns the numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        amount_ = _amount.divu(1e18);
+
+        uint256 _balance = susd.balanceOf(address(this));
+
+        balance_ = _balance.divu(1e18);
 
     }
 

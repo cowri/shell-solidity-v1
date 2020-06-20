@@ -37,8 +37,6 @@ library Shells {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    using Assimilators for Assimilators.Assimilator;
-
     using Shells for Shell;
 
     using SafeERC20Arithmetic for uint256;
@@ -64,7 +62,9 @@ library Shells {
 
     event log(bytes32);
     event log_int(bytes32, int256);
+    event log_ints(bytes32, int256[]);
     event log_uint(bytes32, uint256);
+    event log_uints(bytes32, uint256[]);
 
     function calculateFee (
         Shell storage shell,
@@ -80,6 +80,8 @@ library Shells {
             int128 _ideal = _grossLiq.mul(_weights[i]);
             psi_ += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
         }
+        
+        emit log('~<>~<>~<>~<>~<>~<>~<>~');
 
     }
 
@@ -89,6 +91,13 @@ library Shells {
         int128 _beta,
         int128 _delta
     ) internal returns (int128 fee_) {
+
+        emit log('~<>~<>~<>~<>~<>~<>~<>~');
+
+        emit log_int("_bal", _bal.muli(1e6));
+        emit log_int("_ideal", _ideal.muli(1e6));
+        emit log_int("_beta", _beta.muli(1e6));
+        emit log_int("_delta", _delta.muli(1e6));
 
         if (_bal < _ideal) {
 
@@ -126,35 +135,37 @@ library Shells {
 
         }
 
-    }
+        emit log_int("fee_", fee_.muli(1e6));
 
+    }
 
     function calculateTargetTrade (
         Shell storage shell,
-        Assimilators.Assimilator[] memory assims_
-    ) internal returns (Assimilators.Assimilator[] memory, int128 psi_) {
+        uint _oIx,
+        int128 _tAmt,
+        int128 _oGLiq,
+        int128 _nGLiq,
+        int128[] memory _oBals,
+        int128[] memory _nBals
+    ) internal returns (int128 oAmt_ , int128 psi_) {
 
-        (   int128 _oGLiq,
-            int128 _nGLiq,
-            int128[] memory _oBals,
-            int128[] memory _nBals  ) = shell.getPoolData(assims_);
+        oAmt_ = _tAmt;
 
         {
 
             int128 _lambda = shell.lambda;
             int128 _omega = shell.omega;
-            uint256 _oIx = assims_[0].ix;
 
             for (uint i = 0; i < 10; i++) {
 
                 psi_ = shell.calculateFee(_nBals, _nGLiq);
 
-                int128 _prev = assims_[0].amt;
-                int128 _next = assims_[0].amt = _omega < psi_
-                    ? ( assims_[1].amt.sub(psi_.sub(_omega)) ).neg()
-                    : ( assims_[1].amt.add(_lambda.mul(_omega.sub(psi_))) ).neg();
+                int128 _prev = oAmt_;
+                int128 _next = oAmt_ = _omega < psi_
+                    ? ( _tAmt.sub(psi_.sub(_omega))).neg()
+                    : ( _tAmt.add(_lambda.mul(_omega.sub(psi_)))).neg();
 
-                _nGLiq = _oGLiq.add(assims_[1].amt).add(_next);
+                _nGLiq = _oGLiq.add(_tAmt).add(_next);
 
                 _nBals[_oIx] = _oBals[_oIx].add(_next);
 
@@ -167,39 +178,54 @@ library Shells {
 
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
 
-        assims_[0].amt = assims_[0].amt.mul(ONE.add(shell.epsilon));
-
-        return (assims_, psi_);
+        oAmt_ = oAmt_.mul(ONE + shell.epsilon);
 
     }
 
+
     function calculateOriginTrade (
         Shell storage shell,
-        Assimilators.Assimilator[] memory assims_
-    ) internal returns (Assimilators.Assimilator[] memory, int128 psi_) {
+        uint _tIx,
+        int128 _oAmt,
+        int128 _oGLiq,
+        int128 _nGLiq,
+        int128[] memory _oBals,
+        int128[] memory _nBals
+    ) internal returns (int128 tAmt_, int128 psi_) {
 
-        (   int128 _oGLiq,
-            int128 _nGLiq,
-            int128[] memory _oBals,
-            int128[] memory _nBals  ) = shell.getPoolData(assims_);
+        tAmt_ = _oAmt;
+
+        emit log_int("tAmt_", tAmt_.muli(1e18));
 
         {
+
             int128 _lambda = shell.lambda;
             int128 _omega = shell.omega;
-            uint256 _tIx = assims_[1].ix;
 
             for (uint i = 0; i < 10; i++) {
 
+                emit log_uint("i", i);
+
+                emit log(">>>>>>>>>>>>>>>>");
+
                 psi_ = shell.calculateFee(_nBals, _nGLiq);
 
-                int128 _prev = assims_[1].amt;
-                int128 _next = assims_[1].amt = _omega < psi_
-                    ? ( assims_[0].amt + _omega - psi_ ).neg()
-                    : ( assims_[0].amt + _lambda.mul(_omega - psi_) ).neg();
+                emit log_int("psi_", psi_.muli(1e18));
+                emit log_int("omega_", _omega.muli(1e18));
 
-                _nGLiq = _oGLiq + assims_[0].amt + _next;
+                int128 _prev = tAmt_;
+                int128 _next = tAmt_ = _omega < psi_
+                    ? ( _oAmt + _omega - psi_).neg()
+                    : ( _oAmt + _lambda.mul(_omega - psi_)).neg();
+
+                _nGLiq = _oGLiq + _oAmt + _next;
 
                 _nBals[_tIx] = _oBals[_tIx].add(_next);
+
+                emit log_int("prev", _prev.muli(1e18));
+                emit log_int("next", _next.muli(1e18));
+
+                emit log("<<<<<<<<<<<<<<<<<");
 
                 if (_prev / 1e14 == _next / 1e14) break;
 
@@ -207,69 +233,16 @@ library Shells {
 
         }
 
+        emit log_int("tAmt..._", tAmt_.muli(1e18));
+
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
 
-        assims_[1].amt = assims_[1].amt.mul(ONE.sub(shell.epsilon));
+        emit log("passed halts");
 
-        return (assims_, psi_);
-
-    }
-
-
-    function getPoolData (
-        Shell storage shell,
-        Assimilators.Assimilator[] memory _assims
-    ) internal returns (int128 oGLiq_, int128 nGLiq_, int128[] memory, int128[] memory) {
-
-        int128[] memory oBals_ = new int128[](shell.reserves.length);
-        int128[] memory nBals_ = new int128[](shell.reserves.length);
-
-        for (uint i = 0; i <= _assims.length; i++) {
-
-            for (uint j = 0; j < shell.reserves.length; j++) {
-
-                if (i < _assims.length && _assims[i].ix == j) {
-
-                    if (nBals_[j] == 0) {
-
-                        int128 _bal = _assims[i].bal;
-                        nBals_[j] = oBals_[j] = _bal;
-                        oGLiq_ = oGLiq_.add(_bal);
-                        nGLiq_ = nGLiq_.add(_bal);
-
-                    }
-
-                    int128 _amt = _assims[i].amt;
-                    oGLiq_ = oGLiq_.sub(_amt);
-                    oBals_[j] = oBals_[j].sub(_amt);
-
-                    break;
-
-                } else if (i == _assims.length && nBals_[j] == 0 && oBals_[j] == 0) {
-
-                    int128 _bal = shell.reserves[j].viewNumeraireBalance();
-
-                    nBals_[j] = oBals_[j] = _bal;
-                    nGLiq_ = nGLiq_.add(_bal);
-                    oGLiq_ = oGLiq_.add(_bal);
-
-                }
-
-            }
-
-        }
-
-        for (uint i = 0; i < _assims.length; i++) emit log_int("_assims[i]", _assims[i].amt.muli(1e18));
-
-        emit log_int("oGLiq_", oGLiq_.muli(1e18));
-        for (uint i = 0; i < oBals_.length; i++) emit log_int("oBals_[i]", oBals_[i].muli(1e18));
-
-        emit log_int("nGLiq_", nGLiq_.muli(1e18));
-        for (uint i = 0; i < nBals_.length; i++) emit log_int("nBals_[i]", nBals_[i].muli(1e18));
-
-        return (oGLiq_, nGLiq_, oBals_, nBals_);
+        tAmt_ = tAmt_.mul(ONE.sub(shell.epsilon));
 
     }
+
 
     function calculateLiquidityMembrane (
         Shell storage shell,
@@ -303,13 +276,11 @@ library Shells {
 
     function calculateSelectiveDeposit (
         Shells.Shell storage shell,
-        Assimilators.Assimilator[] memory _assims
+        int128 _oGLiq,
+        int128 _nGLiq,
+        int128[] memory _oBals,
+        int128[] memory _nBals
     ) internal returns (uint256 shells_, int128 omega_) {
-
-        (   int128 _oGLiq,
-            int128 _nGLiq,
-            int128[] memory _oBals,
-            int128[] memory _nBals  ) = shell.getPoolData(_assims);
 
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
 
@@ -323,13 +294,11 @@ library Shells {
 
     function calculateSelectiveWithdraw (
         Shells.Shell storage shell,
-        Assimilators.Assimilator[] memory _assims
+        int128 _oGLiq,
+        int128 _nGLiq,
+        int128[] memory _oBals,
+        int128[] memory _nBals
     ) internal returns (uint256 shells_, int128 omega_) {
-
-        (   int128 _oGLiq,
-            int128 _nGLiq,
-            int128[] memory _oBals,
-            int128[] memory _nBals  ) = shell.getPoolData(_assims);
 
         shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
 
@@ -338,8 +307,6 @@ library Shells {
         ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
 
         shells_ = _shells.abs().mul(ONE.add(shell.epsilon)).mulu(1e18);
-
-        emit log_uint("shells_", shells_);
 
     }
 
@@ -351,8 +318,16 @@ library Shells {
         int128[] memory _nBals
     ) internal {
 
+        emit log("enforce halts");
+        emit log_int("MAX", MAX.muli(1e18));
+
+        emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
+        emit log_int("_nGLiq", _nGLiq.muli(1e18));
+        for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
+
         if (!shell.testHalts) {
-            emit log("skipping halts");
+            // emit log("skipping halts");
             return;
         }
 
@@ -393,8 +368,6 @@ library Shells {
                 }
             }
         }
-
-        emit log("passed halts");
 
     }
 

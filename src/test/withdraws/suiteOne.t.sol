@@ -16,7 +16,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.balanced_10DAI_10USDC_10USDT_2p5SUSD_from_300Proportional();
 
-        assertEq(shellsBurned, 32508125216729574694);
+        assertEq(shellsBurned, 32508125000000000018);
 
     }
 
@@ -24,7 +24,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.lightlyUnbalanced_5DAI_1USDC_3USDT_1SUSD_from_80DAI_100USDC_85USDT_35SUSD();
 
-        assertEq(shellsBurned, 10002499999733097916);
+        assertEq(shellsBurned, 10002500000000000000);
 
     }
 
@@ -32,7 +32,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional();
 
-        assertEq(shellsBurned, 73154345690075849040);
+        assertEq(shellsBurned, 73154344955029368640);
 
     }
 
@@ -40,7 +40,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.partialLowerSlippage_3DAI_60USDC_30USDT_1SUSD_from_80DAI_100USDC_100USDT_23SUSD();
 
-        assertEq(shellsBurned, 94102228495008790366);
+        assertEq(shellsBurned, 94102228808064194663);
 
     }
 
@@ -48,7 +48,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.partialUpperSlippage_balanced_0p001DAI_40USDC_40USDT_10SUSD_from_300Proportional();
 
-        assertEq(shellsBurned, 90224422906045360592);
+        assertEq(shellsBurned, 90224421960738460186);
 
     }
 
@@ -56,7 +56,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.partialLowerIndirectAntiSlippage_40DAI_40USDT_from_95DAI_55USDC_95USDT_15SUSD();
 
-        assertEq(shellsBurned, 80001277060135043666);
+        assertEq(shellsBurned, 80001277371794871867);
 
     }
 
@@ -64,7 +64,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.partialLowerAntiSlippage_0p0001DAI_41USDC_41USDT_1SUSD_from_55DAI_95USDC_95USDT_15SUSD();
 
-        assertEq(shellsBurned, 83002127076568926436);
+        assertEq(shellsBurned, 83002127396794871860);
 
     }
 
@@ -72,7 +72,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.partialUpperAntiSlippage_50USDC_18SUSD_from_90DAI_145USDC_90USDT_50SUSD();
 
-        assertEq(shellsBurned, 68008386735015754177);
+        assertEq(shellsBurned, 68008386736111111158);
 
     }
 
@@ -88,7 +88,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.fullIndirectUpperSlippage_5DAI_5USDT_from90DAI_145USDC_90USDT_50SUSD();
 
-        assertEq(shellsBurned, 10072190169539376480);
+        assertEq(shellsBurned, 10072190173135464226);
 
     }
 
@@ -96,7 +96,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.fullUpperSlippage_8DAI_2USDC_8USDT_2SUSD_from_90DAI_145USDC_90USDT_50SUSD();
 
-        assertEq(shellsBurned, 20090545586275051778);
+        assertEq(shellsBurned, 20090545637715179967);
 
     }
 
@@ -104,7 +104,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.fullLowerSlippage_1USDC_7USDT_2SUSD_from_95DAI_95USDC_55USDT_15SUSD();
 
-        assertEq(shellsBurned, 10134109814565570448);
+        assertEq(shellsBurned, 10134109817307692313);
 
     }
 
@@ -120,7 +120,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.fullIndirectLowerAntiSlippage_5DAI_5USDC_from_95DAI_95USDC_55USDT_15SUSD();
 
-        assertEq(shellsBurned, 9995446955063918311);
+        assertEq(shellsBurned, 9995446955128205126);
 
     }
 
@@ -128,9 +128,25 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD();
 
-        assertEq(shellsBurned, 10696820295674489134);
+        assertEq(shellsBurned, 10696820295820476818);
 
     }
+
+    // function test_s1_selectiveWithdraw_fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD_HACK () public {
+
+    //     uint256 shellsBurned = super.fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD_HACK();
+
+    //     assertEq(shellsBurned, 10696820295674489134);
+
+    // }
+
+    // function test_s1_selectiveWithdraw_fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD_NO_HACK () public {
+
+    //     uint256 shellsBurned = super.fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD_NO_HACK();
+
+    //     assertEq(shellsBurned, 10696820295674489134);
+
+    // }
 
     function test_s1_selectiveWithdraw_fullUpperAntiSlippage_5CDAI_2ASUSD_from_145DAI_90USDC_90USDT_50SUSD () public {
 
@@ -144,7 +160,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.fullUpperAntiSlippage_5DAI_2SUSD_from_145DAI_90USDC_90USDT_50SUSD();
 
-        assertEq(shellsBurned, 6996035991529215020);
+        assertEq(shellsBurned, 6996036011473429940);
 
     }
 
@@ -152,7 +168,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.megaUpperToLower_95USDT_35SUSD_from_90DAI_90USDC_145USDT_50SUSD();
 
-        assertEq(shellsBurned, 130071681773528500889);
+        assertEq(shellsBurned, 130071682128684807393);
 
     }
 
@@ -160,7 +176,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsMinted = super.megaIndirectLowerToUpper_11DAI_74USDC_74USDT_from_55DAI_95USDC_95USDT_15SUSD();
 
-        assertEq(shellsMinted, 159145489520065366756);
+        assertEq(shellsMinted, 159145489489956207277);
 
     }
 
@@ -168,7 +184,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.megaIndirectWithdrawLowerToUpper_11DAI_74USDC_74USDT_0p0001SDUSD_from_55DAI_95USDC_95USDT_15SUSD();
 
-        assertEq(shellsBurned, 159145586630360938967);
+        assertEq(shellsBurned, 159145586600251986918);
 
     }
 

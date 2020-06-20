@@ -14,11 +14,14 @@
 pragma solidity ^0.5.0;
 
 interface IAssimilator {
-    function intakeRaw (uint256 amount) external returns (int128, int128);
+    function intakeRaw (uint256 amount) external returns (int128);
+    function intakeRawAndGetBalance (uint256 amount) external returns (int128, int128);
     function intakeNumeraire (int128 amount) external returns (uint256);
-    function outputRaw (address dst, uint256 amount) external returns (int128, int128);
+    function outputRaw (address dst, uint256 amount) external returns (int128);
+    function outputRawAndGetBalance (address dst, uint256 amount) external returns (int128, int128);
     function outputNumeraire (address dst, int128 amount) external returns (uint256);
     function viewRawAmount (int128) external returns (uint256);
     function viewNumeraireAmount (uint256) external returns (int128);
+    function viewNumeraireAmountAndBalance (uint256) external returns (int128, int128);
     function viewNumeraireBalance (address addr) external view returns (int128);
 }
