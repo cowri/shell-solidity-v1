@@ -121,8 +121,8 @@ contract Loihi is LoihiRoot {
 
     }
 
-    function setParams (uint256 _alpha, uint256 _beta, uint256 _epsilon, uint256 _max, uint256 _lambda, uint256 _omega) public onlyOwner {
-        maxFee = shell.setParams(_alpha, _beta, _epsilon, _max, _lambda, _omega);
+    function setParams (uint256 _alpha, uint256 _beta, uint256 _epsilon, uint256 _max, uint256 _lambda) public onlyOwner {
+        maxFee = shell.setParams(_alpha, _beta, _epsilon, _max, _lambda);
     }
 
     function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint256 _weight) public onlyOwner {

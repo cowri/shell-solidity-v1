@@ -19,10 +19,6 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
         assertEq(targetAmount, 9997499);
 
-        ( , , , int128 epsilon, , , , , ) = l.shell();
-
-        emit log_named_int("epsilon", epsilon.muli(1e18));
-
     }
 
     function test_s1_originSwap_noSlippage_lightlyUnbalanced_10USDC_to_USDT_with_80DAI_100USDC_85USDT_35SUSD () public {

@@ -24,7 +24,7 @@ library Controller {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    using Assimilators for Assimilators.Assimilator;
+    using Assimilators for address;
 
     using Shells for Shells.Shell;
 
@@ -37,16 +37,15 @@ library Controller {
     function setParams (Shells.Shell storage shell, uint256 _alpha, uint256 _beta, uint256 _max, uint256 _epsilon, uint256 _lambda) internal returns (uint256 max_) {
 
         require(_max <= .5e18, "Shell/parameter-invalid-max");
-        int128 max_ = _max.divu(1e18);
 
         int128 _gLiq;
         int128[] memory _bals = new int128[](shell.reserves.length);
         for (uint i = 0; i < _bals.length; i++) {
-            int128 _bal = shell.reserves[i].viewNumeraireBalance();
+            int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
             _gLiq += _bal;
             _bals[i] = _bal;
         }
- 
+
         int128 _omega = shell.calculateFee(_bals, _gLiq);
 
         shell.alpha = _alpha.divu(1e18);

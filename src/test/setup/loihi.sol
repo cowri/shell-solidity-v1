@@ -29,7 +29,7 @@ contract LoihiSetup is StorageSetup {
         emit log_uint("_epsilon", _epsilon);
         emit log_uint("_lambda", _lambda);
 
-        _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda, 0);
+        _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda);
 
     }
 
@@ -41,7 +41,7 @@ contract LoihiSetup is StorageSetup {
        uint256 _epsilon = 5e14;
        uint256 _lambda = .2e18;
 
-       _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda, 0);
+       _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda);
 
     }
 
@@ -53,7 +53,7 @@ contract LoihiSetup is StorageSetup {
         uint256 _epsilon = 0;
         uint256 _lambda = 1e18;
 
-        _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda, 0);
+        _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda);
 
     }
 
@@ -65,7 +65,7 @@ contract LoihiSetup is StorageSetup {
         uint256 _epsilon = 2.5e14;
         uint256 _lambda = .2e18;
 
-        _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda, 0);
+        _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda);
 
     }
 
@@ -77,7 +77,7 @@ contract LoihiSetup is StorageSetup {
         uint256 _epsilon = 3.5e14;
         uint256 _lambda = .5e18;
 
-        _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda, 0);
+        _loihi.setParams(_alpha, _beta, _max, _epsilon, _lambda);
 
     }
 
