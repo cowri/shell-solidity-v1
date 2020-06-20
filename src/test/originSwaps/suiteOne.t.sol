@@ -85,7 +85,7 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
     }
 
-    function test_s1_originSwap_fullUpperAndLowerSlippage_unbalanced_30PctWeight () public {
+    function test_s1_originSwap_fullUpperAndLowerSlippage_unbalanced_30PctWeight__ () public {
 
         uint256 targetAmount = super.fullUpperAndLowerSlippage_unbalanced_30PctWeight();
 

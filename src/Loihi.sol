@@ -185,7 +185,7 @@ contract Loihi is LoihiRoot {
                 if (_isOrigin) ( amt_, _bal ) = _assim.intakeRawAndGetBalance(_amt);
                 else ( amt_, _bal ) = _assim.outputRawAndGetBalance(_rcpnt, _amt);
 
-                oBals_[i] = _bal.sub(amt_);
+                oBals_[i] = _bal - amt_;
                 nBals_[i] = _bal;
 
             }
@@ -198,11 +198,11 @@ contract Loihi is LoihiRoot {
         nGLiq_ = nGLiq_.sub(amt_);
         nBals_[_rIx] = nBals_[_rIx].sub(amt_);
 
-        emit log_int("amt_", amt_.muli(1e18));
-        emit log_int("oGLiq_", oGLiq_.muli(1e18));
-        for (uint i = 0; i < oBals_.length; i++) emit log_int("oBals_ from getSwapData", oBals_[i].muli(1e18));
-        emit log_int("nGLiq_", nGLiq_.muli(1e18));
-        for (uint i = 0; i < nBals_.length; i++) emit log_int("nBals_ from getSwapData", nBals_[i].muli(1e18));
+        // emit log_int("amt_", amt_.muli(1e18));
+        // emit log_int("oGLiq_", oGLiq_.muli(1e18));
+        // for (uint i = 0; i < oBals_.length; i++) emit log_int("oBals_ from getSwapData", oBals_[i].muli(1e18));
+        // emit log_int("nGLiq_", nGLiq_.muli(1e18));
+        // for (uint i = 0; i < nBals_.length; i++) emit log_int("nBals_ from getSwapData", nBals_[i].muli(1e18));
 
         return ( amt_, oGLiq_, nGLiq_, oBals_, nBals_ );
 
@@ -254,7 +254,6 @@ contract Loihi is LoihiRoot {
 
     function transferByOrigin (address _origin, address _target, uint256 _dline, uint256 _mTAmt, uint256 _oAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
 
-        uint _length = shell.reserves.length;
         Assimilators.Assimilator memory _o = shell.assimilators[_origin];
         Assimilators.Assimilator memory _t = shell.assimilators[_target];
 
@@ -267,17 +266,17 @@ contract Loihi is LoihiRoot {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getSwapData(_o.ix, _t.ix, _oAmt, _o.addr, true, address(0));
 
-        emit log_int("shell.omega", shell.omega.muli(1e18));
-        emit log_int("_amt", _amt.muli(1e18));
-        emit log_int("_oGLiq", _oGLiq.muli(1e18));
-        for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals from transferByOrigin", _oBals[i].muli(1e18));
-        emit log_int("_nGLiq", _nGLiq.muli(1e18));
-        for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals from transferByOrigin", _nBals[i].muli(1e18));
+        // emit log_int("shell.omega", shell.omega.muli(1e18));
+        // emit log_int("_amt", _amt.muli(1e18));
+        // emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        // for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals from transferByOrigin", _oBals[i].muli(1e18));
+        // emit log_int("_nGLiq", _nGLiq.muli(1e18));
+        // for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals from transferByOrigin", _nBals[i].muli(1e18));
 
         ( _amt, shell.omega ) = shell.calculateOriginTrade(_t.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
 
-        emit log_int("shell.omega", shell.omega.muli(1e18));
-        emit log_int("_amt", _amt.muli(1e18));
+        // emit log_int("shell.omega", shell.omega.muli(1e18));
+        // emit log_int("_amt", _amt.muli(1e18));
 
         require((tAmt_ = _t.addr.outputNumeraire(_rcpnt, _amt)) > _mTAmt, "Shell/below-min-target-amount");
 
@@ -412,10 +411,10 @@ contract Loihi is LoihiRoot {
     ) {
 
 
-        emit log_uints("_amts", _amts);
-        emit log_addrs("_flvrs", _flvrs);
+        // emit log_uints("_amts", _amts);
+        // emit log_addrs("_flvrs", _flvrs);
         uint _length = shell.reserves.length;
-        emit log_uint("_length", _length);
+        // emit log_uint("_length", _length);
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
 
@@ -425,7 +424,7 @@ contract Loihi is LoihiRoot {
 
             if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {
 
-                emit log("ping");
+                // emit log("ping");
 
                 int128 _amount; int128 _balance;
 
@@ -525,10 +524,10 @@ contract Loihi is LoihiRoot {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getLiquidityData(_flvrs, _amts, true, address(0));
 
-        emit log_int("_oGLiq", _oGLiq.muli(1e18));
-        emit log_int("_nGLiq", _nGLiq.muli(1e18));
-        emit log_ints("_oBals", _oBals);
-        emit log_ints("_nBals", _nBals);
+        // emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        // emit log_int("_nGLiq", _nGLiq.muli(1e18));
+        // emit log_ints("_oBals", _oBals);
+        // emit log_ints("_nBals", _nBals);
 
         ( shells_, shell.omega ) = shell.calculateSelectiveDeposit(_oGLiq, _nGLiq, _oBals, _nBals);
 

@@ -214,16 +214,16 @@ contract OriginSwapTemplate is Setup {
     function fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight () public returns (uint256 targetAmount_) {
 
         l.deposit(
-            address(dai), 13500000e18,
-            address(usdc), 9000000e6,
-            address(usdt), 6500000e6,
-            address(susd), 2500000e18
+            address(dai), 135e18,
+            address(usdc), 90e6,
+            address(usdt), 65e6,
+            address(susd), 25e18
         );
 
         targetAmount_ = l.originSwap(
             address(dai),
             address(usdt),
-            3000000e18
+            30e18
         );
 
     }

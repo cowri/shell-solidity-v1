@@ -54,10 +54,8 @@ contract LoihiRoot {
 
     modifier nonReentrant() {
         require(notEntered, "Shell/re-entered");
-        emit log("entered");
         notEntered = false;
         _;
-        emit log("exited");
         notEntered = true;
     }
 

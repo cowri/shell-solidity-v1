@@ -77,11 +77,11 @@ library Shells {
         int128[] memory _weights = shell.weights;
 
         for (uint i = 0; i < _weights.length; i++) {
-            int128 _ideal = _grossLiq.mul(_weights[i]);
+            int128 _ideal = _grossLiq.unsafe_mul(_weights[i]);
             psi_ += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
         }
         
-        emit log('~<>~<>~<>~<>~<>~<>~<>~');
+        // emit log('~<>~<>~<>~<>~<>~<>~<>~');
 
     }
 
@@ -92,50 +92,50 @@ library Shells {
         int128 _delta
     ) internal returns (int128 fee_) {
 
-        emit log('~<>~<>~<>~<>~<>~<>~<>~');
+        // emit log('~<>~<>~<>~<>~<>~<>~<>~');
 
-        emit log_int("_bal", _bal.muli(1e6));
-        emit log_int("_ideal", _ideal.muli(1e6));
-        emit log_int("_beta", _beta.muli(1e6));
-        emit log_int("_delta", _delta.muli(1e6));
+        // emit log_int("_bal", _bal.muli(1e6));
+        // emit log_int("_ideal", _ideal.muli(1e6));
+        // emit log_int("_beta", _beta.muli(1e6));
+        // emit log_int("_delta", _delta.muli(1e6));
 
         if (_bal < _ideal) {
 
-            int128 _threshold = _ideal.mul(ONE - _beta);
+            int128 _threshold = _ideal.unsafe_mul(ONE - _beta);
 
             if (_bal < _threshold) {
 
-                int128 _feeSection = _threshold.sub(_bal);
+                int128 _feeSection = _threshold - _bal;
 
-                fee_ = _feeSection.div(_ideal);
-                fee_ = fee_.mul(_delta);
+                fee_ = _feeSection.unsafe_div(_ideal);
+                fee_ = fee_.unsafe_mul(_delta);
 
                 if (fee_ > MAX) fee_ = MAX;
 
-                fee_ = fee_.mul(_feeSection);
+                fee_ = fee_.unsafe_mul(_feeSection);
 
             } else fee_ = 0;
 
         } else {
 
-            int128 _threshold = _ideal.mul(ONE + _beta);
+            int128 _threshold = _ideal.unsafe_mul(ONE + _beta);
 
             if (_bal > _threshold) {
 
-                int128 _feeSection = _bal.sub(_threshold);
+                int128 _feeSection = _bal - _threshold;
 
-                fee_ = _feeSection.div(_ideal);
-                fee_ = fee_.mul(_delta);
+                fee_ = _feeSection.unsafe_div(_ideal);
+                fee_ = fee_.unsafe_mul(_delta);
 
                 if (fee_ > MAX) fee_ = MAX;
 
-                fee_ = fee_.mul(_feeSection);
+                fee_ = fee_.unsafe_mul(_feeSection);
 
             } else fee_ = 0;
 
         }
 
-        emit log_int("fee_", fee_.muli(1e6));
+        // emit log_int("fee_", fee_.muli(1e6));
 
     }
 
@@ -169,16 +169,23 @@ library Shells {
 
                 _nBals[_oIx] = _oBals[_oIx].add(_next);
 
-                if (_prev / 1e14 == _next / 1e14) break;
+                if (_prev / 1e13 == _next / 1e13) {
+
+                    enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+
+                    oAmt_ = oAmt_.mul(ONE + shell.epsilon);
+
+                    return ( oAmt_, psi_ );
+
+                }
 
             }
 
 
         }
 
-        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+        revert("Shell/swap-convergence-failed");
 
-        oAmt_ = oAmt_.mul(ONE + shell.epsilon);
 
     }
 
@@ -195,7 +202,7 @@ library Shells {
 
         tAmt_ = _oAmt;
 
-        emit log_int("tAmt_", tAmt_.muli(1e18));
+        // emit log_int("tAmt_", tAmt_.muli(1e18));
 
         {
 
@@ -204,42 +211,44 @@ library Shells {
 
             for (uint i = 0; i < 10; i++) {
 
-                emit log_uint("i", i);
+                // emit log_uint("i", i);
 
-                emit log(">>>>>>>>>>>>>>>>");
+                // emit log(">>>>>>>>>>>>>>>>");
 
                 psi_ = shell.calculateFee(_nBals, _nGLiq);
 
-                emit log_int("psi_", psi_.muli(1e18));
-                emit log_int("omega_", _omega.muli(1e18));
+                // emit log_int("psi_", psi_.muli(1e18));
+                // emit log_int("omega_", _omega.muli(1e18));
 
                 int128 _prev = tAmt_;
                 int128 _next = tAmt_ = _omega < psi_
-                    ? ( _oAmt + _omega - psi_).neg()
-                    : ( _oAmt + _lambda.mul(_omega - psi_)).neg();
+                    ? - ( _oAmt + _omega - psi_)
+                    : - ( _oAmt + _lambda.unsafe_mul(_omega - psi_));
 
                 _nGLiq = _oGLiq + _oAmt + _next;
 
                 _nBals[_tIx] = _oBals[_tIx].add(_next);
 
-                emit log_int("prev", _prev.muli(1e18));
-                emit log_int("next", _next.muli(1e18));
+                // emit log_int("prev", _prev.muli(1e18));
+                // emit log_int("next", _next.muli(1e18));
 
-                emit log("<<<<<<<<<<<<<<<<<");
+                // emit log("<<<<<<<<<<<<<<<<<");
 
-                if (_prev / 1e14 == _next / 1e14) break;
+                if (_prev / 1e13 == _next / 1e13) {
+
+                    enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+
+                    tAmt_ = tAmt_.unsafe_mul(ONE - shell.epsilon);
+
+                    return ( tAmt_, psi_ );
+
+                }
 
             }
 
         }
 
-        emit log_int("tAmt..._", tAmt_.muli(1e18));
-
-        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
-
-        emit log("passed halts");
-
-        tAmt_ = tAmt_.mul(ONE.sub(shell.epsilon));
+        revert("Shell/swap-convergence-failed");
 
     }
 
@@ -318,34 +327,36 @@ library Shells {
         int128[] memory _nBals
     ) internal {
 
-        emit log("enforce halts");
-        emit log_int("MAX", MAX.muli(1e18));
+        // emit log("enforce halts");
+        // emit log_int("MAX", MAX.muli(1e18));
 
-        emit log_int("_oGLiq", _oGLiq.muli(1e18));
-        for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
-        emit log_int("_nGLiq", _nGLiq.muli(1e18));
-        for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
+        // emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        // for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
+        // emit log_int("_nGLiq", _nGLiq.muli(1e18));
+        // for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
 
-        if (!shell.testHalts) {
-            // emit log("skipping halts");
-            return;
-        }
-
+        // if (!shell.testHalts) {
+        //     // emit log("skipping halts");
+        //     return;
+        // }
+        
+        uint256 _length = _nBals.length;
         int128 _alpha = shell.alpha;
+        int128[] memory _weights = shell.weights;
 
-        for (uint i = 0; i < _nBals.length; i++) {
+        for (uint i = 0; i < _length; i++) {
 
-            int128 _nIdeal = _nGLiq.mul(shell.weights[i]);
+            int128 _nIdeal = _nGLiq.unsafe_mul(_weights[i]);
 
             if (_nBals[i] > _nIdeal) {
 
-                int128 _upperAlpha = ONE.add(_alpha);
+                int128 _upperAlpha = ONE + _alpha;
 
-                int128 _nHalt = _nIdeal.mul(_upperAlpha);
+                int128 _nHalt = _nIdeal.unsafe_mul(_upperAlpha);
 
                 if (_nBals[i] > _nHalt){
 
-                    int128 _oHalt = _oGLiq.mul(shell.weights[i]).mul(_upperAlpha);
+                    int128 _oHalt = _oGLiq.unsafe_mul(_weights[i]).unsafe_mul(_upperAlpha);
 
                     if (_oBals[i] < _oHalt) revert("Shell/upper-halt");
                     if (_nBals[i] - _nHalt > _oBals[i] - _oHalt) revert("Shell/upper-halt");
@@ -354,13 +365,13 @@ library Shells {
 
             } else {
 
-                int128 _lowerAlpha = ONE.sub(_alpha);
+                int128 _lowerAlpha = ONE - _alpha;
 
-                int128 _nHalt = _nIdeal.mul(_lowerAlpha);
+                int128 _nHalt = _nIdeal.unsafe_mul(_lowerAlpha);
 
                 if (_nBals[i] < _nHalt){
 
-                    int128 _oHalt = _oGLiq.mul(shell.weights[i]).mul(_lowerAlpha);
+                    int128 _oHalt = _oGLiq.unsafe_mul(_weights[i]).unsafe_mul(_lowerAlpha);
 
                     if (_oBals[i] > _oHalt) revert("Shell/lower-halt");
                     if (_nHalt - _nBals[i] > _oHalt - _oBals[i]) revert("Shel/lower-halt");
