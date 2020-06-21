@@ -183,6 +183,99 @@ library LoihiMethods {
 
     }
 
+    function viewDeposit (
+        Loihi loihi,
+        address[] memory _flvrs,
+        uint256[] memory _amts
+    ) internal returns (uint256 shells_) {
+
+        shells_ = loihi.viewSelectiveDeposit(_flvrs, _amts);
+
+    }
+
+    function viewDeposit (
+        Loihi loihi,
+        address _token,
+        uint256 _amt
+    ) internal returns (uint256 shells_) {
+        address[] memory _stblcns = new address[](1);
+        uint256[] memory _amts = new uint256[](1);
+        _stblcns[0] = _token;
+        _amts[0] = _amt;
+
+        shells_ = loihi.viewSelectiveDeposit(_stblcns, _amts);
+
+    }
+
+    function viewDeposit (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2
+    ) internal returns (uint256 shells_) {
+
+        address[] memory _stblcns = new address[](2);
+        uint256[] memory _amts = new uint256[](2);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+
+        shells_ = loihi.viewSelectiveDeposit(_stblcns, _amts);
+
+    }
+
+    function viewDeposit (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2,
+        address _token3,
+        uint256 _amt3
+    ) internal returns (uint256 shells_) {
+
+        address[] memory _stblcns = new address[](3);
+        uint256[] memory _amts = new uint256[](3);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+        _stblcns[2] = _token3;
+        _amts[2] = _amt3;
+
+        shells_ = loihi.viewSelectiveDeposit(_stblcns, _amts);
+
+    }
+
+    function viewDeposit (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2,
+        address _token3,
+        uint256 _amt3,
+        address _token4,
+        uint256 _amt4
+    ) internal returns (uint256 shells_) {
+
+        address[] memory _stblcns = new address[](4);
+        uint256[] memory _amts = new uint256[](4);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+        _stblcns[2] = _token3;
+        _amts[2] = _amt3;
+        _stblcns[3] = _token4;
+        _amts[3] = _amt4;
+
+        shells_ = loihi.viewSelectiveDeposit(_stblcns, _amts);
+
+    }
+
     function depositSuccess (
         Loihi loihi,
         address _token1,
@@ -384,98 +477,98 @@ library LoihiMethods {
 
     }
 
-    // function withdrawHack (
-    //     Loihi loihi,
-    //     address[] memory _flvrs,
-    //     uint256[] memory _amts
-    // ) internal returns (uint256 shells_) {
+    function viewWithdraw (
+        Loihi loihi,
+        address[] memory _flvrs,
+        uint256[] memory _amts
+    ) internal returns (uint256 shells_) {
 
-    //     shells_ = loihi.selectiveWithdrawHack(_flvrs, _amts, 1e50, 1e50);
+        shells_ = loihi.viewSelectiveWithdraw(_flvrs, _amts);
 
-    // }
+    }
 
-    // function withdrawHack (
-    //     Loihi loihi,
-    //     address _token,
-    //     uint256 _amt
-    // ) internal returns (uint256 shells_) {
-    //     address[] memory _stblcns = new address[](1);
-    //     uint256[] memory _amts = new uint256[](1);
-    //     _stblcns[0] = _token;
-    //     _amts[0] = _amt;
+    function viewWithdraw (
+        Loihi loihi,
+        address _token,
+        uint256 _amt
+    ) internal returns (uint256 shells_) {
+        address[] memory _stblcns = new address[](1);
+        uint256[] memory _amts = new uint256[](1);
+        _stblcns[0] = _token;
+        _amts[0] = _amt;
 
-    //     shells_ = loihi.selectiveWithdrawHack(_stblcns, _amts, 1e50, 1e50);
+        shells_ = loihi.viewSelectiveWithdraw(_stblcns, _amts);
 
-    // }
+    }
 
-    // function withdrawHack (
-    //     Loihi loihi,
-    //     address _token1,
-    //     uint256 _amt1,
-    //     address _token2,
-    //     uint256 _amt2
-    // ) internal returns (uint256 shells_) {
+    function viewWithdraw (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2
+    ) internal returns (uint256 shells_) {
 
-    //     address[] memory _stblcns = new address[](2);
-    //     uint256[] memory _amts = new uint256[](2);
-    //     _stblcns[0] = _token1;
-    //     _amts[0] = _amt1;
-    //     _stblcns[1] = _token2;
-    //     _amts[1] = _amt2;
+        address[] memory _stblcns = new address[](2);
+        uint256[] memory _amts = new uint256[](2);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
 
-    //     shells_ = loihi.selectiveWithdrawHack(_stblcns, _amts, 1e50, 1e50);
+        shells_ = loihi.viewSelectiveWithdraw(_stblcns, _amts);
 
-    // }
+    }
 
-    // function withdrawHack (
-    //     Loihi loihi,
-    //     address _token1,
-    //     uint256 _amt1,
-    //     address _token2,
-    //     uint256 _amt2,
-    //     address _token3,
-    //     uint256 _amt3
-    // ) internal returns (uint256 shells_) {
+    function viewWithdraw (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2,
+        address _token3,
+        uint256 _amt3
+    ) internal returns (uint256 shells_) {
 
-    //     address[] memory _stblcns = new address[](3);
-    //     uint256[] memory _amts = new uint256[](3);
-    //     _stblcns[0] = _token1;
-    //     _amts[0] = _amt1;
-    //     _stblcns[1] = _token2;
-    //     _amts[1] = _amt2;
-    //     _stblcns[2] = _token3;
-    //     _amts[2] = _amt3;
+        address[] memory _stblcns = new address[](3);
+        uint256[] memory _amts = new uint256[](3);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+        _stblcns[2] = _token3;
+        _amts[2] = _amt3;
 
-    //     shells_ = loihi.selectiveWithdrawHack(_stblcns, _amts, 1e50, 1e50);
+        shells_ = loihi.viewSelectiveWithdraw(_stblcns, _amts);
 
-    // }
+    }
 
-    // function withdrawHack (
-    //     Loihi loihi,
-    //     address _token1,
-    //     uint256 _amt1,
-    //     address _token2,
-    //     uint256 _amt2,
-    //     address _token3,
-    //     uint256 _amt3,
-    //     address _token4,
-    //     uint256 _amt4
-    // ) internal returns (uint256 shells_) {
+    function viewWithdraw (
+        Loihi loihi,
+        address _token1,
+        uint256 _amt1,
+        address _token2,
+        uint256 _amt2,
+        address _token3,
+        uint256 _amt3,
+        address _token4,
+        uint256 _amt4
+    ) internal returns (uint256 shells_) {
 
-    //     address[] memory _stblcns = new address[](4);
-    //     uint256[] memory _amts = new uint256[](4);
-    //     _stblcns[0] = _token1;
-    //     _amts[0] = _amt1;
-    //     _stblcns[1] = _token2;
-    //     _amts[1] = _amt2;
-    //     _stblcns[2] = _token3;
-    //     _amts[2] = _amt3;
-    //     _stblcns[3] = _token4;
-    //     _amts[3] = _amt4;
+        address[] memory _stblcns = new address[](4);
+        uint256[] memory _amts = new uint256[](4);
+        _stblcns[0] = _token1;
+        _amts[0] = _amt1;
+        _stblcns[1] = _token2;
+        _amts[1] = _amt2;
+        _stblcns[2] = _token3;
+        _amts[2] = _amt3;
+        _stblcns[3] = _token4;
+        _amts[3] = _amt4;
 
-    //     shells_ = loihi.selectiveWithdrawHack(_stblcns, _amts, 1e50, 1e50);
+        shells_ = loihi.viewSelectiveWithdraw(_stblcns, _amts);
 
-    // }
+    }
 
     function withdrawSuccess (
         Loihi loihi,
@@ -596,17 +689,6 @@ library LoihiMethods {
 
     }
 
-    // function originSwapHack (
-    //     Loihi loihi,
-    //     address _origin,
-    //     address _target,
-    //     uint256 _originAmount
-    // ) internal returns (uint256 targetAmount_) {
-
-    //     targetAmount_ = loihi.swapByOriginHack(_origin, _target, _originAmount, 0, 1e50);
-
-    // }
-
     function originSwapSuccess (
         Loihi loihi,
         address _origin,
@@ -636,17 +718,6 @@ library LoihiMethods {
 
     }
 
-    // function targetSwapHack (
-    //     Loihi loihi,
-    //     address _origin,
-    //     address _target,
-    //     uint256 _targetAmount
-    // ) internal returns (uint256 originAmount_) {
-
-    //     originAmount_ = loihi.swapByTargetHack(_origin, _target, 1e50, _targetAmount, 1e50);
-
-    // }
-
     function targetSwapSuccess (
         Loihi loihi,
         address _origin,
@@ -665,97 +736,5 @@ library LoihiMethods {
 
     }
 
-    // function depositHack (
-    //     Loihi loihi,
-    //     address[] memory _flvrs,
-    //     uint256[] memory _amts
-    // ) internal returns (uint256 shells_) {
-
-    //     shells_ = loihi.selectiveDepositHack(_flvrs, _amts, 0, 1e50);
-
-    // }
-
-    // function depositHack (
-    //     Loihi loihi,
-    //     address _token,
-    //     uint256 _amt
-    // ) internal returns (uint256 shells_) {
-    //     address[] memory _stblcns = new address[](1);
-    //     uint256[] memory _amts = new uint256[](1);
-    //     _stblcns[0] = _token;
-    //     _amts[0] = _amt;
-
-    //     shells_ = loihi.selectiveDepositHack(_stblcns, _amts, 0, 1e50);
-
-    // }
-
-    // function depositHack (
-    //     Loihi loihi,
-    //     address _token1,
-    //     uint256 _amt1,
-    //     address _token2,
-    //     uint256 _amt2
-    // ) internal returns (uint256 shells_) {
-
-    //     address[] memory _stblcns = new address[](2);
-    //     uint256[] memory _amts = new uint256[](2);
-    //     _stblcns[0] = _token1;
-    //     _amts[0] = _amt1;
-    //     _stblcns[1] = _token2;
-    //     _amts[1] = _amt2;
-
-    //     shells_ = loihi.selectiveDepositHack(_stblcns, _amts, 0, 1e50);
-
-    // }
-
-    // function depositHack (
-    //     Loihi loihi,
-    //     address _token1,
-    //     uint256 _amt1,
-    //     address _token2,
-    //     uint256 _amt2,
-    //     address _token3,
-    //     uint256 _amt3
-    // ) internal returns (uint256 shells_) {
-
-    //     address[] memory _stblcns = new address[](3);
-    //     uint256[] memory _amts = new uint256[](3);
-    //     _stblcns[0] = _token1;
-    //     _amts[0] = _amt1;
-    //     _stblcns[1] = _token2;
-    //     _amts[1] = _amt2;
-    //     _stblcns[2] = _token3;
-    //     _amts[2] = _amt3;
-
-    //     shells_ = loihi.selectiveDepositHack(_stblcns, _amts, 0, 1e50);
-
-    // }
-
-    // function depositHack (
-    //     Loihi loihi,
-    //     address _token1,
-    //     uint256 _amt1,
-    //     address _token2,
-    //     uint256 _amt2,
-    //     address _token3,
-    //     uint256 _amt3,
-    //     address _token4,
-    //     uint256 _amt4
-    // ) internal returns (uint256 shells_) {
-
-    //     address[] memory _stblcns = new address[](4);
-    //     uint256[] memory _amts = new uint256[](4);
-    //     _stblcns[0] = _token1;
-    //     _amts[0] = _amt1;
-    //     _stblcns[1] = _token2;
-    //     _amts[1] = _amt2;
-    //     _stblcns[2] = _token3;
-    //     _amts[2] = _amt3;
-    //     _stblcns[3] = _token4;
-    //     _amts[3] = _amt4;
-
-    //     shells_ = loihi.selectiveDepositHack(_stblcns, _amts, 0, 1e50);
-
-    // }
 
 }
