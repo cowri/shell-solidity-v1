@@ -135,112 +135,43 @@ library Shells {
 
         }
 
-        // emit log_int("fee_", fee_.muli(1e6));
-
     }
 
-    function calculateTargetTrade (
+    function calculateTrade (
         Shell storage shell,
-        uint _oIx,
-        int128 _tAmt,
+        uint _rIx,
+        int128 _lAmt,
         int128 _oGLiq,
         int128 _nGLiq,
         int128[] memory _oBals,
         int128[] memory _nBals
-    ) internal returns (int128 oAmt_ , int128 psi_) {
+    ) internal returns (int128 rAmt_ , int128 psi_) {
 
-        oAmt_ = _tAmt;
+        rAmt_ = _lAmt;
 
         {
 
             int128 _lambda = shell.lambda;
             int128 _omega = shell.omega;
 
-            for (uint i = 0; i < 10; i++) {
+            for (uint i = 0; i < 32; i++) {
 
                 psi_ = shell.calculateFee(_nBals, _nGLiq);
 
-                int128 _prev = oAmt_;
-                int128 _next = oAmt_ = _omega < psi_
-                    ? ( _tAmt.sub(psi_.sub(_omega))).neg()
-                    : ( _tAmt.add(_lambda.mul(_omega.sub(psi_)))).neg();
+                int128 _prev = rAmt_;
+                int128 _next = rAmt_ = _omega < psi_
+                    ? - ( _lAmt + _omega - psi_ )
+                    : - ( _lAmt + _lambda.unsafe_mul(_omega - psi_));
 
-                _nGLiq = _oGLiq.add(_tAmt).add(_next);
+                _nGLiq = _oGLiq + _lAmt + _next;
 
-                _nBals[_oIx] = _oBals[_oIx].add(_next);
+                _nBals[_rIx] = _oBals[_rIx].add(_next);
 
                 if (_prev / 1e13 == _next / 1e13) {
 
                     enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
-                    oAmt_ = oAmt_.mul(ONE + shell.epsilon);
-
-                    return ( oAmt_, psi_ );
-
-                }
-
-            }
-
-
-        }
-
-        revert("Shell/swap-convergence-failed");
-
-
-    }
-
-
-    function calculateOriginTrade (
-        Shell storage shell,
-        uint _tIx,
-        int128 _oAmt,
-        int128 _oGLiq,
-        int128 _nGLiq,
-        int128[] memory _oBals,
-        int128[] memory _nBals
-    ) internal returns (int128 tAmt_, int128 psi_) {
-
-        tAmt_ = _oAmt;
-
-        // emit log_int("tAmt_", tAmt_.muli(1e18));
-
-        {
-
-            int128 _lambda = shell.lambda;
-            int128 _omega = shell.omega;
-
-            for (uint i = 0; i < 10; i++) {
-
-                // emit log_uint("i", i);
-
-                // emit log(">>>>>>>>>>>>>>>>");
-
-                psi_ = shell.calculateFee(_nBals, _nGLiq);
-
-                // emit log_int("psi_", psi_.muli(1e18));
-                // emit log_int("omega_", _omega.muli(1e18));
-
-                int128 _prev = tAmt_;
-                int128 _next = tAmt_ = _omega < psi_
-                    ? - ( _oAmt + _omega - psi_)
-                    : - ( _oAmt + _lambda.unsafe_mul(_omega - psi_));
-
-                _nGLiq = _oGLiq + _oAmt + _next;
-
-                _nBals[_tIx] = _oBals[_tIx].add(_next);
-
-                // emit log_int("prev", _prev.muli(1e18));
-                // emit log_int("next", _next.muli(1e18));
-
-                // emit log("<<<<<<<<<<<<<<<<<");
-
-                if (_prev / 1e13 == _next / 1e13) {
-
-                    enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals);
-
-                    tAmt_ = tAmt_.unsafe_mul(ONE - shell.epsilon);
-
-                    return ( tAmt_, psi_ );
+                    return ( rAmt_, psi_ );
 
                 }
 
@@ -251,7 +182,6 @@ library Shells {
         revert("Shell/swap-convergence-failed");
 
     }
-
 
     function calculateLiquidityMembrane (
         Shell storage shell,

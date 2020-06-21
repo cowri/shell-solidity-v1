@@ -273,7 +273,9 @@ contract Loihi is LoihiRoot {
         // emit log_int("_nGLiq", _nGLiq.muli(1e18));
         // for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals from transferByOrigin", _nBals[i].muli(1e18));
 
-        ( _amt, shell.omega ) = shell.calculateOriginTrade(_t.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, shell.omega ) = shell.calculateTrade(_t.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+
+        _amt = _amt.unsafe_mul(ONE - shell.epsilon);
 
         // emit log_int("shell.omega", shell.omega.muli(1e18));
         // emit log_int("_amt", _amt.muli(1e18));
@@ -319,7 +321,9 @@ contract Loihi is LoihiRoot {
             int128[] memory _nBals,
             int128[] memory _oBals ) = viewSwapData(_o.ix, _t.ix, _oAmt, true, _o.addr);
 
-        ( _amt, ) = shell.calculateOriginTrade(_t.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, ) = shell.calculateTrade(_t.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+
+        _amt = _amt.unsafe_mul(ONE - shell.epsilon);
 
         return  _target.viewRawAmount(_amt);
 
@@ -363,7 +367,9 @@ contract Loihi is LoihiRoot {
             int128[] memory _oBals,
             int128[] memory _nBals) = getSwapData(_t.ix, _o.ix, _tAmt, _t.addr, false, _rcpnt);
 
-        ( _amt, shell.omega ) = shell.calculateTargetTrade(_o.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, shell.omega ) = shell.calculateTrade(_o.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+
+        _amt = _amt.unsafe_mul(ONE + shell.epsilon);
 
         require((oAmt_ = _o.addr.intakeNumeraire(_amt)) < _mOAmt, "above-maximum-origin-amount");
 
@@ -390,9 +396,9 @@ contract Loihi is LoihiRoot {
             int128[] memory _nBals,
             int128[] memory _oBals ) = viewSwapData(_t.ix, _o.ix, _tAmt, false, _t.addr);
 
-        ( _amt, ) = shell.calculateTargetTrade(_o.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, ) = shell.calculateTrade(_o.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
 
-        _amt = _amt.mul(ONE.add(shell.epsilon));
+        _amt = _amt.mul(ONE + shell.epsilon);
 
         oAmt_ = _origin.viewRawAmount(_amt);
 
