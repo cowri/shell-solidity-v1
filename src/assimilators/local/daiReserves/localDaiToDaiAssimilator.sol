@@ -116,18 +116,11 @@ contract LocalDaiToDaiAssimilator is LoihiRoot {
     // returns current balance in numeraire
     function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
-        emit log_addr("address", _addr);
-
         uint256 _balance = dai.balanceOf(_addr);
 
         // if (_balance == 0) return ZERO;
 
-        emit log_uint("_balance", _balance);
-
         balance_ = _balance.divu(1e18);
-
-        emit log_int("balance_", balance_.muli(1e18));
-        emit log_int("balance_", balance_);
 
     }
 

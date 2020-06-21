@@ -71,11 +71,15 @@ contract OriginSwapTemplate is Setup {
             address(susd), 30e18
         );
 
+        uint256 gas = gasleft();
+
         targetAmount_ = l.originSwap(
             address(susd),
             address(dai),
             8e18
         );
+
+        emit log_uint("gas used for swap", gas - gasleft());
 
     }
 
@@ -220,11 +224,15 @@ contract OriginSwapTemplate is Setup {
             address(susd), 25e18
         );
 
+        uint256 gas = gasleft();
+
         targetAmount_ = l.originSwap(
             address(dai),
             address(usdt),
-            30e18
+            3e18
         );
+
+        emit log_uint("gas used for swap", gas - gasleft());
 
     }
 
@@ -393,11 +401,15 @@ contract OriginSwapTemplate is Setup {
             address(susd), 25e18
         );
 
+        uint256 gas = gasleft();
+
         targetAmount_ = l.originSwap(
             address(susd),
             address(usdt),
             3.6537e18
         );
+
+        emit log_uint("gas used for swap", gas - gasleft());
 
     }
 
