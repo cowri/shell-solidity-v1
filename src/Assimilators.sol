@@ -49,7 +49,7 @@ library Assimilators {
 
         // amount_ = IAssimilator(_assim).viewRawAmount(_amt);
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewRawAmount.selector, _amt);
+        bytes memory data = abi.encodeWithSelector(iAsmltr.viewRawAmount.selector, _amt.abs());
 
         amount_ = abi.decode(_assim.delegate(data), (uint256));
 

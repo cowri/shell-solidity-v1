@@ -266,13 +266,6 @@ contract Loihi is LoihiRoot {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getSwapData(_o.ix, _t.ix, _oAmt, _o.addr, true, address(0));
 
-        // emit log_int("shell.omega", shell.omega.muli(1e18));
-        // emit log_int("_amt", _amt.muli(1e18));
-        // emit log_int("_oGLiq", _oGLiq.muli(1e18));
-        // for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals from transferByOrigin", _oBals[i].muli(1e18));
-        // emit log_int("_nGLiq", _nGLiq.muli(1e18));
-        // for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals from transferByOrigin", _nBals[i].muli(1e18));
-
         ( _amt, shell.omega ) = shell.calculateTrade(_t.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
 
         _amt = _amt.unsafe_mul(ONE - shell.epsilon);
@@ -308,7 +301,7 @@ contract Loihi is LoihiRoot {
     /// @param _target the address of the target
     /// @param _oAmt the origin amount
     /// @return tAmt_ the amount of target that has been swapped for the origin
-    function viewOriginTrade (address _origin, address _target, uint256 _oAmt) public notFrozen returns (uint256) {
+    function viewOriginTrade (address _origin, address _target, uint256 _oAmt) public notFrozen returns (uint256 tAmt_) {
 
         Assimilators.Assimilator memory _o = shell.assimilators[_origin];
         Assimilators.Assimilator memory _t = shell.assimilators[_target];
@@ -325,7 +318,7 @@ contract Loihi is LoihiRoot {
 
         _amt = _amt.unsafe_mul(ONE - shell.epsilon);
 
-        return  _target.viewRawAmount(_amt);
+        tAmt_ = _t.addr.viewRawAmount(_amt);
 
     }
 
@@ -398,9 +391,9 @@ contract Loihi is LoihiRoot {
 
         ( _amt, ) = shell.calculateTrade(_o.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
 
-        _amt = _amt.mul(ONE + shell.epsilon);
+        _amt = _amt.unsafe_mul(ONE + shell.epsilon);
 
-        oAmt_ = _origin.viewRawAmount(_amt);
+        oAmt_ = _o.addr.viewRawAmount(_amt);
 
     }
 
@@ -485,7 +478,7 @@ contract Loihi is LoihiRoot {
 
                 ( int128 _amount, int128 _balance ) = _assim.addr.viewNumeraireAmountAndBalance(_amts[i]);
                 if (!_isDeposit) _amount = _amount.neg();
-                nBals_[_assim.ix] = _balance.sub(_amount);
+                nBals_[_assim.ix] = _balance.add(_amount);
                 oBals_[_assim.ix] = _balance;
 
 
@@ -502,12 +495,10 @@ contract Loihi is LoihiRoot {
 
         for (uint i = 0; i < _length; i++) {
 
-            int128 _bal;
+            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = shell.reserves[i].addr.viewNumeraireBalance();
 
-            if (oBals_[i] == 0 && nBals_[i] == 0) _bal = nBals_[i] = oBals_[i] = shell.reserves[i].addr.viewNumeraireBalance();
-
-            oGLiq_ += _bal;
-            nGLiq_ += _bal;
+            oGLiq_ += oBals_[i];
+            nGLiq_ += nBals_[i];
 
         }
 
@@ -530,12 +521,10 @@ contract Loihi is LoihiRoot {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getLiquidityData(_flvrs, _amts, true, address(0));
 
-        // emit log_int("_oGLiq", _oGLiq.muli(1e18));
-        // emit log_int("_nGLiq", _nGLiq.muli(1e18));
-        // emit log_ints("_oBals", _oBals);
-        // emit log_ints("_nBals", _nBals);
+        int128 _shells;
+        ( _shells, shell.omega ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _oBals, _nBals);
 
-        ( shells_, shell.omega ) = shell.calculateSelectiveDeposit(_oGLiq, _nGLiq, _oBals, _nBals);
+        shells_ = _shells.mulu(1e18);
 
         require(_minShells < shells_, "Shell/under-minimum-shells");
 
@@ -555,7 +544,9 @@ contract Loihi is LoihiRoot {
             int128[] memory _oBals,
             int128[] memory _nBals ) = viewLiquidityData(_flvrs, _amts, true);
 
-        ( shells_, ) = shell.calculateSelectiveDeposit(_oGLiq, _nGLiq, _oBals, _nBals);
+        ( int128 _shells, ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _oBals, _nBals);
+
+        shells_ = _shells.mulu(1e18);
 
     }
 
@@ -623,7 +614,12 @@ contract Loihi is LoihiRoot {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getLiquidityData(_flvrs, _amts, false, msg.sender);
 
-        ( shells_, shell.omega ) = shell.calculateSelectiveWithdraw(_oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells;
+        ( _shells, shell.omega ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _oBals, _nBals);
+
+        _shells = _shells.abs().unsafe_mul(ONE + shell.epsilon);
+
+        shells_ = _shells.mulu(1e18);
 
         require(shells_ < _maxShells, "Shell/above-maximum-shells");
 
@@ -643,7 +639,11 @@ contract Loihi is LoihiRoot {
             int128[] memory _oBals,
             int128[] memory _nBals ) = viewLiquidityData(_flvrs, _amts, false);
 
-        ( shells_, ) = shell.calculateSelectiveWithdraw(_oGLiq, _nGLiq, _oBals, _nBals);
+        ( int128 _shells, ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _oBals, _nBals);
+
+        _shells = _shells.abs().unsafe_mul(ONE + shell.epsilon);
+
+        shells_ = _shells.mulu(1e18);
 
     }
 
@@ -651,7 +651,7 @@ contract Loihi is LoihiRoot {
     /// @notice  withdrawas amount of shell tokens from the the pool equally from the numeraire assets of the pool with no slippage
     /// @param   _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     function proportionalWithdraw (uint256 _withdrawal) public nonReentrant {
-        
+
         uint _length = shell.reserves.length;
         int128 _oGLiq; int128[] memory _oBals;
         for (uint i = 0; i < _length; i++) {

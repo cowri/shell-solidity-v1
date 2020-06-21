@@ -187,10 +187,13 @@ library Shells {
         Shell storage shell,
         int128 _oGLiq,
         int128 _nGLiq,
-        int128[] memory _bals
+        int128[] memory _oBals,
+        int128[] memory _nBals
     ) internal returns (int128 shells_, int128 psi_) {
 
-        psi_ = shell.calculateFee(_bals, _nGLiq);
+        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+
+        psi_ = shell.calculateFee(_nBals, _nGLiq);
 
         int128 _omega = shell.omega;
         int128 _feeDiff = psi_.sub(_omega);
@@ -210,42 +213,6 @@ library Shells {
         }
 
         if ( shell.totalSupply != 0 ) shells_ = shells_.mul(shell.totalSupply.divu(1e18));
-
-    }
-
-    function calculateSelectiveDeposit (
-        Shells.Shell storage shell,
-        int128 _oGLiq,
-        int128 _nGLiq,
-        int128[] memory _oBals,
-        int128[] memory _nBals
-    ) internal returns (uint256 shells_, int128 omega_) {
-
-        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
-
-        int128 _shells;
-
-        ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
-
-        shells_ = _shells.mulu(1e18);
-
-    }
-
-    function calculateSelectiveWithdraw (
-        Shells.Shell storage shell,
-        int128 _oGLiq,
-        int128 _nGLiq,
-        int128[] memory _oBals,
-        int128[] memory _nBals
-    ) internal returns (uint256 shells_, int128 omega_) {
-
-        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
-
-        int128 _shells;
-
-        ( _shells, omega_ ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _nBals);
-
-        shells_ = _shells.abs().mul(ONE.add(shell.epsilon)).mulu(1e18);
 
     }
 
@@ -269,7 +236,7 @@ library Shells {
         //     // emit log("skipping halts");
         //     return;
         // }
-        
+
         uint256 _length = _nBals.length;
         int128 _alpha = shell.alpha;
         int128[] memory _weights = shell.weights;
