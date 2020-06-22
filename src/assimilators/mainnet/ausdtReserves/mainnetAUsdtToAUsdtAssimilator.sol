@@ -26,21 +26,10 @@ contract MainnetAUsdtToAUsdtAssimilator {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    uint256 constant ZEN_DELTA = 1e6;
-
     address constant usdt = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
-
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
     constructor () public { }
-
-    function fromZen (int128 _amount) internal pure returns (uint256 amount_) {
-        amount_ = _amount.mulu(ZEN_DELTA);
-    }
-
-    function toZen (uint256 _amount) internal pure returns (int128 amount_) {
-        amount_ = _amount.divu(ZEN_DELTA);
-    }
 
     function getAUsdt () private view returns (IAToken) {
 
@@ -55,14 +44,30 @@ contract MainnetAUsdtToAUsdtAssimilator {
 
         getAUsdt().transferFrom(msg.sender, address(this), _amount);
 
-        amount_ = toZen(_amount);
+        amount_ = _amount.divu(1e6);
+
+    }
+
+    // intakes raw amount of AUSsdt and returns the corresponding raw amount
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        IAToken _ausdt = getAUsdt();
+
+        _ausdt.transferFrom(msg.sender, address(this), _amount);
+
+        uint256 _balance = _ausdt.balanceOf(address(this));
+
+        amount_ = _amount.divu(1e6);
+
+        balance_ = _balance.divu(1e6);
 
     }
 
     // intakes a numeraire amount of AUsdt and returns the corresponding raw amount
+    // intakes a numeraire amount of AUsdt and returns the corresponding raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e18);
 
         getAUsdt().transferFrom(msg.sender, address(this), amount_);
 
@@ -73,14 +78,29 @@ contract MainnetAUsdtToAUsdtAssimilator {
 
         getAUsdt().transfer(_dst, _amount);
 
-        amount_ = toZen(_amount);
+        amount_ = _amount.divu(1e6);
+
+    }
+
+    // outputs a raw amount of AUsdt and returns the corresponding numeraire amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        IAToken _ausdt = getAUsdt();
+
+        _ausdt.transfer(_dst, _amount);
+
+        uint256 _balance = _ausdt.balanceOf(address(this));
+
+        amount_ = _amount.divu(1e6);
+
+        balance_ = _balance.divu(1e6);
 
     }
 
     // outputs a numeraire amount of AUsdt and returns the corresponding numeraire amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e6);
 
         getAUsdt().transfer(_dst, amount_);
 
@@ -89,21 +109,23 @@ contract MainnetAUsdtToAUsdtAssimilator {
     // takes a numeraire amount and returns the raw amount
     function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e6);
 
     }
 
     // takes a raw amount and returns the numeraire amount
     function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
-        amount_ = toZen(_amount);
+        amount_ = _amount.divu(1e6);
 
     }
 
     // views the numeraire value of the current balance of the reserve, in this case AUsdt
-    function viewNumeraireBalance () public view returns (int128 amount_) {
+    function viewNumeraireBalance () public view returns (int128 balance_) {
 
-        amount_ = toZen(getAUsdt().balanceOf(address(this)));
+        uint256 _balance = getAUsdt().balanceOf(address(this));
+
+        balance_ = _balance.divu(1e6);
 
     }
 

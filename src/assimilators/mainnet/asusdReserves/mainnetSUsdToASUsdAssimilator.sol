@@ -35,8 +35,6 @@ contract MainnetSUsdToASUsdAssimilator {
 
     IERC20 constant susd = IERC20(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
 
-    uint256 constant ZEN_DELTA = 1e18;
-
     constructor () public { }
 
     function getASUsd () public view returns (IAToken) {
@@ -44,18 +42,6 @@ contract MainnetSUsdToASUsdAssimilator {
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(address(susd));
         return IAToken(aTokenAddress);
-
-    }
-
-    function toZen (uint256 _amount) internal pure returns (int128 zenAmt_) {
-
-        zenAmt_ = _amount.divu(ZEN_DELTA);
-
-    }
-
-    function fromZen (int128 _zenAmt) internal pure returns (uint256 amount_) {
-
-        amount_ = _zenAmt.mulu(ZEN_DELTA);
 
     }
 
@@ -68,21 +54,36 @@ contract MainnetSUsdToASUsdAssimilator {
 
         pool.deposit(address(susd), _amount, 0);
 
-        amount_ = toZen(_amount);
+        amount_ = _amount.divu(1e18);
+
+    }
+
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        susd.transferFrom(msg.sender, address(this), _amount);
+
+        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
+
+        pool.deposit(address(susd), _amount, 0);
+
+        uint256 _balance = getASUsd().balanceOf(address(this));
+
+        amount_ = _amount.divu(1e18);
+
+        balance_ = _balance.divu(1e18);
 
     }
 
     // takes numeraire amount of susd, transfers it in, wraps it in asusd, returns raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e18);
 
         susd.transferFrom(msg.sender, address(this), amount_);
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
         pool.deposit(address(susd), amount_, 0);
-
 
     }
 
@@ -93,14 +94,31 @@ contract MainnetSUsdToASUsdAssimilator {
 
         susd.transfer(_dst, _amount);
 
-        amount_ = toZen(_amount);
+        amount_ = _amount.divu(1e18);
+
+    }
+
+    // takes raw amount, transfers to destination, returns numeraire amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        IAToken _asusd = getASUsd();
+
+        _asusd.redeem(_amount);
+
+        susd.transfer(_dst, _amount);
+
+        uint256 _balance = _asusd.balanceOf(address(this));
+
+        amount_ = _amount.divu(1e18);
+
+        balance_ = _balance.divu(1e18);
 
     }
 
     // takes numeraire amount, transfers to destination, returns raw amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e18);
 
         getASUsd().redeem(amount_);
 
@@ -111,21 +129,23 @@ contract MainnetSUsdToASUsdAssimilator {
     // takes numeraire amount, returns raw amount
     function viewRawAmount (int128 _amount) public pure returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e18);
 
     }
 
     // takes raw amount, returns numeraire amount
     function viewNumeraireAmount (uint256 _amount) public pure returns (int128 amount_) {
 
-        amount_ = toZen(_amount);
+        amount_ = _amount.divu(1e18);
 
     }
 
     // returns numeraire value of reserve asset, in this case ASUsd
-    function viewNumeraireBalance () public view returns (int128 amount_) {
+    function viewNumeraireBalance () public view returns (int128 balance_) {
 
-        amount_ = toZen(getASUsd().balanceOf(address(this)));
+        uint256 _balance = getASUsd().balanceOf(address(this));
+
+        balance_ = _balance.divu(1e18);
 
     }
 

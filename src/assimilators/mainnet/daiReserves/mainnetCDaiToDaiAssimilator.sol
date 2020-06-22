@@ -13,29 +13,27 @@
 
 pragma solidity ^0.5.0;
 
-import "../../../LoihiRoot.sol";
-
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "../../../interfaces/ICToken.sol";
+import "../../../interfaces/IERC20.sol";
 
-contract LocalCDaiToDaiAssimilator is LoihiRoot {
+contract MainnetCDaiToDaiAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
+    
+    ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
+    IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
-    constructor (address _dai, address _cdai) public {
-
-        dai = IERC20(_dai);
-
-        cdai = ICToken(_cdai);
-
-    }
+    constructor () public { }
 
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        cdai.transferFrom(msg.sender, address(this), _amount);
+        bool success = cdai.transferFrom(msg.sender, address(this), _amount);
+
+        if (!success) revert("CDai/transferFrom-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -54,7 +52,9 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        cdai.transferFrom(msg.sender, address(this), _amount);
+        bool success = cdai.transferFrom(msg.sender, address(this), _amount);
+
+        if (!success) revert("CDai/transferFrom-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -75,9 +75,13 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
 
         amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
-        cdai.transferFrom(msg.sender, address(this), amount_);
+        bool _success = cdai.transferFrom(msg.sender, address(this), amount_);
 
-        cdai.redeem(amount_);
+        if (!_success) revert("CDai/transferFrom-failed");
+
+        uint __success = cdai.redeem(amount_);
+
+        if (__success != 0) revert("CDai/redemption-failed");
 
     }
 
@@ -86,11 +90,15 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _daiAmount = ( _amount * _rate ) / 1e18;
+        uint256 _daiAmount = ( ( _amount ) * _rate ) / 1e18;
 
-        cdai.mint(_daiAmount);
+        uint success = cdai.mint(_daiAmount);
 
-        cdai.transfer(_dst, _amount);
+        if (success != 0) revert("CDai/mint-failed");
+
+        bool _success = cdai.transfer(_dst, _amount);
+
+        if (!_success) revert("CDai/transfer-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
 
@@ -107,9 +115,13 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
 
         uint256 _daiAmount = ( _amount * _rate ) / 1e18;
 
-        cdai.mint(_daiAmount);
+        uint success = cdai.mint(_daiAmount);
 
-        cdai.transfer(_dst, _amount);
+        if (success != 0) revert("CDai/mint-failed");
+
+        bool _success = cdai.transfer(_dst, _amount);
+
+        if (!_success) revert("CDai/transfer-failed");
 
         amount_ = _daiAmount.divu(1e18);
 
@@ -120,13 +132,17 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
 
         amount_ = _amount.mulu(1e18);
 
-        cdai.mint(amount_);
+        uint success = cdai.mint(amount_);
+
+        if (success != 0 ) revert("CDai/mint-failed");
 
         uint _rate = cdai.exchangeRateCurrent();
 
         amount_ = ( ( amount_ * 1e18 ) / _rate );
-        
-        cdai.transfer(_dst, amount_);
+
+        bool _success = cdai.transfer(_dst, amount_);
+
+        if (!_success) revert("CDai/transfer-failed");
 
     }
 

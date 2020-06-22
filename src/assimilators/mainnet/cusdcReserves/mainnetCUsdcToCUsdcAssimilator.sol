@@ -25,23 +25,9 @@ contract MainnetCUsdcToCUsdcAssimilator {
     using ABDKMath64x64 for uint256;
     using AssimilatorMath for uint;
 
-    uint256 constant ZEN_DELTA = 1e6;
-
     ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
 
     constructor () public { }
-
-    function toZen (uint256 _amount, uint256 _rate) internal pure returns (int128 amount_) {
-
-        amount_ = _amount.wmul(_rate).divu(ZEN_DELTA);
-
-    }
-
-    function fromZen (int128 _amount, uint256 _rate) internal pure returns (uint256 amount_) {
-
-        amount_ = _amount.mulu(ZEN_DELTA).wdiv(_rate);
-
-    }
 
     // takes raw cusdc amount and transfers it in
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
@@ -52,7 +38,24 @@ contract MainnetCUsdcToCUsdcAssimilator {
 
         uint256 _rate = cusdc.exchangeRateCurrent();
 
-        amount_ = toZen(_amount, _rate);
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
+
+    }
+
+    // takes raw cusdc amount and transfers it in
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        bool success = cusdc.transferFrom(msg.sender, address(this), _amount);
+
+        if (!success) revert("CUsdc/transferFrom-failed");
+
+        uint256 _rate = cusdc.exchangeRateCurrent();
+
+        uint256 _balance = cusdc.balanceOf(address(this));
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
+
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
 
     }
 
@@ -61,7 +64,7 @@ contract MainnetCUsdcToCUsdcAssimilator {
 
         uint256 _rate = cusdc.exchangeRateCurrent();
 
-        amount_ = fromZen(_amount, _rate);
+        amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 
         bool success = cusdc.transferFrom(msg.sender, address(this), amount_);
 
@@ -75,7 +78,7 @@ contract MainnetCUsdcToCUsdcAssimilator {
 
         uint256 _rate = cusdc.exchangeRateCurrent();
 
-        amount_ = fromZen(_amount, _rate);
+        amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 
         bool success = cusdc.transfer(_dst, amount_);
 
@@ -93,7 +96,25 @@ contract MainnetCUsdcToCUsdcAssimilator {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
-        amount_ = toZen(_amount, _rate);
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
+    // takes raw amount
+    // transfers that amount to destination
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        bool success = cusdc.transfer(_dst, _amount);
+
+        if (!success) revert("CUsdc/transfer-failed");
+
+        uint256 _rate = cusdc.exchangeRateStored();
+
+        uint256 _balance = cusdc.balanceOf(address(this));
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
+
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
 
     }
 
@@ -102,7 +123,7 @@ contract MainnetCUsdcToCUsdcAssimilator {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
-        amount_ = fromZen(_amount, _rate);
+        amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 
     }
 
@@ -111,12 +132,12 @@ contract MainnetCUsdcToCUsdcAssimilator {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
-        amount_ = toZen(_amount, _rate);
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
 
     }
 
     // returns numeraire balance of reserve, in this case cUsdc
-    function viewNumeraireBalance () public view returns (int128 amount_) {
+    function viewNumeraireBalance () public view returns (int128 balance_) {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
@@ -124,7 +145,7 @@ contract MainnetCUsdcToCUsdcAssimilator {
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
-        amount_ = toZen(_balance, _rate);
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
 
     }
 

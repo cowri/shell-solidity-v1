@@ -31,8 +31,6 @@ contract MainnetChaiToCDaiAssimilator {
     using ABDKMath64x64 for uint256;
     using AssimilatorMath for uint;
 
-    uint256 constant ZEN_DELTA = 1e18;
-
     IChai constant chai = IChai(0x06AF07097C9Eeb7fD685c692751D5C66dB49c215);
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
@@ -40,28 +38,29 @@ contract MainnetChaiToCDaiAssimilator {
 
     constructor () public { }
 
-    function toZen (uint256 _amt) internal pure returns (int128 zenAmt_) {
-        zenAmt_ = _amt.divu(ZEN_DELTA);
-    }
-
-    function fromZen (int128 _zenAmt) internal pure returns (uint256 amt_) {
-        amt_ = _zenAmt.mulu(ZEN_DELTA);
-    }
-
-    function toDai (uint256 _chai, uint256 _chi) internal pure returns (uint256 dai_) {
-        dai_ = _chai.rmul(_chi);
-    }
-
-    function fromDai (uint256 _dai, uint256 _chi) internal pure returns (uint256 chai_) {
-        chai_ = _dai.rdivup(_chi);
-    }
-
     // takes raw chai amount, transfers it in, unwraps into dai, wraps into the reserve, and finally returns the numeraire amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
         chai.exit(msg.sender, _amount);
 
-        _amount = toDai(_amount, pot.chi());
+        _amount = _amount.rmul(pot.chi());
+
+        uint256 success = cdai.mint(_amount);
+
+        if (success != 0) revert("CDai/mint-failed");
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        amount_ = ( ( ( ( _amount * 1e18 ) / _rate ) * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
+    // takes raw chai amount, transfers it in, unwraps into dai, wraps into the reserve, and finally returns the numeraire amount
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        chai.exit(msg.sender, _amount);
+
+        _amount = _amount.rmul(pot.chi());
 
         uint256 success = cdai.mint(_amount);
 
@@ -80,7 +79,7 @@ contract MainnetChaiToCDaiAssimilator {
     // takes numeraire amount, exits that from chai, wraps it in cdai, and returns the raw amount of chai
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e18);
 
         chai.draw(msg.sender, amount_);
 
@@ -88,14 +87,14 @@ contract MainnetChaiToCDaiAssimilator {
 
         if (success != 0) revert("CDai/mint-failed");
 
-        amount_ = fromDai(amount_, pot.chi());
+        amount_ = amount_.rdivup(pot.chi());
 
     }
 
     // takes numeraire amount, redeems dai from cdai, wraps it in chai and sends it to the destination, and returns the raw amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e18);
 
         uint256 success = cdai.redeemUnderlying(amount_);
 
@@ -103,14 +102,29 @@ contract MainnetChaiToCDaiAssimilator {
 
         chai.join(_dst, amount_);
 
-        amount_ = fromDai(amount_, pot.chi());
+        amount_ = amount_.rdivup(pot.chi());
 
     }
 
     // takes raw amount of chai, calculates the numeraire amount, redeems that from cdai, wraps it in chai and sends to destination, then returns the numeraire amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        _amount = toDai(_amount, pot.chi());
+        _amount = _amount.rmul(pot.chi());
+
+        uint256 success = cdai.redeemUnderlying(_amount);
+
+        if (success != 0) revert("CDai/redeemUnderlying-failed");
+
+        chai.join(_dst, _amount);
+
+        amount_ = _amount.divu(1e18);
+
+    }
+
+    // takes raw amount of chai, calculates the numeraire amount, redeems that from cdai, wraps it in chai and sends to destination, then returns the numeraire amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        _amount = _amount.rmul(pot.chi());
 
         uint256 success = cdai.redeemUnderlying(_amount);
 
@@ -131,19 +145,19 @@ contract MainnetChaiToCDaiAssimilator {
     // pass it a numeraire amount and get the raw amount
     function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
-        amount_ = fromDai(fromZen(_amount), pot.chi());
+        amount_ = _amount.mulu(1e18).rdivup(pot.chi());
 
     }
 
     // pass it a raw amount and get the numeraire amount
     function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
-        amount_ = toZen(toDai(_amount, pot.chi()));
+        amount_ = _amount.rmul(pot.chi()).divu(1e18);
 
     }
 
     // returns the numeraire balance for this numeraire's reserve, in this case cDai
-    function viewNumeraireBalance () public view returns (int128 amount_) {
+    function viewNumeraireBalance () public view returns (int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -151,8 +165,7 @@ contract MainnetChaiToCDaiAssimilator {
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
-        amount_ = toZen(_balance.wmul(_rate));
-
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
     }
 
 }

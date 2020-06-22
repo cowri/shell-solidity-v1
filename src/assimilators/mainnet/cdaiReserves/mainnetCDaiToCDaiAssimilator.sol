@@ -25,28 +25,25 @@ contract MainnetCDaiToCDaiAssimilator {
     using ABDKMath64x64 for uint256;
     using AssimilatorMath for uint;
 
-    uint256 constant ZEN_DELTA = 1e18;
-
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
 
     constructor () public { }
 
-    function toZen (uint256 _amount, uint256 _rate) internal pure returns (int128 zenAmt_) {
+    // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        zenAmt_ = (_amount.wmul(_rate)).divu(ZEN_DELTA);
+        bool success = cdai.transferFrom(msg.sender, address(this), _amount);
+
+        if (!success) revert("CDai/transferFrom-failed");
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
 
     }
-
-    function fromZen (int128 _zenAmt, uint256 _rate) internal pure returns (uint256 amount_) {
-
-        amount_ = _zenAmt.mulu(ZEN_DELTA).wdiv(_rate);
-
-    }
-
-    event log_uint(bytes32, uint256);
 
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         bool success = cdai.transferFrom(msg.sender, address(this), _amount);
 
@@ -67,7 +64,7 @@ contract MainnetCDaiToCDaiAssimilator {
 
         uint256 _rate = cdai.exchangeRateCurrent();
 
-        amount_ = fromZen(_amount, _rate);
+        amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
         bool success = cdai.transferFrom(msg.sender, address(this), amount_);
 
@@ -76,7 +73,20 @@ contract MainnetCDaiToCDaiAssimilator {
     }
 
     // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        bool success = cdai.transfer(_dst, _amount);
+
+        if (!success) revert("CDai/transfer-failed");
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
+    // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         bool success = cdai.transfer(_dst, _amount);
 
@@ -97,7 +107,7 @@ contract MainnetCDaiToCDaiAssimilator {
 
         uint _rate = cdai.exchangeRateCurrent();
 
-        amount_ = fromZen(_amount, _rate);
+        amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
         bool success = cdai.transfer(_dst, amount_);
 
@@ -110,7 +120,7 @@ contract MainnetCDaiToCDaiAssimilator {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        amount_ = fromZen(_amount, _rate);
+        amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
     }
 
@@ -119,12 +129,12 @@ contract MainnetCDaiToCDaiAssimilator {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        amount_ = toZen(_amount, _rate);
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
 
     }
 
     // views the numeraire value of the current balance of the reserve, in this case CDai
-    function viewNumeraireBalance () public view returns (int128 amount_) {
+    function viewNumeraireBalance () public view returns (int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -132,7 +142,7 @@ contract MainnetCDaiToCDaiAssimilator {
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
-        amount_ = toZen(_balance, _rate);
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
 
     }
 

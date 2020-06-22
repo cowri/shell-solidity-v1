@@ -35,22 +35,25 @@ contract MainnetUsdcToCUsdcAssimilator {
 
     constructor () public { }
 
-    function toZen (uint256 _amount) internal pure returns (int128 zenAmt_) {
-
-        zenAmt_ = _amount.divu(ZEN_DELTA);
-
-    }
-
-    function fromZen (int128 _zenAmt) internal pure returns (uint256 amount_) {
-
-        amount_ = _zenAmt.mulu(ZEN_DELTA);
-
-    }
-
     event log_uint(bytes32, uint256);
 
     // takes raw amount of usdc, transfers it in, wraps it in cusdc, returns numeraire amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        usdc.transferFrom(msg.sender, address(this), _amount);
+
+        uint256 success = cusdc.mint(_amount);
+
+        if (success != 0) revert("CUsdc/mint-failed");
+
+        uint256 _rate = cusdc.exchangeRateStored();
+
+        amount_ = ( ( ( ( _amount * 1e18 ) / _rate ) * _rate ) / 1e18 ).divu(1e6);
+
+    }
+
+    // takes raw amount of usdc, transfers it in, wraps it in cusdc, returns numeraire amount
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         usdc.transferFrom(msg.sender, address(this), _amount);
 
@@ -71,7 +74,7 @@ contract MainnetUsdcToCUsdcAssimilator {
     // takes numeraire amount of usdc, calculates raw amount, transfers it in and wraps it in cusdc, returns raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e6);
 
         usdc.transferFrom(msg.sender, address(this), amount_);
 
@@ -82,7 +85,20 @@ contract MainnetUsdcToCUsdcAssimilator {
     }
 
     // takes raw amount of usdc, unwraps it from cusdc, transfers that out, returns numeraire amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        uint256 success = cusdc.redeemUnderlying(_amount);
+
+        if (success != 0) revert("CUsdc/redeemUnderlying-failed");
+
+        usdc.transfer(_dst, _amount);
+
+        amount_ = _amount.divu(1e6);
+
+    }
+
+    // takes raw amount of usdc, unwraps it from cusdc, transfers that out, returns numeraire amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         uint256 success = cusdc.redeemUnderlying(_amount);
 
@@ -94,16 +110,16 @@ contract MainnetUsdcToCUsdcAssimilator {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
-        amount_ = _amount.divu(1e6);
-
         balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
+
+        amount_ = _amount.divu(1e6);
 
     }
 
     // takes numeraire amount of usdc, calculates raw amount, unwraps raw amount of cusdc, transfers that out, returns raw amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e6);
 
         uint256 success = cusdc.redeemUnderlying(amount_);
 
@@ -116,19 +132,19 @@ contract MainnetUsdcToCUsdcAssimilator {
     // takes numeraire amount, returns raw amount
     function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
-        amount_ = fromZen(_amount);
+        amount_ = _amount.mulu(1e6);
 
     }
 
     // takes raw amount, returns numeraire amount
     function viewNumeraireAmount (uint256 _amount) public pure returns (int128 amount_) {
 
-        amount_ = toZen(_amount);
+        amount_ = _amount.divu(1e6);
 
     }
 
     // returns numeraire amount of reserve asset, in this case cUsdc
-    function viewNumeraireBalance () public view returns (int128 amount_) {
+    function viewNumeraireBalance () public view returns (int128 balance_) {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
@@ -136,7 +152,7 @@ contract MainnetUsdcToCUsdcAssimilator {
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
-        amount_ = toZen(_balance.wmul(_rate));
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
 
     }
 

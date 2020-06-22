@@ -13,31 +13,29 @@
 
 pragma solidity ^0.5.0;
 
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-
-import "../../aaveResources/ILendingPool.sol";
-
-import "../../aaveResources/ILendingPoolAddressesProvider.sol";
-
-import "../../../interfaces/IAToken.sol";
-
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MainnetUsdtToAUsdtAssimilator {
+import "../../../interfaces/IERC20NoBool.sol";
+
+contract MainnetUsdtToUsdtAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
-    IERC20 constant usdt = IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7);
+    IERC20NoBool constant usdt = IERC20NoBool(0xdAC17F958D2ee523a2206206994597C13D831ec7);
 
     constructor () public { }
 
-    function getAUsdt () public view returns (IAToken) {
+    // takes raw amount, transfers it in, wraps that in aUsdt, returns numeraire amount
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-        (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(address(usdt));
-        return IAToken(aTokenAddress);
+        safeTransferFrom(usdt, msg.sender, address(this), _amount);
+
+        uint256 _balance = usdt.balanceOf(address(this));
+
+        amount_ = _amount.divu(1e6);
+
+        balance_ = _balance.divu(1e6);
 
     }
 
@@ -46,28 +44,7 @@ contract MainnetUsdtToAUsdtAssimilator {
 
         safeTransferFrom(usdt, msg.sender, address(this), _amount);
 
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-
-        pool.deposit(address(usdt), _amount, 0);
-
         amount_ = _amount.divu(1e6);
-
-    }
-
-    // takes raw amount, transfers it in, wraps that in aUsdt, returns numeraire amount
-    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
-
-        safeTransferFrom(usdt, msg.sender, address(this), _amount);
-
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
-
-        pool.deposit(address(usdt), _amount, 0);
-
-        uint256 _balance = getAUsdt().balanceOf(address(this));
-
-        amount_ = _amount.divu(1e6);
-
-        balance_ = _balance.divu(1e6);
 
     }
 
@@ -78,37 +55,27 @@ contract MainnetUsdtToAUsdtAssimilator {
 
         safeTransferFrom(usdt, msg.sender, address(this), amount_);
 
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
+    }
 
-        pool.deposit(address(usdt), amount_, 0);
+    // takes raw amount, redeems that from aUsdt, transfers it out, returns numeraire amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        safeTransfer(usdt, _dst, _amount);
+
+        uint256 _balance = usdt.balanceOf(address(this));
+
+        balance_ = _balance.divu(1e6);
+
+        amount_ = _amount.divu(1e6);
 
     }
 
     // takes raw amount, redeems that from aUsdt, transfers it out, returns numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        getAUsdt().redeem(_amount);
-
         safeTransfer(usdt, _dst, _amount);
 
         amount_ = _amount.divu(1e6);
-
-    }
-
-    // takes raw amount, redeems that from aUsdt, transfers it out, returns numeraire amount
-    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
-
-        IAToken _ausdt = getAUsdt();
-
-        _ausdt.redeem(_amount);
-
-        safeTransfer(usdt, _dst, _amount);
-
-        uint256 _balance = _ausdt.balanceOf(address(this));
-
-        amount_ = _amount.divu(1e6);
-
-        balance_ = _balance.divu(1e6);
 
     }
 
@@ -117,40 +84,49 @@ contract MainnetUsdtToAUsdtAssimilator {
 
         amount_ = _amount.mulu(1e6);
 
-        getAUsdt().redeem(amount_);
-
         safeTransfer(usdt, _dst, amount_);
 
     }
 
     // takes numeraire amount, returns raw amount
-    function viewRawAmount (int128 _amount) public pure returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
 
     }
 
     // takes raw amount, returns numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public pure returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         amount_ = _amount.divu(1e6);
 
     }
 
-    // returns numeraire amount of reserve asset, in this case aUSDT
-    function viewNumeraireBalance () public view returns (int128 balance_) {
+    // takes raw amount, returns numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        uint256 _balance = getAUsdt().balanceOf(address(this));
+        uint256 _balance = usdt.balanceOf(address(this));
+
+        amount_ = _amount.divu(1e6);
 
         balance_ = _balance.divu(1e6);
 
     }
 
-    function safeTransfer(IERC20 token, address to, uint256 value) internal {
+    // returns numeraire amount of reserve asset, in this case aUSDT
+    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+
+        uint256 _balance = usdt.balanceOf(_addr);
+
+        balance_ = _balance.divu(1e6);
+
+    }
+
+    function safeTransfer(IERC20NoBool token, address to, uint256 value) internal {
         callOptionalReturn(address(token), abi.encodeWithSelector(token.transfer.selector, to, value));
     }
 
-    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
+    function safeTransferFrom(IERC20NoBool token, address from, address to, uint256 value) internal {
         callOptionalReturn(address(token), abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
     }
 
