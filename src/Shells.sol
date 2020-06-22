@@ -143,7 +143,7 @@ library Shells {
         uint _rIx
     ) internal returns (int128 rAmt_ , int128 psi_) {
 
-        rAmt_ = _lAmt;
+        rAmt_ = - _lAmt;
 
         int128 _lambda = shell.lambda;
         int128 _omega = shell.omega;
