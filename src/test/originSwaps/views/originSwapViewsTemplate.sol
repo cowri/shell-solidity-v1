@@ -25,11 +25,15 @@ contract OriginSwapViewsTemplate is Setup {
 
         l.proportionalDeposit(300e18);
 
+        uint256 gas = gasleft();
+
         targetAmount_ = l.viewOriginTrade(
             address(dai),
             address(usdc),
             10e18
         );
+
+        emit log_uint("gas used for swap", gas - gasleft());
 
     }
 

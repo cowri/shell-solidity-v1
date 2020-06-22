@@ -86,9 +86,39 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _daiAmount = ( _amount * _rate ) / 1e18;
+        uint256 _daiAmount = ( ( _amount ) * _rate ) / 1e18;
+
+        uint cdaiBalBefore = cdai.balanceOf(address(this));
+
+uint daiBalBefore = dai.balanceOf(address(this));
+        
+        
+        
 
         cdai.mint(_daiAmount);
+        
+        uint cdaiBalAfter = cdai.balanceOf(address(this));
+uint daiBalAfter = dai.balanceOf(address(this));
+        
+        emit log_uint("cdaiBalBefore", cdaiBalBefore);
+
+        emit log_uint("cdaiBalAfter", cdaiBalAfter)
+    ; 
+            
+       emit  log_uint("dai bal before", daiBalBefore)
+      
+
+      ;
+     emit log_uint("dai bal after", daiBalAfter); 
+
+emit log_uint("dai amount", _daiAmount);
+        
+       
+       
+        
+        
+        
+        
 
         cdai.transfer(_dst, _amount);
 

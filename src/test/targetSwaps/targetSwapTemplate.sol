@@ -67,7 +67,7 @@ contract TargetSwapTemplate is Setup {
         originAmount_ = l.targetSwap(
             address(susd),
             address(ausdt),
-            4e18
+            4e6
         );
 
     }

@@ -89,7 +89,7 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
 
         uint256 originAmount = super.noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight_CUSDC();
 
-        assertEq(originAmount, 3001500000000000000);
+        assertEq(originAmount, 3000748999999999999);
 
     }
 
@@ -105,7 +105,7 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
 
         uint256 originAmount = super.fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight();
 
-        assertEq(originAmount, 3129492601572409000);
+        assertEq(originAmount, 3129492603917005000);
 
     }
 
@@ -177,7 +177,7 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
 
         uint256 originAmount = super.fullUpperAndLowerAntiSlippage_10PctOrigin_to_30PctTarget();
 
-        assertEq(originAmount, 3646340429241883000);
+        assertEq(originAmount, 3646340426509550000);
 
     }
 

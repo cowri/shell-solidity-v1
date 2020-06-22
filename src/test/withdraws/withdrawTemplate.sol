@@ -322,7 +322,7 @@ contract SelectiveWithdrawTemplate is Setup {
             address(susd), 50e18
         );
 
-        uint256 cdaiOf5Numeraires = IAssimilator(cdaiAssimilator).viewRawAmount(uint(5e18).divu(1e18));
+        uint256 cdaiOf5Numeraires = cdaiAssimilator.viewRawAmount(uint(5e18).divu(1e18));
 
         shellsBurned_ = l.withdraw(
             address(cdai), cdaiOf5Numeraires,

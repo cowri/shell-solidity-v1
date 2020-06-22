@@ -42,11 +42,15 @@ contract OriginSwapTemplate is Setup {
             address(susd), 35e18
         );
 
+        uint256 gas = gasleft();
+
         targetAmount_ = l.originSwap(
             address(usdc),
             address(usdt),
             10e6
         );
+
+        emit log_uint("gas", gas - gasleft());
 
     }
 
@@ -128,7 +132,7 @@ contract OriginSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18);
 
-        uint256 cusdcOf40Numeraire = IAssimilator(cusdcAssimilator).viewRawAmount(40e18);
+        uint256 cusdcOf40Numeraire = IAssimilator(cusdcAssimilator).viewRawAmount(uint(40e18).divu(1e18));
 
         uint256 targetAmount = l.originSwap(
             address(cusdc),
@@ -245,7 +249,7 @@ contract OriginSwapTemplate is Setup {
             address(susd), 35e18
         );
 
-        uint256 asusdOf2Point8Numeraire = IAssimilator(asusdAssimilator).viewRawAmount(2.8e18);
+        uint256 asusdOf2Point8Numeraire = IAssimilator(asusdAssimilator).viewRawAmount(uint(2.8e18).divu(1e18));
 
         uint256 targetAmount = l.originSwap(
             address(asusd),
@@ -439,7 +443,7 @@ contract OriginSwapTemplate is Setup {
             address(susd), 40e18
         );
 
-        uint256 chaiOf2p349Numeraire = IAssimilator(chaiAssimilator).viewRawAmount(2.349e18);
+        uint256 chaiOf2p349Numeraire = IAssimilator(chaiAssimilator).viewRawAmount(uint(2.349e18).divu(1e18));
 
         targetAmount_ = l.originSwap(
             address(chai),

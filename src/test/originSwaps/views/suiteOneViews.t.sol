@@ -73,7 +73,7 @@ contract OriginSwapiViewsSuiteOneTest is OriginSwapViewsTemplate, DSTest {
 
         uint256 targetAmount = super.partialUpperAndLowerSlippage_balanced_30PctWeight_CUSDC_to_CDAI();
 
-        assertEq(targetAmount, 39330195827959985796);
+        assertEq(targetAmount, 39339756348795716299);
 
     }
 
@@ -193,7 +193,7 @@ contract OriginSwapiViewsSuiteOneTest is OriginSwapViewsTemplate, DSTest {
 
         uint256 targetAmount = super.CHAI_fullUpperAndLowerAntiSlippage_30pctWeight_to_10Pct();
 
-        assertEq(targetAmount, 2365464484251272960);
+        assertEq(targetAmount, 2366053853162344119);
 
     }
 

@@ -112,7 +112,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
         uint256 shellsBurned = super.fullIndirectLowerAntiSlippage_5CHAI_5CUSDC_from_95DAI_95USDC_55USDT_15SUSD();
 
-        assertEq(shellsBurned, 9992948093387737702);
+        assertEq(shellsBurned, 9995445993336071501);
 
     }
 

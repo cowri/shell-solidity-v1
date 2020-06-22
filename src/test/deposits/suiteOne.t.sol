@@ -96,7 +96,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
         uint256 shellsMinted = super.noSlippage_36CHAI_into_300Proportional();
 
-        assertEq(shellsMinted, 35991000233367100000);
+        assertEq(shellsMinted, 35999999999999999985);
 
     }
 
@@ -104,7 +104,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
         uint256 newShells = super.partialLowerAntiSlippage_36CUSDC_18ASUSD_into_95DAI_55USDC_95USDT_15SUSD();
 
-        assertEq(newShells,  53991711756245652892);
+        assertEq(newShells,  54018716948717948714);
 
     }
 
@@ -184,7 +184,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
         uint256 shellsMinted = super.noSlippage_36CDAI_into_300Proportional();
 
-        assertEq(shellsMinted, 35991000239800010000);
+        assertEq(shellsMinted, 35999999999852135533);
 
     }
 

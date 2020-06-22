@@ -112,7 +112,7 @@ contract LocalCUsdcToUsdcAssimilator is LoihiRoot {
 
         uint256 _balance = usdc.balanceOf(address(this));
 
-        amount_ = _amount.divu(1e6);
+        amount_ = _usdcAmount.divu(1e6);
 
         balance_ = _balance.divu(1e6);
 
