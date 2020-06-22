@@ -266,12 +266,9 @@ contract Loihi is LoihiRoot {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getSwapData(_o.ix, _t.ix, _oAmt, _o.addr, true, address(0));
 
-        ( _amt, shell.omega ) = shell.calculateTrade(_t.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, shell.omega ) = shell.calculateTrade(_oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
         _amt = _amt.unsafe_mul(ONE - shell.epsilon);
-
-        // emit log_int("shell.omega", shell.omega.muli(1e18));
-        // emit log_int("_amt", _amt.muli(1e18));
 
         require((tAmt_ = _t.addr.outputNumeraire(_rcpnt, _amt)) > _mTAmt, "Shell/below-min-target-amount");
 
@@ -291,7 +288,7 @@ contract Loihi is LoihiRoot {
             _oBals[i] = _bal;
         }
 
-        shell.omega = shell.calculateFee(_oBals, _oGLiq);
+        shell.omega = Shells.calculateFee(_oGLiq, _oBals, shell.beta, shell.delta, shell.weights);
 
     }
 
@@ -314,7 +311,7 @@ contract Loihi is LoihiRoot {
             int128[] memory _nBals,
             int128[] memory _oBals ) = viewSwapData(_o.ix, _t.ix, _oAmt, true, _o.addr);
 
-        ( _amt, ) = shell.calculateTrade(_t.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, ) = shell.calculateTrade(_oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
         _amt = _amt.unsafe_mul(ONE - shell.epsilon);
 
@@ -360,7 +357,7 @@ contract Loihi is LoihiRoot {
             int128[] memory _oBals,
             int128[] memory _nBals) = getSwapData(_t.ix, _o.ix, _tAmt, _t.addr, false, _rcpnt);
 
-        ( _amt, shell.omega ) = shell.calculateTrade(_o.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, shell.omega ) = shell.calculateTrade(_oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
 
         _amt = _amt.unsafe_mul(ONE + shell.epsilon);
 
@@ -389,7 +386,7 @@ contract Loihi is LoihiRoot {
             int128[] memory _nBals,
             int128[] memory _oBals ) = viewSwapData(_t.ix, _o.ix, _tAmt, false, _t.addr);
 
-        ( _amt, ) = shell.calculateTrade(_o.ix, _amt, _oGLiq, _nGLiq, _oBals, _nBals);
+        ( _amt, ) = shell.calculateTrade(_oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
 
         _amt = _amt.unsafe_mul(ONE + shell.epsilon);
 

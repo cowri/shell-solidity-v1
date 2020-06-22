@@ -46,7 +46,7 @@ library Controller {
             _bals[i] = _bal;
         }
 
-        int128 _omega = shell.calculateFee(_bals, _gLiq);
+        int128 _omega = Shells.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
 
         shell.alpha = _alpha.divu(1e18);
         shell.beta = _beta.divu(1e18);
@@ -60,7 +60,7 @@ library Controller {
         require(shell.epsilon >= 0 && _epsilon < 1e16, "Shell/parameter-invalid-epsilon");
         require(shell.lambda >= 0 && shell.lambda <= ONE, "Shell/parameter-invalid-lambda");
 
-        int128 _psi = shell.calculateFee(_bals, _gLiq);
+        int128 _psi = Shells.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
         shell.omega = _psi;
 
         require(_omega >= _psi, "Shell/paramter-invalid-psi");

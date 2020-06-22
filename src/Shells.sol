@@ -67,21 +67,17 @@ library Shells {
     event log_uints(bytes32, uint256[]);
 
     function calculateFee (
-        Shell storage shell,
+        int128 _gLiq,
         int128[] memory _bals,
-        int128 _grossLiq
-    ) internal returns (int128 psi_) {
-
-        int128 _beta = shell.beta;
-        int128 _delta = shell.delta;
-        int128[] memory _weights = shell.weights;
+        int128 _beta,
+        int128 _delta,
+        int128[] memory _weights
+    ) internal pure returns (int128 psi_) {
 
         for (uint i = 0; i < _weights.length; i++) {
-            int128 _ideal = _grossLiq.unsafe_mul(_weights[i]);
+            int128 _ideal = _gLiq.unsafe_mul(_weights[i]);
             psi_ += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
         }
-        
-        // emit log('~<>~<>~<>~<>~<>~<>~<>~');
 
     }
 
@@ -90,7 +86,7 @@ library Shells {
         int128 _ideal,
         int128 _beta,
         int128 _delta
-    ) internal returns (int128 fee_) {
+    ) internal pure returns (int128 fee_) {
 
         // emit log('~<>~<>~<>~<>~<>~<>~<>~');
 
@@ -139,41 +135,44 @@ library Shells {
 
     function calculateTrade (
         Shell storage shell,
-        uint _rIx,
-        int128 _lAmt,
         int128 _oGLiq,
         int128 _nGLiq,
         int128[] memory _oBals,
-        int128[] memory _nBals
+        int128[] memory _nBals,
+        int128 _lAmt,
+        uint _rIx
     ) internal returns (int128 rAmt_ , int128 psi_) {
 
         rAmt_ = _lAmt;
 
-        {
+        int128 _lambda = shell.lambda;
+        int128 _omega = shell.omega;
+        int128 _beta = shell.beta;
+        int128 _delta = shell.delta;
+        int128[] memory _weights = shell.weights;
 
-            int128 _lambda = shell.lambda;
-            int128 _omega = shell.omega;
+        for (uint i = 0; i < 32; i++) {
 
-            for (uint i = 0; i < 32; i++) {
+            psi_ = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
 
-                psi_ = shell.calculateFee(_nBals, _nGLiq);
-
-                int128 _prev = rAmt_;
-                int128 _next = rAmt_ = _omega < psi_
+            if ( ( rAmt_ = _omega < psi_
                     ? - ( _lAmt + _omega - psi_ )
-                    : - ( _lAmt + _lambda.unsafe_mul(_omega - psi_));
+                    : - ( _lAmt + _lambda.unsafe_mul(_omega - psi_))
+                 ) / 1e13 == rAmt_ / 1e13 ) {
 
-                _nGLiq = _oGLiq + _lAmt + _next;
+                _nGLiq = _oGLiq + _lAmt + rAmt_;
 
-                _nBals[_rIx] = _oBals[_rIx].add(_next);
+                _nBals[_rIx] = _oBals[_rIx] + rAmt_;
 
-                if (_prev / 1e13 == _next / 1e13) {
+                enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, _weights);
 
-                    enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+                return ( rAmt_, psi_ );
 
-                    return ( rAmt_, psi_ );
+            } else {
 
-                }
+                _nGLiq = _oGLiq + _lAmt + rAmt_;
+
+                _nBals[_rIx] = _oBals[_rIx].add(rAmt_);
 
             }
 
@@ -191,9 +190,9 @@ library Shells {
         int128[] memory _nBals
     ) internal returns (int128 shells_, int128 psi_) {
 
-        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals);
+        shell.enforceHalts(_oGLiq, _nGLiq, _oBals, _nBals, shell.weights);
 
-        psi_ = shell.calculateFee(_nBals, _nGLiq);
+        psi_ = calculateFee(_nGLiq, _nBals, shell.beta, shell.delta, shell.weights);
 
         int128 _omega = shell.omega;
         int128 _feeDiff = psi_.sub(_omega);
@@ -221,7 +220,8 @@ library Shells {
         int128 _oGLiq,
         int128 _nGLiq,
         int128[] memory _oBals,
-        int128[] memory _nBals
+        int128[] memory _nBals,
+        int128[] memory _weights
     ) internal {
 
         // emit log("enforce halts");
@@ -239,7 +239,6 @@ library Shells {
 
         uint256 _length = _nBals.length;
         int128 _alpha = shell.alpha;
-        int128[] memory _weights = shell.weights;
 
         for (uint i = 0; i < _length; i++) {
 

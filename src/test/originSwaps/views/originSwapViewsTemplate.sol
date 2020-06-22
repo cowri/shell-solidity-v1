@@ -228,7 +228,7 @@ contract OriginSwapViewsTemplate is Setup {
 
         targetAmount_ = l.viewOriginTrade(
             address(dai),
-            address(usdt),
+            address(susd),
             3e18
         );
 
