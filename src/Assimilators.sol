@@ -47,25 +47,27 @@ library Assimilators {
 
     function viewRawAmount (address _assim, int128 _amt) internal returns (uint256 amount_) {
 
-        // amount_ = IAssimilator(_assim).viewRawAmount(_amt);
+        // amount_ = IAssimilator(_assim).viewRawAmount(_amt); // for production
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewRawAmount.selector, _amt.abs());
+        bytes memory data = abi.encodeWithSelector(iAsmltr.viewRawAmount.selector, _amt.abs()); // for development
 
-        amount_ = abi.decode(_assim.delegate(data), (uint256));
+        amount_ = abi.decode(_assim.delegate(data), (uint256)); // for development
 
     }
 
     function viewNumeraireAmount (address _assim, uint256 _amt) internal returns (int128 amt_) {
 
-        // amount_ = IAssimilator(_assim).viewNumeraireAmount(_amt);
+        // amount_ = IAssimilator(_assim).viewNumeraireAmount(_amt); // for production
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireAmount.selector, _amt);
+        bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireAmount.selector, _amt); // for development
 
-        amt_ = abi.decode(_assim.delegate(data), (int128));
+        amt_ = abi.decode(_assim.delegate(data), (int128)); // for development
 
     }
 
     function viewNumeraireAmountAndBalance (address _assim, uint256 _amt) internal returns (int128 amt_, int128 bal_) {
+
+        // ( amt_, bal_ ) = IAssimilator(_assim).viewNumeraireAmountAndBalance(_amt); // for production
 
         bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireAmountAndBalance.selector, _amt);
 
@@ -75,7 +77,7 @@ library Assimilators {
 
     function viewNumeraireBalance (address _assim) internal returns (int128 bal_) {
 
-        // nAmt_ = IAssimilator(_assim).viewNumeraireBalance(address(this));
+        nAmt_ = IAssimilator(_assim).viewNumeraireBalance(address(this));
 
         bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireBalance.selector, address(this));
 

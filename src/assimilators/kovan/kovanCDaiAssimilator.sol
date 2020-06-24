@@ -29,7 +29,7 @@ contract KovanCDaiAssimilator {
     }
 
     function intakeNumeraire (uint256 amount) public returns (uint256) {
-        uint256 rate = cdai.exchangeRateCurrent();
+        uint256 rate = cdai.exchangeRateStored();
         uint256 cdaiAmount = wmul(rate, amount);
         cdai.transferFrom(msg.sender, address(this), cdaiAmount);
         return cdaiAmount;
@@ -43,7 +43,7 @@ contract KovanCDaiAssimilator {
     // wraps it into cdai amount
     // sends that to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        uint rate = cdai.exchangeRateCurrent();
+        uint rate = cdai.exchangeRateStored();
         uint cdaiAmount = wdiv(amount, rate);
         cdai.transfer(dst, cdaiAmount);
         return cdaiAmount;
@@ -67,13 +67,13 @@ contract KovanCDaiAssimilator {
 
     // takes raw amount and gives numeraire amount
     function getRawAmount (uint256 amount) public returns (uint256) {
-        uint256 rate = cdai.exchangeRateCurrent();
+        uint256 rate = cdai.exchangeRateStored();
         return wdiv(amount, rate);
     }
 
     // takes raw amount and gives numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        uint256 rate = cdai.exchangeRateCurrent();
+        uint256 rate = cdai.exchangeRateStored();
         return wmul(amount, rate);
     }
 

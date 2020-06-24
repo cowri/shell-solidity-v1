@@ -38,7 +38,7 @@ contract LocalCUsdcToUsdcAssimilator is LoihiRoot {
 
         cusdc.transferFrom(msg.sender, address(this), _amount);
 
-        uint256 _rate = cusdc.exchangeRateCurrent();
+        uint256 _rate = cusdc.exchangeRateStored();
 
         _amount = ( _amount * _rate ) / 1e18;
 
@@ -57,7 +57,7 @@ contract LocalCUsdcToUsdcAssimilator is LoihiRoot {
 
         cusdc.transferFrom(msg.sender, address(this), _amount);
 
-        uint256 _rate = cusdc.exchangeRateCurrent();
+        uint256 _rate = cusdc.exchangeRateStored();
 
         _amount = ( _amount * _rate ) / 1e18;
 
@@ -70,7 +70,7 @@ contract LocalCUsdcToUsdcAssimilator is LoihiRoot {
     // takes numeraire amount and transfers corresponding cusdc in
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        uint256 _rate = cusdc.exchangeRateCurrent();
+        uint256 _rate = cusdc.exchangeRateStored();
 
         amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 
@@ -88,7 +88,7 @@ contract LocalCUsdcToUsdcAssimilator is LoihiRoot {
 
         cusdc.mint(amount_);
 
-        uint256 _rate = cusdc.exchangeRateCurrent();
+        uint256 _rate = cusdc.exchangeRateStored();
 
         amount_ = ( amount_ * 1e18 ) / _rate;
 

@@ -88,13 +88,6 @@ library Shells {
         int128 _delta
     ) internal pure returns (int128 fee_) {
 
-        // emit log('~<>~<>~<>~<>~<>~<>~<>~');
-
-        // emit log_int("_bal", _bal.muli(1e6));
-        // emit log_int("_ideal", _ideal.muli(1e6));
-        // emit log_int("_beta", _beta.muli(1e6));
-        // emit log_int("_delta", _delta.muli(1e6));
-
         if (_bal < _ideal) {
 
             int128 _threshold = _ideal.unsafe_mul(ONE - _beta);
@@ -155,10 +148,10 @@ library Shells {
 
             psi_ = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
 
-            if ( ( rAmt_ = _omega < psi_
+            if (( rAmt_ = _omega < psi_
                     ? - ( _lAmt + _omega - psi_ )
                     : - ( _lAmt + _lambda.unsafe_mul(_omega - psi_))
-                 ) / 1e13 == rAmt_ / 1e13 ) {
+                ) / 1e13 == rAmt_ / 1e13 ) {
 
                 _nGLiq = _oGLiq + _lAmt + rAmt_;
 
@@ -223,19 +216,6 @@ library Shells {
         int128[] memory _nBals,
         int128[] memory _weights
     ) internal {
-
-        // emit log("enforce halts");
-        // emit log_int("MAX", MAX.muli(1e18));
-
-        // emit log_int("_oGLiq", _oGLiq.muli(1e18));
-        // for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
-        // emit log_int("_nGLiq", _nGLiq.muli(1e18));
-        // for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
-
-        // if (!shell.testHalts) {
-        //     // emit log("skipping halts");
-        //     return;
-        // }
 
         uint256 _length = _nBals.length;
         int128 _alpha = shell.alpha;

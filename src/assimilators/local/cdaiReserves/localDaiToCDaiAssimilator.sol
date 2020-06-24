@@ -42,7 +42,7 @@ contract LocalDaiToCDaiAssimilator is LoihiRoot {
 
         dai.transferFrom(msg.sender, address(this), _amount);
 
-        uint256 _rate = cdai.exchangeRateCurrent();
+        uint256 _rate = cdai.exchangeRateStored();
 
         cdai.mint(_amount);
 

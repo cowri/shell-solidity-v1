@@ -118,7 +118,7 @@ contract LocalChaiToDaiAssimilator is LoihiRoot {
         amount_ = fromDai(amount_, pot.chi());
 
     }
-    
+
     // takes raw amount of chai, calculates the numeraire amount, redeems that from cdai, wraps it in chai and sends to destination, then returns the numeraire amount
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 

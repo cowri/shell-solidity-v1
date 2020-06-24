@@ -62,7 +62,7 @@ contract MainnetCDaiToCDaiAssimilator {
     // takes a numeraire amount, calculates the raw amount of cDai, transfers it in and returns the corresponding raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        uint256 _rate = cdai.exchangeRateCurrent();
+        uint256 _rate = cdai.exchangeRateStored();
 
         amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
@@ -105,7 +105,7 @@ contract MainnetCDaiToCDaiAssimilator {
     // takes a numeraire value of CDai, figures out the raw amount, transfers raw amount out, and returns raw amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        uint _rate = cdai.exchangeRateCurrent();
+        uint _rate = cdai.exchangeRateStored();
 
         amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 

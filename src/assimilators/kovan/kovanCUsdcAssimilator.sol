@@ -29,7 +29,7 @@ contract KovanCUsdcAssimilator {
     
     // takes numeraire amount and transfers corresponding cusdc in
     function intakeNumeraire (uint256 amount) public returns (uint256) {
-        uint256 rate = cusdc.exchangeRateCurrent();
+        uint256 rate = cusdc.exchangeRateStored();
         amount = wdiv(amount / 1000000000000, rate);
         cusdc.transferFrom(msg.sender, address(this), amount);
         return amount;
@@ -38,7 +38,7 @@ contract KovanCUsdcAssimilator {
     // takes numeraire amount
     // transfers corresponding cusdc to destination
     function outputNumeraire (address dst, uint256 amount) public returns (uint256) {
-        uint256 rate = cusdc.exchangeRateCurrent();
+        uint256 rate = cusdc.exchangeRateStored();
         amount = wdiv(amount / 1000000000000, rate);
         cusdc.transfer(dst, amount);
         return amount;
@@ -72,14 +72,14 @@ contract KovanCUsdcAssimilator {
     // takes raw cusdc amount
     // returns corresponding numeraire amount
     function getRawAmount (uint256 amount) public returns (uint256) {
-        uint256 rate = cusdc.exchangeRateCurrent();
+        uint256 rate = cusdc.exchangeRateStored();
         return wdiv(amount /1000000000000 , rate);
     }
 
     // takes raw cusdc amount
     // returns corresponding numeraire amount
     function getNumeraireAmount (uint256 amount) public returns (uint256) {
-        uint256 rate = cusdc.exchangeRateCurrent();
+        uint256 rate = cusdc.exchangeRateStored();
         return wmul(amount, rate) * 1000000000000;
     }
 

@@ -36,7 +36,7 @@ contract MainnetCUsdcToCUsdcAssimilator {
 
         if (!success) revert("CUsdc/transferFrom-failed");
 
-        uint256 _rate = cusdc.exchangeRateCurrent();
+        uint256 _rate = cusdc.exchangeRateStored();
 
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
 
@@ -49,7 +49,7 @@ contract MainnetCUsdcToCUsdcAssimilator {
 
         if (!success) revert("CUsdc/transferFrom-failed");
 
-        uint256 _rate = cusdc.exchangeRateCurrent();
+        uint256 _rate = cusdc.exchangeRateStored();
 
         uint256 _balance = cusdc.balanceOf(address(this));
 
@@ -62,7 +62,7 @@ contract MainnetCUsdcToCUsdcAssimilator {
     // takes numeraire amount and transfers corresponding cusdc in
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        uint256 _rate = cusdc.exchangeRateCurrent();
+        uint256 _rate = cusdc.exchangeRateStored();
 
         amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 
@@ -76,7 +76,7 @@ contract MainnetCUsdcToCUsdcAssimilator {
     // transfers corresponding cusdc to destination
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        uint256 _rate = cusdc.exchangeRateCurrent();
+        uint256 _rate = cusdc.exchangeRateStored();
 
         amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 

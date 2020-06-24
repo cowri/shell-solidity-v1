@@ -28,6 +28,8 @@ library Controller {
 
     using Shells for Shells.Shell;
 
+    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
+
     event log(bytes32);
     event log_int(bytes32, int128);
     event log_int(bytes32, int);
@@ -61,9 +63,12 @@ library Controller {
         require(shell.lambda >= 0 && shell.lambda <= ONE, "Shell/parameter-invalid-lambda");
 
         int128 _psi = Shells.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
-        shell.omega = _psi;
 
         require(_omega >= _psi, "Shell/paramter-invalid-psi");
+
+        shell.omega = _psi;
+
+        emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda);
 
         max_ = _max;
 

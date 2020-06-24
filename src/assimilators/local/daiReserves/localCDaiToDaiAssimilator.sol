@@ -71,7 +71,7 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
     // takes a numeraire amount, calculates the raw amount of cDai, transfers it in and returns the corresponding raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        uint256 _rate = cdai.exchangeRateCurrent();
+        uint256 _rate = cdai.exchangeRateStored();
 
         amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
@@ -122,10 +122,10 @@ contract LocalCDaiToDaiAssimilator is LoihiRoot {
 
         cdai.mint(amount_);
 
-        uint _rate = cdai.exchangeRateCurrent();
+        uint _rate = cdai.exchangeRateStored();
 
         amount_ = ( ( amount_ * 1e18 ) / _rate );
-        
+
         cdai.transfer(_dst, amount_);
 
     }
