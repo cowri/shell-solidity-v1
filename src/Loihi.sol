@@ -594,27 +594,27 @@ contract Loihi is LoihiRoot {
     }
 
     function transfer (address _recipient, uint256 _amount) public nonReentrant returns (bool) {
-        return shell.transfer(_recipient, _amount);
+        // return shell.transfer(_recipient, _amount);
     }
 
     function transferFrom (address _sender, address _recipient, uint256 _amount) public nonReentrant returns (bool) {
-        return shell.transferFrom(_sender, _recipient, _amount);
+        // return shell.transferFrom(_sender, _recipient, _amount);
     }
 
     function approve (address _spender, uint256 _amount) public nonReentrant returns (bool success_) {
-        return shell.approve(_spender, _amount);
+        // return shell.approve(_spender, _amount);
     }
 
     function increaseAllowance(address _spender, uint256 _addedValue) public returns (bool success_) {
-        return shell.increaseAllowance(_spender, _addedValue);
+        // return shell.increaseAllowance(_spender, _addedValue);
     }
 
     function decreaseAllowance(address _spender, uint256 _subtractedValue) public returns (bool success_) {
-        return shell.decreaseAllowance(_spender, _subtractedValue);
+        // return shell.decreaseAllowance(_spender, _subtractedValue);
     }
 
     function balanceOf (address _account) public view returns (uint256) {
-        return shell.balances[_account];
+        // return shell.balances[_account];
     }
 
     function totalSupply () public view returns (uint256 totalSupply_) {
@@ -622,7 +622,7 @@ contract Loihi is LoihiRoot {
     }
 
     function allowance (address _owner, address _spender) public view returns (uint256) {
-        return shell.allowances[_owner][_spender];
+        // return shell.allowances[_owner][_spender];
     }
 
     function totalReserves () public returns (uint256, uint256[] memory) {
@@ -635,7 +635,9 @@ contract Loihi is LoihiRoot {
             balances_[i] = _bal;
             totalBalance_ += _bal;
         }
+
         return (totalBalance_, balances_);
+
     }
 
     function safeApprove(address _token, address _spender, uint256 _value) public onlyOwner {
