@@ -77,8 +77,6 @@ library Assimilators {
 
     function viewNumeraireBalance (address _assim) internal returns (int128 bal_) {
 
-        nAmt_ = IAssimilator(_assim).viewNumeraireBalance(address(this));
-
         bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireBalance.selector, address(this));
 
         bal_ = abi.decode(_assim.delegate(data), (int128));
