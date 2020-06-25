@@ -2,48 +2,48 @@ pragma solidity ^0.5.0;
 
 import "./storage.sol";
 
-import "../../assimilators/kovan/KovanDaiAssimilator.sol";
-import "../../assimilators/kovan/KovanCDaiAssimilator.sol";
-import "../../assimilators/kovan/KovanChaiAssimilator.sol";
-import "../../assimilators/kovan/KovanUsdcAssimilator.sol";
-import "../../assimilators/kovan/KovanCUsdcAssimilator.sol";
-import "../../assimilators/kovan/KovanSUsdAssimilator.sol";
-import "../../assimilators/kovan/KovanASUsdAssimilator.sol";
-import "../../assimilators/kovan/KovanUsdtAssimilator.sol";
-import "../../assimilators/kovan/KovanAUsdtAssimilator.sol";
+import "../../assimilators/kovan/kovanDaiAssimilator.sol";
+import "../../assimilators/kovan/kovanCDaiAssimilator.sol";
+import "../../assimilators/kovan/kovanChaiAssimilator.sol";
+import "../../assimilators/kovan/kovanUsdcAssimilator.sol";
+import "../../assimilators/kovan/kovanCUsdcAssimilator.sol";
+import "../../assimilators/kovan/kovanSUsdAssimilator.sol";
+import "../../assimilators/kovan/kovanASUsdAssimilator.sol";
+import "../../assimilators/kovan/kovanUsdtAssimilator.sol";
+import "../../assimilators/kovan/kovanAUsdtAssimilator.sol";
 
 /* Assimilator set one - holding reserves in cDai, cUsdc, aUsdt and aSusd */
-import "../../assimilators/mainnet/cdaiReserves/MainnetDaiToCDaiAssimilator.sol";
-import "../../assimilators/mainnet/cdaiReserves/MainnetCDaiToCDaiAssimilator.sol";
-import "../../assimilators/mainnet/cdaiReserves/MainnetChaiToCDaiAssimilator.sol";
-import "../../assimilators/mainnet/cusdcReserves/MainnetUsdcToCUsdcAssimilator.sol";
-import "../../assimilators/mainnet/cusdcReserves/MainnetCUsdcToCUsdcAssimilator.sol";
-import "../../assimilators/mainnet/asusdReserves/MainnetSUsdToASUsdAssimilator.sol";
-import "../../assimilators/mainnet/asusdReserves/MainnetASUsdToASUsdAssimilator.sol";
-import "../../assimilators/mainnet/ausdtReserves/MainnetUsdtToAUsdtAssimilator.sol";
-import "../../assimilators/mainnet/ausdtReserves/MainnetAUsdtToAUsdtAssimilator.sol";
+import "../../assimilators/mainnet/cdaiReserves/mainnetDaiToCDaiAssimilator.sol";
+import "../../assimilators/mainnet/cdaiReserves/mainnetCDaiToCDaiAssimilator.sol";
+import "../../assimilators/mainnet/cdaiReserves/mainnetChaiToCDaiAssimilator.sol";
+import "../../assimilators/mainnet/cusdcReserves/mainnetUsdcToCUsdcAssimilator.sol";
+import "../../assimilators/mainnet/cusdcReserves/mainnetCUsdcToCUsdcAssimilator.sol";
+import "../../assimilators/mainnet/asusdReserves/mainnetSUsdToASUsdAssimilator.sol";
+import "../../assimilators/mainnet/asusdReserves/mainnetASUsdToASUsdAssimilator.sol";
+import "../../assimilators/mainnet/ausdtReserves/mainnetUsdtToAUsdtAssimilator.sol";
+import "../../assimilators/mainnet/ausdtReserves/mainnetAUsdtToAUsdtAssimilator.sol";
 
 /* Assimilator set one - holding reserves in cDai, cUsdc, aUsdt and aSusd */
-import "../../assimilators/local/cdaiReserves/LocalDaiToCDaiAssimilator.sol";
-import "../../assimilators/local/cdaiReserves/LocalCDaiToCDaiAssimilator.sol";
-import "../../assimilators/local/cdaiReserves/LocalChaiToCDaiAssimilator.sol";
-import "../../assimilators/local/cusdcReserves/LocalUsdcToCUsdcAssimilator.sol";
-import "../../assimilators/local/cusdcReserves/LocalCUsdcToCUsdcAssimilator.sol";
-import "../../assimilators/local/ausdtReserves/LocalUsdtToAUsdtAssimilator.sol";
-import "../../assimilators/local/ausdtReserves/LocalAUsdtToAUsdtAssimilator.sol";
-import "../../assimilators/local/asusdReserves/LocalSUsdToASUsdAssimilator.sol";
-import "../../assimilators/local/asusdReserves/LocalASUsdToASUsdAssimilator.sol";
+import "../../assimilators/local/cdaiReserves/localDaiToCDaiAssimilator.sol";
+import "../../assimilators/local/cdaiReserves/localCDaiToCDaiAssimilator.sol";
+import "../../assimilators/local/cdaiReserves/localChaiToCDaiAssimilator.sol";
+import "../../assimilators/local/cusdcReserves/localUsdcToCUsdcAssimilator.sol";
+import "../../assimilators/local/cusdcReserves/localCUsdcToCUsdcAssimilator.sol";
+import "../../assimilators/local/ausdtReserves/localUsdtToAUsdtAssimilator.sol";
+import "../../assimilators/local/ausdtReserves/localAUsdtToAUsdtAssimilator.sol";
+import "../../assimilators/local/asusdReserves/localSUsdToASUsdAssimilator.sol";
+import "../../assimilators/local/asusdReserves/localASUsdToASUsdAssimilator.sol";
 
 /* Assimilator set two - staking to dai, usdc, usdt and susd */
-import "../../assimilators/local/daiReserves/LocalDaiToDaiAssimilator.sol";
-import "../../assimilators/local/daiReserves/LocalCDaiToDaiAssimilator.sol";
-import "../../assimilators/local/daiReserves/LocalChaiToDaiAssimilator.sol";
-import "../../assimilators/local/usdcReserves/LocalUsdcToUsdcAssimilator.sol";
-import "../../assimilators/local/usdcReserves/LocalCUsdcToUsdcAssimilator.sol";
-import "../../assimilators/local/usdtReserves/LocalUsdtToUsdtAssimilator.sol";
-import "../../assimilators/local/usdtReserves/LocalAUsdtToUsdtAssimilator.sol";
-import "../../assimilators/local/susdReserves/LocalSUsdToSUsdAssimilator.sol";
-import "../../assimilators/local/susdReserves/LocalASUsdToSUsdAssimilator.sol";
+import "../../assimilators/local/daiReserves/localDaiToDaiAssimilator.sol";
+import "../../assimilators/local/daiReserves/localCDaiToDaiAssimilator.sol";
+import "../../assimilators/local/daiReserves/localChaiToDaiAssimilator.sol";
+import "../../assimilators/local/usdcReserves/localUsdcToUsdcAssimilator.sol";
+import "../../assimilators/local/usdcReserves/localCUsdcToUsdcAssimilator.sol";
+import "../../assimilators/local/usdtReserves/localUsdtToUsdtAssimilator.sol";
+import "../../assimilators/local/usdtReserves/localAUsdtToUsdtAssimilator.sol";
+import "../../assimilators/local/susdReserves/localSUsdToSUsdAssimilator.sol";
+import "../../assimilators/local/susdReserves/localASUsdToSUsdAssimilator.sol";
 
 
 contract AssimilatorSetup is StorageSetup {
