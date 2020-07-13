@@ -14,15 +14,20 @@
 
 pragma solidity >0.4.13;
 
-import "./Assimilators.sol";
 import "./Shells.sol";
 
-library ShellsExternal {
-
-    using SafeERC20Arithmetic for uint256;
+library ShellsERC20 {
 
     event Approval(address indexed _owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
+
+    function add(uint x, uint y, string memory errorMessage) private pure returns (uint z) {
+        require((z = x + y) >= x, errorMessage);
+    }
+
+    function sub(uint x, uint y, string memory errorMessage) private pure returns (uint z) {
+        require((z = x - y) <= x, errorMessage);
+    }
 
     /**
      * @dev See {IERC20-transfer}.
@@ -32,7 +37,7 @@ library ShellsExternal {
      * - `recipient` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer(Shells.Shell storage shell, address recipient, uint256 amount) external returns (bool) {
+    function transfer(Shells.Shell storage shell, address recipient, uint256 amount) internal returns (bool) {
         _transfer(shell, msg.sender, recipient, amount);
         return true;
     }
@@ -44,7 +49,7 @@ library ShellsExternal {
      *
      * - `spender` cannot be the zero address.
      */
-    function approve(Shells.Shell storage shell, address spender, uint256 amount) external returns (bool) {
+    function approve(Shells.Shell storage shell, address spender, uint256 amount) internal returns (bool) {
         _approve(shell, msg.sender, spender, amount);
         return true;
     }
@@ -61,9 +66,9 @@ library ShellsExternal {
      * - the caller must have allowance for `sender`'s tokens of at least
      * `amount`
      */
-    function transferFrom(Shells.Shell storage shell, address sender, address recipient, uint256 amount) external returns (bool) {
+    function transferFrom(Shells.Shell storage shell, address sender, address recipient, uint256 amount) internal returns (bool) {
         _transfer(shell, msg.sender, recipient, amount);
-        _approve(shell, sender, msg.sender, shell.allowances[sender][msg.sender].sub(amount, "Shell/insufficient-allowance"));
+        _approve(shell, sender, msg.sender, sub(shell.allowances[sender][msg.sender], amount, "Shell/insufficient-allowance"));
         return true;
     }
 
@@ -79,8 +84,8 @@ library ShellsExternal {
      *
      * - `spender` cannot be the zero address.
      */
-    function increaseAllowance(Shells.Shell storage shell, address spender, uint256 addedValue) external returns (bool) {
-        _approve(shell, msg.sender, spender, shell.allowances[msg.sender][spender].add(addedValue));
+    function increaseAllowance(Shells.Shell storage shell, address spender, uint256 addedValue) internal returns (bool) {
+        _approve(shell, msg.sender, spender, add(shell.allowances[msg.sender][spender], addedValue, "Shell/approval-overflow"));
         return true;
     }
 
@@ -98,15 +103,15 @@ library ShellsExternal {
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
      */
-    function decreaseAllowance(Shells.Shell storage shell, address spender, uint256 subtractedValue) external returns (bool) {
-        _approve(shell, msg.sender, spender, shell.allowances[msg.sender][spender].sub(subtractedValue, "Shell/insufficient-allowance"));
+    function decreaseAllowance(Shells.Shell storage shell, address spender, uint256 subtractedValue) internal returns (bool) {
+        _approve(shell, msg.sender, spender, sub(shell.allowances[msg.sender][spender], subtractedValue, "Shell/allowance-decrease-underflow"));
         return true;
     }
 
     /**
      * @dev Moves tokens `amount` from `sender` to `recipient`.
      *
-     * This is external function is equivalent to {transfer}, and can be used to
+     * This is public function is equivalent to {transfer}, and can be used to
      * e.g. implement automatic token fees, slashing mechanisms, etc.
      *
      * Emits a {Transfer} event.
@@ -121,8 +126,8 @@ library ShellsExternal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
 
-        shell.balances[sender] = shell.balances[sender].sub(amount, "Shell/insufficient-balance");
-        shell.balances[recipient] = shell.balances[recipient].add(amount);
+        shell.balances[sender] = sub(shell.balances[sender], amount, "Shell/insufficient-balance");
+        shell.balances[recipient] = add(shell.balances[recipient], amount, "Shell/transfer-overflow");
         emit Transfer(sender, recipient, amount);
     }
 
@@ -130,7 +135,7 @@ library ShellsExternal {
     /**
      * @dev Sets `amount` as the allowance of `spender` over the `_owner`s tokens.
      *
-     * This is external function is equivalent to `approve`, and can be used to
+     * This is public function is equivalent to `approve`, and can be used to
      * e.g. set automatic allowances for certain subsystems, etc.
      *
      * Emits an {Approval} event.

@@ -735,7 +735,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(susd), 800e18 / 100
         );
 
-        l.setTestHalts(false);
+        l.TEST_setTestHalts(false);
 
         targetAmount_ = l.viewOriginTrade(
             address(usdc),
@@ -771,7 +771,7 @@ contract OriginSwapViewsTemplate is Setup {
 
         l.prime();
 
-        l.setTestHalts(false);
+        l.TEST_setTestHalts(false);
 
         targetAmount_ = l.viewOriginTrade(
             address(usdt),
@@ -788,7 +788,7 @@ contract OriginSwapViewsTemplate is Setup {
         usdt.transfer(address(l), 4910e6);
         ausdt.transfer(address(l), 4910e6);
 
-        l.setTestHalts(false);
+        l.TEST_setTestHalts(false);
 
         targetAmount_ = l.viewOriginTrade(
             address(usdt),
@@ -813,7 +813,7 @@ contract OriginSwapViewsTemplate is Setup {
         susd.transfer(address(l), 1970e18);
         asusd.transfer(address(l), 1970e18);
 
-        l.setTestHalts(false);
+        l.TEST_setTestHalts(false);
 
         l.prime();
 
@@ -840,7 +840,7 @@ contract OriginSwapViewsTemplate is Setup {
         susd.transfer(address(l), 1970e18);
         asusd.transfer(address(l), 1970e18);
 
-        l.setTestHalts(false);
+        l.TEST_setTestHalts(false);
 
         targetAmount_ = l.viewOriginTrade(
             address(dai),
@@ -859,7 +859,7 @@ contract OriginSwapViewsTemplate is Setup {
 
         l.prime();
 
-        l.setTestHalts(false);
+        l.TEST_setTestHalts(false);
 
         targetAmount_ = l.viewOriginTrade(
             address(usdt),
@@ -878,7 +878,7 @@ contract OriginSwapViewsTemplate is Setup {
 
         l.prime();
 
-        l.setTestHalts(false);
+        l.TEST_setTestHalts(false);
 
         targetAmount_ = l.viewOriginTrade(
             address(usdt),

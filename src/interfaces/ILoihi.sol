@@ -101,7 +101,7 @@ interface ILoihi {
     function allowance(address owner, address spender) external view returns (uint256);
     function approve(address spender, uint256 amount) external returns (bool);
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-    function totalReserves () external view returns (uint256, uint256[] memory);
+    function liquidity () external view returns (uint256, uint256[] memory);
     function getNumeraires () external view returns (address[] memory);
     function getReserves () external view returns (address[] memory);
     function getAdapter (address flavor) external view returns (address[] memory);

@@ -8,7 +8,7 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20NoBool.sol";
 import "./storage.sol";
 
 contract ApproveFrom {
-    function safeApprove(address _token, address _spender, uint256 _value) public;
+    function TEST_safeApprove(address _token, address _spender, uint256 _value) public;
 }
 
 contract LoihiSetup is StorageSetup {
@@ -156,8 +156,8 @@ contract LoihiSetup is StorageSetup {
         targets[4] = address(usdt); spenders[4] = address(ausdt);
 
         for (uint i = 0; i < targets.length; i++) {
-            ApproveFrom(_approveFrom).safeApprove(targets[i], spenders[i], uint256(0));
-            ApproveFrom(_approveFrom).safeApprove(targets[i], spenders[i], uint256(-1));
+            ApproveFrom(_approveFrom).TEST_safeApprove(targets[i], spenders[i], uint256(0));
+            ApproveFrom(_approveFrom).TEST_safeApprove(targets[i], spenders[i], uint256(-1));
         }
 
     }
@@ -173,8 +173,8 @@ contract LoihiSetup is StorageSetup {
         targets[4] = address(usdt); spenders[4] = aaveLpCore;
 
         for (uint i = 0; i < targets.length; i++) {
-            ApproveFrom(_approveFrom).safeApprove(targets[i], spenders[i], uint256(0));
-            ApproveFrom(_approveFrom).safeApprove(targets[i], spenders[i], uint256(-1));
+            ApproveFrom(_approveFrom).TEST_safeApprove(targets[i], spenders[i], uint256(0));
+            ApproveFrom(_approveFrom).TEST_safeApprove(targets[i], spenders[i], uint256(-1));
         }
 
     }

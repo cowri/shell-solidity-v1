@@ -13,33 +13,22 @@
 
 import "./Assimilators.sol";
 
+import "./UnsafeMath64x64.sol";
+
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 pragma solidity >0.4.13;
 
-library SafeERC20Arithmetic {
-
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "add-overflow");
-    }
-
-    function sub(uint x, uint y, string memory _errorMessage) internal pure returns (uint z) {
-        require((z = x - y) <= x, _errorMessage);
-    }
-
-}
-
 library Shells {
 
     int128 constant ONE = 0x10000000000000000;
-    int128 constant MAX = 0x4000000000000000;
+    int128 constant MAX = 0x4000000000000000; // .25 in laments terms
 
     using ABDKMath64x64 for int128;
+    using UnsafeMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
     using Shells for Shell;
-
-    using SafeERC20Arithmetic for uint256;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -75,7 +64,7 @@ library Shells {
     ) internal pure returns (int128 psi_) {
 
         for (uint i = 0; i < _weights.length; i++) {
-            int128 _ideal = _gLiq.unsafe_mul(_weights[i]);
+            int128 _ideal = _gLiq.us_mul(_weights[i]);
             psi_ += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
         }
 
@@ -90,35 +79,35 @@ library Shells {
 
         if (_bal < _ideal) {
 
-            int128 _threshold = _ideal.unsafe_mul(ONE - _beta);
+            int128 _threshold = _ideal.us_mul(ONE - _beta);
 
             if (_bal < _threshold) {
 
                 int128 _feeSection = _threshold - _bal;
 
-                fee_ = _feeSection.unsafe_div(_ideal);
-                fee_ = fee_.unsafe_mul(_delta);
+                fee_ = _feeSection.us_div(_ideal);
+                fee_ = fee_.us_mul(_delta);
 
                 if (fee_ > MAX) fee_ = MAX;
 
-                fee_ = fee_.unsafe_mul(_feeSection);
+                fee_ = fee_.us_mul(_feeSection);
 
             } else fee_ = 0;
 
         } else {
 
-            int128 _threshold = _ideal.unsafe_mul(ONE + _beta);
+            int128 _threshold = _ideal.us_mul(ONE + _beta);
 
             if (_bal > _threshold) {
 
                 int128 _feeSection = _bal - _threshold;
 
-                fee_ = _feeSection.unsafe_div(_ideal);
-                fee_ = fee_.unsafe_mul(_delta);
+                fee_ = _feeSection.us_div(_ideal);
+                fee_ = fee_.us_mul(_delta);
 
                 if (fee_ > MAX) fee_ = MAX;
 
-                fee_ = fee_.unsafe_mul(_feeSection);
+                fee_ = fee_.us_mul(_feeSection);
 
             } else fee_ = 0;
 
@@ -150,7 +139,7 @@ library Shells {
 
             if (( rAmt_ = _omega < psi_
                     ? - ( _lAmt + _omega - psi_ )
-                    : - ( _lAmt + _lambda.unsafe_mul(_omega - psi_))
+                    : - ( _lAmt + _lambda.us_mul(_omega - psi_))
                 ) / 1e13 == rAmt_ / 1e13 ) {
 
                 _nGLiq = _oGLiq + _lAmt + rAmt_;
@@ -192,17 +181,9 @@ library Shells {
         int128 _liqDiff = _nGLiq.sub(_oGLiq);
         int128 _oUtil = _oGLiq.sub(_omega);
 
-        if (_feeDiff >= 0) {
-
-            if (_oGLiq == 0) shells_ = _nGLiq.sub(psi_);
-            else shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
-
-        } else {
-
-            if (_oGLiq == 0) shells_ = _nGLiq.sub(psi_);
-            else shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff)).div(_oUtil);
-
-        }
+        if (_oGLiq == 0) shells_ = _nGLiq.sub(psi_);
+        else if (_feeDiff >= 0) shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
+        else shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff)).div(_oUtil);
 
         if ( shell.totalSupply != 0 ) shells_ = shells_.mul(shell.totalSupply.divu(1e18));
 
@@ -222,17 +203,17 @@ library Shells {
 
         for (uint i = 0; i < _length; i++) {
 
-            int128 _nIdeal = _nGLiq.unsafe_mul(_weights[i]);
+            int128 _nIdeal = _nGLiq.us_mul(_weights[i]);
 
             if (_nBals[i] > _nIdeal) {
 
                 int128 _upperAlpha = ONE + _alpha;
 
-                int128 _nHalt = _nIdeal.unsafe_mul(_upperAlpha);
+                int128 _nHalt = _nIdeal.us_mul(_upperAlpha);
 
                 if (_nBals[i] > _nHalt){
 
-                    int128 _oHalt = _oGLiq.unsafe_mul(_weights[i]).unsafe_mul(_upperAlpha);
+                    int128 _oHalt = _oGLiq.us_mul(_weights[i]).us_mul(_upperAlpha);
 
                     if (_oBals[i] < _oHalt) revert("Shell/upper-halt");
                     if (_nBals[i] - _nHalt > _oBals[i] - _oHalt) revert("Shell/upper-halt");
@@ -243,11 +224,11 @@ library Shells {
 
                 int128 _lowerAlpha = ONE - _alpha;
 
-                int128 _nHalt = _nIdeal.unsafe_mul(_lowerAlpha);
+                int128 _nHalt = _nIdeal.us_mul(_lowerAlpha);
 
                 if (_nBals[i] < _nHalt){
 
-                    int128 _oHalt = _oGLiq.unsafe_mul(_weights[i]).unsafe_mul(_lowerAlpha);
+                    int128 _oHalt = _oGLiq.us_mul(_weights[i]).us_mul(_lowerAlpha);
 
                     if (_oBals[i] > _oHalt) revert("Shell/lower-halt");
                     if (_nHalt - _nBals[i] > _oHalt - _oBals[i]) revert("Shel/lower-halt");
@@ -260,9 +241,9 @@ library Shells {
 
     function burn (Shell storage shell, address account, uint256 amount) internal {
 
-        shell.balances[account] = shell.balances[account].sub(amount, "Shell/insufficient-shell-balance");
+        shell.balances[account] = s_sub(shell.balances[account], amount);
 
-        shell.totalSupply = shell.totalSupply.sub(amount, "Shell/insufficient-total-supply");
+        shell.totalSupply = s_sub(shell.totalSupply, amount);
 
         emit Transfer(msg.sender, address(0), amount);
 
@@ -270,12 +251,19 @@ library Shells {
 
     function mint (Shell storage shell, address account, uint256 amount) internal {
 
-        shell.totalSupply = shell.totalSupply.add(amount);
+        shell.totalSupply = s_add(shell.totalSupply, amount);
 
-        shell.balances[account] = shell.balances[account].add(amount);
+        shell.balances[account] = s_add(shell.balances[account], amount);
 
         emit Transfer(address(0), msg.sender, amount);
 
     }
 
+    function s_add(uint x, uint y) internal pure returns (uint z) {
+        require((z = x + y) >= x, "Shell/mint-overflow");
+    }
+
+    function s_sub(uint x, uint y) internal pure returns (uint z) {
+        require((z = x - y) <= x, "Shell/burn-underflow");
+    }
 }

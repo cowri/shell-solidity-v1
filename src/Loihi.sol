@@ -19,9 +19,11 @@ import "./Assimilators.sol";
 
 import "./Controller.sol";
 
-import "./ShellsExternal.sol";
+import "./ShellsERC20.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
+import "./UnsafeMath64x64.sol";
 
 contract ERC20Approve {
     function approve (address spender, uint256 amount) public returns (bool);
@@ -30,11 +32,12 @@ contract ERC20Approve {
 contract Loihi is LoihiRoot {
 
     using ABDKMath64x64 for int128;
+    using UnsafeMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
     using Assimilators for address;
     using Shells for Shells.Shell;
-    using ShellsExternal for Shells.Shell;
+    using ShellsERC20 for Shells.Shell;
     using Controller for Shells.Shell;
 
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
@@ -194,7 +197,7 @@ contract Loihi is LoihiRoot {
 
         ( _amt, shell.omega ) = shell.calculateTrade(_oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
-        _amt = _amt.unsafe_mul(ONE - shell.epsilon);
+        _amt = _amt.us_mul(ONE - shell.epsilon);
 
         require((tAmt_ = _t.addr.outputNumeraire(_rcpnt, _amt)) > _mTAmt, "Shell/below-min-target-amount");
 
@@ -205,8 +208,8 @@ contract Loihi is LoihiRoot {
     function prime () public {
 
         int128 _oGLiq;
-        int128[] memory _oBals;
         uint256 _length = shell.reserves.length;
+        int128[] memory _oBals = new int128[](_length);
 
         for (uint i = 0; i < _length; i++) {
             int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
@@ -239,7 +242,7 @@ contract Loihi is LoihiRoot {
 
         ( _amt, ) = shell.calculateTrade(_oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
-        _amt = _amt.unsafe_mul(ONE - shell.epsilon);
+        _amt = _amt.us_mul(ONE - shell.epsilon);
 
         tAmt_ = _t.addr.viewRawAmount(_amt);
 
@@ -285,7 +288,7 @@ contract Loihi is LoihiRoot {
 
         ( _amt, shell.omega ) = shell.calculateTrade(_oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
 
-        _amt = _amt.unsafe_mul(ONE + shell.epsilon);
+        _amt = _amt.us_mul(ONE + shell.epsilon);
 
         require((oAmt_ = _o.addr.intakeNumeraire(_amt)) < _mOAmt, "above-maximum-origin-amount");
 
@@ -314,7 +317,7 @@ contract Loihi is LoihiRoot {
 
         ( _amt, ) = shell.calculateTrade(_oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
 
-        _amt = _amt.unsafe_mul(ONE + shell.epsilon);
+        _amt = _amt.us_mul(ONE + shell.epsilon);
 
         oAmt_ = _o.addr.viewRawAmount(_amt);
 
@@ -534,7 +537,7 @@ contract Loihi is LoihiRoot {
         int128 _shells;
         ( _shells, shell.omega ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _oBals, _nBals);
 
-        _shells = _shells.abs().unsafe_mul(ONE + shell.epsilon);
+        _shells = _shells.abs().us_mul(ONE + shell.epsilon);
 
         shells_ = _shells.mulu(1e18);
 
@@ -558,7 +561,7 @@ contract Loihi is LoihiRoot {
 
         ( int128 _shells, ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _oBals, _nBals);
 
-        _shells = _shells.abs().unsafe_mul(ONE + shell.epsilon);
+        _shells = _shells.abs().us_mul(ONE + shell.epsilon);
 
         shells_ = _shells.mulu(1e18);
 
@@ -594,27 +597,27 @@ contract Loihi is LoihiRoot {
     }
 
     function transfer (address _recipient, uint256 _amount) public nonReentrant returns (bool) {
-        // return shell.transfer(_recipient, _amount);
+        return shell.transfer(_recipient, _amount);
     }
 
     function transferFrom (address _sender, address _recipient, uint256 _amount) public nonReentrant returns (bool) {
-        // return shell.transferFrom(_sender, _recipient, _amount);
+        return shell.transferFrom(_sender, _recipient, _amount);
     }
 
     function approve (address _spender, uint256 _amount) public nonReentrant returns (bool success_) {
-        // return shell.approve(_spender, _amount);
+        return shell.approve(_spender, _amount);
     }
 
     function increaseAllowance(address _spender, uint256 _addedValue) public returns (bool success_) {
-        // return shell.increaseAllowance(_spender, _addedValue);
+        return shell.increaseAllowance(_spender, _addedValue);
     }
 
     function decreaseAllowance(address _spender, uint256 _subtractedValue) public returns (bool success_) {
-        // return shell.decreaseAllowance(_spender, _subtractedValue);
+        return shell.decreaseAllowance(_spender, _subtractedValue);
     }
 
     function balanceOf (address _account) public view returns (uint256) {
-        // return shell.balances[_account];
+        return shell.balances[_account];
     }
 
     function totalSupply () public view returns (uint256 totalSupply_) {
@@ -622,25 +625,35 @@ contract Loihi is LoihiRoot {
     }
 
     function allowance (address _owner, address _spender) public view returns (uint256) {
-        // return shell.allowances[_owner][_spender];
+        return shell.allowances[_owner][_spender];
     }
 
-    function totalReserves () public returns (uint256, uint256[] memory) {
+    function liquidity () public returns (uint256, uint256[] memory) {
 
         uint _length;
-        uint totalBalance_;
-        uint[] memory balances_ = new uint256[](_length);
+        uint totalLiquidity_;
+        uint[] memory liquidity_ = new uint256[](_length);
+
         for (uint i = 0; i < _length; i++) {
-            uint256 _bal = shell.reserves[i].addr.viewNumeraireBalance().mulu(1e18);
-            balances_[i] = _bal;
-            totalBalance_ += _bal;
+
+            uint256 _liquidity = shell.reserves[i].addr.viewNumeraireBalance().mulu(1e18);
+
+            totalLiquidity_ += _liquidity;
+            liquidity_[i] = _liquidity;
+
         }
 
-        return (totalBalance_, balances_);
+        return (totalLiquidity_, liquidity_);
 
     }
 
-    function safeApprove(address _token, address _spender, uint256 _value) public onlyOwner {
+    function TEST_setTestHalts (bool testHalts) public {
+
+        shell.testHalts = testHalts;
+
+    }
+
+    function TEST_safeApprove (address _token, address _spender, uint256 _value) public onlyOwner {
 
         (bool success, bytes memory returndata) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
 

@@ -223,7 +223,7 @@ contract SelectiveWithdrawSuiteOneViews is SelectiveWithdrawViewsTemplate, DSTes
 
     //     l.proportionalWithdraw(150e18);
 
-    //     ( uint256 totalReserves, uint256[] memory reserves ) = l.totalReserves();
+    //     ( uint256 totalReserves, uint256[] memory reserves ) = l.liquidity();
 
     //     uint256 endingShells = l.balanceOf(address(this));
 
@@ -246,7 +246,7 @@ contract SelectiveWithdrawSuiteOneViews is SelectiveWithdrawViewsTemplate, DSTes
 
     //     l.proportionalWithdraw(150*WAD);
 
-    //     ( uint256 totalReserves, uint256[] memory reserves ) = l.totalReserves();
+    //     ( uint256 totalReserves, uint256[] memory reserves ) = l.liquidity();
 
     //     uint256 endingShells = l.balanceOf(address(this));
 
