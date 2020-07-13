@@ -19,7 +19,9 @@ import "../../../interfaces/IChai.sol";
 import "../../../interfaces/IPot.sol";
 import "../../../interfaces/IERC20.sol";
 
-contract MainnetChaiToDaiAssimilator {
+import "../../../interfaces/IAssimilator.sol";
+
+contract MainnetChaiToDaiAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -74,9 +76,6 @@ contract MainnetChaiToDaiAssimilator {
 
         balance_ = _balance.divu(1e18);
 
-        // amount_ = ( ( ( ( _amount * 1e18 ) / _rate / 1e2 * 1e2 ) * _rate ) / 1e18 ).divu(1e18);
-        // balance_ = ( ( ( _balance / 1e2 * 1e2 ) * _rate ) / 1e18 ).divu(1e18);
-
     }
 
     // takes raw chai amount, transfers it in, unwraps into dai, wraps into the reserve, and finally returns the numeraire amount
@@ -87,9 +86,6 @@ contract MainnetChaiToDaiAssimilator {
         chai.draw(msg.sender, _amount);
 
         amount_ = _amount.divu(1e18);
-
-        // amount_ = ( ( ( ( _amount * 1e18 ) / _rate / 1e2 * 1e2 ) * _rate ) / 1e18 ).divu(1e18);
-        // balance_ = ( ( ( _balance / 1e2 * 1e2 ) * _rate ) / 1e18 ).divu(1e18);
 
     }
 

@@ -21,7 +21,9 @@ import "../../aaveResources/ILendingPool.sol";
 import "../../../interfaces/IAToken.sol";
 import "../../../interfaces/IERC20.sol";
 
-contract MainnetASUsdToSUsdAssimilator {
+import "../../../interfaces/IAssimilator.sol";
+
+contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

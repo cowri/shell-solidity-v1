@@ -18,11 +18,13 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 import "../../../interfaces/ICToken.sol";
 import "../../../interfaces/IERC20.sol";
 
-contract MainnetCDaiToDaiAssimilator {
+import "../../../interfaces/IAssimilator.sol";
+
+contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
-    
+
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
@@ -31,15 +33,17 @@ contract MainnetCDaiToDaiAssimilator {
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        bool success = cdai.transferFrom(msg.sender, address(this), _amount);
+        bool _transferSuccess = cdai.transferFrom(msg.sender, address(this), _amount);
 
-        if (!success) revert("CDai/transferFrom-failed");
+        require(success, "CDai/transferFrom-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
         _amount = ( _amount * _rate ) / 1e18;
 
-        cdai.redeemUnderlying(_amount);
+        uint _success = cdai.redeemUnderlying(_amount);
+
+        require(_redeemSuccess == 0, "CDai/redeem-underlying-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
 
@@ -52,15 +56,17 @@ contract MainnetCDaiToDaiAssimilator {
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        bool success = cdai.transferFrom(msg.sender, address(this), _amount);
+        bool _transferSuccess = cdai.transferFrom(msg.sender, address(this), _amount);
 
-        if (!success) revert("CDai/transferFrom-failed");
+        require(_transferSuccess, "CDai/transferFrom-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
         _amount = ( _amount * _rate ) / 1e18;
 
-        cdai.redeemUnderlying(_amount);
+        uint _redeemSuccess = cdai.redeemUnderlying(_amount);
+
+        require(_redeemSuccess == 0, "CDai/redeem-underlying-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -75,13 +81,13 @@ contract MainnetCDaiToDaiAssimilator {
 
         amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
-        bool _success = cdai.transferFrom(msg.sender, address(this), amount_);
+        bool _transferSuccess = cdai.transferFrom(msg.sender, address(this), amount_);
 
-        if (!_success) revert("CDai/transferFrom-failed");
+        require(_transferSuccess, "CDai/transferFrom-failed");
 
-        uint __success = cdai.redeem(amount_);
+        uint _redeemSuccess = cdai.redeem(amount_);
 
-        if (__success != 0) revert("CDai/redemption-failed");
+        require(_redeemSuccess == 0, "CDai/redemption-failed");
 
     }
 
@@ -92,13 +98,13 @@ contract MainnetCDaiToDaiAssimilator {
 
         uint256 _daiAmount = ( ( _amount ) * _rate ) / 1e18;
 
-        uint success = cdai.mint(_daiAmount);
+        uint _mintSuccess = cdai.mint(_daiAmount);
 
-        if (success != 0) revert("CDai/mint-failed");
+        require(_mintSuccess == 0, "CDai/mint-failed");
 
-        bool _success = cdai.transfer(_dst, _amount);
+        bool _transferSuccess = cdai.transfer(_dst, _amount);
 
-        if (!_success) revert("CDai/transfer-failed");
+        require(_transferSuccess, "CDai/transfer-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
 
@@ -115,13 +121,13 @@ contract MainnetCDaiToDaiAssimilator {
 
         uint256 _daiAmount = ( _amount * _rate ) / 1e18;
 
-        uint success = cdai.mint(_daiAmount);
+        uint _mintSuccess = cdai.mint(_daiAmount);
 
-        if (success != 0) revert("CDai/mint-failed");
+        require(_mintSuccess == 0, "CDai/mint-failed");
 
-        bool _success = cdai.transfer(_dst, _amount);
+        bool _transferSuccess = cdai.transfer(_dst, _amount);
 
-        if (!_success) revert("CDai/transfer-failed");
+        require(_transferSuccess, "CDai/transfer-failed");
 
         amount_ = _daiAmount.divu(1e18);
 
@@ -132,17 +138,17 @@ contract MainnetCDaiToDaiAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        uint success = cdai.mint(amount_);
+        uint _mintSuccess = cdai.mint(amount_);
 
-        if (success != 0 ) revert("CDai/mint-failed");
+        require(_mintSuccess == 0, "CDai/mint-failed");
 
         uint _rate = cdai.exchangeRateStored();
 
         amount_ = ( ( amount_ * 1e18 ) / _rate );
 
-        bool _success = cdai.transfer(_dst, amount_);
+        bool _transferSuccess = cdai.transfer(_dst, amount_);
 
-        if (!_success) revert("CDai/transfer-failed");
+        require(_transferSuccess, "CDai/transfer-failed");
 
     }
 
@@ -173,7 +179,7 @@ contract MainnetCDaiToDaiAssimilator {
 
         uint256 _balance = dai.balanceOf(address(this));
 
-        if (_balance == 0) return ( amount_, ABDKMath64x64.fromUInt(0));
+        if (_balance == 0) return ( amount_, ABDKMath64x64.fromUInt(0) );
 
         balance_ = _balance.divu(1e18);
 

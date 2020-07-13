@@ -19,9 +19,11 @@ import "../../../interfaces/ICToken.sol";
 
 import "../../AssimilatorMath.sol";
 
+import "../../../interfaces/IAssimilator.sol";
+
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MainnetDaiToCDaiAssimilator {
+contract MainnetDaiToCDaiAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

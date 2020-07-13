@@ -18,9 +18,10 @@ import "../../../LoihiRoot.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "../../../interfaces/ICToken.sol";
-// import "../../interfaces/IERC20.sol";
 
-contract LocalCUsdcToUsdcAssimilator is LoihiRoot {
+import "../../../interfaces/IAssimilator.sol";
+
+contract LocalCUsdcToUsdcAssimilator is IAssimilator, LoihiRoot {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

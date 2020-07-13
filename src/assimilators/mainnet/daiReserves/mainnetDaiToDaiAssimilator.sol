@@ -17,7 +17,9 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "../../../interfaces/IERC20.sol";
 
-contract MainnetDaiToDaiAssimilator {
+import "../../../interfaces/IAssimilator.sol";
+
+contract MainnetDaiToDaiAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -29,7 +31,9 @@ contract MainnetDaiToDaiAssimilator {
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        dai.transferFrom(msg.sender, address(this), _amount);
+        bool _success = dai.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/dai-transfer-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
 
@@ -42,7 +46,9 @@ contract MainnetDaiToDaiAssimilator {
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
     function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        dai.transferFrom(msg.sender, address(this), _amount);
+        bool _success = dai.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/dai-transfer-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -54,14 +60,18 @@ contract MainnetDaiToDaiAssimilator {
         // truncate stray decimals caused by conversion
         amount_ = _amount.mulu(1e18) / 1e3 * 1e3;
 
-        dai.transferFrom(msg.sender, address(this), amount_);
+        bool _success = dai.transferFrom(msg.sender, address(this), amount_);
+
+        require(_success, "Shell/dai-transfer-failed");
 
     }
 
     // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        dai.transfer(_dst, _amount);
+        bool _success = dai.transfer(_dst, _amount);
+
+        require(_success, "Shell/dai-transfer-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
 
@@ -74,7 +84,9 @@ contract MainnetDaiToDaiAssimilator {
     // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        dai.transfer(_dst, _amount);
+        bool _success = dai.transfer(_dst, _amount);
+
+        require(_success, "Shell/dai-transfer-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -85,7 +97,9 @@ contract MainnetDaiToDaiAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        dai.transfer(_dst, amount_);
+        bool _success = dai.transfer(_dst, amount_);
+
+        require(_success, "Shelll/dai-transfer-failed");
 
         return amount_;
 

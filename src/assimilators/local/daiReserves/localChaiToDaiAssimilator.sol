@@ -21,7 +21,9 @@ import "../../../interfaces/IChai.sol";
 import "../../../interfaces/ICToken.sol";
 import "../../../interfaces/IPot.sol";
 
-contract LocalChaiToDaiAssimilator is LoihiRoot {
+import "../../../interfaces/IAssimilator.sol";
+
+contract LocalChaiToDaiAssimilator is IAssimilator, LoihiRoot {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

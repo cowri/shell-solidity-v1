@@ -21,15 +21,14 @@ import "../../../interfaces/IChai.sol";
 
 import "../../../interfaces/IPot.sol";
 
-import "../../AssimilatorMath.sol";
+import "../../../interfaces/IAssimilator.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MainnetChaiToCDaiAssimilator {
+contract MainnetChaiToCDaiAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
-    using AssimilatorMath for uint;
 
     IChai constant chai = IChai(0x06AF07097C9Eeb7fD685c692751D5C66dB49c215);
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);

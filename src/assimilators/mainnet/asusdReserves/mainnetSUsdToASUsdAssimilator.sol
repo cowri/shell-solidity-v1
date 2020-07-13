@@ -21,15 +21,14 @@ import "../../aaveResources/ILendingPoolAddressesProvider.sol";
 
 import "../../../interfaces/IAToken.sol";
 
-import "../../AssimilatorMath.sol";
+import "../../../interfaces/IAssimilator.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MainnetSUsdToASUsdAssimilator {
+contract MainnetSUsdToASUsdAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
-    using AssimilatorMath for uint;
 
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 

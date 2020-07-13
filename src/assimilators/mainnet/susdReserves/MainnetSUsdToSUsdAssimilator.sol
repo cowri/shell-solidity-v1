@@ -17,7 +17,9 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "../../../interfaces/IERC20.sol";
 
-contract MainnetSUsdToSUsdAssimilator {
+import "../../../interfaces/IAssimilator.sol";
+
+contract MainnetSUsdToSUsdAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

@@ -21,9 +21,11 @@ import "../../aaveResources/ILendingPoolAddressesProvider.sol";
 
 import "../../../interfaces/IAToken.sol";
 
+import "../../../interfaces/IAssimilator.sol";
+
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract MainnetUsdtToAUsdtAssimilator {
+contract MainnetUsdtToAUsdtAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

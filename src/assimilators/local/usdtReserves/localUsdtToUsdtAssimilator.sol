@@ -17,7 +17,9 @@ import "../../../LoihiRoot.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract LocalUsdtToUsdtAssimilator is LoihiRoot {
+import "../../../interfaces/IAssimilator.sol";
+
+contract LocalUsdtToUsdtAssimilator is IAssimilator, LoihiRoot {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -27,7 +29,7 @@ contract LocalUsdtToUsdtAssimilator is LoihiRoot {
         usdt = IERC20NoBool(_usdt);
 
     }
-    
+
     // takes raw amount, transfers it in, wraps that in aUsdt, returns numeraire amount
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 

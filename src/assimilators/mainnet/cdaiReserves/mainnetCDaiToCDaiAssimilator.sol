@@ -17,13 +17,12 @@ import "../../../interfaces/ICToken.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-import "../../AssimilatorMath.sol";
+import "../../../interfaces/IAssimilator.sol";
 
-contract MainnetCDaiToCDaiAssimilator {
+contract MainnetCDaiToCDaiAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
-    using AssimilatorMath for uint;
 
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
 

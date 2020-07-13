@@ -15,9 +15,11 @@ pragma solidity ^0.5.0;
 
 import "../../../LoihiRoot.sol";
 
+import "../../../interfaces/IAssimilator.sol";
+
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract LocalSUsdToSUsdAssimilator is LoihiRoot {
+contract LocalSUsdToSUsdAssimilator is IAssimilator, LoihiRoot {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

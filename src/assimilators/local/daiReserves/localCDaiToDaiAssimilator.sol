@@ -17,9 +17,11 @@ import "../../../LoihiRoot.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
+import "../../../interfaces/IAssimilator.sol";
+
 import "../../../interfaces/ICToken.sol";
 
-contract LocalCDaiToDaiAssimilator is LoihiRoot {
+contract LocalCDaiToDaiAssimilator is IAssimilator, LoihiRoot {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
