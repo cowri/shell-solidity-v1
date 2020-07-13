@@ -181,13 +181,23 @@ contract Loihi is LoihiRoot {
 
     }
 
-    function transferByOrigin (address _origin, address _target, uint256 _dline, uint256 _mTAmt, uint256 _oAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
+    function transferByOrigin (address _origin, address _target, uint256 _dline, uint256 _minTAmt, uint256 _oAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
 
         Assimilators.Assimilator memory _o = shell.assimilators[_origin];
         Assimilators.Assimilator memory _t = shell.assimilators[_target];
 
-        // TODO: how to include min target amount
-        if (_o.ix == _t.ix) return _t.addr.outputNumeraire(_rcpnt, _o.addr.intakeRaw(_oAmt));
+        require(_o.addr != address(0), "Shell/origin-not-supported");
+        require(_t.addr != address(0), "Shell/target-not-supported");
+
+        if (_o.ix == _t.ix) {
+
+            tAmt_ = _t.addr.outputNumeraire(_rcpnt, _o.addr.intakeRaw(_oAmt));
+
+            require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
+
+            return tAmt_;
+
+        }
 
         (   int128 _amt,
             int128 _oGLiq,
@@ -231,6 +241,9 @@ contract Loihi is LoihiRoot {
 
         Assimilators.Assimilator memory _o = shell.assimilators[_origin];
         Assimilators.Assimilator memory _t = shell.assimilators[_target];
+
+        require(_o.addr != address(0), "Shell/origin-not-supported");
+        require(_t.addr != address(0), "Shell/target-not-supported");
 
         if (_o.ix == _t.ix) return _t.addr.viewRawAmount(_o.addr.viewNumeraireAmount(_oAmt));
 
@@ -277,8 +290,19 @@ contract Loihi is LoihiRoot {
         Assimilators.Assimilator memory _o = shell.assimilators[_origin];
         Assimilators.Assimilator memory _t = shell.assimilators[_target];
 
+        require(_o.addr != address(0), "Shell/origin-not-supported");
+        require(_t.addr != address(0), "Shell/target-not-supported");
+
         // TODO: how to incorporate max origin amount
-        if (_o.ix == _t.ix) return _o.addr.intakeNumeraire(_t.addr.outputRaw(_rcpnt, _tAmt));
+        if (_o.ix == _t.ix) {
+
+            oAmt_ = _o.addr.intakeNumeraire(_t.addr.outputRaw(_rcpnt, _tAmt));
+
+            require(oAmt_ > _tAmt, "Shell/above-maximum-origin-amount");
+
+            return oAmt_;
+
+        }
 
         (   int128 _amt,
             int128 _oGLiq,
@@ -290,7 +314,7 @@ contract Loihi is LoihiRoot {
 
         _amt = _amt.us_mul(ONE + shell.epsilon);
 
-        require((oAmt_ = _o.addr.intakeNumeraire(_amt)) < _mOAmt, "above-maximum-origin-amount");
+        require((oAmt_ = _o.addr.intakeNumeraire(_amt)) < _mOAmt, "Shell/above-maximum-origin-amount");
 
         emit Trade(msg.sender, _origin, _target, oAmt_, _tAmt);
 
@@ -306,6 +330,9 @@ contract Loihi is LoihiRoot {
 
         Assimilators.Assimilator memory _o = shell.assimilators[_origin];
         Assimilators.Assimilator memory _t = shell.assimilators[_target];
+
+        require(_o.addr != address(0), "Shell/origin-not-supported");
+        require(_t.addr != address(0), "Shell/target-not-supported");
 
         if (_o.ix == _t.ix) return _o.addr.viewRawAmount(_t.addr.viewNumeraireAmount(_tAmt));
 
@@ -342,6 +369,8 @@ contract Loihi is LoihiRoot {
         for (uint i = 0; i < _flvrs.length; i++) {
 
             Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
+
+            require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
             if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {
 
@@ -485,8 +514,9 @@ contract Loihi is LoihiRoot {
         int128 _shells = _deposit.divu(1e18);
 
         uint _length = shell.reserves.length;
-        int128 _oGLiq;
         int128[] memory _oBals = new int128[](_length);
+        int128 _oGLiq;
+
         for (uint i = 0; i < _length; i++) {
             int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
             _oBals[i] = _bal;
@@ -496,22 +526,18 @@ contract Loihi is LoihiRoot {
         if (_oGLiq == 0) {
 
             for (uint8 i = 0; i < _length; i++) {
-
                 shell.numeraires[i].addr.intakeNumeraire(_shells.mul(shell.weights[i]));
-
             }
 
         } else {
 
             int128 _multiplier = _shells.div(_oGLiq);
 
-            shell.omega = shell.omega.mul(ONE.add(_multiplier));
-
             for (uint8 i = 0; i < _length; i++) {
-
                 shell.numeraires[i].addr.intakeNumeraire(_oBals[i].mul(_multiplier));
-
             }
+
+            shell.omega = shell.omega.mul(ONE.add(_multiplier));
 
         }
 
@@ -535,6 +561,7 @@ contract Loihi is LoihiRoot {
             int128[] memory _nBals ) = getLiquidityData(_flvrs, _amts, false, msg.sender);
 
         int128 _shells;
+
         ( _shells, shell.omega ) = shell.calculateLiquidityMembrane(_oGLiq, _nGLiq, _oBals, _nBals);
 
         _shells = _shells.abs().us_mul(ONE + shell.epsilon);
