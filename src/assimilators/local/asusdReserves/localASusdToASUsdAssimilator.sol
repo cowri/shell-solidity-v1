@@ -17,11 +17,11 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "../../../interfaces/IAToken.sol";
 
-import "../../../LoihiRoot.sol";
+import "../../../Loihi.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
-contract LocalASUsdToASUsdAssimilator is IAssimilator, LoihiRoot {
+contract LocalASUsdToASUsdAssimilator is IAssimilator, Loihi {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -115,7 +115,7 @@ contract LocalASUsdToASUsdAssimilator is IAssimilator, LoihiRoot {
     }
 
     // views the numeraire value of the current balance of the reserve, in this case ASUsd
-    function viewNumeraireBalance () public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
         uint256 _balance = getASUsd().balanceOf(address(this));
 

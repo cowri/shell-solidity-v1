@@ -143,7 +143,7 @@ contract MainnetUsdcToCUsdcAssimilator is IAssimilator {
     }
 
     // returns numeraire amount of reserve asset, in this case cUsdc
-    function viewNumeraireBalance () public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
         uint256 _rate = cusdc.exchangeRateStored();
 

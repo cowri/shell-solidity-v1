@@ -123,7 +123,7 @@ contract MainnetAUsdtToAUsdtAssimilator is IAssimilator {
     }
 
     // views the numeraire value of the current balance of the reserve, in this case AUsdt
-    function viewNumeraireBalance () public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
         uint256 _balance = getAUsdt().balanceOf(address(this));
 

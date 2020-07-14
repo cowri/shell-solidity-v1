@@ -147,7 +147,7 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
     }
 
     // returns current balance in numeraire
-    function viewNumeraireBalance () public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 

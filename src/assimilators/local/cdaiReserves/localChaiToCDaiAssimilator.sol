@@ -13,7 +13,7 @@
 
 pragma solidity ^0.5.0;
 
-import "../../../LoihiRoot.sol";
+import "../../../Loihi.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
@@ -23,7 +23,7 @@ import "../../../interfaces/IPot.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
-contract LocalChaiToCDaiAssimilator is IAssimilator, LoihiRoot {
+contract LocalChaiToCDaiAssimilator is IAssimilator, Loihi {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -182,7 +182,7 @@ contract LocalChaiToCDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // returns the numeraire balance for this numeraire's reserve, in this case cDai
-    function viewNumeraireBalance () public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 

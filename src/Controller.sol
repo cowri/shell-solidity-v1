@@ -14,7 +14,11 @@
 pragma solidity >0.4.13;
 
 import "./Assimilators.sol";
-import "./Shells.sol";
+
+import "./ShellMath.sol";
+
+import "./Loihi.sol";
+
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 library Controller {
@@ -26,29 +30,27 @@ library Controller {
 
     using Assimilators for address;
 
-    using Shells for Shells.Shell;
-
     event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
 
-    event log(bytes32);
-    event log_int(bytes32, int128);
-    event log_int(bytes32, int);
-    event log_uint(bytes32, uint);
-    event log_addr(bytes32, address);
-
-    function setParams (Shells.Shell storage shell, uint256 _alpha, uint256 _beta, uint256 _max, uint256 _epsilon, uint256 _lambda) internal returns (uint256 max_) {
+    function setParams (
+        Loihi.Shell storage shell,
+        Loihi.Assimilator[] storage reserves,
+        uint256 _alpha,
+        uint256 _beta,
+        uint256 _max,
+        uint256 _epsilon,
+        uint256 _lambda
+    ) internal returns (uint256 max_) {
 
         require(_max <= .5e18, "Shell/parameter-invalid-max");
 
         int128 _gLiq;
-        int128[] memory _bals = new int128[](shell.reserves.length);
+        int128[] memory _bals = new int128[](reserves.length);
         for (uint i = 0; i < _bals.length; i++) {
-            int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
+            int128 _bal = reserves[i].addr.viewNumeraireBalance();
             _gLiq += _bal;
             _bals[i] = _bal;
         }
-
-        int128 _omega = Shells.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
 
         shell.alpha = _alpha.divu(1e18);
         shell.beta = _beta.divu(1e18);
@@ -62,9 +64,9 @@ library Controller {
         require(shell.epsilon >= 0 && _epsilon < 1e16, "Shell/parameter-invalid-epsilon");
         require(shell.lambda >= 0 && shell.lambda <= ONE, "Shell/parameter-invalid-lambda");
 
-        int128 _psi = Shells.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
+        int128 _psi = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
 
-        require(_omega >= _psi, "Shell/paramter-invalid-psi");
+        require(shell.omega >= _psi, "Shell/paramter-invalid-psi");
 
         shell.omega = _psi;
 
@@ -74,34 +76,48 @@ library Controller {
 
     }
 
-    function includeAsset (Shells.Shell storage shell, address _numeraire, address _numeraireAssim, address _reserve, address _reserveAssim, uint256 _weight) internal {
+    function includeAsset (
+        Loihi.Shell storage shell,
+        mapping (address => Loihi.Assimilator) storage assimilators,
+        Loihi.Assimilator[] storage numeraires,
+        Loihi.Assimilator[] storage reserves,
+        address _numeraire,
+        address _numeraireAssim,
+        address _reserve,
+        address _reserveAssim,
+        uint256 _weight
+    ) internal {
 
-        Assimilators.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
+        Loihi.Assimilator storage _numeraireAssimilator = assimilators[_numeraire];
 
         _numeraireAssimilator.addr = _numeraireAssim;
 
-        _numeraireAssimilator.ix = uint8(shell.numeraires.length);
+        _numeraireAssimilator.ix = uint8(numeraires.length);
 
-        shell.numeraires.push(_numeraireAssimilator);
+        numeraires.push(_numeraireAssimilator);
 
-        Assimilators.Assimilator storage _reserveAssimilator = shell.assimilators[_reserve];
+        Loihi.Assimilator storage _reserveAssimilator = assimilators[_reserve];
 
         _reserveAssimilator.addr = _reserveAssim;
 
-        _reserveAssimilator.ix = uint8(shell.reserves.length);
+        _reserveAssimilator.ix = uint8(reserves.length);
 
-        shell.reserves.push(_reserveAssimilator);
+        reserves.push(_reserveAssimilator);
 
         shell.weights.push(_weight.divu(1e18).add(uint256(1).divu(1e18)));
 
     }
 
-    function includeAssimilator (Shells.Shell storage shell, address _numeraire, address _derivative, address _assimilator) internal {
+    function includeAssimilator (
+        mapping (address => Loihi.Assimilator) storage assimilators,
+        address _numeraire,
+        address _derivative,
+        address _assimilator
+    ) internal {
 
-        Assimilators.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
+        Loihi.Assimilator storage _numeraireAssim = assimilators[_numeraire];
 
-        shell.assimilators[_derivative] = Assimilators.Assimilator(_assimilator, _numeraireAssim.ix);
-        // shell.assimilators[_derivative] = Assimilators.Assimilator(_assimilator, _numeraireAssim.ix, 0, 0);
+        assimilators[_derivative] = Loihi.Assimilator(_assimilator, _numeraireAssim.ix);
 
     }
 

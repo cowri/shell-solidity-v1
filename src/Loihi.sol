@@ -19,75 +19,154 @@ import "./Assimilators.sol";
 
 import "./Controller.sol";
 
-import "./ShellsERC20.sol";
+import "./ShellMath.sol";
+
+import "./Shells.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "./UnsafeMath64x64.sol";
 
-contract ERC20Approve {
-    function approve (address spender, uint256 amount) public returns (bool);
-}
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20NoBool.sol";
+import "./interfaces/ICToken.sol";
+import "./interfaces/IAToken.sol";
+import "./interfaces/IChai.sol";
+import "./interfaces/IPot.sol";
 
-contract Loihi is LoihiRoot {
+contract Loihi {
+
+    int128 constant ONE = 0x10000000000000000;
+
+    string  public constant name = "Shells";
+    string  public constant symbol = "SHL";
+    uint8   public constant decimals = 18;
 
     using ABDKMath64x64 for int128;
     using UnsafeMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
     using Assimilators for address;
-    using Shells for Shells.Shell;
-    using ShellsERC20 for Shells.Shell;
-    using Controller for Shells.Shell;
+    using ShellMath for Shell;
+    using Shells for Shell;
+    using Controller for Shell;
+
+    struct Shell {
+        int128 alpha;
+        int128 beta;
+        int128 delta;
+        int128 epsilon;
+        int128 lambda;
+        int128 omega;
+        int128[] weights;
+        uint256 totalSupply;
+        mapping (address => uint256) balances;
+        mapping (address => mapping (address => uint256)) allowances;
+        bool testHalts;
+    }
+
+    struct Assimilator {
+        address addr;
+        uint8 ix;
+    }
+
+    Shell public shell;
+
+    Assimilator[] public reserves;
+    Assimilator[] public numeraires;
+    mapping (address => Assimilator) internal assimilators;
+
+    address public owner;
+    bool internal notEntered = true;
+    bool public frozen = false;
+    uint public maxFee;
 
     event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
     event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);
     event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event SetFrozen(bool isFrozen);
 
-    // constructor () public {
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Shell/caller-is-not-owner");
+        _;
+    }
+
+    modifier nonReentrant() {
+        require(notEntered, "Shell/re-entered");
+        notEntered = false;
+        _;
+        notEntered = true;
+    }
+
+    modifier notFrozen () {
+        require(!frozen, "Shell/frozen-only-allowing-proportional-withdraw");
+        _;
+    }
+
+
     constructor () public {
 
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
-
         shell.testHalts = true;
 
     }
 
     function setParams (uint256 _alpha, uint256 _beta, uint256 _epsilon, uint256 _max, uint256 _lambda) public onlyOwner {
-        maxFee = shell.setParams(_alpha, _beta, _epsilon, _max, _lambda);
+        maxFee = Controller.setParams(shell, reserves, _alpha, _beta, _epsilon, _max, _lambda);
     }
 
     function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint256 _weight) public onlyOwner {
-        shell.includeAsset(_numeraire, _nAssim, _reserve, _rAssim, _weight);
+        Controller.includeAsset(shell, assimilators, numeraires, reserves, _numeraire, _nAssim, _reserve, _rAssim, _weight);
     }
 
     function includeAssimilator (address _numeraire, address _derivative, address _assimilator) public onlyOwner {
-        shell.includeAssimilator(_numeraire, _derivative, _assimilator);
+        Controller.includeAssimilator(assimilators, _numeraire, _derivative, _assimilator);
     }
 
     function excludeAdapter (address _assimilator) external onlyOwner {
-        delete shell.assimilators[_assimilator];
+        delete assimilators[_assimilator];
     }
 
-    function supportsInterface (bytes4 interfaceID) public returns (bool) {
-        return interfaceID == ERC20ID || interfaceID == ERC165ID;
+    function freeze (bool _toFreezeOrNotToFreeze) public onlyOwner {
+
+        emit SetFrozen(_toFreezeOrNotToFreeze);
+        frozen = _toFreezeOrNotToFreeze;
+
     }
 
-    function freeze (bool _isFrozen) public onlyOwner {
-        frozen = _isFrozen;
-        emit SetFrozen(_isFrozen);
+    // function transferOwnership (address _newOwner) public onlyOwner {
+    //     emit OwnershipTransferred(owner, _newOwner);
+    //     owner = _newOwner;
+    // }
+
+    function prime () public {
+
+        uint _length = reserves.length;
+        int128 _oGLiq;
+        int128[] memory _oBals = new int128[](_length);
+
+        for (uint i = 0; i < _length; i++) {
+            int128 _bal = reserves[i].addr.viewNumeraireBalance();
+            _oGLiq += _bal;
+            _oBals[i] = _bal;
+        }
+
+        shell.omega = ShellMath.calculateFee(_oGLiq, _oBals, shell.beta, shell.delta, shell.weights);
+
     }
 
-    function transferOwnership (address _newOwner) public onlyOwner {
-        emit OwnershipTransferred(owner, _newOwner);
-        owner = _newOwner;
-    }
+    function getOriginAndTarget (address _o, address _t) internal returns (Assimilator memory, Assimilator memory) {
 
-    function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) public notFrozen returns (uint256 tAmt_) {
+        Assimilator memory o_ = assimilators[_o];
+        Assimilator memory t_ = assimilators[_t];
 
-        return transferByOrigin(_o, _t, _dline, _mTAmt, _oAmt, msg.sender);
+        require(o_.addr != address(0), "Shell/origin-not-supported");
+        require(t_.addr != address(0), "Shell/target-not-supported");
+
+        return ( o_, t_ );
 
     }
 
@@ -106,14 +185,14 @@ contract Loihi is LoihiRoot {
         int128[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = reserves.length;
 
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
 
         for (uint i = 0; i < _length; i++) {
 
-            if (i != _lIx) nBals_[i] = oBals_[i] = shell.reserves[i].addr.viewNumeraireBalance();
+            if (i != _lIx) nBals_[i] = oBals_[i] = reserves[i].addr.viewNumeraireBalance();
             else {
 
                 int128 _bal;
@@ -151,13 +230,13 @@ contract Loihi is LoihiRoot {
         int128[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = reserves.length;
         int128[] memory nBals_ = new int128[](_length);
         int128[] memory oBals_ = new int128[](_length);
 
         for (uint i = 0; i < _length; i++) {
 
-            if (i != _lIx) nBals_[i] = oBals_[i] = shell.reserves[i].addr.viewNumeraireBalance();
+            if (i != _lIx) nBals_[i] = oBals_[i] = reserves[i].addr.viewNumeraireBalance();
             else {
 
                 int128 _bal;
@@ -181,13 +260,16 @@ contract Loihi is LoihiRoot {
 
     }
 
+    function swapByOrigin (address _o, address _t, uint256 _oAmt, uint256 _mTAmt, uint256 _dline) public notFrozen returns (uint256 tAmt_) {
+
+        return transferByOrigin(_o, _t, _dline, _mTAmt, _oAmt, msg.sender);
+
+    }
+
     function transferByOrigin (address _origin, address _target, uint256 _dline, uint256 _minTAmt, uint256 _oAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 tAmt_) {
 
-        Assimilators.Assimilator memory _o = shell.assimilators[_origin];
-        Assimilators.Assimilator memory _t = shell.assimilators[_target];
-
-        require(_o.addr != address(0), "Shell/origin-not-supported");
-        require(_t.addr != address(0), "Shell/target-not-supported");
+        (   Assimilator memory _o,
+            Assimilator memory _t  ) = getOriginAndTarget(_origin, _target);
 
         if (_o.ix == _t.ix) {
 
@@ -215,21 +297,6 @@ contract Loihi is LoihiRoot {
 
     }
 
-    function prime () public {
-
-        int128 _oGLiq;
-        uint256 _length = shell.reserves.length;
-        int128[] memory _oBals = new int128[](_length);
-
-        for (uint i = 0; i < _length; i++) {
-            int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
-            _oGLiq += _bal;
-            _oBals[i] = _bal;
-        }
-
-        shell.omega = Shells.calculateFee(_oGLiq, _oBals, shell.beta, shell.delta, shell.weights);
-
-    }
 
     /// @author james foley http://github.com/realisation
     /// @notice view how much of the target currency the origin currency will provide
@@ -239,11 +306,8 @@ contract Loihi is LoihiRoot {
     /// @return tAmt_ the amount of target that has been swapped for the origin
     function viewOriginTrade (address _origin, address _target, uint256 _oAmt) public notFrozen returns (uint256 tAmt_) {
 
-        Assimilators.Assimilator memory _o = shell.assimilators[_origin];
-        Assimilators.Assimilator memory _t = shell.assimilators[_target];
-
-        require(_o.addr != address(0), "Shell/origin-not-supported");
-        require(_t.addr != address(0), "Shell/target-not-supported");
+        (   Assimilator memory _o,
+            Assimilator memory _t  ) = getOriginAndTarget(_origin, _target);
 
         if (_o.ix == _t.ix) return _t.addr.viewRawAmount(_o.addr.viewNumeraireAmount(_oAmt));
 
@@ -286,14 +350,9 @@ contract Loihi is LoihiRoot {
     /// @return oAmt_ the amount of origin that has been swapped for the target
     function transferByTarget (address _origin, address _target, uint256 _mOAmt, uint256 _dline, uint256 _tAmt, address _rcpnt) public notFrozen nonReentrant returns (uint256 oAmt_) {
 
-        uint _length = shell.reserves.length;
-        Assimilators.Assimilator memory _o = shell.assimilators[_origin];
-        Assimilators.Assimilator memory _t = shell.assimilators[_target];
+        (   Assimilator memory _o,
+            Assimilator memory _t  ) = getOriginAndTarget(_origin, _target);
 
-        require(_o.addr != address(0), "Shell/origin-not-supported");
-        require(_t.addr != address(0), "Shell/target-not-supported");
-
-        // TODO: how to incorporate max origin amount
         if (_o.ix == _t.ix) {
 
             oAmt_ = _o.addr.intakeNumeraire(_t.addr.outputRaw(_rcpnt, _tAmt));
@@ -328,11 +387,8 @@ contract Loihi is LoihiRoot {
     /// @return oAmt_ the amount of target that has been swapped for the origin
     function viewTargetTrade (address _origin, address _target, uint256 _tAmt) public notFrozen returns (uint256 oAmt_) {
 
-        Assimilators.Assimilator memory _o = shell.assimilators[_origin];
-        Assimilators.Assimilator memory _t = shell.assimilators[_target];
-
-        require(_o.addr != address(0), "Shell/origin-not-supported");
-        require(_t.addr != address(0), "Shell/target-not-supported");
+        (   Assimilator memory _o,
+            Assimilator memory _t  ) = getOriginAndTarget(_origin, _target);
 
         if (_o.ix == _t.ix) return _o.addr.viewRawAmount(_t.addr.viewNumeraireAmount(_tAmt));
 
@@ -362,13 +418,13 @@ contract Loihi is LoihiRoot {
         int128[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = reserves.length;
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
 
         for (uint i = 0; i < _flvrs.length; i++) {
 
-            Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
+            Assimilator memory _assim = assimilators[_flvrs[i]];
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
@@ -397,7 +453,7 @@ contract Loihi is LoihiRoot {
 
         for (uint i = 0; i < _length; i++) {
 
-            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = shell.reserves[i].addr.viewNumeraireBalance();
+            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = reserves[i].addr.viewNumeraireBalance();
 
             oGLiq_ += oBals_[i];
             nGLiq_ += nBals_[i];
@@ -415,13 +471,15 @@ contract Loihi is LoihiRoot {
         int128[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = reserves.length;
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
 
         for (uint i = 0; i < _flvrs.length; i++) {
 
-            Assimilators.Assimilator memory _assim = shell.assimilators[_flvrs[i]];
+            Assimilator memory _assim = assimilators[_flvrs[i]];
+
+            require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
             if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {
 
@@ -444,7 +502,7 @@ contract Loihi is LoihiRoot {
 
         for (uint i = 0; i < _length; i++) {
 
-            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = shell.reserves[i].addr.viewNumeraireBalance();
+            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = reserves[i].addr.viewNumeraireBalance();
 
             oGLiq_ += oBals_[i];
             nGLiq_ += nBals_[i];
@@ -477,7 +535,7 @@ contract Loihi is LoihiRoot {
 
         require(_minShells < shells_, "Shell/under-minimum-shells");
 
-        shell.mint(msg.sender, shells_);
+        mint(msg.sender, shells_);
 
     }
 
@@ -499,12 +557,6 @@ contract Loihi is LoihiRoot {
 
     }
 
-    event log_int(bytes32, int);
-    event log_ints(bytes32, int128[]);
-    event log_uint(bytes32, uint);
-    event log_uints(bytes32, uint[]);
-    event log_addrs(bytes32, address[]);
-
     /// @author james foley http://github.com/realisation
     /// @notice deposit into the pool with no slippage from the numeraire assets the pool supports
     /// @param  _deposit the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
@@ -513,12 +565,12 @@ contract Loihi is LoihiRoot {
 
         int128 _shells = _deposit.divu(1e18);
 
-        uint _length = shell.reserves.length;
+        uint _length = reserves.length;
         int128[] memory _oBals = new int128[](_length);
         int128 _oGLiq;
 
         for (uint i = 0; i < _length; i++) {
-            int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
+            int128 _bal = reserves[i].addr.viewNumeraireBalance();
             _oBals[i] = _bal;
             _oGLiq += _bal;
         }
@@ -526,7 +578,7 @@ contract Loihi is LoihiRoot {
         if (_oGLiq == 0) {
 
             for (uint8 i = 0; i < _length; i++) {
-                shell.numeraires[i].addr.intakeNumeraire(_shells.mul(shell.weights[i]));
+                numeraires[i].addr.intakeNumeraire(_shells.mul(shell.weights[i]));
             }
 
         } else {
@@ -534,7 +586,7 @@ contract Loihi is LoihiRoot {
             int128 _multiplier = _shells.div(_oGLiq);
 
             for (uint8 i = 0; i < _length; i++) {
-                shell.numeraires[i].addr.intakeNumeraire(_oBals[i].mul(_multiplier));
+                numeraires[i].addr.intakeNumeraire(_oBals[i].mul(_multiplier));
             }
 
             shell.omega = shell.omega.mul(ONE.add(_multiplier));
@@ -543,7 +595,7 @@ contract Loihi is LoihiRoot {
 
         if (shell.totalSupply > 0) _shells = _shells.div(_oGLiq).mul(shell.totalSupply.divu(1e18));
 
-        shell.mint(msg.sender, shells_ = _shells.mulu(1e18));
+        mint(msg.sender, shells_ = _shells.mulu(1e18));
 
     }
 
@@ -570,7 +622,7 @@ contract Loihi is LoihiRoot {
 
         require(shells_ < _maxShells, "Shell/above-maximum-shells");
 
-        shell.burn(msg.sender, shells_);
+        burn(msg.sender, shells_);
 
     }
 
@@ -599,10 +651,12 @@ contract Loihi is LoihiRoot {
     /// @param   _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     function proportionalWithdraw (uint256 _withdrawal) public nonReentrant {
 
-        uint _length = shell.reserves.length;
+        uint _length = reserves.length;
+
         int128 _oGLiq; int128[] memory _oBals;
+
         for (uint i = 0; i < _length; i++) {
-            int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
+            int128 _bal = reserves[i].addr.viewNumeraireBalance();
             _oGLiq += _bal;
             _oBals[i] = _bal;
         }
@@ -611,36 +665,62 @@ contract Loihi is LoihiRoot {
             .mul(ONE.sub(shell.epsilon))
             .div(shell.totalSupply.divu(1e18));
 
-        for (uint8 i = 0; i < shell.reserves.length; i++) {
-
-            shell.reserves[i].addr.outputNumeraire(msg.sender, _oBals[i].mul(_multiplier));
-
+        for (uint8 i = 0; i < _length; i++) {
+            reserves[i].addr.outputNumeraire(msg.sender, _oBals[i].mul(_multiplier));
         }
 
         shell.omega = shell.omega.mul(ONE.sub(_multiplier));
 
-        shell.burn(msg.sender, _withdrawal);
+        burn(msg.sender, _withdrawal);
 
+    }
+
+    function burn (address account, uint256 amount) internal {
+
+        shell.balances[account] = burn_sub(shell.balances[account], amount);
+
+        shell.totalSupply = burn_sub(shell.totalSupply, amount);
+
+        emit Transfer(msg.sender, address(0), amount);
+
+    }
+
+    function mint (address account, uint256 amount) internal {
+
+        shell.totalSupply = mint_add(shell.totalSupply, amount);
+
+        shell.balances[account] = mint_add(shell.balances[account], amount);
+
+        emit Transfer(address(0), msg.sender, amount);
+
+    }
+
+    function mint_add(uint x, uint y) internal pure returns (uint z) {
+        require((z = x + y) >= x, "Shell/mint-overflow");
+    }
+
+    function burn_sub(uint x, uint y) internal pure returns (uint z) {
+        require((z = x - y) <= x, "Shell/burn-underflow");
     }
 
     function transfer (address _recipient, uint256 _amount) public nonReentrant returns (bool) {
-        return shell.transfer(_recipient, _amount);
+        // return shell.transfer(_recipient, _amount);
     }
 
     function transferFrom (address _sender, address _recipient, uint256 _amount) public nonReentrant returns (bool) {
-        return shell.transferFrom(_sender, _recipient, _amount);
+        // return shell.transferFrom(_sender, _recipient, _amount);
     }
 
     function approve (address _spender, uint256 _amount) public nonReentrant returns (bool success_) {
-        return shell.approve(_spender, _amount);
+        // return shell.approve(_spender, _amount);
     }
 
     function increaseAllowance(address _spender, uint256 _addedValue) public returns (bool success_) {
-        return shell.increaseAllowance(_spender, _addedValue);
+        // return shell.increaseAllowance(_spender, _addedValue);
     }
 
     function decreaseAllowance(address _spender, uint256 _subtractedValue) public returns (bool success_) {
-        return shell.decreaseAllowance(_spender, _subtractedValue);
+        // return shell.decreaseAllowance(_spender, _subtractedValue);
     }
 
     function balanceOf (address _account) public view returns (uint256) {
@@ -663,7 +743,7 @@ contract Loihi is LoihiRoot {
 
         for (uint i = 0; i < _length; i++) {
 
-            uint256 _liquidity = shell.reserves[i].addr.viewNumeraireBalance().mulu(1e18);
+            uint256 _liquidity = reserves[i].addr.viewNumeraireBalance().mulu(1e18);
 
             totalLiquidity_ += _liquidity;
             liquidity_[i] = _liquidity;
@@ -674,9 +754,9 @@ contract Loihi is LoihiRoot {
 
     }
 
-    function TEST_setTestHalts (bool testHalts) public {
+    function TEST_setTestHalts (bool toTestOrNotToTest) public {
 
-        shell.testHalts = testHalts;
+        shell.testHalts = toTestOrNotToTest;
 
     }
 
@@ -686,6 +766,18 @@ contract Loihi is LoihiRoot {
 
         require(success, "SafeERC20: low-level call failed");
 
+    }
+    
+    IERC20 dai; ICToken cdai; IChai chai; IPot pot;
+    IERC20 usdc; ICToken cusdc;
+    IERC20NoBool usdt; IAToken ausdt;
+    IERC20 susd; IAToken asusd;
+
+    function includeTestAssimilatorState(IERC20 _dai, ICToken _cdai, IChai _chai, IPot _pot, IERC20 _usdc, ICToken _cusdc, IERC20NoBool _usdt, IAToken _ausdt, IERC20 _susd, IAToken _asusd) public {
+        dai = _dai; cdai = _cdai; chai = _chai; pot = _pot;
+        usdc = _usdc; cusdc = _cusdc;
+        usdt = _usdt; ausdt = _ausdt;
+        susd = _susd; asusd = _asusd;
     }
 
 }

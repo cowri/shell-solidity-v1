@@ -140,7 +140,7 @@ contract MainnetSUsdToASUsdAssimilator is IAssimilator {
     }
 
     // returns numeraire value of reserve asset, in this case ASUsd
-    function viewNumeraireBalance () public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
         uint256 _balance = getASUsd().balanceOf(address(this));
 

@@ -13,13 +13,13 @@
 
 pragma solidity ^0.5.0;
 
-import "../../../LoihiRoot.sol";
+import "../../../Loihi.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract LocalSUsdToSUsdAssimilator is IAssimilator, LoihiRoot {
+contract LocalSUsdToSUsdAssimilator is IAssimilator, Loihi {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -103,7 +103,7 @@ contract LocalSUsdToSUsdAssimilator is IAssimilator, LoihiRoot {
     }
 
     // returns numeraire value of reserve asset, in this case ASUsd
-    function viewNumeraireBalance () public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
         uint256 _balance = susd.balanceOf(address(this));
 

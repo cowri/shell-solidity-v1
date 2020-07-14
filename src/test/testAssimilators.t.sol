@@ -18,7 +18,7 @@ import "../interfaces/IAssimilator.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract AssimilatorBouncer is LoihiRoot {
+contract AssimilatorBouncer is Loihi {
 
     using ABDKMath64x64 for uint256;
     using ABDKMath64x64 for int128;
@@ -37,7 +37,7 @@ contract AssimilatorBouncer is LoihiRoot {
 
     function depositRaw (address _assim, uint256 _amt) public returns (int256 amt_, int256 bal_) {
 
-        ( int128 _amt64x64, int128 _bal64x64 ) = _assim.intakeRaw(_amt);
+        ( int128 _amt64x64, int128 _bal64x64 ) = AssimilatorMethods.intakeRaw(_assim, _amt);
 
         amt_ = _amt64x64.muli(1e18);
 
@@ -49,13 +49,13 @@ contract AssimilatorBouncer is LoihiRoot {
 
         int128 _amt64x64 = _amt.divu(1e18);
 
-        amt_ = _assim.intakeNumeraire(_amt64x64);
+        amt_ = AssimilatorMethods.intakeNumeraire(_assim, _amt64x64);
 
     }
 
     function withdrawRaw (address _assim, uint256 _amt) public returns (int256 amt_, int256 bal_) {
 
-        ( int128 _amt64x64, int128 _bal64x64 ) = _assim.outputRaw(msg.sender, _amt);
+        ( int128 _amt64x64, int128 _bal64x64 ) = AssimilatorMethods.outputRaw(_assim, msg.sender, _amt);
 
         amt_ = _amt64x64.muli(1e18);
 
@@ -67,7 +67,7 @@ contract AssimilatorBouncer is LoihiRoot {
 
         int128 _amt64x64 = _amt.divu(1e18);
 
-        amt_ = _assim.outputNumeraire(msg.sender, _amt64x64);
+        amt_ = AssimilatorMethods.outputNumeraire(_assim, msg.sender, _amt64x64);
 
     }
 

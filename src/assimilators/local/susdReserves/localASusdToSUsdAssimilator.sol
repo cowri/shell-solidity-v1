@@ -19,9 +19,9 @@ import "../../../interfaces/IAToken.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
-import "../../../LoihiRoot.sol";
+import "../../../Loihi.sol";
 
-contract LocalASUsdToSUsdAssimilator is IAssimilator, LoihiRoot {
+contract LocalASUsdToSUsdAssimilator is IAssimilator, Loihi {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -129,7 +129,7 @@ contract LocalASUsdToSUsdAssimilator is IAssimilator, LoihiRoot {
     }
 
     // views the numeraire value of the current balance of the reserve, in this case ASUsd
-    function viewNumeraireBalance () public returns (int128 amount_) {
+    function viewNumeraireBalance (address _addr) public returns (int128 amount_) {
 
         uint256 _balance = susd.balanceOf(address(this));
 
