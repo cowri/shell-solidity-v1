@@ -17,8 +17,6 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 import "../../../interfaces/ICToken.sol";
 
-import "../../AssimilatorMath.sol";
-
 import "../../../interfaces/IAssimilator.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
@@ -27,7 +25,6 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
-    using AssimilatorMath for uint256;
 
     ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
     IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
@@ -150,13 +147,27 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
     }
 
     // returns current balance in numeraire
-    function viewNumeraireBalance () public view returns (int128 balance_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
         uint256 _balance = cdai.balanceOf(address(this));
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
+
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
+
+        uint256 _balance = cdai.balanceOf(address(this));
+
+        if (_balance == 0) return ( amount_, ABDKMath64x64.fromUInt(0) );
 
         balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
 

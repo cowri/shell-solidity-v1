@@ -33,7 +33,18 @@ contract LocalCUsdcToCUsdcAssimilator is IAssimilator, LoihiRoot {
     }
 
     // takes raw cusdc amount and transfers it in
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        cusdc.transferFrom(msg.sender, address(this), _amount);
+
+        uint256 _rate = cusdc.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
+
+    }
+
+    // takes raw cusdc amount and transfers it in
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         cusdc.transferFrom(msg.sender, address(this), _amount);
 
@@ -72,7 +83,21 @@ contract LocalCUsdcToCUsdcAssimilator is IAssimilator, LoihiRoot {
 
     // takes raw amount
     // transfers that amount to destination
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        uint256 _balanceBefore = cusdc.balanceOf(address(this));
+
+        cusdc.transfer(_dst, _amount);
+
+        uint256 _rate = cusdc.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
+
+    }
+
+    // takes raw amount
+    // transfers that amount to destination
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         uint256 _balanceBefore = cusdc.balanceOf(address(this));
 
@@ -107,13 +132,28 @@ contract LocalCUsdcToCUsdcAssimilator is IAssimilator, LoihiRoot {
     }
 
     // returns numeraire balance of reserve, in this case cUsdc
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
-        uint256 _balance = cusdc.balanceOf(_addr);
+        uint256 _balance = cusdc.balanceOf(address(this));
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
+
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
+
+    }
+
+    // takes numeraire amount, returns raw amount of cUsdc
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        uint256 _rate = cusdc.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
+
+        uint256 _balance = cusdc.balanceOf(address(this));
+
+        if (_balance == 0) return (amount_, ABDKMath64x64.fromUInt(0));
 
         balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
 

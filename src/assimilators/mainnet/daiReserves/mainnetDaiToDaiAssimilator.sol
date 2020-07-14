@@ -44,7 +44,7 @@ contract MainnetDaiToDaiAssimilator is IAssimilator {
     }
 
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
         bool _success = dai.transferFrom(msg.sender, address(this), _amount);
 

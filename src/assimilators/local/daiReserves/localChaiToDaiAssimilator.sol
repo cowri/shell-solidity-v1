@@ -165,9 +165,9 @@ contract LocalChaiToDaiAssimilator is IAssimilator, LoihiRoot {
 
     }
 
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
-        uint256 _balance = dai.balanceOf(_addr);
+        uint256 _balance = dai.balanceOf(address(this));
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
@@ -178,7 +178,7 @@ contract LocalChaiToDaiAssimilator is IAssimilator, LoihiRoot {
     function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         uint256 _balance = dai.balanceOf(address(this));
-        
+
         _amount = toDai(_amount, pot.chi());
 
         amount_ = _amount.divu(1e18);

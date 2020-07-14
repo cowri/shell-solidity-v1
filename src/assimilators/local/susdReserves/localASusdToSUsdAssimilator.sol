@@ -34,7 +34,7 @@ contract LocalASUsdToSUsdAssimilator is IAssimilator, LoihiRoot {
 
     }
 
-    function getASUsd () public view returns (IAToken) {
+    function getASUsd () public returns (IAToken) {
 
         return asusd;
 
@@ -128,6 +128,15 @@ contract LocalASUsdToSUsdAssimilator is IAssimilator, LoihiRoot {
 
     }
 
+    // views the numeraire value of the current balance of the reserve, in this case ASUsd
+    function viewNumeraireBalance () public returns (int128 amount_) {
+
+        uint256 _balance = susd.balanceOf(address(this));
+
+        amount_ = _balance.divu(1e18);
+
+    }
+    
     // takes a raw amount and returns the numeraire amount
     function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
@@ -136,15 +145,6 @@ contract LocalASUsdToSUsdAssimilator is IAssimilator, LoihiRoot {
         uint256 _balance = susd.balanceOf(address(this));
 
         balance_ = _balance.divu(1e18);
-
-    }
-
-    // views the numeraire value of the current balance of the reserve, in this case ASUsd
-    function viewNumeraireBalance (address _addr) public returns (int128 amount_) {
-
-        uint256 _balance = susd.balanceOf(_addr);
-
-        amount_ = _balance.divu(1e18);
 
     }
 

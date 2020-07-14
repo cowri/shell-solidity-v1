@@ -151,6 +151,17 @@ contract LocalCDaiToDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // views the numeraire value of the current balance of the reserve, in this case CDai
+    function viewNumeraireBalance () public returns (int128 balance_) {
+
+        uint256 _balance = dai.balanceOf(address(this));
+
+        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
+
+        balance_ = _balance.divu(1e18);
+
+    }
+
+    // views the numeraire value of the current balance of the reserve, in this case CDai
     function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
@@ -160,17 +171,6 @@ contract LocalCDaiToDaiAssimilator is IAssimilator, LoihiRoot {
         uint256 _balance = dai.balanceOf(address(this));
 
         if (_balance == 0) return ( amount_, ABDKMath64x64.fromUInt(0));
-
-        balance_ = _balance.divu(1e18);
-
-    }
-
-    // views the numeraire value of the current balance of the reserve, in this case CDai
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
-
-        uint256 _balance = dai.balanceOf(_addr);
-
-        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
         balance_ = _balance.divu(1e18);
 

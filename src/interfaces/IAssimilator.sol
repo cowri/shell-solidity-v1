@@ -22,6 +22,6 @@ interface IAssimilator {
     function outputNumeraire (address dst, int128 amount) external returns (uint256);
     function viewRawAmount (int128) external returns (uint256);
     function viewNumeraireAmount (uint256) external returns (int128);
+    function viewNumeraireBalance () external returns (int128);
     function viewNumeraireAmountAndBalance (uint256) external returns (int128, int128);
-    function viewNumeraireBalance (address addr) external view returns (int128);
 }

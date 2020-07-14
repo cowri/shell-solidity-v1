@@ -31,14 +31,6 @@ library AssimilatorMethods {
 
     }
 
-    function viewNumeraireBalance (address _assim) internal returns (int128 nAmt_) {
-
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireBalance.selector, address(this));
-
-        nAmt_ = abi.decode(_assim.delegate(data), (int128));
-
-    }
-
     function intakeRaw (address _assim, uint256 _amount) internal returns (int128 amount_, int128 balance_) {
 
         bytes memory data = abi.encodeWithSelector(iAsmltr.intakeRaw.selector, _amount);

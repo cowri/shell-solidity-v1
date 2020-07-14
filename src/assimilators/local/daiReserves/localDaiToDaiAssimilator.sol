@@ -50,7 +50,7 @@ contract LocalDaiToDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
         dai.transferFrom(msg.sender, address(this), _amount);
 
@@ -63,6 +63,8 @@ contract LocalDaiToDaiAssimilator is IAssimilator, LoihiRoot {
 
         // truncate stray decimals caused by conversion
         amount_ = _amount.mulu(1e18) / 1e3 * 1e3;
+
+        emit log_uint("amount_", amount_);
 
         dai.transferFrom(msg.sender, address(this), amount_);
 
@@ -116,9 +118,9 @@ contract LocalDaiToDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // returns current balance in numeraire
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
-        uint256 _balance = dai.balanceOf(_addr);
+        uint256 _balance = dai.balanceOf(address(this));
 
         // if (_balance == 0) return ZERO;
 

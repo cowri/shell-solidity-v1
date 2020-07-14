@@ -68,7 +68,24 @@ contract LocalChaiToCDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // takes raw chai amount, transfers it in, unwraps into dai, wraps into the reserve, and finally returns the numeraire amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        _amount = toDai(_amount, pot.chi());
+
+        chai.draw(msg.sender, _amount);
+
+        cdai.mint(_amount);
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        // convert numeraire amount into cdai amount and back
+        // provides precise dai amount as was understood by compound
+        amount_ = ( ( ( ( _amount * 1e18 ) / _rate / 1e2 * 1e2 ) * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
+    // takes raw chai amount, transfers it in, unwraps into dai, wraps into the reserve, and finally returns the numeraire amount
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         _amount = toDai(_amount, pot.chi());
 
@@ -116,7 +133,19 @@ contract LocalChaiToCDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // takes raw amount of chai, calculates the numeraire amount, redeems that from cdai, wraps it in chai and sends to destination, then returns the numeraire amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        _amount = toDai(_amount, pot.chi());
+
+        cdai.redeemUnderlying(_amount);
+
+        chai.join(_dst, _amount);
+
+        amount_ = _amount.divu(1e18);
+
+    }
+    // takes raw amount of chai, calculates the numeraire amount, redeems that from cdai, wraps it in chai and sends to destination, then returns the numeraire amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         _amount = toDai(_amount, pot.chi());
 
@@ -153,17 +182,34 @@ contract LocalChaiToCDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // returns the numeraire balance for this numeraire's reserve, in this case cDai
-    function viewNumeraireBalance (address _addr) public returns (int128 amount_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _balance = cdai.balanceOf(_addr);
+        uint256 _balance = cdai.balanceOf(address(this));
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
-        amount_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
 
     }
-    
+
+    // pass it a raw amount and get the numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        _amount = toDai(_amount, pot.chi());
+
+        amount_ = _amount.divu(1e18);
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        uint256 _balance = cdai.balanceOf(address(this));
+
+        if (_balance == 0) return (amount_, ABDKMath64x64.fromUInt(0));
+
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
 
 }

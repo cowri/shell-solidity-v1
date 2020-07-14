@@ -126,25 +126,32 @@ contract MainnetUsdtToAUsdtAssimilator is IAssimilator {
     }
 
     // takes numeraire amount, returns raw amount
-    function viewRawAmount (int128 _amount) public pure returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
 
     }
 
     // takes raw amount, returns numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public pure returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         amount_ = _amount.divu(1e6);
 
     }
 
     // returns numeraire amount of reserve asset, in this case aUSDT
-    function viewNumeraireBalance () public view returns (int128 balance_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
         uint256 _balance = getAUsdt().balanceOf(address(this));
 
         balance_ = _balance.divu(1e6);
+
+    }
+    
+    // takes raw amount, returns numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        amount_ = _amount.divu(1e6);
 
     }
 

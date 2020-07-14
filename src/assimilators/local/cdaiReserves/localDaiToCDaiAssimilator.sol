@@ -38,7 +38,24 @@ contract LocalDaiToCDaiAssimilator is IAssimilator, LoihiRoot {
     event log_int(bytes32, int256);
 
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        uint256 gas = gasleft();
+
+        dai.transferFrom(msg.sender, address(this), _amount);
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        cdai.mint(_amount);
+
+        // convert numeraire amount into cdai amount and back
+        // provides precise dai amount as was understood by compound
+        amount_ = ( ( ( ( _amount * 1e18 ) / _rate / 1e2 * 1e2 ) * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
+    // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         uint256 gas = gasleft();
 
@@ -73,7 +90,18 @@ contract LocalDaiToCDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        cdai.redeemUnderlying(_amount);
+
+        dai.transfer(_dst, _amount);
+
+        amount_ = _amount.divu(1e18);
+
+    }
+
+    // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         cdai.redeemUnderlying(_amount);
 
@@ -117,15 +145,30 @@ contract LocalDaiToCDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // returns current balance in numeraire
-    function viewNumeraireBalance (address _addr) public returns (int128 amount_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _balance = cdai.balanceOf(_addr);
+        uint256 _balance = cdai.balanceOf(address(this));
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
-        amount_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
+    // takes raw amount and returns numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        amount_ = _amount.divu(1e18);
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        uint256 _balance = cdai.balanceOf(address(this));
+
+        if (_balance == 0) return (amount_, ABDKMath64x64.fromUInt(0));
+
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
 
     }
 

@@ -173,10 +173,7 @@ contract MainnetChaiToDaiAssimilator is IAssimilator {
 
         amount_ = _amount.divu(1e18);
 
-        if (_balance == 0) return ( amount_, ABDKMath64x64.fromUInt(0));
-
         balance_ = _balance.divu(1e18);
-
 
     }
 

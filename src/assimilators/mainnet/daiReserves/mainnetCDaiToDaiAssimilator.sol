@@ -35,13 +35,13 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         bool _transferSuccess = cdai.transferFrom(msg.sender, address(this), _amount);
 
-        require(success, "CDai/transferFrom-failed");
+        require(_transferSuccess, "CDai/transferFrom-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
         _amount = ( _amount * _rate ) / 1e18;
 
-        uint _success = cdai.redeemUnderlying(_amount);
+        uint _redeemSuccess = cdai.redeemUnderlying(_amount);
 
         require(_redeemSuccess == 0, "CDai/redeem-underlying-failed");
 
@@ -108,7 +108,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         uint256 _balance = dai.balanceOf(address(this));
 
-        amount_ = _daiAmount.divu(1e18);
+        amount_ = _daiAmount.divu(1e18).neg();
 
         balance_ = _balance.divu(1e18);
 
@@ -171,6 +171,17 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
     }
 
     // views the numeraire value of the current balance of the reserve, in this case CDai
+    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+
+        uint256 _balance = dai.balanceOf(_addr);
+
+        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
+
+        balance_ = _balance.divu(1e18);
+
+    }
+
+    // views the numeraire value of the current balance of the reserve, in this case CDai
     function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
@@ -178,19 +189,6 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
 
         uint256 _balance = dai.balanceOf(address(this));
-
-        if (_balance == 0) return ( amount_, ABDKMath64x64.fromUInt(0) );
-
-        balance_ = _balance.divu(1e18);
-
-    }
-
-    // views the numeraire value of the current balance of the reserve, in this case CDai
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
-
-        uint256 _balance = dai.balanceOf(_addr);
-
-        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
         balance_ = _balance.divu(1e18);
 

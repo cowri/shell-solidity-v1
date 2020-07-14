@@ -106,21 +106,21 @@ contract LocalUsdtToUsdtAssimilator is IAssimilator, LoihiRoot {
 
     }
 
+    // returns numeraire amount of reserve asset, in this case aUSDT
+    function viewNumeraireBalance () public returns (int128 balance_) {
+
+        uint256 _balance = usdt.balanceOf(address(this));
+
+        balance_ = _balance.divu(1e6);
+
+    }
+
     // takes raw amount, returns numeraire amount
     function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         uint256 _balance = usdt.balanceOf(address(this));
 
         amount_ = _amount.divu(1e6);
-
-        balance_ = _balance.divu(1e6);
-
-    }
-
-    // returns numeraire amount of reserve asset, in this case aUSDT
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
-
-        uint256 _balance = usdt.balanceOf(_addr);
 
         balance_ = _balance.divu(1e6);
 

@@ -110,8 +110,6 @@ contract MainnetUsdcToUsdcAssimilator is IAssimilator {
 
         uint256 _balance = usdc.balanceOf(_addr);
 
-        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
-
         balance_ = _balance.divu(1e6);
 
     }

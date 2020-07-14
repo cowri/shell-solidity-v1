@@ -115,7 +115,7 @@ contract MainnetCDaiToCDaiAssimilator is IAssimilator {
     }
 
     // takes a numeraire amount and returns the raw amount
-    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -124,7 +124,7 @@ contract MainnetCDaiToCDaiAssimilator is IAssimilator {
     }
 
     // takes a raw amount and returns the numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -133,13 +133,27 @@ contract MainnetCDaiToCDaiAssimilator is IAssimilator {
     }
 
     // views the numeraire value of the current balance of the reserve, in this case CDai
-    function viewNumeraireBalance () public view returns (int128 balance_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
         uint256 _balance = cdai.balanceOf(address(this));
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
+
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
+
+        uint256 _balance = cdai.balanceOf(address(this));
+
+        if (_balance == 0) return ( amount_, ABDKMath64x64.fromUInt(0) );
 
         balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
 

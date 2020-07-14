@@ -33,7 +33,7 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
     constructor () public { }
 
-    function getASUsd () public view returns (IAToken) {
+    function getASUsd () public returns (IAToken) {
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(address(susd));

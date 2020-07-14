@@ -209,7 +209,7 @@ contract Loihi is LoihiRoot {
 
         _amt = _amt.us_mul(ONE - shell.epsilon);
 
-        require((tAmt_ = _t.addr.outputNumeraire(_rcpnt, _amt)) > _mTAmt, "Shell/below-min-target-amount");
+        require((tAmt_ = _t.addr.outputNumeraire(_rcpnt, _amt)) > _minTAmt, "Shell/below-min-target-amount");
 
         emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
 

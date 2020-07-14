@@ -19,7 +19,9 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "../../../interfaces/IAToken.sol";
 
-contract LocalUsdtToAUsdtAssimilator is LoihiRoot {
+import "../../../interfaces/IAssimilator.sol";
+
+contract LocalUsdtToAUsdtAssimilator is IAssimilator, LoihiRoot {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -32,14 +34,25 @@ contract LocalUsdtToAUsdtAssimilator is LoihiRoot {
 
      }
 
-    function getAUsdt () public view returns (IAToken) {
+    function getAUsdt () public returns (IAToken) {
 
         return ausdt;
 
     }
 
     // takes raw amount, transfers it in, wraps that in aUsdt, returns numeraire amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        safeTransferFrom(usdt, msg.sender, address(this), _amount);
+
+        ausdt.deposit(_amount);
+
+        amount_ = _amount.divu(1e6);
+
+    }
+
+    // takes raw amount, transfers it in, wraps that in aUsdt, returns numeraire amount
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         safeTransferFrom(usdt, msg.sender, address(this), _amount);
 
@@ -65,7 +78,18 @@ contract LocalUsdtToAUsdtAssimilator is LoihiRoot {
     }
 
     // takes raw amount, redeems that from aUsdt, transfers it out, returns numeraire amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        ausdt.redeem(_amount);
+
+        safeTransfer(usdt, _dst, _amount);
+
+        amount_ = _amount.divu(1e6);
+
+    }
+
+    // takes raw amount, redeems that from aUsdt, transfers it out, returns numeraire amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         ausdt.redeem(_amount);
 
@@ -105,9 +129,20 @@ contract LocalUsdtToAUsdtAssimilator is LoihiRoot {
     }
 
     // returns numeraire amount of reserve asset, in this case aUSDT
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
-        uint256 _balance = getAUsdt().balanceOf(_addr);
+        uint256 _balance = getAUsdt().balanceOf(address(this));
+
+        balance_ = _balance.divu(1e6);
+
+    }
+
+    // takes raw amount, returns numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        amount_ = _amount.divu(1e6);
+
+        uint256 _balance = getAUsdt().balanceOf(address(this));
 
         balance_ = _balance.divu(1e6);
 

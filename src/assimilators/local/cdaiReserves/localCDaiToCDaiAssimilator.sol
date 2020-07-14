@@ -31,9 +31,22 @@ contract LocalCDaiToCDaiAssimilator is IAssimilator, LoihiRoot {
         cdai = ICToken(_cdai);
 
     }
+    
+    // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        bool success = cdai.transferFrom(msg.sender, address(this), _amount);
+
+        if (!success) revert("CDai/transferFrom-failed");
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
+
+    }
 
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         bool success = cdai.transferFrom(msg.sender, address(this), _amount);
 
@@ -49,8 +62,6 @@ contract LocalCDaiToCDaiAssimilator is IAssimilator, LoihiRoot {
 
     }
 
-    event log_uint(bytes32, uint256);
-
     // takes a numeraire amount, calculates the raw amount of cDai, transfers it in and returns the corresponding raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
@@ -65,7 +76,20 @@ contract LocalCDaiToCDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        bool success = cdai.transfer(_dst, _amount);
+
+        if (!success) revert("CDai/transfer-failed");
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
+    // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         bool success = cdai.transfer(_dst, _amount);
 
@@ -113,16 +137,32 @@ contract LocalCDaiToCDaiAssimilator is IAssimilator, LoihiRoot {
     }
 
     // views the numeraire value of the current balance of the reserve, in this case CDai
-    function viewNumeraireBalance (address _addr) public returns (int128 amount_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _balance = cdai.balanceOf(_addr);
+        uint256 _balance = cdai.balanceOf(address(this));
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
-        amount_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
 
     }
+
+    // takes a raw amount and returns the numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        uint256 _rate = cdai.exchangeRateStored();
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
+
+        uint256 _balance = cdai.balanceOf(address(this));
+
+        if (_balance == 0) return (amount_, ABDKMath64x64.fromUInt(0));
+
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e18);
+
+    }
+
 
 }

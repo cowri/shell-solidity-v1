@@ -32,14 +32,23 @@ contract LocalASUsdToASUsdAssimilator is IAssimilator, LoihiRoot {
 
     }
 
-    function getASUsd () public view returns (IAToken) {
+    function getASUsd () public returns (IAToken) {
 
         return asusd;
 
     }
 
     // intakes raw amount of ASUsd and returns the corresponding raw amount
-    function intakeRaw (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function intakeRaw (uint256 _amount) public returns (int128 amount_) {
+
+        asusd.transferFrom(msg.sender, address(this), _amount);
+
+        amount_ = _amount.divu(1e18);
+
+    }
+
+    // intakes raw amount of ASUsd and returns the corresponding raw amount
+    function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         asusd.transferFrom(msg.sender, address(this), _amount);
 
@@ -61,7 +70,16 @@ contract LocalASUsdToASUsdAssimilator is IAssimilator, LoihiRoot {
     }
 
     // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
-    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
+
+        asusd.transfer(_dst, _amount);
+
+        amount_ = _amount.divu(1e18);
+
+    }
+
+    // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
+    function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         asusd.transfer(_dst, _amount);
 
@@ -83,26 +101,38 @@ contract LocalASUsdToASUsdAssimilator is IAssimilator, LoihiRoot {
     }
 
     // takes a numeraire amount and returns the raw amount
-    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e18);
 
     }
 
     // takes a raw amount and returns the numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         amount_ = _amount.divu(1e18);
 
     }
 
     // views the numeraire value of the current balance of the reserve, in this case ASUsd
-    function viewNumeraireBalance (address _addr) public view returns (int128 amount_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
-        uint256 _balance = getASUsd().balanceOf(_addr);
+        uint256 _balance = getASUsd().balanceOf(address(this));
 
-        amount_ = _balance.divu(1e18);
+        balance_ = _balance.divu(1e18);
 
     }
+
+    // takes a raw amount and returns the numeraire amount
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        amount_ = _amount.divu(1e18);
+
+        uint256 _balance = getASUsd().balanceOf(address(this));
+
+        balance_ = _balance.divu(1e18);
+
+    }
+
 
 }

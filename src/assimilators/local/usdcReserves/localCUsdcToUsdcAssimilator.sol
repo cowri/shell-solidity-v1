@@ -153,6 +153,15 @@ contract LocalCUsdcToUsdcAssimilator is IAssimilator, LoihiRoot {
 
     }
 
+    // returns numeraire balance of reserve, in this case cUsdc
+    function viewNumeraireBalance () public returns (int128 balance_) {
+
+        uint256 _balance = usdc.balanceOf(address(this));
+
+        balance_ = _balance.divu(1e6);
+
+    }
+
     // takes numeraire amount, returns raw amount of cUsdc
     function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
@@ -161,17 +170,6 @@ contract LocalCUsdcToUsdcAssimilator is IAssimilator, LoihiRoot {
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
 
         uint256 _balance = usdc.balanceOf(address(this));
-
-        balance_ = _balance.divu(1e6);
-
-    }
-
-    // returns numeraire balance of reserve, in this case cUsdc
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
-
-        uint256 _balance = usdc.balanceOf(_addr);
-
-        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
         balance_ = _balance.divu(1e6);
 

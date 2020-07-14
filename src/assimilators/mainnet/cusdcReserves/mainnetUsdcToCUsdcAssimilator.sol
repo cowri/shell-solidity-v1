@@ -25,7 +25,6 @@ contract MainnetUsdcToCUsdcAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
-    using AssimilatorMath for uint;
 
     IERC20 constant usdc = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
 
@@ -130,27 +129,41 @@ contract MainnetUsdcToCUsdcAssimilator is IAssimilator {
     }
 
     // takes numeraire amount, returns raw amount
-    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
 
     }
 
     // takes raw amount, returns numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public pure returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public  returns (int128 amount_) {
 
         amount_ = _amount.divu(1e6);
 
     }
 
     // returns numeraire amount of reserve asset, in this case cUsdc
-    function viewNumeraireBalance () public view returns (int128 balance_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
         uint256 _balance = cusdc.balanceOf(address(this));
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
+
+        balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
+
+    }
+
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        amount_ = _amount.divu(1e6);
+
+        uint256 _rate = cusdc.exchangeRateStored();
+
+        uint256 _balance = cusdc.balanceOf(address(this));
+
+        if (_balance == 0) return ( amount_, ABDKMath64x64.fromUInt(0) );
 
         balance_ = ( ( _balance * _rate ) / 1e18 ).divu(1e6);
 

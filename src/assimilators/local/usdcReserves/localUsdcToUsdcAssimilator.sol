@@ -98,9 +98,7 @@ contract LocalUsdcToUsdcAssimilator is IAssimilator, LoihiRoot {
 
     }
 
-    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
-
-        amount_ = _amount.divu(1e6);
+    function viewNumeraireBalance () public returns (int128 balance_) {
 
         uint256 _balance = usdc.balanceOf(address(this));
 
@@ -108,11 +106,11 @@ contract LocalUsdcToUsdcAssimilator is IAssimilator, LoihiRoot {
 
     }
 
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        uint256 _balance = usdc.balanceOf(_addr);
+        amount_ = _amount.divu(1e6);
 
-        if (_balance == 0) return ABDKMath64x64.fromUInt(0);
+        uint256 _balance = usdc.balanceOf(address(this));
 
         balance_ = _balance.divu(1e6);
 

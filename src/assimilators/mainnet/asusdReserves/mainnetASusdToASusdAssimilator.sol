@@ -31,7 +31,7 @@ contract MainnetASUsdToASUsdAssimilator is IAssimilator {
 
     constructor () public { }
 
-    function getASUsd () public view returns (IAToken) {
+    function getASUsd () public returns (IAToken) {
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(susd);
@@ -104,21 +104,31 @@ contract MainnetASUsdToASUsdAssimilator is IAssimilator {
     }
 
     // takes a numeraire amount and returns the raw amount
-    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e18);
 
     }
 
     // takes a raw amount and returns the numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
 
         amount_ = _amount.divu(1e18);
 
     }
 
     // views the numeraire value of the current balance of the reserve, in this case ASUsd
-    function viewNumeraireBalance () public view returns (int128 balance_) {
+    function viewNumeraireBalance () public returns (int128 balance_) {
+
+        uint256 _balance = getASUsd().balanceOf(address(this));
+
+        balance_ = _balance.divu(1e18);
+
+    }
+
+    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+
+        amount_ = _amount.divu(1e18);
 
         uint256 _balance = getASUsd().balanceOf(address(this));
 
