@@ -16,18 +16,17 @@ pragma solidity ^0.5.0;
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "../../../interfaces/ICToken.sol";
-
 import "../../../interfaces/IERC20.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
-contract MainnetCDaiToDaiAssimilator is IAssimilator {
+contract KovanCDaiToDaiAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
-    IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    ICToken constant cdai = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
+    IERC20 constant dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
 
     constructor () public { }
 
@@ -72,6 +71,8 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
         amount_ = _amount.divu(1e18);
 
     }
+
+    event log_uint(bytes32, uint256);
 
     // takes a numeraire amount, calculates the raw amount of cDai, transfers it in and returns the corresponding raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {

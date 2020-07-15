@@ -20,13 +20,13 @@ import "../../../interfaces/IERC20.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
-contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
+contract KovanCUsdcToUsdcAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    IERC20 constant usdc = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-    ICToken constant cusdc = ICToken(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
+    IERC20 constant usdc = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF);
+    ICToken constant cusdc = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35);
 
     constructor () public { }
 

@@ -13,8 +13,6 @@
 
 pragma solidity ^0.5.0;
 
-import "./LoihiRoot.sol";
-
 import "./Assimilators.sol";
 
 import "./Controller.sol";
@@ -27,8 +25,8 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "./UnsafeMath64x64.sol";
 
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20NoBool.sol";
+import "./interfaces/IERC20.sol";
+import "./interfaces/IERC20NoBool.sol";
 import "./interfaces/ICToken.sol";
 import "./interfaces/IAToken.sol";
 import "./interfaces/IChai.sol";
@@ -767,7 +765,7 @@ contract Loihi {
         require(success, "SafeERC20: low-level call failed");
 
     }
-    
+
     IERC20 dai; ICToken cdai; IChai chai; IPot pot;
     IERC20 usdc; ICToken cusdc;
     IERC20NoBool usdt; IAToken ausdt;

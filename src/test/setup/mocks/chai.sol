@@ -1,18 +1,23 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Detailed.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Mintable.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import "ds-math/math.sol";
+import "./erc20.sol";
 
-contract ChaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
-    ERC20 underlying;
+contract ChaiMock is ERC20Mock {
+
+    ERC20Mock underlying;
+
     uint256 constant chi = 1014865463929259205354699760;
 
-    constructor(address _underlying, string memory _name, string memory _symbols, uint8 _decimals, uint256 _amount)
-    ERC20Detailed(_name, _symbols, _decimals) public {
-        _mint(msg.sender, _amount);
-        underlying = ERC20(_underlying);
+    constructor (
+        address _underlying,
+        string memory _name,
+        string memory _symbols,
+        uint8 _decimals,
+        uint256 _amount
+    ) ERC20Mock (_name, _symbols, _decimals, _amount) public {
+
+        underlying = ERC20Mock(_underlying);
+
     }
 
     event log_uint(bytes32, uint256);

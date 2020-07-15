@@ -2,8 +2,8 @@ pragma solidity ^0.5.0;
 
 import "../../Loihi.sol";
 
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20NoBool.sol";
+import "../../interfaces/IERC20.sol";
+import "../../interfaces/IERC20NoBool.sol";
 
 import "./storage.sol";
 

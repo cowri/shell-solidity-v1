@@ -1,16 +1,21 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Detailed.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Mintable.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import "ds-math/math.sol";
+import "./erc20.sol";
 
-contract ATokenMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
-    ERC20 underlying;
-    constructor(address _underlying, string memory _name, string memory _symbols, uint8 _decimals, uint256 _amount)
-    ERC20Detailed(_name, _symbols, _decimals) public {
-        _mint(msg.sender, _amount);
-        underlying = ERC20(_underlying);
+contract ATokenMock is ERC20Mock {
+
+    ERC20Mock underlying;
+
+    constructor(
+        address _underlying,
+        string memory _name,
+        string memory _symbols,
+        uint8 _decimals,
+        uint256 _amount
+    ) ERC20Mock (_name, _symbols, _decimals, _amount) public {
+
+        underlying = ERC20Mock(_underlying);
+        
     }
 
     function deposit (uint256 amount) public returns (uint) {
@@ -25,15 +30,15 @@ contract ATokenMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
         return amount;
     }
 
-    function safeTransfer(IERC20 token, address to, uint256 value) internal {
+    function safeTransfer(ERC20Mock token, address to, uint256 value) internal {
         callOptionalReturn(address(token), abi.encodeWithSelector(0xa9059cbb, to, value));
     }
 
-    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
+    function safeTransferFrom(ERC20Mock token, address from, address to, uint256 value) internal {
         callOptionalReturn(address(token), abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
     }
 
-    function safeApprove(IERC20 token, address spender, uint256 value) internal {
+    function safeApprove(ERC20Mock token, address spender, uint256 value) internal {
         callOptionalReturn(address(token), abi.encodeWithSelector(token.approve.selector, spender, value));
     }
 

@@ -1,8 +1,7 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20NoBool.sol";
-
+import "../../interfaces/IERC20.sol";
+import "../../interfaces/IERC20NoBool.sol";
 import "../../interfaces/IAssimilator.sol";
 import "../../interfaces/IAToken.sol";
 import "../../interfaces/ICToken.sol";

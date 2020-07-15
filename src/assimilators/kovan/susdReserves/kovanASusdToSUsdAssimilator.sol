@@ -19,18 +19,17 @@ import "../../aaveResources/ILendingPoolAddressesProvider.sol";
 import "../../aaveResources/ILendingPool.sol";
 
 import "../../../interfaces/IAToken.sol";
-
 import "../../../interfaces/IERC20.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
-contract MainnetASUsdToSUsdAssimilator is IAssimilator {
+contract KovanASUsdToSUsdAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    IERC20 constant susd = IERC20(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
+    IERC20 constant susd = IERC20(0xD868790F57B39C9B2B51b12de046975f986675f9);
+    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
 
     constructor () public { }
 

@@ -16,21 +16,19 @@ pragma solidity ^0.5.0;
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "../../../interfaces/IChai.sol";
-
 import "../../../interfaces/IPot.sol";
-
 import "../../../interfaces/IERC20.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
-contract MainnetChaiToDaiAssimilator is IAssimilator {
+contract KovanChaiToDaiAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    IChai constant chai = IChai(0x06AF07097C9Eeb7fD685c692751D5C66dB49c215);
-    IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    IPot constant pot = IPot(0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7);
+    IChai constant chai = IChai(0xB641957b6c29310926110848dB2d464C8C3c3f38);
+    IERC20 constant dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
+    IPot constant pot = IPot(0xEA190DBDC7adF265260ec4dA6e9675Fd4f5A78bb);
 
     constructor () public { }
 

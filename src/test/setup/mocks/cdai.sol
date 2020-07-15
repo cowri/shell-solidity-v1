@@ -1,29 +1,24 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Detailed.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20Mintable.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import "ds-math/math.sol";
+import "./erc20.sol";
 
-import "abdk-libraries-solidity/ABDKMath64x64.sol";
+contract CDaiMock is ERC20Mock {
 
-contract CDaiMock is ERC20, ERC20Detailed, ERC20Mintable, DSMath {
-    ERC20 underlying;
+    ERC20Mock underlying;
 
-    using ABDKMath64x64 for uint;
-    using ABDKMath64x64 for int128;
-
-    // int128 constant rate = 0xC174B0030A0DD6AB5B914FD;
-    
     uint constant rate = 202853120189954603721819673;
 
-    constructor(address _underlying, string memory _name, string memory _symbols, uint8 _decimals, uint256 _amount)
-    ERC20Detailed(_name, _symbols, _decimals) public {
-        _mint(msg.sender, _amount);
-        underlying = ERC20(_underlying);
-    }
+    constructor(
+        address _underlying,
+        string memory _name,
+        string memory _symbols,
+        uint8 _decimals,
+        uint256 _amount
+    ) ERC20Mock (_name, _symbols, _decimals, _amount) public {
 
-    event log_uint(bytes32, uint256);
+        underlying = ERC20Mock(_underlying);
+
+    }
 
     function mint (uint256 amount) public returns (uint cdaiAmount_) {
 
