@@ -37,11 +37,13 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        dai.transferFrom(msg.sender, address(this), _amount);
+        bool _transferSuccess = dai.transferFrom(msg.sender, address(this), _amount);
 
-        uint256 success = cdai.mint(_amount);
+        require(_transferSuccess, "Shell/DAI-transfer-from-failed");
 
-        if (success != 0) revert("CDai/mint-failed");
+        uint256 _mintSuccess = cdai.mint(_amount);
+
+        require(_mintSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -52,11 +54,13 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        dai.transferFrom(msg.sender, address(this), _amount);
+        bool _transferSuccess = dai.transferFrom(msg.sender, address(this), _amount);
 
-        uint256 success = cdai.mint(_amount);
+        require(_transferSuccess, "Shell/DAI-transfer-from-failed");
 
-        if (success != 0) revert("CDai/mint-failed");
+        uint256 _mintSuccess = cdai.mint(_amount);
+
+        require(_mintSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -73,24 +77,28 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        dai.transferFrom(msg.sender, address(this), amount_);
+        bool _transferSuccess = dai.transferFrom(msg.sender, address(this), amount_);
 
-        uint256 success = cdai.mint(amount_);
+        require(_transferSuccess, "Shell/DAI-transfer-from-failed");
 
-        if (success != 0) revert("CDai/mint-failed");
+        uint256 _mintSuccess = cdai.mint(amount_);
+
+        require(_mintSuccess == 0, "Shell/cDAI-mint-failed");
 
     }
 
     // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        uint256 success = cdai.redeemUnderlying(_amount);
+        uint256 _redeemSuccess = cdai.redeemUnderlying(_amount);
 
-        if (success != 0) revert("CDai/redeemUnderlying-failed");
+        require(_redeemSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        dai.transfer(_dst, _amount);
+        bool _transferSuccess = dai.transfer(_dst, _amount);
+
+        require(_transferSuccess, "Shell/DAI-transfer-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -99,15 +107,17 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
     // takes raw amount of dai, unwraps that from cDai, transfers it out, returns numeraire amount
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        uint256 success = cdai.redeemUnderlying(_amount);
+        uint256 _redeemSuccess = cdai.redeemUnderlying(_amount);
 
-        if (success != 0) revert("CDai/redeemUnderlying-failed");
+        require(_redeemSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
 
         uint256 _balance = cdai.balanceOf(address(this));
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        dai.transfer(_dst, _amount);
+        bool _transferSuccess = dai.transfer(_dst, _amount);
+
+        require(_transferSuccess, "Shell/DAI-transfer-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -120,11 +130,13 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        uint256 success = cdai.redeemUnderlying(amount_);
+        uint256 _redeemSuccess = cdai.redeemUnderlying(amount_);
 
-        if (success != 0) revert("CDai/redeemUnderlying-failed");
+        require(_redeemSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
 
-        dai.transfer(_dst, amount_);
+        bool _transferSuccess = dai.transfer(_dst, amount_);
+
+        require(_transferSuccess, "Shell/DAI-transfer-failed");
 
     }
 

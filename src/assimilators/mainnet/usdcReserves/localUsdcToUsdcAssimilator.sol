@@ -30,7 +30,9 @@ contract MainnetUsdcToUsdcAssimilator is IAssimilator {
 
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        usdc.transferFrom(msg.sender, address(this), _amount);
+        bool _success = usdc.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/USDC-transfer-from-failed");
 
         uint256 _balance = usdc.balanceOf(address(this));
 
@@ -42,7 +44,9 @@ contract MainnetUsdcToUsdcAssimilator is IAssimilator {
 
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        usdc.transferFrom(msg.sender, address(this), _amount);
+        bool _success = usdc.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/USDC-transfer-from-failed");
 
         amount_ = _amount.divu(1e6);
 
@@ -52,13 +56,17 @@ contract MainnetUsdcToUsdcAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e6);
 
-        usdc.transferFrom(msg.sender, address(this), amount_);
+        bool _success = usdc.transferFrom(msg.sender, address(this), amount_);
+
+        require(_success, "Shell/USDC-transfer-from-failed");
 
     }
 
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        usdc.transfer(_dst, _amount);
+        bool _success = usdc.transfer(_dst, _amount);
+
+        require(_success, "Shell/USDC-transfer-failed");
 
         uint256 _balance = usdc.balanceOf(address(this));
 
@@ -70,7 +78,9 @@ contract MainnetUsdcToUsdcAssimilator is IAssimilator {
 
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        usdc.transfer(_dst, _amount);
+        bool _success = usdc.transfer(_dst, _amount);
+
+        require(_success, "Shell/USDC-transfer-failed");
 
         amount_ = _amount.divu(1e6);
 
@@ -80,7 +90,9 @@ contract MainnetUsdcToUsdcAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e6);
 
-        usdc.transfer(_dst, amount_);
+        bool _success = usdc.transfer(_dst, amount_);
+
+        require(_success, "Shell/USDC-transfer-failed");
 
     }
 

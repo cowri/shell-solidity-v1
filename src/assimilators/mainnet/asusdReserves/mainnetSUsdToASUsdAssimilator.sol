@@ -47,7 +47,9 @@ contract MainnetSUsdToASUsdAssimilator is IAssimilator {
     // takes raw amount, transfers it in, wraps it in asusd, returns numeraire amount
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        susd.transferFrom(msg.sender, address(this), _amount);
+        bool _success = susd.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/SUSD-transfer-from-failed");
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
@@ -59,13 +61,17 @@ contract MainnetSUsdToASUsdAssimilator is IAssimilator {
 
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        susd.transferFrom(msg.sender, address(this), _amount);
+        bool _success = susd.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/SUSD-transfer-from-failed");
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
         pool.deposit(address(susd), _amount, 0);
 
-        uint256 _balance = getASUsd().balanceOf(address(this));
+        IAToken _asusd = getASUsd();
+
+        uint256 _balance = _asusd.balanceOf(address(this));
 
         amount_ = _amount.divu(1e18);
 
@@ -78,7 +84,9 @@ contract MainnetSUsdToASUsdAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        susd.transferFrom(msg.sender, address(this), amount_);
+        bool _success = susd.transferFrom(msg.sender, address(this), amount_);
+
+        require(_success, "Shell/SUSD-transfer-from-failed");
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
@@ -89,9 +97,13 @@ contract MainnetSUsdToASUsdAssimilator is IAssimilator {
     // takes raw amount, transfers to destination, returns numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        getASUsd().redeem(_amount);
+        IAToken _asusd = getASUsd();
 
-        susd.transfer(_dst, _amount);
+        _asusd.redeem(_amount);
+
+        bool _success = susd.transfer(_dst, _amount);
+
+        require(_success, "Shell/SUSD-transfer-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -104,7 +116,9 @@ contract MainnetSUsdToASUsdAssimilator is IAssimilator {
 
         _asusd.redeem(_amount);
 
-        susd.transfer(_dst, _amount);
+        bool _success = susd.transfer(_dst, _amount);
+
+        require(_success, "Shell/aSUSD-transfer-failed");
 
         uint256 _balance = _asusd.balanceOf(address(this));
 
@@ -119,9 +133,13 @@ contract MainnetSUsdToASUsdAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        getASUsd().redeem(amount_);
+        IAToken _asusd = getASUsd();
 
-        susd.transfer(_dst, amount_);
+        _asusd.redeem(amount_);
+
+        bool _success = susd.transfer(_dst, amount_);
+
+        require(_success, "Shell/SUSD-transfer-failed");
 
     }
 
@@ -142,7 +160,9 @@ contract MainnetSUsdToASUsdAssimilator is IAssimilator {
     // returns numeraire value of reserve asset, in this case ASUsd
     function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
-        uint256 _balance = getASUsd().balanceOf(address(this));
+        IAToken _asusd = getASUsd();
+
+        uint256 _balance = _asusd.balanceOf(address(this));
 
         balance_ = _balance.divu(1e18);
 
@@ -153,7 +173,9 @@ contract MainnetSUsdToASUsdAssimilator is IAssimilator {
 
         amount_ = _amount.divu(1e18);
 
-        uint256 _balance = getASUsd().balanceOf(address(this));
+        IAToken _asusd = getASUsd();
+
+        uint256 _balance = _asusd.balanceOf(address(this));
 
         balance_ = _balance.divu(1e18);
 

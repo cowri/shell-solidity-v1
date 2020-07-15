@@ -30,7 +30,9 @@ contract MainnetSUsdToSUsdAssimilator is IAssimilator {
 
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        susd.transferFrom(msg.sender, address(this), _amount);
+        bool _success = susd.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/SUSD-transfer-from-failed");
 
         uint256 _balance = susd.balanceOf(address(this));
 
@@ -42,7 +44,9 @@ contract MainnetSUsdToSUsdAssimilator is IAssimilator {
 
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        susd.transferFrom(msg.sender, address(this), _amount);
+        bool _success = susd.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/SUSD-transfer-from-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -53,13 +57,17 @@ contract MainnetSUsdToSUsdAssimilator is IAssimilator {
         // truncate stray decimals caused by conversion
         amount_ = _amount.mulu(1e18) / 1e3 * 1e3;
 
-        susd.transferFrom(msg.sender, address(this), amount_);
+        bool _success = susd.transferFrom(msg.sender, address(this), amount_);
+
+        require(_success, "Shell/SUSD-transfer-from-failed");
 
     }
 
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        susd.transfer(_dst, _amount);
+        bool _success = susd.transfer(_dst, _amount);
+
+        require(_success, "Shell/SUSD-transfer-failed");
 
         uint256 _balance = susd.balanceOf(address(this));
 
@@ -71,7 +79,9 @@ contract MainnetSUsdToSUsdAssimilator is IAssimilator {
 
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        susd.transfer(_dst, _amount);
+        bool _success = susd.transfer(_dst, _amount);
+
+        require(_success, "Shell/SUSD-transfer-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -82,7 +92,9 @@ contract MainnetSUsdToSUsdAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        susd.transfer(_dst, amount_);
+        bool _success = susd.transfer(_dst, amount_);
+
+        require(_success, "Shell/SUSD-transfer-failed");
 
     }
 

@@ -65,7 +65,9 @@ contract MainnetUsdtToAUsdtAssimilator is IAssimilator {
 
         pool.deposit(address(usdt), _amount, 0);
 
-        uint256 _balance = getAUsdt().balanceOf(address(this));
+        IAToken _ausdt = getAUsdt();
+
+        uint256 _balance = _ausdt.balanceOf(address(this));
 
         amount_ = _amount.divu(1e6);
 
@@ -89,7 +91,9 @@ contract MainnetUsdtToAUsdtAssimilator is IAssimilator {
     // takes raw amount, redeems that from aUsdt, transfers it out, returns numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        getAUsdt().redeem(_amount);
+        IAToken _ausdt = getAUsdt();
+
+        _ausdt.redeem(_amount);
 
         safeTransfer(usdt, _dst, _amount);
 
@@ -119,7 +123,9 @@ contract MainnetUsdtToAUsdtAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e6);
 
-        getAUsdt().redeem(amount_);
+        IAToken _ausdt = getAUsdt();
+
+        _ausdt.redeem(amount_);
 
         safeTransfer(usdt, _dst, amount_);
 
@@ -142,12 +148,14 @@ contract MainnetUsdtToAUsdtAssimilator is IAssimilator {
     // returns numeraire amount of reserve asset, in this case aUSDT
     function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
-        uint256 _balance = getAUsdt().balanceOf(address(this));
+        IAToken _ausdt = getAUsdt();
+
+        uint256 _balance = _ausdt.balanceOf(address(this));
 
         balance_ = _balance.divu(1e6);
 
     }
-    
+
     // takes raw amount, returns numeraire amount
     function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 

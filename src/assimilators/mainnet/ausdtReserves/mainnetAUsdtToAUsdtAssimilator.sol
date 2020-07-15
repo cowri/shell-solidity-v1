@@ -44,7 +44,11 @@ contract MainnetAUsdtToAUsdtAssimilator is IAssimilator {
     // intakes raw amount of AUSsdt and returns the corresponding raw amount
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        getAUsdt().transferFrom(msg.sender, address(this), _amount);
+        IAToken _ausdt = getAUsdt();
+
+        bool _success = _ausdt.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/aUSDT-transfer-from-failed");
 
         amount_ = _amount.divu(1e6);
 
@@ -55,7 +59,9 @@ contract MainnetAUsdtToAUsdtAssimilator is IAssimilator {
 
         IAToken _ausdt = getAUsdt();
 
-        _ausdt.transferFrom(msg.sender, address(this), _amount);
+        bool _success = _ausdt.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/aUSDT-transfer-from-failed");
 
         uint256 _balance = _ausdt.balanceOf(address(this));
 
@@ -71,14 +77,22 @@ contract MainnetAUsdtToAUsdtAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        getAUsdt().transferFrom(msg.sender, address(this), amount_);
+        IAToken _ausdt = getAUsdt();
+
+        bool _success = _ausdt.transferFrom(msg.sender, address(this), amount_);
+
+        require(_success, "Shell/aUSDT-transfer-from-failed");
 
     }
 
     // outputs a raw amount of AUsdt and returns the corresponding numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        getAUsdt().transfer(_dst, _amount);
+        IAToken _ausdt = getAUsdt();
+
+        bool _success = _ausdt.transfer(_dst, _amount);
+
+        require(_success, "Shell/aUSDT-transfer-failed");
 
         amount_ = _amount.divu(1e6);
 
@@ -89,7 +103,9 @@ contract MainnetAUsdtToAUsdtAssimilator is IAssimilator {
 
         IAToken _ausdt = getAUsdt();
 
-        _ausdt.transfer(_dst, _amount);
+        bool _success = _ausdt.transfer(_dst, _amount);
+
+        require(_success, "Shell/aUSDT-transfer-failed");
 
         uint256 _balance = _ausdt.balanceOf(address(this));
 
@@ -104,7 +120,11 @@ contract MainnetAUsdtToAUsdtAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e6);
 
-        getAUsdt().transfer(_dst, amount_);
+        IAToken _ausdt = getAUsdt();
+
+        bool _success = _ausdt.transfer(_dst, amount_);
+
+        require(_success, "Shell/aUSDT-transfer-failed");
 
     }
 
@@ -125,7 +145,9 @@ contract MainnetAUsdtToAUsdtAssimilator is IAssimilator {
     // views the numeraire value of the current balance of the reserve, in this case AUsdt
     function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
-        uint256 _balance = getAUsdt().balanceOf(address(this));
+        IAToken _ausdt = getAUsdt();
+
+        uint256 _balance = _ausdt.balanceOf(address(this));
 
         balance_ = _balance.divu(1e6);
 
@@ -136,7 +158,9 @@ contract MainnetAUsdtToAUsdtAssimilator is IAssimilator {
 
         amount_ = _amount.divu(1e6);
 
-        uint256 _balance = getAUsdt().balanceOf(address(this));
+        IAToken _ausdt = getAUsdt();
+
+        uint256 _balance = _ausdt.balanceOf(address(this));
 
         balance_ = _balance.divu(1e6);
 

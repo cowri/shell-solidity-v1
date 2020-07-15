@@ -31,9 +31,9 @@ contract MainnetCDaiToCDaiAssimilator is IAssimilator {
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        bool success = cdai.transferFrom(msg.sender, address(this), _amount);
+        bool _success = cdai.transferFrom(msg.sender, address(this), _amount);
 
-        if (!success) revert("CDai/transferFrom-failed");
+        require(_success, "Shell/cDAI-transfer-from-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -44,9 +44,9 @@ contract MainnetCDaiToCDaiAssimilator is IAssimilator {
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        bool success = cdai.transferFrom(msg.sender, address(this), _amount);
+        bool _success = cdai.transferFrom(msg.sender, address(this), _amount);
 
-        if (!success) revert("CDai/transferFrom-failed");
+        require(_success, "Shell/cDAI-transfer-from-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -65,18 +65,18 @@ contract MainnetCDaiToCDaiAssimilator is IAssimilator {
 
         amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
-        bool success = cdai.transferFrom(msg.sender, address(this), amount_);
+        bool _success = cdai.transferFrom(msg.sender, address(this), amount_);
 
-        if (!success) revert("CDai/transferFrom-failed");
+        require(_success, "Shell/cDAI-transfer-from-failed");
 
     }
 
     // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        bool success = cdai.transfer(_dst, _amount);
+        bool _success = cdai.transfer(_dst, _amount);
 
-        if (!success) revert("CDai/transfer-failed");
+        require(_success, "Shell/cDAI-transfer-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -87,9 +87,9 @@ contract MainnetCDaiToCDaiAssimilator is IAssimilator {
     // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        bool success = cdai.transfer(_dst, _amount);
+        bool _success = cdai.transfer(_dst, _amount);
 
-        if (!success) revert("CDai/transfer-failed");
+        require(_success, "Shell/cDAI-transfer-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -108,9 +108,9 @@ contract MainnetCDaiToCDaiAssimilator is IAssimilator {
 
         amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
-        bool success = cdai.transfer(_dst, amount_);
+        bool _success = cdai.transfer(_dst, amount_);
 
-        if (!success) revert("CDai/transfer-failed");
+        require(_success, "Shell/cDAI-transfer-failed");
 
     }
 

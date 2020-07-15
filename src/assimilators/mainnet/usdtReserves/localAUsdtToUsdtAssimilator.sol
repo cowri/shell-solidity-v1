@@ -47,7 +47,9 @@ contract MainnetAUsdtToUsdtAssimilator is IAssimilator {
 
         IAToken _ausdt = getAUsdt();
 
-        _ausdt.transferFrom(msg.sender, address(this), _amount);
+        bool _success = _ausdt.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/aUSDT-transfer-from-failed");
 
         _ausdt.redeem(_amount);
 
@@ -66,7 +68,9 @@ contract MainnetAUsdtToUsdtAssimilator is IAssimilator {
 
         IAToken _ausdt = getAUsdt();
 
-        _ausdt.transferFrom(msg.sender, address(this), _amount);
+        bool _success = _ausdt.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/aUSDT-transfer-from-failed");
 
         _ausdt.redeem(_amount);
 
@@ -81,7 +85,9 @@ contract MainnetAUsdtToUsdtAssimilator is IAssimilator {
 
         IAToken _ausdt = getAUsdt();
 
-        _ausdt.transferFrom(msg.sender, address(this), amount_);
+        bool _success = _ausdt.transferFrom(msg.sender, address(this), amount_);
+
+        require(_success, "Shell/aUSDT-transfer-from-failed");
 
         _ausdt.redeem(amount_);
 
@@ -94,7 +100,11 @@ contract MainnetAUsdtToUsdtAssimilator is IAssimilator {
 
         pool.deposit(address(usdt), _amount, 0);
 
-        getAUsdt().transfer(_dst, _amount);
+        IAToken _ausdt = getAUsdt();
+
+        bool _success = _ausdt.transfer(_dst, _amount);
+
+        require(_success, "Shell/aUSDT-transfer-failed");
 
         uint256 _balance = usdt.balanceOf(address(this));
 
@@ -111,7 +121,11 @@ contract MainnetAUsdtToUsdtAssimilator is IAssimilator {
 
         pool.deposit(address(usdt), _amount, 0);
 
-        getAUsdt().transfer(_dst, _amount);
+        IAToken _ausdt = getAUsdt();
+
+        bool _success = _ausdt.transfer(_dst, _amount);
+
+        require(_success, "Shell/aUSDT-transfer-failed");
 
         amount_ = _amount.divu(1e6);
 
@@ -126,7 +140,11 @@ contract MainnetAUsdtToUsdtAssimilator is IAssimilator {
 
         pool.deposit(address(usdt), amount_, 0);
 
-        getAUsdt().transfer(_dst, amount_);
+        IAToken _ausdt = getAUsdt();
+
+        bool _success = _ausdt.transfer(_dst, amount_);
+
+        require(_success, "Shell/aUSDT-transfer-failed");
 
     }
 

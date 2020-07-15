@@ -46,7 +46,9 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
         IAToken _asusd = getASUsd();
 
-        _asusd.transferFrom(msg.sender, address(this), _amount);
+        bool _success = _asusd.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/aSUSD-transfer-from-failed");
 
         _asusd.redeem(_amount);
 
@@ -63,7 +65,9 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
         IAToken _asusd = getASUsd();
 
-        _asusd.transferFrom(msg.sender, address(this), _amount);
+        bool _success = _asusd.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/aSUSD-transfer-from-failed");
 
         _asusd.redeem(_amount);
 
@@ -78,7 +82,9 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
         IAToken _asusd = getASUsd();
 
-        _asusd.transferFrom(msg.sender, address(this), amount_);
+        bool _success = _asusd.transferFrom(msg.sender, address(this), amount_);
+
+        require(_success, "Shell/aSUSD-transfer-from-failed");
 
         _asusd.redeem(amount_);
 
@@ -91,7 +97,9 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
         _asusd.deposit(_amount);
 
-        _asusd.transfer(_dst, _amount);
+        bool _success = _asusd.transfer(_dst, _amount);
+
+        require(_success, "Shell/aSUSD-transfer-failed");
 
         uint256 _balance = susd.balanceOf(address(this));
 
@@ -108,7 +116,9 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
         _asusd.deposit(_amount);
 
-        _asusd.transfer(_dst, _amount);
+        bool _success = _asusd.transfer(_dst, _amount);
+
+        require(_success, "Shell/aSUSD-transfer-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -123,7 +133,9 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
         _asusd.deposit(amount_);
 
-        _asusd.transfer(_dst, amount_);
+        bool _success = _asusd.transfer(_dst, amount_);
+
+        require(_success, "Shell/aSUSD-transfer-failed");
 
     }
 

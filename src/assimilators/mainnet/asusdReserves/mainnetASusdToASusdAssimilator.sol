@@ -42,7 +42,11 @@ contract MainnetASUsdToASUsdAssimilator is IAssimilator {
     // intakes raw amount of ASUsd and returns the corresponding raw amount
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        getASUsd().transferFrom(msg.sender, address(this), _amount);
+        IAToken _asusd = getASUsd();
+
+        bool _success = _asusd.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/aSUSD-transfer-from-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -52,7 +56,9 @@ contract MainnetASUsdToASUsdAssimilator is IAssimilator {
 
         IAToken _asusd = getASUsd();
 
-        _asusd.transferFrom(msg.sender, address(this), _amount);
+        bool _success = _asusd.transferFrom(msg.sender, address(this), _amount);
+
+        require(_success, "Shell/aSUSD-transfer-from-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -67,14 +73,22 @@ contract MainnetASUsdToASUsdAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        getASUsd().transferFrom(msg.sender, address(this), amount_);
+        IAToken _asusd = getASUsd();
+
+        bool _success = _asusd.transferFrom(msg.sender, address(this), amount_);
+
+        require(_success, "Shell/aSUSD-transfer-from-failed");
 
     }
 
     // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        getASUsd().transfer(_dst, _amount);
+        IAToken _asusd = getASUsd();
+
+        bool _success = _asusd.transfer(_dst, _amount);
+
+        require(_success, "Shell/aSUSD-transfer-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -84,7 +98,9 @@ contract MainnetASUsdToASUsdAssimilator is IAssimilator {
 
         IAToken _asusd = getASUsd();
 
-        _asusd.transfer(_dst, _amount);
+        bool _success = _asusd.transfer(_dst, _amount);
+
+        require(_success, "Shell/aSUSD-transfer-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -97,9 +113,13 @@ contract MainnetASUsdToASUsdAssimilator is IAssimilator {
     // outputs a numeraire amount of ASUsd and returns the corresponding numeraire amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        getASUsd().transfer(_dst, amount_);
-
         amount_ = _amount.mulu(1e18);
+
+        IAToken _asusd = getASUsd();
+
+        bool _success = _asusd.transfer(_dst, amount_);
+
+        require(_success, "Shell/aSUSD-transfer-failed");
 
     }
 
@@ -120,7 +140,9 @@ contract MainnetASUsdToASUsdAssimilator is IAssimilator {
     // views the numeraire value of the current balance of the reserve, in this case ASUsd
     function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
 
-        uint256 _balance = getASUsd().balanceOf(address(this));
+        IAToken _asusd = getASUsd();
+
+        uint256 _balance = _asusd.balanceOf(address(this));
 
         balance_ = _balance.divu(1e18);
 
@@ -130,7 +152,9 @@ contract MainnetASUsdToASUsdAssimilator is IAssimilator {
 
         amount_ = _amount.divu(1e18);
 
-        uint256 _balance = getASUsd().balanceOf(address(this));
+        IAToken _asusd = getASUsd();
+
+        uint256 _balance = _asusd.balanceOf(address(this));
 
         balance_ = _balance.divu(1e18);
 

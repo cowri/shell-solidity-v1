@@ -33,7 +33,7 @@ contract MainnetDaiToDaiAssimilator is IAssimilator {
 
         bool _success = dai.transferFrom(msg.sender, address(this), _amount);
 
-        require(_success, "Shell/dai-transfer-failed");
+        require(_success, "Shell/DAI-transfer-from-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
 
@@ -48,7 +48,7 @@ contract MainnetDaiToDaiAssimilator is IAssimilator {
 
         bool _success = dai.transferFrom(msg.sender, address(this), _amount);
 
-        require(_success, "Shell/dai-transfer-failed");
+        require(_success, "Shell/DAI-transfer-from-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -62,7 +62,7 @@ contract MainnetDaiToDaiAssimilator is IAssimilator {
 
         bool _success = dai.transferFrom(msg.sender, address(this), amount_);
 
-        require(_success, "Shell/dai-transfer-failed");
+        require(_success, "Shell/DAI-transfer-from-failed");
 
     }
 
@@ -71,7 +71,7 @@ contract MainnetDaiToDaiAssimilator is IAssimilator {
 
         bool _success = dai.transfer(_dst, _amount);
 
-        require(_success, "Shell/dai-transfer-failed");
+        require(_success, "Shell/DAI-transfer-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
 
@@ -86,7 +86,7 @@ contract MainnetDaiToDaiAssimilator is IAssimilator {
 
         bool _success = dai.transfer(_dst, _amount);
 
-        require(_success, "Shell/dai-transfer-failed");
+        require(_success, "Shell/DAI-transfer-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -99,7 +99,7 @@ contract MainnetDaiToDaiAssimilator is IAssimilator {
 
         bool _success = dai.transfer(_dst, amount_);
 
-        require(_success, "Shelll/dai-transfer-failed");
+        require(_success, "Shelll/DAI-transfer-failed");
 
         return amount_;
 

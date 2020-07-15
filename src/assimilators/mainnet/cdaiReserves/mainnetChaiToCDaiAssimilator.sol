@@ -68,9 +68,9 @@ contract MainnetChaiToCDaiAssimilator is IAssimilator {
 
         _amount = rmul(_amount, pot.chi());
 
-        uint256 success = cdai.mint(_amount);
+        uint256 _success = cdai.mint(_amount);
 
-        if (success != 0) revert("CDai/mint-failed");
+        require(_success == 0, "Shell/cDAI-mint-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -85,9 +85,9 @@ contract MainnetChaiToCDaiAssimilator is IAssimilator {
 
         _amount = rmul(_amount, pot.chi());
 
-        uint256 success = cdai.mint(_amount);
+        uint256 _success = cdai.mint(_amount);
 
-        if (success != 0) revert("CDai/mint-failed");
+        require(_success == 0, "Shell/cDAI-mint-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -106,9 +106,9 @@ contract MainnetChaiToCDaiAssimilator is IAssimilator {
 
         chai.draw(msg.sender, amount_);
 
-        uint256 success = cdai.mint(amount_);
+        uint256 _success = cdai.mint(amount_);
 
-        if (success != 0) revert("CDai/mint-failed");
+        require(_success == 0, "Shell/cDAI-mint-failed");
 
         amount_ = rdivup(amount_, pot.chi());
 
@@ -119,9 +119,9 @@ contract MainnetChaiToCDaiAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        uint256 success = cdai.redeemUnderlying(amount_);
+        uint256 _success = cdai.redeemUnderlying(amount_);
 
-        if (success != 0) revert("CDai/redeemUnderlying-failed");
+        require(_success == 0, "Shell/cDAI-redeem-underlying-failed");
 
         chai.join(_dst, amount_);
 
@@ -134,9 +134,9 @@ contract MainnetChaiToCDaiAssimilator is IAssimilator {
 
         _amount = rmul(_amount, pot.chi());
 
-        uint256 success = cdai.redeemUnderlying(_amount);
+        uint256 _success = cdai.redeemUnderlying(_amount);
 
-        if (success != 0) revert("CDai/redeemUnderlying-failed");
+        require(_success == 0, "Shell/cDAI-redeem-underlying-failed");
 
         chai.join(_dst, _amount);
 
@@ -149,9 +149,9 @@ contract MainnetChaiToCDaiAssimilator is IAssimilator {
 
         _amount = rmul(_amount, pot.chi());
 
-        uint256 success = cdai.redeemUnderlying(_amount);
+        uint256 _success = cdai.redeemUnderlying(_amount);
 
-        if (success != 0) revert("CDai/redeemUnderlying-failed");
+        require(_success == 0, "Shell/cDAI-redeem-underlying-failed");
 
         chai.join(_dst, _amount);
 

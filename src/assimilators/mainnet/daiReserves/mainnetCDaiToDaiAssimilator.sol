@@ -35,7 +35,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         bool _transferSuccess = cdai.transferFrom(msg.sender, address(this), _amount);
 
-        require(_transferSuccess, "CDai/transferFrom-failed");
+        require(_transferSuccess, "Shell/cDAI-transfer-from-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -43,7 +43,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         uint _redeemSuccess = cdai.redeemUnderlying(_amount);
 
-        require(_redeemSuccess == 0, "CDai/redeem-underlying-failed");
+        require(_redeemSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
 
@@ -58,7 +58,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         bool _transferSuccess = cdai.transferFrom(msg.sender, address(this), _amount);
 
-        require(_transferSuccess, "CDai/transferFrom-failed");
+        require(_transferSuccess, "Shell/cDAI-transfer-from-failed");
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -66,7 +66,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         uint _redeemSuccess = cdai.redeemUnderlying(_amount);
 
-        require(_redeemSuccess == 0, "CDai/redeem-underlying-failed");
+        require(_redeemSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
 
         amount_ = _amount.divu(1e18);
 
@@ -83,11 +83,11 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         bool _transferSuccess = cdai.transferFrom(msg.sender, address(this), amount_);
 
-        require(_transferSuccess, "CDai/transferFrom-failed");
+        require(_transferSuccess, "Shell/cDAI-transfer-from-failed");
 
         uint _redeemSuccess = cdai.redeem(amount_);
 
-        require(_redeemSuccess == 0, "CDai/redemption-failed");
+        require(_redeemSuccess == 0, "Shell/cDAI-redeem-failed");
 
     }
 
@@ -100,11 +100,11 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         uint _mintSuccess = cdai.mint(_daiAmount);
 
-        require(_mintSuccess == 0, "CDai/mint-failed");
+        require(_mintSuccess == 0, "Shell/cDAI-mint-failed");
 
         bool _transferSuccess = cdai.transfer(_dst, _amount);
 
-        require(_transferSuccess, "CDai/transfer-failed");
+        require(_transferSuccess, "Shell/cDAI-transfer-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
 
@@ -123,11 +123,11 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         uint _mintSuccess = cdai.mint(_daiAmount);
 
-        require(_mintSuccess == 0, "CDai/mint-failed");
+        require(_mintSuccess == 0, "Shell/cDAI-mint-failed");
 
         bool _transferSuccess = cdai.transfer(_dst, _amount);
 
-        require(_transferSuccess, "CDai/transfer-failed");
+        require(_transferSuccess, "Shell/cDAI-transfer-failed");
 
         amount_ = _daiAmount.divu(1e18);
 
@@ -140,7 +140,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         uint _mintSuccess = cdai.mint(amount_);
 
-        require(_mintSuccess == 0, "CDai/mint-failed");
+        require(_mintSuccess == 0, "Shell/cDAI-mint-failed");
 
         uint _rate = cdai.exchangeRateStored();
 
@@ -148,7 +148,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         bool _transferSuccess = cdai.transfer(_dst, amount_);
 
-        require(_transferSuccess, "CDai/transfer-failed");
+        require(_transferSuccess, "Shell/cDAI-transfer-failed");
 
     }
 

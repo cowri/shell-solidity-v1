@@ -31,9 +31,9 @@ contract MainnetCUsdcToCUsdcAssimilator is IAssimilator {
     // takes raw cusdc amount and transfers it in
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        bool success = cusdc.transferFrom(msg.sender, address(this), _amount);
+        bool _success = cusdc.transferFrom(msg.sender, address(this), _amount);
 
-        if (!success) revert("CUsdc/transferFrom-failed");
+        require(_success, "Shell/cUSDC-transfer-from-failed");
 
         uint256 _rate = cusdc.exchangeRateStored();
 
@@ -44,9 +44,9 @@ contract MainnetCUsdcToCUsdcAssimilator is IAssimilator {
     // takes raw cusdc amount and transfers it in
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        bool success = cusdc.transferFrom(msg.sender, address(this), _amount);
+        bool _success = cusdc.transferFrom(msg.sender, address(this), _amount);
 
-        if (!success) revert("CUsdc/transferFrom-failed");
+        require(_success, "Shell/cUSDC-transfer-from-failed");
 
         uint256 _rate = cusdc.exchangeRateStored();
 
@@ -65,9 +65,9 @@ contract MainnetCUsdcToCUsdcAssimilator is IAssimilator {
 
         amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 
-        bool success = cusdc.transferFrom(msg.sender, address(this), amount_);
+        bool _success = cusdc.transferFrom(msg.sender, address(this), amount_);
 
-        if (!success) revert("CUsdc/transferFrom-failed");
+        require(_success, "Shell/cUSDC-transfer-from-failed");
 
     }
 
@@ -79,9 +79,9 @@ contract MainnetCUsdcToCUsdcAssimilator is IAssimilator {
 
         amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 
-        bool success = cusdc.transfer(_dst, amount_);
+        bool _success = cusdc.transfer(_dst, amount_);
 
-        if (!success) revert("CUsdc/transfer-failed");
+        require(_success, "Shell/cUSDC-transfer-failed");
 
     }
 
@@ -89,9 +89,9 @@ contract MainnetCUsdcToCUsdcAssimilator is IAssimilator {
     // transfers that amount to destination
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        bool success = cusdc.transfer(_dst, _amount);
+        bool _success = cusdc.transfer(_dst, _amount);
 
-        if (!success) revert("CUsdc/transfer-failed");
+        require(_success, "Shell/cUSDC-transfer-failed");
 
         uint256 _rate = cusdc.exchangeRateStored();
 
@@ -103,9 +103,9 @@ contract MainnetCUsdcToCUsdcAssimilator is IAssimilator {
     // transfers that amount to destination
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        bool success = cusdc.transfer(_dst, _amount);
+        bool _success = cusdc.transfer(_dst, _amount);
 
-        if (!success) revert("CUsdc/transfer-failed");
+        require(_success, "Shell/cUSDC-transfer-failed");
 
         uint256 _rate = cusdc.exchangeRateStored();
 

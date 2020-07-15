@@ -33,17 +33,17 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
     // takes raw cusdc amount and transfers it in
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        bool success = cusdc.transferFrom(msg.sender, address(this), _amount);
+        bool _transferSuccess = cusdc.transferFrom(msg.sender, address(this), _amount);
 
-        if (!success) revert("CUsdc/transferFrom-failed");
+        require(_transferSuccess, "Shell/cUSDC-transfer-from-failed");
 
         uint256 _rate = cusdc.exchangeRateStored();
 
         _amount = ( _amount * _rate ) / 1e18;
 
-        uint _success = cusdc.redeemUnderlying(_amount);
+        uint _redeemSuccess = cusdc.redeemUnderlying(_amount);
 
-        if (_success != 0) revert("CUsdc/redeemUnderlying-failed");
+        require(_redeemSuccess == 0, "Shell/cUSDC-redeem-underlying-failed");
 
         uint256 _balance = usdc.balanceOf(address(this));
 
@@ -56,17 +56,17 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
     // takes raw cusdc amount and transfers it in
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        bool success = cusdc.transferFrom(msg.sender, address(this), _amount);
+        bool _transferSuccess = cusdc.transferFrom(msg.sender, address(this), _amount);
 
-        if (!success) revert("CUsdc/transferFrom-failed");
+        require(_transferSuccess, "Shell/cUSDC-transfer-from-failed");
 
         uint256 _rate = cusdc.exchangeRateStored();
 
         _amount = ( _amount * _rate ) / 1e18;
 
-        uint _success = cusdc.redeemUnderlying(_amount);
+        uint _redeemSuccess = cusdc.redeemUnderlying(_amount);
 
-        if (_success != 0) revert("CUsdc/redeemUnderlying-failed");
+        require(_redeemSuccess == 0, "Shell/cUSDC-redeem-underlying-failed");
 
         amount_ = _amount.divu(1e6);
 
@@ -79,13 +79,13 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
 
         amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 
-        bool success = cusdc.transferFrom(msg.sender, address(this), amount_);
+        bool _transferSuccess = cusdc.transferFrom(msg.sender, address(this), amount_);
 
-        if (!success) revert("CUsdc/transferFrom-failed");
+        require(_transferSuccess, "Shell/cUSDC-transfer-from-failed");
 
-        uint _success = cusdc.redeem(amount_);
+        uint _redeemSuccess = cusdc.redeem(amount_);
 
-        if (_success != 0) revert("CUsdc/redeem-failed");
+        require(_redeemSuccess == 0, "Shell/cUSDC-redeem-failed");
 
     }
 
@@ -95,17 +95,17 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e6);
 
-        uint success = cusdc.mint(amount_);
+        uint _mintSuccess = cusdc.mint(amount_);
 
-        if (success != 0) revert("CUsdc/mint-failed");
+        require(_mintSuccess == 0, "Shell/cUSDC-mint-failed");
 
         uint256 _rate = cusdc.exchangeRateStored();
 
         amount_ = ( amount_ * 1e18 ) / _rate;
 
-        bool _success = cusdc.transfer(_dst, amount_);
+        bool _transferSuccess = cusdc.transfer(_dst, amount_);
 
-        if (!_success) revert("CUsdc/transfer-failed");
+        require(_transferSuccess, "Shell/cUSDC-transfer-failed");
 
     }
 
@@ -119,13 +119,13 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
 
         uint256 _usdcAmount = ( _amount * _rate ) / 1e18;
 
-        uint success = cusdc.mint(_usdcAmount);
+        uint _mintSuccess = cusdc.mint(_usdcAmount);
 
-        if (success != 0 ) revert("CUsdc/mint-failed");
+        require(_mintSuccess == 0, "Shell/cUSDC-mint-failed");
 
-        bool _success = cusdc.transfer(_dst, _amount);
+        bool _transferSuccess = cusdc.transfer(_dst, _amount);
 
-        if (!_success) revert("CUsdc/transfer-failed");
+        require(_transferSuccess, "Shell/cUSDC-transfer-failed");
 
         uint256 _balance = usdc.balanceOf(address(this));
 
@@ -143,13 +143,13 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
 
         uint256 _usdcAmount = ( _amount * _rate ) / 1e18;
 
-        uint success = cusdc.mint(_usdcAmount);
+        uint _mintSuccess = cusdc.mint(_usdcAmount);
 
-        if (success != 0 ) revert("CUsdc/mint-failed");
+        require(_mintSuccess == 0, "Shell/cUSDC-mint-failed");
 
-        bool _success = cusdc.transfer(_dst, _amount);
+        bool _transferSuccess = cusdc.transfer(_dst, _amount);
 
-        if (!_success) revert("CUsdc/transfer-failed");
+        require(_transferSuccess, "Shell/cUSDC-transfer-failed");
 
         amount_ = _amount.divu(1e6);
 
