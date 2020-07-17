@@ -145,6 +145,8 @@ contract LoihiSetup is StorageSetup {
 
     }
 
+    event log(bytes32);
+
     function interApproveStablecoinsLocal (address _approveFrom) public {
 
         address[] memory targets = new address[](5);
@@ -155,7 +157,12 @@ contract LoihiSetup is StorageSetup {
         targets[3] = address(usdc); spenders[3] = address(cusdc);
         targets[4] = address(usdt); spenders[4] = address(ausdt);
 
+        emit log("inter approve");
+
         for (uint i = 0; i < targets.length; i++) {
+
+            emit log_uint("i", i);
+
             ApproveFrom(_approveFrom).TEST_safeApprove(targets[i], spenders[i], uint256(0));
             ApproveFrom(_approveFrom).TEST_safeApprove(targets[i], spenders[i], uint256(-1));
         }

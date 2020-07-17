@@ -21,7 +21,7 @@ contract TargetSwapTemplate is Setup {
 
     function noSlippage_balanced_DAI_to_10USDC_300Proportional () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         originAmount_ = l.targetSwap(
             address(dai),
@@ -50,7 +50,7 @@ contract TargetSwapTemplate is Setup {
 
     function noSlippage_balanced_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         originAmount_ = l.targetSwap(
             address(susd),
@@ -62,7 +62,7 @@ contract TargetSwapTemplate is Setup {
 
     function noSlippage_Balanced_10PctWeight_to_30PctWeight_AUSDT () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         originAmount_ = l.targetSwap(
             address(susd),
@@ -74,7 +74,7 @@ contract TargetSwapTemplate is Setup {
 
     function partialUpperAndLowerSlippage_balanced_30PctWeight_to30PctWeight () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         originAmount_ = l.targetSwap(
             address(usdc),
@@ -86,7 +86,7 @@ contract TargetSwapTemplate is Setup {
 
     function partialUpperAndLowerSlippage_balanced_30PctWeight_to_10PctWeight () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         originAmount_ = l.targetSwap(
             address(usdc),
@@ -98,7 +98,7 @@ contract TargetSwapTemplate is Setup {
 
     function partialUpperAndLowerSLippage_balanced_30PctWeight_to_10PctWeight_ASUSD () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         originAmount_ = l.targetSwap(
             address(usdc),
@@ -488,7 +488,7 @@ contract TargetSwapTemplate is Setup {
 
     function upperHaltCheck_10PctWeight () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         ( success_, ) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector,
@@ -503,7 +503,7 @@ contract TargetSwapTemplate is Setup {
 
     function lowerhaltCheck_10PctWeight () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         ( success_, ) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector,
@@ -552,7 +552,7 @@ contract TargetSwapTemplate is Setup {
 
     function targetGreaterThanBalance_10Pct () public {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         l.targetSwap(
             address(usdc),
@@ -564,7 +564,7 @@ contract TargetSwapTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_to_outOfBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -581,7 +581,7 @@ contract TargetSwapTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_to_inBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -598,7 +598,7 @@ contract TargetSwapTemplate is Setup {
 
     function smartHalt_upper_unrelated () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -615,7 +615,7 @@ contract TargetSwapTemplate is Setup {
 
     function smartHalt_lower () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18);
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
@@ -638,7 +638,7 @@ contract TargetSwapTemplate is Setup {
 
     function smartHalt_lower_unrelated () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18);
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
@@ -697,7 +697,7 @@ contract TargetSwapTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyOutOfBounds_noHalts_omegaUpdate () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 4910e6);
         ausdt.transfer(address(l), 4910e6);
@@ -716,7 +716,7 @@ contract TargetSwapTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyOutOfBounds_noHalts_noOmegaUpdate () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 4910e6);
         ausdt.transfer(address(l), 4910e6);
@@ -733,7 +733,7 @@ contract TargetSwapTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyInBounds_noHalts_updateOmega () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(4910e18).divu(1e18));
 
@@ -760,7 +760,7 @@ contract TargetSwapTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyInBounds_noHalts_noUpdateOmega () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(4910e18).divu(1e18));
 
@@ -785,7 +785,7 @@ contract TargetSwapTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBound_towards_mutuallyInBound_noHalts_omegaUpdate () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         susd.transfer(address(l), 4970e18);
         asusd.transfer(address(l), 4970e18);
@@ -804,7 +804,7 @@ contract TargetSwapTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBound_zero_noHalts_omegaUpdate () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         susd.transfer(address(l), 4970e18);
         asusd.transfer(address(l), 4970e18);

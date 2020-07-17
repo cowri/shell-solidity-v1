@@ -21,9 +21,9 @@ contract TargetSwapViewsTemplate is Setup {
 
     function noSlippage_balanced_DAI_to_10USDC_300Proportional () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(dai),
             address(usdc),
             10e6
@@ -40,7 +40,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 35e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdc),
             address(susd),
             3e18
@@ -50,9 +50,9 @@ contract TargetSwapViewsTemplate is Setup {
 
     function noSlippage_balanced_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(susd),
             address(usdt),
             4e6
@@ -62,9 +62,9 @@ contract TargetSwapViewsTemplate is Setup {
 
     function noSlippage_Balanced_10PctWeight_to_30PctWeight_AUSDT () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(susd),
             address(ausdt),
             4e18
@@ -74,9 +74,9 @@ contract TargetSwapViewsTemplate is Setup {
 
     function partialUpperAndLowerSlippage_balanced_30PctWeight_to30PctWeight () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdc),
             address(dai),
             40e18
@@ -86,9 +86,9 @@ contract TargetSwapViewsTemplate is Setup {
 
     function partialUpperAndLowerSlippage_balanced_30PctWeight_to_10PctWeight () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdc),
             address(susd),
             12e18
@@ -98,9 +98,9 @@ contract TargetSwapViewsTemplate is Setup {
 
     function partialUpperAndLowerSLippage_balanced_30PctWeight_to_10PctWeight_ASUSD () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdc),
             address(asusd),
             12e18
@@ -117,7 +117,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 30e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(susd),
             address(dai),
             8e18
@@ -134,7 +134,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 35e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdc),
             address(susd),
             3e18
@@ -151,7 +151,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 35e18
         );
 
-        uint256 originAmount = l.viewTargetTrade(
+        uint256 originAmount = l.viewTargetSwap(
             address(cusdc),
             address(susd),
             3e18
@@ -171,7 +171,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 30e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(dai),
             address(usdt),
             5e6
@@ -188,7 +188,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 25e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(dai),
             address(susd),
             3e18
@@ -205,7 +205,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 35e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(susd),
             address(usdc),
             2.8e6
@@ -222,7 +222,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 30e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdc),
             address(dai),
             30e18
@@ -241,7 +241,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     //     uint256 gas = gasleft();
 
-    //     originAmount_ = l.viewTargetTrade(
+    //     originAmount_ = l.viewTargetSwap(
     //         address(usdc),
     //         address(dai),
     //         30e18
@@ -283,7 +283,7 @@ contract TargetSwapViewsTemplate is Setup {
 
         uint256 chaiOf10Numeraire = chaiAssimilator.viewRawAmount(uint(10e18).divu(1e18));
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(susd),
             address(chai),
             chaiOf10Numeraire
@@ -300,7 +300,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 25e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(susd),
             address(dai),
             10e18
@@ -317,7 +317,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 40e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdt),
             address(susd),
             10e18
@@ -334,7 +334,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 30e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdt),
             address(usdc),
             5e6
@@ -351,7 +351,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 25e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(susd),
             address(usdt),
             3.6537e6
@@ -368,7 +368,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 40e18
         );
 
-        uint256 originAmount = l.viewTargetTrade(
+        uint256 originAmount = l.viewTargetSwap(
             address(cdai),
             address(susd),
             2.349e18
@@ -387,7 +387,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 40e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(dai),
             address(susd),
             2.349e18
@@ -404,7 +404,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 30e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(dai),
             address(usdt),
             70e6
@@ -421,7 +421,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 20e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(susd),
             address(usdt),
             20e6
@@ -438,7 +438,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 40e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(dai),
             address(susd),
             20e18
@@ -488,7 +488,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function upperHaltCheck_10PctWeight () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         ( success_, ) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector,
@@ -503,7 +503,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function lowerhaltCheck_10PctWeight () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         ( success_, ) = address(l).call(abi.encodeWithSelector(
             l.swapByTarget.selector,
@@ -525,7 +525,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 35e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(dai),
             address(susd),
             3e18
@@ -542,7 +542,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 45e18
         );
 
-        l.viewTargetTrade(
+        l.viewTargetSwap(
             address(usdt),
             address(dai),
             50e18
@@ -552,9 +552,9 @@ contract TargetSwapViewsTemplate is Setup {
 
     function targetGreaterThanBalance_10Pct () public {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
-        l.viewTargetTrade(
+        l.viewTargetSwap(
             address(usdc),
             address(susd),
             31e18
@@ -564,7 +564,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_to_outOfBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -581,7 +581,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_to_inBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -598,7 +598,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function smartHalt_upper_unrelated () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -615,7 +615,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function smartHalt_lower () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18);
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
@@ -638,7 +638,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function smartHalt_lower_unrelated () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18);
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
@@ -670,7 +670,7 @@ contract TargetSwapViewsTemplate is Setup {
 
         l.TEST_setTestHalts(false);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdc),
             address(usdt),
             4900e6
@@ -687,7 +687,7 @@ contract TargetSwapViewsTemplate is Setup {
             address(susd), 800e18
         );
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdc),
             address(usdt),
             4900e6
@@ -697,7 +697,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyOutOfBounds_noHalts_omegaUpdate () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 4910e6);
         ausdt.transfer(address(l), 4910e6);
@@ -706,7 +706,7 @@ contract TargetSwapViewsTemplate is Setup {
 
         l.TEST_setTestHalts(false);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdt),
             address(dai),
             1e18
@@ -716,14 +716,14 @@ contract TargetSwapViewsTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyOutOfBounds_noHalts_noOmegaUpdate () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 4910e6);
         ausdt.transfer(address(l), 4910e6);
 
         l.TEST_setTestHalts(false);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdt),
             address(dai),
             1e18
@@ -733,7 +733,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyInBounds_noHalts_updateOmega () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(4910e18).divu(1e18));
 
@@ -750,7 +750,7 @@ contract TargetSwapViewsTemplate is Setup {
 
         l.prime();
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(dai),
             address(usdt),
             5000e6
@@ -760,7 +760,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBounds_to_mutuallyInBounds_noHalts_noUpdateOmega () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(4910e18).divu(1e18));
 
@@ -775,7 +775,7 @@ contract TargetSwapViewsTemplate is Setup {
 
         l.TEST_setTestHalts(false);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(dai),
             address(usdt),
             5000e6
@@ -785,7 +785,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBound_towards_mutuallyInBound_noHalts_omegaUpdate () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         susd.transfer(address(l), 4970e18);
         asusd.transfer(address(l), 4970e18);
@@ -794,7 +794,7 @@ contract TargetSwapViewsTemplate is Setup {
 
         l.TEST_setTestHalts(false);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdt),
             address(susd),
             1e18
@@ -804,7 +804,7 @@ contract TargetSwapViewsTemplate is Setup {
 
     function monotonicity_outOfBand_mutuallyOutOfBound_zero_noHalts_omegaUpdate () public returns (uint256 originAmount_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         susd.transfer(address(l), 4970e18);
         asusd.transfer(address(l), 4970e18);
@@ -813,7 +813,7 @@ contract TargetSwapViewsTemplate is Setup {
 
         l.TEST_setTestHalts(false);
 
-        originAmount_ = l.viewTargetTrade(
+        originAmount_ = l.viewTargetSwap(
             address(usdt),
             address(susd),
             0

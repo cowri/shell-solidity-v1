@@ -81,6 +81,8 @@ contract ERC20Mock {
         return _allowances[owner][spender];
     }
 
+    event log(bytes32);
+    
     /**
      * @dev See {IERC20-approve}.
      *
@@ -89,6 +91,7 @@ contract ERC20Mock {
      * - `spender` cannot be the zero address.
      */
     function approve(address spender, uint256 amount) public returns (bool) {
+        emit log("IN APPROVE");
         _approve(msg.sender, spender, amount);
         return true;
     }

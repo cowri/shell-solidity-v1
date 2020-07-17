@@ -24,7 +24,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function balanced_10DAI_10USDC_10USDT_2p5SUSD_from_300Proportional () public returns (uint256 shellsBurned_) {
 
-        uint256 _startingShells = l.proportionalDeposit(300e18);
+        ( uint256 _startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
 
         shellsBurned_ = l.withdraw(
             address(dai), 10e18,
@@ -55,7 +55,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional () public returns (uint256 shellsBurned_) {
 
-        uint256 _startingShells = l.proportionalDeposit(300e18);
+        ( uint256 _startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
 
         shellsBurned_ = l.withdraw(
             address(dai), 5e18,
@@ -86,7 +86,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function partialUpperSlippage_balanced_0p001DAI_40USDC_40USDT_10SUSD_from_300Proportional () public returns (uint256 shellsBurned_) {
 
-        uint256 _startingShells = l.proportionalDeposit(300e18);
+        ( uint256 _startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
 
         shellsBurned_ = l.withdraw(
             address(dai), 0.001e18,
@@ -482,7 +482,7 @@ contract SelectiveWithdrawTemplate is Setup {
             address(susd), 30e18
         );
 
-        l.proportionalWithdraw(150e18);
+        l.proportionalWithdraw(150e18, 1e50);
 
         ( , uint256[] memory reserves ) = l.liquidity();
 
@@ -492,7 +492,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_to_outOfBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -505,7 +505,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_to_inBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -518,7 +518,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function smartHalt_upper_unrelated () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -531,7 +531,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function smartHalt_lower_outOfBounds_exacerbated () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18);
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
@@ -552,7 +552,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function smartHalt_lower_outOfBounds_to_outOfBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18);
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
@@ -575,7 +575,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function smartHalt_lower_outOfBounds_to_inBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18);
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
@@ -598,7 +598,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_inBounds_noHalt_omegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
@@ -613,7 +613,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_inBounds_noHalt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
@@ -626,7 +626,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_inBounds_halt_omegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
@@ -639,7 +639,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_inBounds_halt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
@@ -650,7 +650,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_noHalt_omegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         susd.transfer(address(l), 9970e18);
         asusd.transfer(address(l), 9970e18);
@@ -665,7 +665,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_noHalt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         susd.transfer(address(l), 9970e18);
         asusd.transfer(address(l), 9970e18);
@@ -678,7 +678,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_halt_omegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         susd.transfer(address(l), 9970e18);
         asusd.transfer(address(l), 9970e18);
@@ -691,7 +691,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_halt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         susd.transfer(address(l), 9970e18);
         asusd.transfer(address(l), 9970e18);
@@ -702,7 +702,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_lower_inBounds_to_outOfBounds_halt () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(30000e18);
+        l.proportionalDeposit(30000e18, 1e50);
 
         shellsBurned_ = l.withdraw(address(dai), 8910e18);
 
@@ -710,7 +710,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_lower_inBounds_to_outOfBounds_noHalt () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(30000e18);
+        l.proportionalDeposit(30000e18, 1e50);
 
         l.TEST_setTestHalts(false);
 
@@ -720,7 +720,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_halt_omegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
 
@@ -741,7 +741,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_halt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
 
@@ -760,7 +760,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_noHalt_omegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
 
@@ -783,7 +783,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_noHalt_noOmegaUpdate () public returns (uint256 shellsBurned_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
 
@@ -809,7 +809,7 @@ contract SelectiveWithdrawTemplate is Setup {
         uint256 susd_
     ) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
@@ -821,7 +821,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         l.TEST_setTestHalts(false);
 
-        l.proportionalWithdraw(1e18);
+        l.proportionalWithdraw(1e18, 1e50);
 
         dai_ = dai.balanceOf(address(this)) - _daiBal;
         usdc_ = usdc.balanceOf(address(this)) - _usdcBal;
@@ -839,7 +839,7 @@ contract SelectiveWithdrawTemplate is Setup {
         uint256 susd_
     ) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(9910e18).divu(1e18));
 
@@ -857,7 +857,7 @@ contract SelectiveWithdrawTemplate is Setup {
         uint256 _usdtBal = usdt.balanceOf(address(this));
         uint256 _susdBal = susd.balanceOf(address(this));
 
-        l.proportionalWithdraw(1e18);
+        l.proportionalWithdraw(1e18, 1e50);
 
         dai_ = dai.balanceOf(address(this)) - _daiBal;
         usdc_ = usdc.balanceOf(address(this)) - _usdcBal;

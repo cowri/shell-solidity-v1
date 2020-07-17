@@ -102,7 +102,7 @@ library ProportionalLiquidity {
         uint256 _deposit
     ) internal returns (
         uint shells_,
-        uint[] memory deposits_
+        uint[] memory
     ) {
 
         int128 _shells = _deposit.divu(1e18);

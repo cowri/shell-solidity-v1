@@ -238,7 +238,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     function testFailSelectiveDepositUpperHaltCheck30Pct () public {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         l.deposit(address(dai), 100e18);
 
@@ -246,7 +246,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     function testFailSelectiveDepositLowerHaltCheck30Pct () public {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         l.deposit(
             address(dai), 300e18,
@@ -258,7 +258,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     function testFailSelectiveDepositDepostUpperHaltCheck10Pct () public {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         l.deposit(address(susd), 500e18);
 
@@ -266,7 +266,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     function testFailSelectiveDepositLowerHaltCheck10Pct () public {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         l.deposit(
             address(dai), 200e18,

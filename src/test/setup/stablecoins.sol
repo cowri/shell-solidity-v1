@@ -56,11 +56,15 @@ contract StablecoinSetup is StorageSetup {
 
     }
 
+    event log_addr(bytes32, address);
+
     function setupStablecoinsLocal () public {
 
         dai = IERC20(address(new ERC20Mock("dai", "dai", 18, uint256(-1)/2)));
         cdai = ICToken(address(new CDaiMock(address(dai), "cdai", "cdai", 8, 0)));
         chai = IChai(address(new ChaiMock(address(dai), "chai", "chai", 18, 0)));
+        emit log_addr("DAI", address(dai));
+        emit log_addr("ChaI", address(chai));
 
         pot = IPot(address(new PotMock()));
 

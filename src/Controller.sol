@@ -34,7 +34,6 @@ library Controller {
 
     function setParams (
         Loihi.Shell storage shell,
-        Loihi.Assimilator[] storage reserves,
         uint256 _alpha,
         uint256 _beta,
         uint256 _max,
@@ -45,11 +44,16 @@ library Controller {
         require(_max <= .5e18, "Shell/parameter-invalid-max");
 
         int128 _gLiq;
-        int128[] memory _bals = new int128[](reserves.length);
+        int128[] memory _bals = new int128[](shell.reserves.length);
+
         for (uint i = 0; i < _bals.length; i++) {
-            int128 _bal = reserves[i].addr.viewNumeraireBalance();
-            _gLiq += _bal;
+
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+
             _bals[i] = _bal;
+
+            _gLiq += _bal;
+
         }
 
         shell.alpha = _alpha.divu(1e18);
@@ -78,9 +82,6 @@ library Controller {
 
     function includeAsset (
         Loihi.Shell storage shell,
-        mapping (address => Loihi.Assimilator) storage assimilators,
-        Loihi.Assimilator[] storage numeraires,
-        Loihi.Assimilator[] storage reserves,
         address _numeraire,
         address _numeraireAssim,
         address _reserve,
@@ -88,36 +89,54 @@ library Controller {
         uint256 _weight
     ) internal {
 
-        Loihi.Assimilator storage _numeraireAssimilator = assimilators[_numeraire];
+        Loihi.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
         _numeraireAssimilator.addr = _numeraireAssim;
 
-        _numeraireAssimilator.ix = uint8(numeraires.length);
+        _numeraireAssimilator.ix = uint8(shell.numeraires.length);
 
-        numeraires.push(_numeraireAssimilator);
+        shell.numeraires.push(_numeraireAssimilator);
 
-        Loihi.Assimilator storage _reserveAssimilator = assimilators[_reserve];
+        Loihi.Assimilator storage _reserveAssimilator = shell.assimilators[_reserve];
 
         _reserveAssimilator.addr = _reserveAssim;
 
-        _reserveAssimilator.ix = uint8(reserves.length);
+        _reserveAssimilator.ix = uint8(shell.reserves.length);
 
-        reserves.push(_reserveAssimilator);
+        shell.reserves.push(_reserveAssimilator);
 
         shell.weights.push(_weight.divu(1e18).add(uint256(1).divu(1e18)));
 
     }
 
     function includeAssimilator (
-        mapping (address => Loihi.Assimilator) storage assimilators,
+        Loihi.Shell storage shell,
         address _numeraire,
         address _derivative,
         address _assimilator
     ) internal {
 
-        Loihi.Assimilator storage _numeraireAssim = assimilators[_numeraire];
+        Loihi.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
-        assimilators[_derivative] = Loihi.Assimilator(_assimilator, _numeraireAssim.ix);
+        shell.assimilators[_derivative] = Loihi.Assimilator(_assimilator, _numeraireAssim.ix);
+
+    }
+
+    function prime (
+        Loihi.Shell storage shell
+    ) internal {
+
+        uint _length = shell.reserves.length;
+        int128 _oGLiq;
+        int128[] memory _oBals = new int128[](_length);
+
+        for (uint i = 0; i < _length; i++) {
+            int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
+            _oGLiq += _bal;
+            _oBals[i] = _bal;
+        }
+
+        shell.omega = ShellMath.calculateFee(_oGLiq, _oBals, shell.beta, shell.delta, shell.weights);
 
     }
 

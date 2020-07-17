@@ -28,8 +28,8 @@ contract TargetSwapSuiteSixTest is TargetSwapTemplate, DSTest {
 
     function doubleDeposit (uint256 shells) public {
 
-        l.proportionalDeposit(shells);
-        l2.proportionalDeposit(shells);
+        l.proportionalDeposit(shells, 1e50);
+        l2.proportionalDeposit(shells, 1e50);
 
     }
 

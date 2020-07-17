@@ -22,7 +22,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.proportionalDeposit(300e18);
+        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
 
         uint256 gas = gasleft();
 
@@ -39,7 +39,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     // function noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_HACK () public returns (uint256 shellsMinted_) {
 
-    //     uint256 startingShells = l.proportionalDeposit(300e18);
+    //     uint256 startingShells = l.proportionalDeposit(300e18, 1e50);
 
     //     uint256 gas = gasleft();
 
@@ -97,7 +97,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function partialUpperSlippage_5DAI_5USDC_70USDT_28SUSD_300Proportional () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.proportionalDeposit(300e18);
+        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
 
         shellsMinted_ = l.viewDeposit(
             address(dai), 5e18,
@@ -128,7 +128,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function partialLowerSlippage_balanced_0p001DAI_90USDC_90USDT () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.proportionalDeposit(300e18);
+        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
 
         shellsMinted_ = l.viewDeposit(
             address(dai), .001e18,
@@ -174,7 +174,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function noSlippage_36CHAI_into_300Proportional () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.proportionalDeposit(300e18);
+        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
 
         uint256 _chaiOf36Numeraire = chaiAssimilator.viewRawAmount(uint(36e18).divu(1e18));
 
@@ -372,7 +372,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function noSlippage_36CDAI_into_300Proportional () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.proportionalDeposit(300e18);
+        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
 
         uint256 cdaiOf36Numeraire = cdaiAssimilator.viewRawAmount(uint(36e18).divu(1e18));
 
@@ -382,7 +382,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function noSlippage_36DAI_from_300Proportional () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.proportionalDeposit(300e18);
+        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
 
         shellsMinted_ = l.viewDeposit(address(dai), 36e18);
 
@@ -390,7 +390,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function upperSlippage_36Point001Dai_into_300Proportional () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.proportionalDeposit(300e18);
+        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
 
         shellsMinted_ = l.viewDeposit(address(dai), 36.001e18);
 
@@ -469,7 +469,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function testFailSelectiveDepositUpperHaltCheck30Pct () public {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         l.deposit(address(dai), 100e18);
 
@@ -477,7 +477,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function testFailSelectiveDepositLowerHaltCheck30Pct () public {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         l.deposit(
             address(dai), 300e18,
@@ -489,7 +489,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function testFailSelectiveDepositDepostUpperHaltCheck10Pct () public {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         l.deposit(address(susd), 500e18);
 
@@ -497,7 +497,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function testFailSelectiveDepositLowerHaltCheck10Pct () public {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         l.deposit(
             address(dai), 200e18,
@@ -518,7 +518,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
         ( , uint256[] memory _before ) = l.liquidity();
 
-        l.proportionalDeposit(90e18);
+        l.proportionalDeposit(90e18, 1e50);
 
         ( , uint256[] memory after_ ) = l.liquidity();
 
@@ -542,7 +542,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
         ( , uint256[] memory _before ) = l.liquidity();
 
-        l.proportionalDeposit(90e18);
+        l.proportionalDeposit(90e18, 1e50);
 
         ( , uint256[] memory after_ ) = l.liquidity();
 
@@ -566,7 +566,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
         ( , uint256[] memory _before ) = l.liquidity();
 
-        l.proportionalDeposit(90e18);
+        l.proportionalDeposit(90e18, 1e50);
 
         ( , uint256[] memory after_ ) = l.liquidity();
 
@@ -581,7 +581,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_exacerbated () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -596,7 +596,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_to_outOfBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -613,7 +613,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_to_inBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
@@ -630,7 +630,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function smartHalt_lower_unrelated () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18);
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
@@ -653,7 +653,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function smartHalt_lower_outOfBounds_to_outOfBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18);
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
@@ -674,7 +674,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function smartHalt_lower_outOfBounds_to_inBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18);
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
@@ -695,7 +695,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_upper_inBounds_to_outOfBounds_noHalt () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         l.TEST_setTestHalts(false);
 
@@ -705,7 +705,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_upper_inBounds_to_outOfBounds_halt () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         mintedShells_ = l.deposit(address(usdt), 10000e6);
 
@@ -713,7 +713,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_noHalt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
@@ -728,7 +728,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_noHalt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
@@ -741,7 +741,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_halt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
@@ -754,7 +754,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_halt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
@@ -765,7 +765,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_inBounds_halt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
@@ -787,7 +787,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_inBounds_halt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
@@ -807,7 +807,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_inBounds_noHalt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
@@ -831,7 +831,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_inBounds_noHalt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
@@ -853,7 +853,7 @@ contract SelectiveDepositViewsTemplate is Setup {
     
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_halt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
@@ -875,7 +875,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_halt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
@@ -895,7 +895,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_noHalt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
@@ -919,7 +919,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_noHalt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
@@ -946,7 +946,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         uint256 susd_
     ) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
 
@@ -964,7 +964,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         uint256 _usdtBal = usdt.balanceOf(address(this));
         uint256 _susdBal = susd.balanceOf(address(this));
 
-        l.proportionalDeposit(1e18);
+        l.proportionalDeposit(1e18, 1e50);
 
         dai_ = _daiBal - dai.balanceOf(address(this));
         usdc_ = _usdcBal - usdc.balanceOf(address(this));
@@ -980,7 +980,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         uint256 susd_
     ) {
 
-        l.proportionalDeposit(300e18);
+        l.proportionalDeposit(300e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(9910e18).divu(1e18));
 
@@ -992,7 +992,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         uint256 _usdtBal = usdt.balanceOf(address(this));
         uint256 _susdBal = susd.balanceOf(address(this));
 
-        l.proportionalDeposit(1e18);
+        l.proportionalDeposit(1e18, 1e50);
 
         dai_ = _daiBal - dai.balanceOf(address(this));
         usdc_ = _usdcBal - usdc.balanceOf(address(this));
