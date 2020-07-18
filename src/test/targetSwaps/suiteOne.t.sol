@@ -37,14 +37,6 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
 
     }
 
-    function test_s1_targetSwap_noSlippage_Balanced_10PctWeight_to_30PctWeight_AUSDT () public {
-
-        uint256 originAmount = super.noSlippage_Balanced_10PctWeight_to_30PctWeight_AUSDT();
-
-        assertEq(originAmount, 4001000000000000000);
-
-    }
-
     function test_s1_targetSwap_partialUpperAndLowerSlippage_balanced_30PctWeight_to30PctWeight () public {
 
         uint256 originAmount = super.partialUpperAndLowerSlippage_balanced_30PctWeight_to30PctWeight();
@@ -56,14 +48,6 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
     function test_s1_targetSwap_partialUpperAndLowerSlippage_balanced_30PctWeight_to_10PctWeight () public {
 
         uint256 originAmount = super.partialUpperAndLowerSlippage_balanced_30PctWeight_to_10PctWeight();
-
-        assertEq(originAmount, 12070653);
-
-    }
-
-    function test_s1_targetSwap_partialUpperAndLowerSLippage_balanced_30PctWeight_to_10PctWeight_ASUSD () public {
-
-        uint256 originAmount = super.partialUpperAndLowerSLippage_balanced_30PctWeight_to_10PctWeight_ASUSD();
 
         assertEq(originAmount, 12070653);
 
@@ -82,14 +66,6 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
         uint256 originAmount = super.noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight();
 
         assertEq(originAmount, 3000750);
-
-    }
-
-    function test_s1_targetSwap_noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight_CUSDC () public {
-
-        uint256 originAmount = super.noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight_CUSDC();
-
-        assertEq(originAmount, 3000748999999999999);
 
     }
 
@@ -141,14 +117,6 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
 
     // }
 
-    function test_s1_targetSwap_partialUpperAndLowerAntiSlippage_unbalanced_CHAI_10PctWeight_to_30PctWeight () public {
-
-        uint256 originAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_CHAI_10PctWeight_to_30PctWeight();
-
-        assertEq(originAmount, 9991320735294117000);
-
-    }
-
     function test_s1_targetSwap_partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight () public {
 
         uint256 originAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight();
@@ -178,14 +146,6 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
         uint256 originAmount = super.fullUpperAndLowerAntiSlippage_10PctOrigin_to_30PctTarget();
 
         assertEq(originAmount, 3646340426509550000);
-
-    }
-
-    function test_s1_targetSwap_fullUpperAndLowerAntiSlippage_CDAI_30pct_to_10Pct () public {
-
-        uint256 originAmount = super.fullUpperAndLowerAntiSlippage_CDAI_30pct_to_10Pct();
-
-        assertEq(originAmount, 2332029381004849492);
 
     }
 

@@ -172,35 +172,6 @@ contract SelectiveDepositTemplate is Setup {
 
     }
 
-    function noSlippage_36CHAI_into_300Proportional () public returns (uint256 shellsMinted_) {
-
-        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
-
-        uint256 _chaiOf36Numeraire = chaiAssimilator.viewRawAmount(uint(36e18).divu(1e18));
-
-        shellsMinted_ = l.deposit(address(chai), _chaiOf36Numeraire);
-
-    }
-
-    function partialLowerAntiSlippage_36CUSDC_18ASUSD_into_95DAI_55USDC_95USDT_15SUSD () public returns (uint256 shellsMinted_) {
-
-        uint256 startingShells = l.deposit(
-            address(dai), 95e18,
-            address(usdc), 55e6,
-            address(usdt), 95e6,
-            address(susd), 15e18
-        );
-
-        uint256 cusdcOf36Numeraire = cusdcAssimilator.viewRawAmount(uint(36e18).divu(1e18));
-        uint256 asusdOf18Numeraire = asusdAssimilator.viewRawAmount(uint(18e18).divu(1e18));
-
-        shellsMinted_ = l.deposit(
-            address(cusdc), cusdcOf36Numeraire,
-            address(asusd), asusdOf18Numeraire
-        );
-
-    }
-
     function partialLowerAntiSlippage_36USDC_18SUSD_into_95DAI_55USDC_95USDT_15SUSD () public returns (uint256 shellsMinted_) {
 
         uint256 startingShells = l.deposit(
@@ -263,25 +234,6 @@ contract SelectiveDepositTemplate is Setup {
         shellsMinted_ = l.deposit(
             address(dai), 9e18,
             address(usdc), 9e6
-        );
-
-    }
-
-    function fullUpperAntiSlippage_5CHAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD () public returns (uint256 shellsMinted_) {
-
-        uint256 startingShells = l.deposit(
-            address(dai), 90e18,
-            address(usdc), 90e6,
-            address(usdt), 145e6,
-            address(susd), 50e18
-        );
-
-        uint256 chaiOf5Numeraire = chaiAssimilator.viewRawAmount(uint(5e18).divu(1e18));
-        uint256 cusdcOf5Numeraire = cusdcAssimilator.viewRawAmount(uint(5e18).divu(1e18));
-
-        shellsMinted_ = l.deposit(
-            address(chai), chaiOf5Numeraire,
-            address(cusdc), cusdcOf5Numeraire
         );
 
     }
@@ -370,16 +322,6 @@ contract SelectiveDepositTemplate is Setup {
 
     }
 
-    function noSlippage_36CDAI_into_300Proportional () public returns (uint256 shellsMinted_) {
-
-        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
-
-        uint256 cdaiOf36Numeraire = cdaiAssimilator.viewRawAmount(uint(36e18).divu(1e18));
-
-        shellsMinted_ = l.deposit(address(cdai), cdaiOf36Numeraire);
-
-    }
-
     function noSlippage_36DAI_from_300Proportional () public returns (uint256 shellsMinted_) {
 
         ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
@@ -424,27 +366,6 @@ contract SelectiveDepositTemplate is Setup {
         shellsMinted_ = l.deposit(
             address(dai), 165e18,
             address(usdt), 165e6
-        );
-
-    }
-
-    function megaDepositIndirectUpperLower_165CDAI_0p0001CUSDC_165USDT_0p5SUSD_into_90DAI_145USDC_90USDT_50SUSD () public returns (uint256 shellsMinted_) {
-
-        uint256 startingShells = l.deposit(
-            address(dai), 90e18,
-            address(usdc), 145e6,
-            address(usdt), 90e6,
-            address(susd), 50e18
-        );
-
-        uint256 cdaiOf165Numeraire = cdaiAssimilator.viewRawAmount(uint(165e18).divu(1e18));
-        uint256 cusdcOf0Point0001Numeraire = cusdcAssimilator.viewRawAmount(uint(0.0001e6).divu(1e6));
-
-        shellsMinted_ = l.deposit(
-            address(cdai), cdaiOf165Numeraire,
-            address(cusdc), cusdcOf0Point0001Numeraire,
-            address(usdt), 165e6,
-            address(susd), 5e18
         );
 
     }
@@ -583,9 +504,6 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
-
-        cusdc.transfer(address(l), _rawCUsdc);
         usdc.transfer(address(l), 110e6);
 
         success_ = l.depositSuccess(
@@ -598,9 +516,6 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
-
-        cusdc.transfer(address(l), _rawCUsdc);
         usdc.transfer(address(l), 110e6);
 
         success_ = l.depositSuccess(
@@ -615,9 +530,6 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
-
-        cusdc.transfer(address(l), _rawCUsdc);
         usdc.transfer(address(l), 110e6);
 
         success_ = l.depositSuccess(
@@ -632,16 +544,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(67e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
-
-        cdai.transfer(address(l), _rawCDai);
         dai.transfer(address(l), 70e18);
 
         usdt.transfer(address(l), 70e6);
-        ausdt.transfer(address(l), 70e6);
 
         susd.transfer(address(l), 23e18);
-        asusd.transfer(address(l), 23e18);
 
         success_ = l.depositSuccess(
             address(dai), 1e18,
@@ -655,16 +562,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(67e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
-
-        cdai.transfer(address(l), _rawCDai);
         dai.transfer(address(l), 70e18);
 
         usdt.transfer(address(l), 70e6);
-        ausdt.transfer(address(l), 70e6);
 
         susd.transfer(address(l), 23e18);
-        asusd.transfer(address(l), 23e18);
 
         l.prime();
 
@@ -678,16 +580,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(67e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
-
-        cdai.transfer(address(l), _rawCDai);
         dai.transfer(address(l), 70e18);
 
         usdt.transfer(address(l), 70e6);
-        ausdt.transfer(address(l), 70e6);
 
         susd.transfer(address(l), 23e18);
-        asusd.transfer(address(l), 23e18);
 
         success_ = l.depositSuccess(
             address(usdc), 50e6
@@ -718,7 +615,6 @@ contract SelectiveDepositTemplate is Setup {
         l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
-        ausdt.transfer(address(l), 9910e6);
 
         l.TEST_setTestHalts(false);
 
@@ -733,7 +629,6 @@ contract SelectiveDepositTemplate is Setup {
         l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
-        ausdt.transfer(address(l), 9910e6);
 
         l.TEST_setTestHalts(false);
 
@@ -746,7 +641,6 @@ contract SelectiveDepositTemplate is Setup {
         l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
-        ausdt.transfer(address(l), 9910e6);
 
         l.prime();
 
@@ -759,7 +653,6 @@ contract SelectiveDepositTemplate is Setup {
         l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 9910e6);
-        ausdt.transfer(address(l), 9910e6);
 
         mintedShells_ = l.deposit(address(usdc), 1e6);
 
@@ -769,17 +662,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-
         dai.transfer(address(l), 8910e18);
-        cdai.transfer(address(l), _rawCDai);
 
         usdc.transfer(address(l), 8910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
 
         susd.transfer(address(l), 2970e18);
-        asusd.transfer(address(l), 2970e18);
 
         l.prime();
 
@@ -791,17 +678,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-
         dai.transfer(address(l), 8910e18);
-        cdai.transfer(address(l), _rawCDai);
 
         usdc.transfer(address(l), 8910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
 
         susd.transfer(address(l), 2970e18);
-        asusd.transfer(address(l), 2970e18);
 
         mintedShells_ = l.deposit(address(usdt), 8910e6);
 
@@ -811,17 +692,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-
         dai.transfer(address(l), 8910e18);
-        cdai.transfer(address(l), _rawCDai);
 
         usdc.transfer(address(l), 8910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
 
         susd.transfer(address(l), 2970e18);
-        asusd.transfer(address(l), 2970e18);
 
         l.TEST_setTestHalts(false);
 
@@ -835,17 +710,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-
         dai.transfer(address(l), 8910e18);
-        cdai.transfer(address(l), _rawCDai);
 
         usdc.transfer(address(l), 8910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
 
         susd.transfer(address(l), 2970e18);
-        asusd.transfer(address(l), 2970e18);
 
         l.TEST_setTestHalts(false);
 
@@ -857,17 +726,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-
         dai.transfer(address(l), 8910e18);
-        cdai.transfer(address(l), _rawCDai);
 
         usdc.transfer(address(l), 8910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
 
         susd.transfer(address(l), 2970e18);
-        asusd.transfer(address(l), 2970e18);
 
         l.prime();
 
@@ -879,17 +742,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-
         dai.transfer(address(l), 8910e18);
-        cdai.transfer(address(l), _rawCDai);
 
         usdc.transfer(address(l), 8910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
 
         susd.transfer(address(l), 2970e18);
-        asusd.transfer(address(l), 2970e18);
 
         mintedShells_ = l.deposit(address(usdt), 1e6);
 
@@ -899,17 +756,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-
         dai.transfer(address(l), 8910e18);
-        cdai.transfer(address(l), _rawCDai);
 
         usdc.transfer(address(l), 8910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
 
         susd.transfer(address(l), 2970e18);
-        asusd.transfer(address(l), 2970e18);
 
         l.TEST_setTestHalts(false);
 
@@ -923,17 +774,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-
         dai.transfer(address(l), 8910e18);
-        cdai.transfer(address(l), _rawCDai);
 
         usdc.transfer(address(l), 8910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
 
         susd.transfer(address(l), 2970e18);
-        asusd.transfer(address(l), 2970e18);
 
         l.TEST_setTestHalts(false);
 
@@ -950,16 +795,11 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(8910e18).divu(1e18));
-
         usdc.transfer(address(l), 8910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
 
         usdt.transfer(address(l), 8910e6);
-        ausdt.transfer(address(l), 8910e6);
 
         susd.transfer(address(l), 2970e18);
-        asusd.transfer(address(l), 2970e18);
 
         uint256 _daiBal = dai.balanceOf(address(this));
         uint256 _usdcBal = usdc.balanceOf(address(this));
@@ -984,10 +824,7 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(9910e18).divu(1e18));
-
         usdc.transfer(address(l), 9910e6);
-        cusdc.transfer(address(l), _rawCDai);
 
         uint256 _daiBal = dai.balanceOf(address(this));
         uint256 _usdcBal = usdc.balanceOf(address(this));

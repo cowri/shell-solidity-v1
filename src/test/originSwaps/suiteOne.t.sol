@@ -69,14 +69,6 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
     }
 
-    function test_s1_originSwap_partialUpperAndLowerSlippage_balanced_30PctWeight_CUSDC_to_CDAI () public {
-
-        uint256 targetAmount = super.partialUpperAndLowerSlippage_balanced_30PctWeight_CUSDC_to_CDAI();
-
-        assertEq(targetAmount, 39339755421580561359);
-
-    }
-
     function test_s1_originSwap_partialUpperAndLowerSlippage_balanced_30PctWeight_to_10PctWeight () public {
 
         uint256 targetAmount = super.partialUpperAndLowerSlippage_balanced_30PctWeight_to_10PctWeight();
@@ -114,14 +106,6 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
         uint256 targetAmount = super.fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight();
 
         assertEq(targetAmount, 2877116893342516205);
-
-    }
-
-    function test_s1_originSwap_fullUpperAndLowerSlippage_CUSDC_ASUSD_unbalanced_10PctWeight_to_30PctWeight_ASUSD_CUSDC () public {
-
-        uint256 targetAmount = super.fullUpperAndLowerSlippage_CUSDC_ASUSD_unbalanced_10PctWeight_to_30PctWeight_ASUSD_CUSDC();
-
-        assertEq(targetAmount, 2697033999999999999);
 
     }
 
@@ -189,14 +173,6 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
     }
 
-    function test_s1_originSwap_CHAI_fullUpperAndLowerAntiSlippage_30pctWeight_to_10Pct () public {
-
-        uint256 targetAmount = super.CHAI_fullUpperAndLowerAntiSlippage_30pctWeight_to_10Pct();
-
-        assertEq(targetAmount, 2366053853162344119);
-
-    }
-
     function test_s1_originSwap_upperHaltCheck_30PctWeight () public {
 
         bool success = super.upperHaltCheck_30PctWeight();
@@ -233,14 +209,6 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
     function test_s1_originSwap_megaLowerToUpperUpperToLower_30PctWeight () public {
 
         uint256 targetAmount = super.megaLowerToUpperUpperToLower_30PctWeight();
-
-        assertEq(targetAmount, 69982499);
-
-    }
-
-    function test_s1_originSwap_megaLowerToUpperUpperToLower_CDAI_30PctWeight () public {
-
-        uint256 targetAmount = super.megaLowerToUpperUpperToLower_CDAI_30PctWeight();
 
         assertEq(targetAmount, 69982499);
 

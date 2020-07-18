@@ -32,6 +32,9 @@ library Controller {
 
     event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
 
+    event log(bytes32);
+    event log_addr(bytes32, address);
+
     function setParams (
         Loihi.Shell storage shell,
         uint256 _alpha,
@@ -39,7 +42,9 @@ library Controller {
         uint256 _max,
         uint256 _epsilon,
         uint256 _lambda
-    ) internal returns (uint256 max_) {
+    ) external returns (uint256 max_) {
+
+        emit log("hello");
 
         require(_max <= .5e18, "Shell/parameter-invalid-max");
 
@@ -47,8 +52,12 @@ library Controller {
         int128[] memory _bals = new int128[](shell.reserves.length);
 
         for (uint i = 0; i < _bals.length; i++) {
+            
+        emit log_addr("hello", shell.reserves[i].addr);
 
             int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            
+        emit log("hello");
 
             _bals[i] = _bal;
 
@@ -87,7 +96,7 @@ library Controller {
         address _reserve,
         address _reserveAssim,
         uint256 _weight
-    ) internal {
+    ) external {
 
         Loihi.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
@@ -114,7 +123,7 @@ library Controller {
         address _numeraire,
         address _derivative,
         address _assimilator
-    ) internal {
+    ) external {
 
         Loihi.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
@@ -124,7 +133,7 @@ library Controller {
 
     function prime (
         Loihi.Shell storage shell
-    ) internal {
+    ) external {
 
         uint _length = shell.reserves.length;
         int128 _oGLiq;

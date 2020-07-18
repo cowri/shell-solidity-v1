@@ -17,8 +17,6 @@ import "../../../Loihi.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-import "../../../interfaces/ICToken.sol";
-
 import "../../../interfaces/IAssimilator.sol";
 
 contract LocalDaiToDaiAssimilator is IAssimilator, Loihi {
