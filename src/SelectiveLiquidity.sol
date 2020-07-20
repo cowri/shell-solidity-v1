@@ -1,3 +1,5 @@
+pragma solidity ^0.5.0;
+
 import "./Assimilators.sol";
 
 import "./Loihi.sol";
@@ -130,6 +132,8 @@ library SelectiveLiquidity {
 
     }
 
+    event log_int(bytes32, int);
+
     // / @author james foley http://github.com/realisation
     // / @notice selectively deposit any supported stablecoin flavor into the contract in return for corresponding amount of shell tokens
     // / @param _flvrs an array containing the addresses of the flavors being deposited into
@@ -140,7 +144,7 @@ library SelectiveLiquidity {
     function selectiveDeposit (
         Loihi.Shell storage shell,
         address[] memory _flvrs,
-        uint[] memory _amts,
+        uint[] calldata _amts,
         uint _minShells
     ) internal returns (
         uint shells_
@@ -153,6 +157,8 @@ library SelectiveLiquidity {
 
         int128 _shells;
         ( _shells, shell.omega ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+
+        emit log_int("_shells", _shells.muli(1e18));
 
         shells_ = _shells.mulu(1e18);
 
@@ -195,7 +201,7 @@ library SelectiveLiquidity {
     function selectiveWithdraw (
         Loihi.Shell storage shell,
         address[] memory _flvrs,
-        uint[] memory _amts,
+        uint[] calldata _amts,
         uint _maxShells
     ) internal returns (
         uint256 shells_

@@ -10,7 +10,8 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
     function getLoihiSuiteOne () public returns (Loihi loihi_) {
 
-        loihi_ = getLoihiSuiteOneLocal();
+        // loihi_ = getLoihiSuiteOneLocal();
+        loihi_ = getLoihiSuiteOneKovan();
         // loihi_ = getLoihiSuiteOneMainnet();
 
     }
@@ -30,7 +31,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         );
 
         includeAssetsSetOne(loihi_);
-        // includeAssimilatorsSetOne(loihi_);
 
         setParamsSetOne(loihi_);
 
@@ -42,16 +42,29 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
     function getLoihiSuiteOneMainnet () public returns (Loihi loihi_) {
 
         setupStablecoinsMainnet();
-        // setupAssimilatorsSetOneMainnet();
+        setupAssimilatorsSetOneMainnet();
 
         loihi_ = new Loihi();
 
         includeAssetsSetOne(loihi_);
-        // includeAssimilatorsSetOne(loihi_);
         setParamsSetOne(loihi_);
 
         approveStablecoins(address(loihi_));
-        // interApproveStablecoinsRPC(address(loihi_));
+
+    }
+
+    function getLoihiSuiteOneKovan () public returns (Loihi loihi_) {
+
+        setupStablecoinsKovan();
+        setupAssimilatorsSetOneKovan();
+
+        loihi_ = new Loihi();
+        // loihi_ = Loihi(0x1f47CEee00830AC4C8e4C76Ae8d8F3Bc1F3dB85A);
+
+        includeAssetsSetOne(loihi_);
+        setParamsSetOne(loihi_);
+
+        approveStablecoins(address(loihi_));
 
     }
 

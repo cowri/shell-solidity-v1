@@ -57,19 +57,19 @@ contract SelectiveDepositTemplate is Setup {
 
     function balanced_5DAI_1USDC_3USDT_1SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
-            address(dai), 80e18,
-            address(usdc), 100e6,
-            address(usdt), 85e6,
-            address(susd), 35e18
-        );
+        // uint256 startingShells = l.deposit(
+        //     address(dai), 80e18,
+        //     address(usdc), 100e6,
+        //     address(usdt), 85e6,
+        //     address(susd), 35e6
+        // );
 
-        shellsMinted_ = l.deposit(
-            address(dai), 5e18,
-            address(usdc), 1e6,
-            address(usdt), 3e6,
-            address(susd), 1e18
-        );
+        // shellsMinted_ = l.deposit(
+        //     address(dai), 5e18,
+        //     address(usdc), 1e6,
+        //     address(usdt), 3e6,
+        //     address(susd), 1e6
+        // );
 
     }
 
@@ -79,7 +79,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
     }
@@ -90,7 +90,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 55e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
     }
@@ -103,7 +103,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 70e6,
-            address(susd), 28e18
+            address(susd), 28e6
         );
 
     }
@@ -114,14 +114,14 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 100e6,
-            address(susd), 23e18
+            address(susd), 23e6
         );
 
         shellsMinted_ = l.deposit(
             address(dai), 1e18,
             address(usdc), 51e6,
             address(usdt), 51e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -144,7 +144,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.deposit(
@@ -156,18 +156,24 @@ contract SelectiveDepositTemplate is Setup {
 
     function partialUpperAntiSlippage_unbalanced_1DAI_46USDC_53USDT_1SUSD_into_145DAI_90USDC_90USDT_50SUSD () public returns (uint256 shellsMinted_) {
 
+        uint balance = dai.balanceOf(address(this));
+
+        emit log_uint("balance", balance);
+
         uint256 startingShells = l.deposit(
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
+
+        emit log_uint("starting shells", startingShells);
 
         shellsMinted_ = l.deposit(
             address(dai), 1e18,
             address(usdc), 46e6,
             address(usdt), 53e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -178,12 +184,12 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 55e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsMinted_ = l.deposit(
             address(usdc), 36e6,
-            address(susd), 18e18
+            address(susd), 18e6
         );
 
     }
@@ -194,12 +200,12 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.deposit(
             address(usdc), 5e6,
-            address(susd), 3e18
+            address(susd), 3e6
         );
 
     }
@@ -210,14 +216,14 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 95e6,
             address(usdt), 55e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsMinted_ = l.deposit(
             address(dai), 12e18,
             address(usdc), 12e6,
             address(usdt), 1e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -228,7 +234,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 95e6,
             address(usdt), 55e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsMinted_ = l.deposit(
@@ -246,7 +252,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 145e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         emit log_uint("gas on first deposit", gas - gasleft());
@@ -270,7 +276,7 @@ contract SelectiveDepositTemplate is Setup {
     //         address(dai), 90e18,
     //         address(usdc), 90e6,
     //         address(usdt), 145e6,
-    //         address(susd), 50e18
+    //         address(susd), 50e6
     //     );
 
     //     emit log_uint("gas on first deposit", gas - gasleft());
@@ -292,14 +298,14 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.deposit(
             address(dai), 8e18,
             address(usdc), 12e6,
             address(usdt), 10e6,
-            address(susd), 2e18
+            address(susd), 2e6
         );
 
     }
@@ -310,14 +316,14 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 95e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsMinted_ = l.deposit(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 5e6,
-            address(susd), 2e18
+            address(susd), 2e6
         );
 
     }
@@ -344,12 +350,12 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 95e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsMinted_ = l.deposit(
             address(dai), 105e18,
-            address(susd), 37e18
+            address(susd), 37e6
         );
 
     }
@@ -360,7 +366,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.deposit(
@@ -376,7 +382,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.deposit(
@@ -403,7 +409,7 @@ contract SelectiveDepositTemplate is Setup {
         l.deposit(
             address(dai), 300e18,
             address(usdt), 300e6,
-            address(susd), 100e18
+            address(susd), 100e6
         );
 
     }
@@ -412,7 +418,7 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(address(susd), 500e18);
+        l.deposit(address(susd), 500e6);
 
     }
 
@@ -434,7 +440,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 140e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         ( , uint256[] memory _before ) = l.liquidity();
@@ -458,7 +464,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 100e18,
             address(usdc), 90e6,
             address(usdt), 80e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         ( , uint256[] memory _before ) = l.liquidity();
@@ -482,7 +488,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 125e6,
             address(usdt), 55e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         ( , uint256[] memory _before ) = l.liquidity();
@@ -521,7 +527,7 @@ contract SelectiveDepositTemplate is Setup {
         success_ = l.depositSuccess(
             address(dai), 1e18,
             address(usdt), 1e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -535,7 +541,7 @@ contract SelectiveDepositTemplate is Setup {
         success_ = l.depositSuccess(
             address(dai), 110e18,
             address(usdt), 110e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
     }
@@ -548,12 +554,12 @@ contract SelectiveDepositTemplate is Setup {
 
         usdt.transfer(address(l), 70e6);
 
-        susd.transfer(address(l), 23e18);
+        susd.transfer(address(l), 23e6);
 
         success_ = l.depositSuccess(
             address(dai), 1e18,
             address(usdt), 1e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -566,7 +572,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdt.transfer(address(l), 70e6);
 
-        susd.transfer(address(l), 23e18);
+        susd.transfer(address(l), 23e6);
 
         l.prime();
 
@@ -584,7 +590,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdt.transfer(address(l), 70e6);
 
-        susd.transfer(address(l), 23e18);
+        susd.transfer(address(l), 23e6);
 
         success_ = l.depositSuccess(
             address(usdc), 50e6
@@ -666,7 +672,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdc.transfer(address(l), 8910e6);
 
-        susd.transfer(address(l), 2970e18);
+        susd.transfer(address(l), 2970e6);
 
         l.prime();
 
@@ -682,7 +688,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdc.transfer(address(l), 8910e6);
 
-        susd.transfer(address(l), 2970e18);
+        susd.transfer(address(l), 2970e6);
 
         mintedShells_ = l.deposit(address(usdt), 8910e6);
 
@@ -696,7 +702,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdc.transfer(address(l), 8910e6);
 
-        susd.transfer(address(l), 2970e18);
+        susd.transfer(address(l), 2970e6);
 
         l.TEST_setTestHalts(false);
 
@@ -714,7 +720,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdc.transfer(address(l), 8910e6);
 
-        susd.transfer(address(l), 2970e18);
+        susd.transfer(address(l), 2970e6);
 
         l.TEST_setTestHalts(false);
 
@@ -730,7 +736,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdc.transfer(address(l), 8910e6);
 
-        susd.transfer(address(l), 2970e18);
+        susd.transfer(address(l), 2970e6);
 
         l.prime();
 
@@ -746,7 +752,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdc.transfer(address(l), 8910e6);
 
-        susd.transfer(address(l), 2970e18);
+        susd.transfer(address(l), 2970e6);
 
         mintedShells_ = l.deposit(address(usdt), 1e6);
 
@@ -760,7 +766,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdc.transfer(address(l), 8910e6);
 
-        susd.transfer(address(l), 2970e18);
+        susd.transfer(address(l), 2970e6);
 
         l.TEST_setTestHalts(false);
 
@@ -778,7 +784,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdc.transfer(address(l), 8910e6);
 
-        susd.transfer(address(l), 2970e18);
+        susd.transfer(address(l), 2970e6);
 
         l.TEST_setTestHalts(false);
 
@@ -799,7 +805,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdt.transfer(address(l), 8910e6);
 
-        susd.transfer(address(l), 2970e18);
+        susd.transfer(address(l), 2970e6);
 
         uint256 _daiBal = dai.balanceOf(address(this));
         uint256 _usdcBal = usdc.balanceOf(address(this));

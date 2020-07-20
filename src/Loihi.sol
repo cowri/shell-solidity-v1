@@ -71,7 +71,6 @@ contract Loihi {
 
     Shell public shell;
 
-
     address public owner;
     bool internal notEntered = true;
     bool public frozen = false;
@@ -117,43 +116,43 @@ contract Loihi {
 
     }
 
-    function setParams (uint _alpha, uint _beta, uint _epsilon, uint _max, uint _lambda) public onlyOwner {
+    function setParams (uint _alpha, uint _beta, uint _epsilon, uint _max, uint _lambda) external onlyOwner {
 
         maxFee = Controller.setParams(shell, _alpha, _beta, _epsilon, _max, _lambda);
 
     }
 
-    function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint _weight) public onlyOwner {
+    function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint _weight) external onlyOwner {
 
         Controller.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _weight);
 
     }
 
-    function includeAssimilator (address _numeraire, address _derivative, address _assimilator) public onlyOwner {
+    function includeAssimilator (address _numeraire, address _derivative, address _assimilator) external onlyOwner {
 
         Controller.includeAssimilator(shell, _numeraire, _derivative, _assimilator);
 
     }
 
-    function excludeAdapter (address _assimilator) external onlyOwner {
+    function excludeAssimilator (address _assimilator) external onlyOwner {
 
         delete shell.assimilators[_assimilator];
 
     }
 
-    function freeze (bool _toFreezeOrNotToFreeze) public onlyOwner {
+    function freeze (bool _toFreezeOrNotToFreeze) external onlyOwner {
 
         emit SetFrozen(_toFreezeOrNotToFreeze);
         frozen = _toFreezeOrNotToFreeze;
 
     }
 
-    function transferOwnership (address _newOwner) public onlyOwner {
+    function transferOwnership (address _newOwner) external onlyOwner {
         emit OwnershipTransferred(owner, _newOwner);
         owner = _newOwner;
     }
 
-    function prime () public {
+    function prime () external {
 
         Controller.prime(shell);
 
@@ -174,7 +173,6 @@ contract Loihi {
         require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
 
     }
-
 
     function transferByOrigin (
         address _origin,
@@ -370,34 +368,6 @@ contract Loihi {
 
         return ProportionalLiquidity.proportionalWithdraw(shell, _withdrawal);
 
-    }
-
-    function burn (address account, uint amount) internal {
-
-        shell.balances[account] = burn_sub(shell.balances[account], amount);
-
-        shell.totalSupply = burn_sub(shell.totalSupply, amount);
-
-        emit Transfer(msg.sender, address(0), amount);
-
-    }
-
-    function mint (address account, uint amount) internal {
-
-        shell.totalSupply = mint_add(shell.totalSupply, amount);
-
-        shell.balances[account] = mint_add(shell.balances[account], amount);
-
-        emit Transfer(address(0), msg.sender, amount);
-
-    }
-
-    function mint_add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "Shell/mint-overflow");
-    }
-
-    function burn_sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x, "Shell/burn-underflow");
     }
 
     function transfer (address _recipient, uint _amount) public nonReentrant returns (bool) {

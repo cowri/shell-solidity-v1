@@ -40,7 +40,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         uint256 gas = gasleft();
@@ -62,7 +62,7 @@ contract OriginSwapTemplate is Setup {
         targetAmount_ = l.originSwap(
             address(susd),
             address(usdt),
-            4e18
+            4e6
         );
 
     }
@@ -73,7 +73,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 65e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         uint256 gas = gasleft();
@@ -81,7 +81,7 @@ contract OriginSwapTemplate is Setup {
         targetAmount_ = l.originSwap(
             address(susd),
             address(dai),
-            8e18
+            8e6
         );
 
         emit log_uint("gas used for swap", gas - gasleft());
@@ -106,7 +106,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 80e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         targetAmount_ = l.originSwap(
@@ -147,7 +147,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 90e6,
             address(usdt), 60e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         uint256 gas = gasleft();
@@ -168,7 +168,7 @@ contract OriginSwapTemplate is Setup {
     //         address(dai), 135e18,
     //         address(usdc), 90e6,
     //         address(usdt), 60e6,
-    //         address(susd), 30e18
+    //         address(susd), 30e6
     //     );
 
     //     uint256 gas = gasleft();
@@ -189,7 +189,7 @@ contract OriginSwapTemplate is Setup {
     //         address(dai), 135e18,
     //         address(usdc), 90e6,
     //         address(usdt), 60e6,
-    //         address(susd), 30e18
+    //         address(susd), 30e6
     //     );
 
     //     uint256 gas = gasleft();
@@ -210,7 +210,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 90e6,
             address(usdt), 65e6,
-            address(susd), 25e18
+            address(susd), 25e6
         );
 
         uint256 gas = gasleft();
@@ -231,7 +231,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 55e6,
             address(usdt), 90e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         uint gas = gasleft();
@@ -239,7 +239,7 @@ contract OriginSwapTemplate is Setup {
         targetAmount_ = l.originSwap(
             address(susd),
             address(usdc),
-            2.8e18
+            2.8e6
         );
 
         emit log_uint("gas used", gas - gasleft());
@@ -252,7 +252,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 60e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         targetAmount_ = l.originSwap(
@@ -269,13 +269,13 @@ contract OriginSwapTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 25e18
+            address(susd), 25e6
         );
 
         targetAmount_ = l.originSwap(
             address(susd),
             address(dai),
-            10e18
+            10e6
         );
 
     }
@@ -286,7 +286,7 @@ contract OriginSwapTemplate is Setup {
     //         address(dai), 135e18,
     //         address(usdc), 90e6,
     //         address(usdt), 90e6,
-    //         address(susd), 25e18
+    //         address(susd), 25e6
     //     );
 
     //     uint256 gas = gasleft();
@@ -307,7 +307,7 @@ contract OriginSwapTemplate is Setup {
     //         address(dai), 135e18,
     //         address(usdc), 90e6,
     //         address(usdt), 90e6,
-    //         address(susd), 25e18
+    //         address(susd), 25e6
     //     );
 
     //     uint256 gas = gasleft();
@@ -328,7 +328,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 58e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
         targetAmount_ = l.originSwap(
@@ -345,7 +345,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 135e6,
             address(usdt), 60e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         uint256 gas = gasleft();
@@ -366,7 +366,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 135e6,
-            address(susd), 25e18
+            address(susd), 25e6
         );
 
         uint256 gas = gasleft();
@@ -374,7 +374,7 @@ contract OriginSwapTemplate is Setup {
         targetAmount_ = l.originSwap(
             address(susd),
             address(usdt),
-            3.6537e18
+            3.6537e6
         );
 
         emit log_uint("gas used for swap", gas - gasleft());
@@ -387,7 +387,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 58e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
         targetAmount_ = l.originSwap(
@@ -404,7 +404,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 135e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         ( success_, ) = address(l).call(abi.encodeWithSelector(
@@ -424,7 +424,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 60e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         ( success_, ) = address(l).call(abi.encodeWithSelector(
@@ -446,7 +446,7 @@ contract OriginSwapTemplate is Setup {
             l.swapByOrigin.selector,
             address(susd),
             address(usdt),
-            20e18,
+            20e6,
             0,
             1e50
         ));
@@ -461,7 +461,7 @@ contract OriginSwapTemplate is Setup {
             l.swapByOrigin.selector,
             address(dai),
             address(susd),
-            20e18,
+            20e6,
             0,
             1e50
         ));
@@ -474,7 +474,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 90e6,
             address(usdt), 125e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         targetAmount_ = l.originSwap(
@@ -491,13 +491,13 @@ contract OriginSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 100e6,
-            address(susd), 20e18
+            address(susd), 20e6
         );
 
         targetAmount_ = l.originSwap(
             address(susd),
             address(usdt),
-            20e18
+            20e6
         );
 
     }
@@ -508,7 +508,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 80e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
         targetAmount_ = l.originSwap(
@@ -525,7 +525,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 46e18,
             address(usdc), 134e6,
             address(usdt), 75e6,
-            address(susd), 45e18
+            address(susd), 45e6
         );
 
         l.originSwap(
@@ -584,7 +584,7 @@ contract OriginSwapTemplate is Setup {
 
         usdt.transfer(address(l), 70e6);
 
-        susd.transfer(address(l), 23e18);
+        susd.transfer(address(l), 23e6);
 
         success_ = l.originSwapSuccess(
             address(usdc),
@@ -602,7 +602,7 @@ contract OriginSwapTemplate is Setup {
 
         usdt.transfer(address(l), 70e6);
 
-        susd.transfer(address(l), 23e18);
+        susd.transfer(address(l), 23e6);
 
         success_ = l.originSwapSuccess(
             address(usdc),
@@ -620,7 +620,7 @@ contract OriginSwapTemplate is Setup {
 
         usdt.transfer(address(l), 70e6);
 
-        susd.transfer(address(l), 23e18);
+        susd.transfer(address(l), 23e6);
 
         success_ = l.originSwapSuccess(
             address(usdt),
@@ -637,7 +637,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 2000e18 / 100,
             address(usdc), 5000e6 / 100,
             address(usdt), 5000e6 / 100,
-            address(susd), 800e18 / 100
+            address(susd), 800e6 / 100
         );
 
         l.TEST_setTestHalts(false);
@@ -656,7 +656,7 @@ contract OriginSwapTemplate is Setup {
             address(dai), 2000e18,
             address(usdc), 5000e6,
             address(usdt), 5000e6,
-            address(susd), 800e18
+            address(susd), 800e6
         );
 
         targetAmount_ = l.originSwap(
@@ -707,7 +707,7 @@ contract OriginSwapTemplate is Setup {
 
         usdc.transfer(address(l), 4910e6);
         usdt.transfer(address(l), 9910e6);
-        susd.transfer(address(l), 1970e18);
+        susd.transfer(address(l), 1970e6);
 
         l.TEST_setTestHalts(false);
 
@@ -727,7 +727,7 @@ contract OriginSwapTemplate is Setup {
 
         usdc.transfer(address(l), 4910e6);
         usdt.transfer(address(l), 9910e6);
-        susd.transfer(address(l), 1970e18);
+        susd.transfer(address(l), 1970e6);
 
         l.TEST_setTestHalts(false);
 
@@ -743,7 +743,7 @@ contract OriginSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        susd.transfer(address(l), 4970e18);
+        susd.transfer(address(l), 4970e6);
 
         l.prime();
 
@@ -761,7 +761,7 @@ contract OriginSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        susd.transfer(address(l), 4970e18);
+        susd.transfer(address(l), 4970e6);
 
         l.prime();
 

@@ -14,7 +14,7 @@
 import "./interfaces/IAssimilator.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-pragma solidity >0.4.13;
+pragma solidity ^0.5.0;
 
 library Assimilators {
 

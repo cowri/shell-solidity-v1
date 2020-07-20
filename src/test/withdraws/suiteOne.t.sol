@@ -194,7 +194,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
     //         address(dai), 80e18,
     //         address(usdc), 100e6,
     //         address(usdt), 85e6,
-    //         address(susd), 35e18
+    //         address(susd), 35e6
     //     );
 
     //     l.proportionalWithdraw(150e18);
@@ -217,7 +217,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
     //         address(dai), 55e18,
     //         address(usdc), 90e6,
     //         address(usdt), 125e6,
-    //         address(susd), 30e18
+    //         address(susd), 30e6
     //     );
 
     //     l.proportionalWithdraw(150*WAD);

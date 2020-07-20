@@ -4,8 +4,6 @@ import "./Assimilators.sol";
 
 import "./Loihi.sol";
 
-import "./ShellMath.sol";
-
 import "./UnsafeMath64x64.sol";
 
 library ProportionalLiquidity {

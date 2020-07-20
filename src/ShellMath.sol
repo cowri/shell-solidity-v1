@@ -11,6 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+pragma solidity ^0.5.0;
+
 import "./Assimilators.sol";
 
 import "./UnsafeMath64x64.sol";
@@ -18,8 +20,6 @@ import "./UnsafeMath64x64.sol";
 import "./Loihi.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
-
-pragma solidity >0.4.13;
 
 library ShellMath {
 
@@ -50,7 +50,7 @@ library ShellMath {
         int128 _ideal,
         int128 _beta,
         int128 _delta
-    ) internal pure returns (int128 fee_) {
+    ) private pure returns (int128 fee_) {
 
         if (_bal < _ideal) {
 
