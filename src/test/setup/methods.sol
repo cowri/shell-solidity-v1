@@ -754,7 +754,7 @@ library LoihiMethods {
     ) internal returns (uint[] memory) {
 
         address[] memory _tokens = new address[](2);
-        uint[] memory _amounts = new uint[](2);
+        uint256[] memory _amounts = new uint[](2);
 
         _tokens[0] = _token1;
         _amounts[0] = _amount1;
@@ -776,7 +776,7 @@ library LoihiMethods {
     ) internal returns (uint[] memory) {
 
         address[] memory _tokens = new address[](3);
-        uint[] memory _amounts = new uint[](3);
+        uint256[] memory _amounts = new uint[](3);
 
         _tokens[0] = _token1;
         _amounts[0] = _amount1;
@@ -802,7 +802,7 @@ library LoihiMethods {
     ) internal returns (uint[] memory) {
 
         address[] memory _tokens = new address[](4);
-        uint[] memory _amounts = new uint[](4);
+        uint256[] memory _amounts = new uint[](4);
 
         _tokens[0] = _token1;
         _amounts[0] = _amount1;
@@ -816,4 +816,5 @@ library LoihiMethods {
         return loihi.partitionedWithdraw(_tokens, _amounts);
 
     }
+
 }

@@ -409,9 +409,9 @@ contract Loihi {
 
     function partitionedWithdraw (
         address[] calldata _tokens,
-        uint[] calldata _amounts
+        uint256[] calldata _amounts
     ) external returns (
-        uint[] memory withdraws_
+        uint256[] memory withdraws_
     ) {
 
         require(frozen, "Shell/pool-is-not-frozen");

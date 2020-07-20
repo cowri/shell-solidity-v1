@@ -16,7 +16,7 @@ contract PartitionedWithdrawSuiteOne is PartitionedLiquidityTemplate, DSTest {
     event log_bool(bytes32, bool);
     event log_uints(bytes32, uint[]);
 
-    function partitioned_s1_from_proportional_state () public {
+    function test_s1_partitioned_from_proportional_state () public {
 
         uint[] memory _withdraws = super.from_proportional_state();
 
@@ -35,7 +35,15 @@ contract PartitionedWithdrawSuiteOne is PartitionedLiquidityTemplate, DSTest {
 
     }
 
-    function partitioned_s1_from_slighty_unbalanced_state () public {
+    function testFail_s1_partitioned_from_proportional_state_underflow () public {
+
+        bool success = super.from_proprotional_state_underflow();
+
+        assertTrue(!success);
+
+    }
+
+    function test_s1_partitioned_from_slighty_unbalanced_state () public {
 
         uint[] memory _withdraws = super.from_slightly_unbalanced_state();
 

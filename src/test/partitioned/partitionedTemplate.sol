@@ -18,6 +18,20 @@ contract PartitionedLiquidityTemplate is Setup {
 
     Loihi l;
 
+    function from_proprotional_state_underflow () public returns (bool success_) {
+
+        l.proportionalDeposit(300e18, 1e50);
+
+        l.freeze(true);
+
+        l.partition();
+
+        l.partitionedWithdraw(
+            address(dai), 301e18
+        );
+
+    }
+
     function from_proportional_state () public returns (uint[] memory) {
 
         l.proportionalDeposit(300e18, 1e50);

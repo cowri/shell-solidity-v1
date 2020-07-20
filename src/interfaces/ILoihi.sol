@@ -86,7 +86,6 @@ interface ILoihi {
         uint deadline
     ) external returns (uint[] memory);
 
-
     function owner () external view returns (address);
 
     function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint _weight) external;
