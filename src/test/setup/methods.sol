@@ -728,5 +728,92 @@ library LoihiMethods {
 
     }
 
+    function partitionedWithdraw (
+        Loihi loihi,
+        address _token1,
+        uint _amount1
+    ) internal returns (uint[] memory) {
 
+        address[] memory _tokens = new address[](1);
+        uint[] memory _amounts = new uint[](1);
+
+        _tokens[0] = _token1;
+        _amounts[0] = _amount1;
+
+        return loihi.partitionedWithdraw(_tokens, _amounts);
+
+    }
+
+
+    function partitionedWithdraw (
+        Loihi loihi,
+        address _token1,
+        uint _amount1,
+        address _token2,
+        uint _amount2
+    ) internal returns (uint[] memory) {
+
+        address[] memory _tokens = new address[](2);
+        uint[] memory _amounts = new uint[](2);
+
+        _tokens[0] = _token1;
+        _amounts[0] = _amount1;
+        _tokens[1] = _token2;
+        _amounts[1] = _amount2;
+
+        return loihi.partitionedWithdraw(_tokens, _amounts);
+
+    }
+
+    function partitionedWithdraw (
+        Loihi loihi,
+        address _token1,
+        uint _amount1,
+        address _token2,
+        uint _amount2,
+        address _token3,
+        uint _amount3
+    ) internal returns (uint[] memory) {
+
+        address[] memory _tokens = new address[](3);
+        uint[] memory _amounts = new uint[](3);
+
+        _tokens[0] = _token1;
+        _amounts[0] = _amount1;
+        _tokens[1] = _token2;
+        _amounts[1] = _amount2;
+        _tokens[2] = _token3;
+        _amounts[2] = _amount3;
+
+        return loihi.partitionedWithdraw(_tokens, _amounts);
+
+    }
+
+    function partitionedWithdraw (
+        Loihi loihi,
+        address _token1,
+        uint _amount1,
+        address _token2,
+        uint _amount2,
+        address _token3,
+        uint _amount3,
+        address _token4,
+        uint _amount4
+    ) internal returns (uint[] memory) {
+
+        address[] memory _tokens = new address[](4);
+        uint[] memory _amounts = new uint[](4);
+
+        _tokens[0] = _token1;
+        _amounts[0] = _amount1;
+        _tokens[0] = _token2;
+        _amounts[0] = _amount2;
+        _tokens[0] = _token3;
+        _amounts[0] = _amount3;
+        _tokens[0] = _token4;
+        _amounts[0] = _amount4;
+
+        return loihi.partitionedWithdraw(_tokens, _amounts);
+
+    }
 }

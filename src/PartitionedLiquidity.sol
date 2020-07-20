@@ -16,6 +16,7 @@ library PartitionedLiquidity {
 
     int128 constant ONE = 0x10000000000000000;
 
+    event log(bytes32);
     event log_int(bytes32, int128);
     event log_ints(bytes32, int128[]);
     event log_uint(bytes32, uint);
@@ -23,27 +24,29 @@ library PartitionedLiquidity {
 
     function partitionedWithdraw (
         Loihi.Shell storage shell,
-        mapping storage partitions,
+        mapping (address => Loihi.PartitionTicket) storage partitionTickets,
         address[] memory _tokens,
-        uint[] memory _withdraws
+        uint[] memory _withdrawals
     ) internal returns (
-        uint[] memory withdraws_
+        uint[] memory
     ) {
 
         uint _length = shell.reserves.length;
-        uint _totalSupply = shell.totalSupply;
+        uint _balance = shell.balances[msg.sender];
 
-        Loihi.PartitionTicket storage totalSuppliesTicket = partitions[address(this)];
-        Loihi.PartitionTicket storage ticket = partitions[msg.sender];
+        Loihi.PartitionTicket storage totalSuppliesTicket = partitionTickets[address(this)];
+        Loihi.PartitionTicket storage ticket = partitionTickets[msg.sender];
 
         if (!ticket.active) {
 
-            for (uint i = 0; i < _length; i++) ticket.claims[i] = _totalSupply;
+            for (uint i = 0; i < _length; i++) ticket.claims.push(_balance);
             ticket.active = true;
 
         }
 
         _length = _tokens.length;
+
+        uint[] memory withdrawals_ = new uint[](_length);
 
         for (uint i = 0; i < _length; i++) {
 
@@ -51,30 +54,34 @@ library PartitionedLiquidity {
 
             require(_assim.addr != address(0), "Shell/unsupported-asset");
 
-            int128 _balance = Assimilators.viewNumeraireBalance(_assim.addr);
+            int128 _reserveBalance = Assimilators.viewNumeraireBalance(_assim.addr);
 
-            int128 _multiplier = _amounts[i].divu(1e18)
+            int128 _multiplier = _withdrawals[i].divu(1e18)
                 .div(totalSuppliesTicket.claims[_assim.ix].divu(1e18));
-
-            withdraws_[i] = Assimilators.outputNumeraire(
-                _assim.addr,
-                msg.sender,
-                _balance.mul(_multiplier)
-            );
 
             totalSuppliesTicket.claims[_assim.ix] = burn_sub(
                 totalSuppliesTicket.claims[_assim.ix],
-                withdraws_[i]
+                _withdrawals[i]
             );
 
             ticket.claims[_assim.ix] = burn_sub(
                 ticket.claims[_assim.ix],
-                withdraws_[i]
+                _withdrawals[i]
             );
 
-            emit PartitionRedeemed(_tokens[i], msg.sender, withdraws_[i]);
+            uint _withdrawal = Assimilators.outputNumeraire(
+                _assim.addr,
+                msg.sender,
+                _reserveBalance.mul(_multiplier)
+            );
+
+            withdrawals_[i] = _withdrawal;
+
+            emit PartitionRedeemed(_tokens[i], msg.sender, withdrawals_[i]);
 
         }
+
+        return withdrawals_;
 
     }
 
