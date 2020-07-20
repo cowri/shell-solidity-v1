@@ -19,100 +19,99 @@ interface ILoihi {
     function viewOriginTrade (
         address origin,
         address target,
-        uint256 originAmount
-    ) external view returns (uint256);
+        uint originAmount
+    ) external view returns (uint);
 
     function viewTargetTrade (
         address origin,
         address target,
-        uint256 targetAmount
-    ) external view returns (uint256);
+        uint targetAmount
+    ) external view returns (uint);
 
     function swapByOrigin (
         address origin,
         address target,
-        uint256 originAmount,
-        uint256 minTargetAmount,
-        uint256 deadline
-    ) external returns (uint256);
+        uint originAmount,
+        uint minTargetAmount,
+        uint deadline
+    ) external returns (uint);
 
     function transferByOrigin (
         address origin,
         address target,
-        uint256 originAmount,
-        uint256 targetMin,
-        uint256 deadline,
+        uint originAmount,
+        uint targetMin,
+        uint deadline,
         address recipient
-    ) external returns (uint256);
+    ) external returns (uint);
 
     function swapByTarget (
         address origin,
         address target,
-        uint256 targetAmount,
-        uint256 maxOriginAmount,
-        uint256 deadline
-    ) external returns (uint256);
+        uint targetAmount,
+        uint maxOriginAmount,
+        uint deadline
+    ) external returns (uint);
 
     function tansferByTarget (
         address origin,
         address target,
-        uint256 targetAmount,
-        uint256 maxOriginAmount,
+        uint targetAmount,
+        uint maxOriginAmount,
         address recipient,
-        uint256 deadline
-    ) external returns (uint256);
+        uint deadline
+    ) external returns (uint);
 
     function selectiveDeposit (
         address[] calldata _flavors,
-        uint256[] calldata _amounts,
-        uint256 _minShells,
-        uint256 _deadline
-    ) external returns (uint256);
+        uint[] calldata _amounts,
+        uint _minShells,
+        uint _deadline
+    ) external returns (uint);
 
     function selectiveWithdraw (
         address[] calldata _flavors,
-        uint256[] calldata _amounts,
-        uint256 _maxShells,
-        uint256 _deadline
-    ) external returns (uint256);
+        uint[] calldata _amounts,
+        uint _maxShells,
+        uint _deadline
+    ) external returns (uint);
 
     function proportionalDeposit (
-        uint256 totalStablecoins
-    ) external returns (uint256[] memory);
+        uint totalStablecoins,
+        uint deadline
+    ) external returns (uint shells_, uint[] memory);
 
     function proportionalWithdraw (
-        uint256 shellTokens
-    ) external returns (uint256[] memory);
+        uint shellTokens,
+        uint deadline
+    ) external returns (uint[] memory);
 
-    function transferOwnership (
-        address newOwner
-    ) external;
 
     function owner () external view returns (address);
 
-    function includeNumeraireReserveAndWeight (address numeraire, address reserve, uint256 weight) external;
-    function includeAdapter (address flavor, address adapter, address reserve, uint256 weight) external;
-    function excludeAdapter (address flavor) external;
-    function setParams (uint256 alpha, uint256 beta, uint256 feeDerivative, uint256 feeBase) external;
-    function totalSupply() external view returns (uint256);
-    function decimals() external view returns (uint256);
-    function balanceOf(address account) external view returns (uint256);
-    function transfer(address recipient, uint256 amount) external returns (bool);
-    function allowance(address owner, address spender) external view returns (uint256);
-    function approve(address spender, uint256 amount) external returns (bool);
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-    function liquidity () external view returns (uint256, uint256[] memory);
-    function getNumeraires () external view returns (address[] memory);
-    function getReserves () external view returns (address[] memory);
-    function getAdapter (address flavor) external view returns (address[] memory);
-    function executeApprovals (address[] calldata targets, address[] calldata spenders) external;
+    function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint _weight) external;
+    function includeAssimilator (address _numeraire, address _derivative, address _assimilator) external;
+    function excluseAssimilator (address _assimilator) external;
+    function freeze (bool _toFreezeOrNotToFreeze) external;
+    function transferOwnership (address _newOwner) external;
+    function setParams (uint _alpha, uint _beta, uint _epsilon, uint _max, uint _lambda) external;
+    function prime () external;
+    function liquidity () external view returns (uint, uint[] memory);
 
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-    event ShellsMinted(address indexed minter, uint256 amount, address[] indexed coins, uint256[] amounts);
-    event ShellsBurned(address indexed burner, uint256 amount, address[] indexed coins, uint256[] amounts);
-    event ShellsBurned(address indexed burner, uint256 amount);
+    function decimals() external view returns (uint);
+    function totalSupply() external view returns (uint);
+    function balanceOf(address account) external view returns (uint);
+    function transfer(address recipient, uint amount) external returns (bool);
+    function transferFrom(address sender, address recipient, uint amount) external returns (bool);
+    function approve(address spender, uint amount) external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint);
+
+    event Transfer(address indexed from, address indexed to, uint value);
+    event Approval(address indexed owner, address indexed spender, uint value);
+    event ShellsMinted(address indexed minter, uint amount, address[] indexed coins, uint[] amounts);
+    event ShellsBurned(address indexed burner, uint amount, address[] indexed coins, uint[] amounts);
+    event ShellsBurned(address indexed burner, uint amount);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
+    event Trade(address indexed trader, address indexed origin, address indexed target, uint originAmount, uint targetAmount);
 
 }

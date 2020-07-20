@@ -75,10 +75,20 @@ contract Loihi {
 
     Shell public shell;
 
+    struct PartitionTicket {
+        uint[] claims;
+        bool active;
+    }
+
+    mapping (address => PartitionTicket) partitions;
+
+    bool public partitioned = false;
+    bool public frozen = false;
 
     address public owner;
     bool internal notEntered = true;
-    bool public frozen = false;
+
+
     uint public maxFee;
 
     event ShellsMinted(address indexed minter, uint amount, address[] indexed coins, uint[] amounts);
@@ -376,32 +386,29 @@ contract Loihi {
 
     }
 
-    function burn (address account, uint amount) internal {
+    function partition () external {
 
-        shell.balances[account] = burn_sub(shell.balances[account], amount);
+        uint _length = shell.reserves.length;
 
-        shell.totalSupply = burn_sub(shell.totalSupply, amount);
+        PartitionTicket storage ticket = partitions(address(this));
 
-        emit Transfer(msg.sender, address(0), amount);
+        ticket.active = true;
 
-    }
+        for (uint i = 0; i < _length; i++) ticket.claims[i] = shell.totalSupply;
 
-    function mint (address account, uint amount) internal {
-
-        shell.totalSupply = mint_add(shell.totalSupply, amount);
-
-        shell.balances[account] = mint_add(shell.balances[account], amount);
-
-        emit Transfer(address(0), msg.sender, amount);
+        partitioned = true;
 
     }
 
-    function mint_add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, "Shell/mint-overflow");
-    }
+    function partitionedWithdraw (
+        address[] calldata _tokens,
+        uint[] calldata _amounts
+    ) external returns (
+        uint[] memory withdraws_
+    ) {
 
-    function burn_sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x, "Shell/burn-underflow");
+        return PartitionedLiquidity.partitionedWithdraw(shell, partitions, _tokens, _amounts);
+
     }
 
     function transfer (address _recipient, uint _amount) public nonReentrant returns (bool) {
