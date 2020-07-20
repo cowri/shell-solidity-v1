@@ -139,7 +139,7 @@ library Swaps {
         address _target,
         uint256 _oAmt,
         address _rcpnt
-    ) external returns (
+    ) internal returns (
         uint256 tAmt_
     ) {
 
@@ -176,7 +176,7 @@ library Swaps {
         address _origin,
         address _target,
         uint256 _oAmt
-    ) external returns (
+    ) internal returns (
         uint256 tAmt_
     ) {
 
@@ -215,7 +215,7 @@ library Swaps {
         address _target,
         uint256 _tAmt,
         address _rcpnt
-    ) external returns (
+    ) internal returns (
         uint256 oAmt_
     ) {
 
@@ -251,7 +251,7 @@ library Swaps {
         address _origin,
         address _target,
         uint256 _tAmt
-    ) external returns (
+    ) internal returns (
         uint256 oAmt_
     ) {
 

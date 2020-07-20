@@ -139,12 +139,10 @@ library SelectiveLiquidity {
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (
         Loihi.Shell storage shell,
-        // address[] memory _flvrs,
-        // uint[] memory _amts,
-        address[] calldata _flvrs,
-        uint[] calldata _amts,
+        address[] memory _flvrs,
+        uint[] memory _amts,
         uint _minShells
-    ) external returns (
+    ) internal returns (
         uint shells_
     ) {
 
@@ -171,11 +169,9 @@ library SelectiveLiquidity {
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function viewSelectiveDeposit (
         Loihi.Shell storage shell,
-        // address[] memory _flvrs,
-        // uint[] memory _amts
-        address[] calldata _flvrs,
-        uint[] calldata _amts
-    ) external returns (
+        address[] memory _flvrs,
+        uint[] memory _amts
+    ) internal returns (
         uint shells_
     ) {
 
@@ -198,12 +194,10 @@ library SelectiveLiquidity {
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (
         Loihi.Shell storage shell,
-        // address[] memory _flvrs,
-        // uint[] memory _amts,
-        address[] calldata _flvrs,
-        uint[] calldata _amts,
+        address[] memory _flvrs,
+        uint[] memory _amts,
         uint _maxShells
-    ) external returns (
+    ) internal returns (
         uint256 shells_
     ) {
 
@@ -233,11 +227,9 @@ library SelectiveLiquidity {
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function viewSelectiveWithdraw (
         Loihi.Shell storage shell,
-        // address[] memory _flvrs,
-        // uint[] memory _amts
-        address[] calldata _flvrs,
-        uint[] calldata _amts
-    ) external returns (
+        address[] memory _flvrs,
+        uint[] memory _amts
+    ) internal returns (
         uint shells_
     ) {
 

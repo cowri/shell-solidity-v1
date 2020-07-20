@@ -42,7 +42,7 @@ library Controller {
         uint256 _max,
         uint256 _epsilon,
         uint256 _lambda
-    ) external returns (uint256 max_) {
+    ) internal returns (uint256 max_) {
 
         emit log("hello");
 
@@ -96,7 +96,7 @@ library Controller {
         address _reserve,
         address _reserveAssim,
         uint256 _weight
-    ) external {
+    ) internal {
 
         Loihi.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
@@ -123,7 +123,7 @@ library Controller {
         address _numeraire,
         address _derivative,
         address _assimilator
-    ) external {
+    ) internal {
 
         Loihi.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
@@ -133,7 +133,7 @@ library Controller {
 
     function prime (
         Loihi.Shell storage shell
-    ) external {
+    ) internal {
 
         uint _length = shell.reserves.length;
         int128 _oGLiq;

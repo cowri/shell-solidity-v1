@@ -249,7 +249,7 @@ contract Loihi {
     ) public deadline(_dline) notFrozen nonReentrant returns (uint oAmt_) {
 
         oAmt_ = Swaps.targetSwap(shell, _origin, _target, _tAmt, _rcpnt);
-        
+
         require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
 
     }
