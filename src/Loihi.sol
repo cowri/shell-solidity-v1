@@ -402,10 +402,7 @@ contract Loihi {
 
         totalSupplyTicket.active = true;
 
-        for (uint i = 0; i < _length; i++) {
-            emit log_uint("i", i);
-            totalSupplyTicket.claims.push(shell.totalSupply);
-        }
+        for (uint i = 0; i < _length; i++) totalSupplyTicket.claims.push(shell.totalSupply);
 
         partitioned = true;
 
@@ -531,7 +528,7 @@ contract Loihi {
     IERC20NoBool usdt; IAToken ausdt;
     IERC20 susd; IAToken asusd;
 
-    function includeTestAssimilatorState(IERC20 _dai, ICToken _cdai, IChai _chai, IPot _pot, IERC20 _usdc, ICToken _cusdc, IERC20NoBool _usdt, IAToken _ausdt, IERC20 _susd, IAToken _asusd) public {
+    function TEST_includeAssimilatorState(IERC20 _dai, ICToken _cdai, IChai _chai, IPot _pot, IERC20 _usdc, ICToken _cusdc, IERC20NoBool _usdt, IAToken _ausdt, IERC20 _susd, IAToken _asusd) public {
         dai = _dai; cdai = _cdai; chai = _chai; pot = _pot;
         usdc = _usdc; cusdc = _cusdc;
         usdt = _usdt; ausdt = _ausdt;
