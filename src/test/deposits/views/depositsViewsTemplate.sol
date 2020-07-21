@@ -666,6 +666,8 @@ contract SelectiveDepositViewsTemplate is Setup {
         susd.transfer(address(l), 23e18);
         asusd.transfer(address(l), 23e18);
 
+        l.prime();
+
         success_ = l.depositSuccess(
             address(usdc), 1e6
         );

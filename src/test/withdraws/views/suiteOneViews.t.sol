@@ -76,14 +76,6 @@ contract SelectiveWithdrawSuiteOneViews is SelectiveWithdrawViewsTemplate, DSTes
 
     }
 
-    function test_s1_viewSelectiveWithdraw_partialUpperAntiSlippage_50CUSDC_18SUSD_from_90DAI_145USDC_90USDT_50SUSD () public {
-
-        uint256 shellsBurned = super.partialUpperAntiSlippage_50CUSDC_18SUSD_from_90DAI_145USDC_90USDT_50SUSD();
-
-        assertEq(shellsBurned, 67991384639438932784);
-
-    }
-
     function test_s1_viewSelectiveWithdraw_fullIndirectUpperSlippage_5DAI_5USDT_from90DAI_145USDC_90USDT_50SUSD () public {
 
         uint256 shellsBurned = super.fullIndirectUpperSlippage_5DAI_5USDT_from90DAI_145USDC_90USDT_50SUSD();
@@ -105,14 +97,6 @@ contract SelectiveWithdrawSuiteOneViews is SelectiveWithdrawViewsTemplate, DSTes
         uint256 shellsBurned = super.fullLowerSlippage_1USDC_7USDT_2SUSD_from_95DAI_95USDC_55USDT_15SUSD();
 
         assertEq(shellsBurned, 10134109817307692313);
-
-    }
-
-    function test_s1_viewSelectiveWithdraw_fullIndirectLowerAntiSlippage_5CHAI_5CUSDC_from_95DAI_95USDC_55USDT_15SUSD () public {
-
-        uint256 shellsBurned = super.fullIndirectLowerAntiSlippage_5CHAI_5CUSDC_from_95DAI_95USDC_55USDT_15SUSD();
-
-        assertEq(shellsBurned, 9992948093387737702);
 
     }
 
@@ -147,14 +131,6 @@ contract SelectiveWithdrawSuiteOneViews is SelectiveWithdrawViewsTemplate, DSTes
     //     assertEq(shellsBurned, 10696820295674489134);
 
     // }
-
-    function test_s1_viewSelectiveWithdraw_fullUpperAntiSlippage_5CDAI_2ASUSD_from_145DAI_90USDC_90USDT_50SUSD () public {
-
-        uint256 shellsBurned = super.fullUpperAntiSlippage_5CDAI_2ASUSD_from_145DAI_90USDC_90USDT_50SUSD();
-
-        assertEq(shellsBurned, 6994286984194756641);
-
-    }
 
     function test_s1_viewSelectiveWithdraw_fullUpperAntiSlippage_5DAI_2SUSD_from_145DAI_90USDC_90USDT_50SUSD () public {
 

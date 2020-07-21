@@ -69,19 +69,11 @@ contract OriginSwapiViewsSuiteOneTest is OriginSwapViewsTemplate, DSTest {
 
     }
 
-    function test_s1_originSwapViews_partialUpperAndLowerSlippage_balanced_30PctWeight_CUSDC_to_CDAI () public {
-
-        uint256 targetAmount = super.partialUpperAndLowerSlippage_balanced_30PctWeight_CUSDC_to_CDAI();
-
-        assertEq(targetAmount, 39339756348795716299);
-
-    }
-
     function test_s1_originSwapViews_partialUpperAndLowerSlippage_balanced_30PctWeight_to_10PctWeight () public {
 
         uint256 targetAmount = super.partialUpperAndLowerSlippage_balanced_30PctWeight_to_10PctWeight();
 
-        assertEq(targetAmount, 14817098063643470308);
+        assertEq(targetAmount, 14817098101815228528);
 
     }
 
@@ -114,14 +106,6 @@ contract OriginSwapiViewsSuiteOneTest is OriginSwapViewsTemplate, DSTest {
         uint256 targetAmount = super.fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight();
 
         assertEq(targetAmount, 2877116893342516205);
-
-    }
-
-    function test_s1_originSwapViews_fullUpperAndLowerSlippage_CUSDC_ASUSD_unbalanced_10PctWeight_to_30PctWeight_ASUSD_CUSDC () public {
-
-        uint256 targetAmount = super.fullUpperAndLowerSlippage_CUSDC_ASUSD_unbalanced_10PctWeight_to_30PctWeight_ASUSD_CUSDC();
-
-        assertEq(targetAmount, 2696349000000000000);
 
     }
 
@@ -189,14 +173,6 @@ contract OriginSwapiViewsSuiteOneTest is OriginSwapViewsTemplate, DSTest {
 
     }
 
-    function test_s1_originSwapViews_CHAI_fullUpperAndLowerAntiSlippage_30pctWeight_to_10Pct () public {
-
-        uint256 targetAmount = super.CHAI_fullUpperAndLowerAntiSlippage_30pctWeight_to_10Pct();
-
-        assertEq(targetAmount, 2366053853162344119);
-
-    }
-
     function test_s1_originSwapViews_upperHaltCheck_30PctWeight () public {
 
         bool success = super.upperHaltCheck_30PctWeight();
@@ -235,14 +211,6 @@ contract OriginSwapiViewsSuiteOneTest is OriginSwapViewsTemplate, DSTest {
         uint256 targetAmount = super.megaLowerToUpperUpperToLower_30PctWeight();
 
         assertEq(targetAmount, 69982499);
-
-    }
-
-    function test_s1_originSwapViews_megaLowerToUpperUpperToLower_CDAI_30PctWeight () public {
-
-        uint256 targetAmount = super.megaLowerToUpperUpperToLower_CDAI_30PctWeight();
-
-        assertEq(targetAmount, 17491279);
 
     }
 

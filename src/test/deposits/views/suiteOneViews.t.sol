@@ -92,22 +92,6 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
 
     }
 
-    function test_s1_selectiveDepositViews_noSlippage_36CHAI_into_300Proportional () public {
-
-        uint256 shellsMinted = super.noSlippage_36CHAI_into_300Proportional();
-
-        assertEq(shellsMinted, 35991000233367100000);
-
-    }
-
-    function test_s1_selectiveDepositViews_partialLowerAntiSlippage_36CUSDC_18ASUSD_into_95DAI_55USDC_95USDT_15SUSD () public {
-
-        uint256 newShells = super.partialLowerAntiSlippage_36CUSDC_18ASUSD_into_95DAI_55USDC_95USDT_15SUSD();
-
-        assertEq(newShells,  53991711756245652892);
-
-    }
-
     function test_s1_selectiveDepositViews_partialLowerAntiSlippage_36USDC_18SUSD_into_95DAI_55USDC_95USDT_15SUSD () public {
 
         uint256 newShells = super.partialLowerAntiSlippage_36USDC_18SUSD_into_95DAI_55USDC_95USDT_15SUSD();
@@ -140,30 +124,6 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
 
     }
 
-    function test_s1_selectiveDepositViews_fullUpperAntiSlippage_5CHAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD () public {
-
-        uint256 newShells = super.fullUpperAntiSlippage_5CHAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD();
-
-        assertEq(newShells, 10006716171387577028);
-
-    }
-
-    // function test_s1_selectiveDepositViews_fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_NO_HACK () public {
-
-    //     uint256 newShells = super.fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD();
-
-    //     assertEq(newShells, 10006716145229473334);
-
-    // }
-
-    // function test_s1_selectiveDepositViews_fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_HACK () public {
-
-    //     uint256 newShells = super.fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_HACK();
-
-    //     assertEq(newShells, 10006716145229473334);
-
-    // }
-
     function test_s1_selectiveDepositViews_fullUpperAntiSlippage_8DAI_12USDC_10USDT_2SUSD_into_145DAI_90USDC_90USDT_50SUSD () public {
 
         uint256 newShells = super.fullUpperAntiSlippage_8DAI_12USDC_10USDT_2SUSD_into_145DAI_90USDC_90USDT_50SUSD();
@@ -177,14 +137,6 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
         uint256 newShells = super.fullLowerAntiSlippage_5DAI_5USDC_5USDT_2SUSD_into_55DAI_95USDC_95USDT_15SUSD();
 
         assertEq(newShells, 17007127696010367489);
-
-    }
-
-    function test_s1_selectiveDepositViews_noSlippage_36CDAI_into_300Proportional () public {
-
-        uint256 shellsMinted = super.noSlippage_36CDAI_into_300Proportional();
-
-        assertEq(shellsMinted, 35991000239800010000);
 
     }
 
@@ -217,14 +169,6 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
         uint256 newShells = super.megaDepositIndirectUpperToLower_165DAI_165USDT_into_90DAI_145USDC_90USDT_50SUSD();
 
         assertEq(newShells, 329943557919621749370);
-
-    }
-
-    function test_s1_selectiveDepositViews_megaDepositIndirectUpperLower_165CDAI_0p0001CUSDC_165USDT_0p5SUSD_into_90DAI_145USDC_90USDT_50SUSD () public {
-
-        uint256 newShells = super.megaDepositIndirectUpperLower_165CDAI_0p0001CUSDC_165USDT_0p5SUSD_into_90DAI_145USDC_90USDT_50SUSD();
-
-        assertEq(newShells, 32007966147966147958);
 
     }
 
