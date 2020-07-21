@@ -11,7 +11,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.17;
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
@@ -513,9 +513,6 @@ contract Loihi {
     event log_ints(bytes32, int[]);
 
     function TEST_safeApprove (address _token, address _spender, uint _value) public onlyOwner {
-        emit log_addr("token", _token);
-        emit log_addr("spender", _spender);
-        emit log_uint("_value", _value);
 
         (bool success, bytes memory returndata) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
 

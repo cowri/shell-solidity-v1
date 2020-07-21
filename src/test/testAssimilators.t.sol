@@ -1,5 +1,5 @@
 
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.17;
 
 import "ds-test/test.sol";
 import "ds-math/math.sol";
@@ -91,7 +91,7 @@ contract AssimilatorSetOneTests is Setup, DSTest {
 
         assimBouncer = new AssimilatorBouncer();
 
-        assimBouncer.includeTestAssimilatorState(
+        assimBouncer.TEST_includeAssimilatorState(
             IERC20(dai),
             ICToken(cdai),
             IChai(chai),

@@ -1,5 +1,5 @@
 
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.17;
 
 import "ds-test/test.sol";
 
@@ -93,22 +93,6 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
     }
 
-    // function test_s1_originSwap_fullUpperAndLowerSlippage_unbalanced_30PctWeight_NO_HACK () public {
-
-    //     uint256 targetAmount = super.fullUpperAndLowerSlippage_unbalanced_30PctWeight_NO_HACK();
-
-    //     assertEq(targetAmount, 4666173);
-
-    // }
-
-    // function test_s1_originSwap_fullUpperAndLowerSlippage_unbalanced_30PctWeight_HACK () public {
-
-    //     uint256 targetAmount = super.fullUpperAndLowerSlippage_unbalanced_30PctWeight_HACK();
-
-    //     assertEq(targetAmount, 4666173);
-
-    // }
-
     function test_s1_originSwap_fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight () public {
 
         uint256 targetAmount = super.fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight();
@@ -140,22 +124,6 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
         assertEq(targetAmount, 30077776294642857112);
 
     }
-
-    // function test_s1_originSwap_partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight_NO_HACK () public {
-
-    //     uint256 targetAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight_NO_HACK();
-
-    //     assertEq(targetAmount, 10006174300378984359);
-
-    // }
-
-    // function test_s1_originSwap_partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight_HACK () public {
-
-    //     uint256 targetAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight_HACK();
-
-    //     assertEq(targetAmount, 10006174300378984359);
-
-    // }
 
     function test_s1_originSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight () public {
 

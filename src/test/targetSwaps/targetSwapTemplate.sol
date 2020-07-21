@@ -1,5 +1,5 @@
 
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.17;
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
@@ -229,48 +229,6 @@ contract TargetSwapTemplate is Setup {
         );
 
     }
-
-    // function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight_NO_HACK () public returns (uint256 originAmount_) {
-
-    //     l.deposit(
-    //         address(dai), 135e18,
-    //         address(usdc), 60e6,
-    //         address(usdt), 90e6,
-    //         address(susd), 30e18
-    //     );
-
-    //     uint256 gas = gasleft();
-
-    //     originAmount_ = l.targetSwap(
-    //         address(usdc),
-    //         address(dai),
-    //         30e18
-    //     );
-
-    //     emit log_uint("gas used", gas - gasleft());
-
-    // }
-
-    // function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight_HACK () public returns (uint256 originAmount_) {
-
-    //     l.deposit(
-    //         address(dai), 135e18,
-    //         address(usdc), 60e6,
-    //         address(usdt), 90e6,
-    //         address(susd), 30e18
-    //     );
-
-    //     uint256 gas = gasleft();
-
-    //     originAmount_ = l.targetSwapHack(
-    //         address(usdc),
-    //         address(dai),
-    //         30e18
-    //     );
-
-    //     emit log_uint("gas used", gas - gasleft());
-
-    // }
 
     function partialUpperAndLowerAntiSlippage_unbalanced_CHAI_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.17;
 
 import "../../Loihi.sol";
 
@@ -55,7 +55,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
         
-        loihi_.includeTestAssimilatorState(
+        loihi_.TEST_includeAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
@@ -96,7 +96,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
 
-        loihi_.includeTestAssimilatorState(
+        loihi_.TEST_includeAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
@@ -119,7 +119,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
         
-        loihi_.includeTestAssimilatorState(
+        loihi_.TEST_includeAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
@@ -142,7 +142,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
 
-        loihi_.includeTestAssimilatorState(
+        loihi_.TEST_includeAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
@@ -165,7 +165,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
         
-        loihi_.includeTestAssimilatorState(
+        loihi_.TEST_includeAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
@@ -188,7 +188,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
 
-        loihi_.includeTestAssimilatorState(
+        loihi_.TEST_includeAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
@@ -208,7 +208,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
 
-        loihi_.includeTestAssimilatorState(
+        loihi_.TEST_includeAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
@@ -231,7 +231,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
         loihi_ = new Loihi();
 
-        loihi_.includeTestAssimilatorState(
+        loihi_.TEST_includeAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,

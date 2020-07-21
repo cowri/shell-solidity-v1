@@ -1,5 +1,5 @@
 
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.17;
 
 import "ds-test/test.sol";
 
@@ -100,22 +100,6 @@ contract TargetSwapViewsSuiteOneTests is TargetSwapViewsTemplate, DSTest {
         assertEq(originAmount, 29922181);
 
     }
-
-    // function test_s1_targetSwapView_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight_HACK () public {
-
-    //     uint256 originAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight_HACK();
-
-    //     assertEq(originAmount, 29929682);
-
-    // }
-
-    // function test_s1_targetSwapView_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight_NO_HACK () public {
-
-    //     uint256 originAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_30PctWeight_NO_HACK();
-
-    //     assertEq(originAmount, 29929682);
-
-    // }
 
     function test_s1_targetSwapView_partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight () public {
 

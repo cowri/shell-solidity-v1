@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.17;
 
 import "../../Loihi.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";

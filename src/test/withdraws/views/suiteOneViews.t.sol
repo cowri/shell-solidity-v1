@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.17;
 
 import "ds-test/test.sol";
 
@@ -115,22 +115,6 @@ contract SelectiveWithdrawSuiteOneViews is SelectiveWithdrawViewsTemplate, DSTes
         assertEq(shellsBurned, 10696820295820476818);
 
     }
-
-    // function test_s1_viewSelectiveWithdraw_fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD_HACK () public {
-
-    //     uint256 shellsBurned = super.fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD_HACK();
-
-    //     assertEq(shellsBurned, 10696820295674489134);
-
-    // }
-
-    // function test_s1_viewSelectiveWithdraw_fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD_NO_HACK () public {
-
-    //     uint256 shellsBurned = super.fullLowerAntiSlippageWithdraw_5DAI_5USDC_0p5USDT_0p2SUSD_from_95DAI_95USDC_55USDT_15SUSD_NO_HACK();
-
-    //     assertEq(shellsBurned, 10696820295674489134);
-
-    // }
 
     function test_s1_viewSelectiveWithdraw_fullUpperAntiSlippage_5DAI_2SUSD_from_145DAI_90USDC_90USDT_50SUSD () public {
 

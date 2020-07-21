@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.17;
 
 import "ds-test/test.sol";
 
@@ -11,22 +11,6 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
         l = getLoihiSuiteOne();
 
     }
-
-    // function test_s1_selectiveDepositViews_noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_NO_HACK () public logs_gas {
-
-    //     uint256 newShells = super.noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD();
-
-    //     assertEq(newShells, 32499999216641686631);
-
-    // }
-
-    // function test_s1_selectiveDepositViews_noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_HACK () public logs_gas {
-
-    //     uint256 newShells = super.noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_HACK();
-
-    //     assertEq(newShells, 32499999216641686631);
-
-    // }
 
     function test_s1_selectiveDepositViews_balanced_5DAI_1USDC_3USDT_1SUSD () public {
 

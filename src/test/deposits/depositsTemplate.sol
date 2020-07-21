@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.17;
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
@@ -36,24 +36,6 @@ contract SelectiveDepositTemplate is Setup {
         emit log_uint("gas for deposit", gas - gasleft());
 
     }
-
-    // function noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD_HACK () public returns (uint256 shellsMinted_) {
-
-    //     uint256 startingShells = l.proportionalDeposit(300e18, 1e50);
-
-    //     uint256 gas = gasleft();
-
-    //     shellsMinted_ = l.depositHack(
-    //         address(dai), 10e18,
-    //         address(usdc), 10e6,
-    //         address(usdt), 10e6,
-    //         address(susd), 2.5e18
-    //     );
-
-    //     emit log_uint("gas for deposit", gas - gasleft());
-
-
-    // }
 
     function balanced_5DAI_1USDC_3USDT_1SUSD () public returns (uint256 shellsMinted_) {
 
@@ -309,30 +291,6 @@ contract SelectiveDepositTemplate is Setup {
         emit log_uint("gas on second deposit", gas - gasleft());
 
     }
-
-    // function fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD_HACK () public returns (uint256 shellsMinted_) {
-
-    //     uint256 gas = gasleft();
-
-    //     uint256 startingShells = l.depositHack(
-    //         address(dai), 90e18,
-    //         address(usdc), 90e6,
-    //         address(usdt), 145e6,
-    //         address(susd), 50e18
-    //     );
-
-    //     emit log_uint("gas on first deposit", gas - gasleft());
-
-    //     gas = gasleft();
-
-    //     shellsMinted_ = l.depositHack(
-    //         address(dai), 5e18,
-    //         address(usdc), 5e6
-    //     );
-
-    //     emit log_uint("gas on second deposit", gas - gasleft());
-
-    // }
 
     function fullUpperAntiSlippage_8DAI_12USDC_10USDT_2SUSD_into_145DAI_90USDC_90USDT_50SUSD () public returns (uint256 shellsMinted_) {
 
