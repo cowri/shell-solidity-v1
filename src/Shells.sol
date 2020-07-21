@@ -12,8 +12,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-pragma solidity >0.4.13;
-
+pragma solidity ^0.5.0;
 import "./Loihi.sol";
 
 library Shells {
