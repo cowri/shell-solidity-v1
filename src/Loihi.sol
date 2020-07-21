@@ -284,7 +284,7 @@ contract Loihi {
         uint oAmt_
     ) {
 
-        oAmt_ = Swaps.viewOriginSwap(shell, _origin, _target, _tAmt);
+        oAmt_ = Swaps.viewTargetSwap(shell, _origin, _target, _tAmt);
 
     }
 
