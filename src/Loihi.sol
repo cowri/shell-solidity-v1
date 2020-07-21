@@ -73,8 +73,6 @@ contract Loihi {
 
     Shell public shell;
 
-<<<<<<< HEAD
-=======
     struct PartitionTicket {
         uint[] claims;
         bool active;
@@ -85,7 +83,6 @@ contract Loihi {
     bool public partitioned = false;
     bool public frozen = false;
 
->>>>>>> libraries
     address public owner;
     bool internal notEntered = true;
 
