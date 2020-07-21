@@ -84,12 +84,13 @@ contract Loihi {
 
     mapping (address => PartitionTicket) public partitionTickets;
 
+    address[] public numeraires;
+
     bool public partitioned = false;
     bool public frozen = false;
 
     address public owner;
     bool internal notEntered = true;
-
 
     uint public maxFee;
 
@@ -141,7 +142,7 @@ contract Loihi {
 
     function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint _weight) public onlyOwner {
 
-        Controller.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _weight);
+        Controller.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
 
     }
 
@@ -151,7 +152,7 @@ contract Loihi {
 
     }
 
-    function excludeAdapter (address _assimilator) external onlyOwner {
+    function excludeAssimilator (address _assimilator) external onlyOwner {
 
         delete shell.assimilators[_assimilator];
 

@@ -82,12 +82,21 @@ library Controller {
 
     function includeAsset (
         Loihi.Shell storage shell,
+        address[] storage numeraires,
         address _numeraire,
         address _numeraireAssim,
         address _reserve,
         address _reserveAssim,
         uint256 _weight
     ) internal {
+
+        require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
+        require(_numeraireAssim != address(0), "Shell/numeraire-assimilator-cannot-be-zeroth-adress");
+        require(_reserve != address(0), "Shell/reserve-cannot-be-zeroth-adress");
+        require(_reserveAssim != address(0), "Shell/reserve-assimilator-cannot-be-zeroth-adress");
+        require(_weight < 1e18, "Shell/weight-must-be-less-than-one");
+
+        numeraires.push(_numeraire);
 
         Loihi.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
@@ -105,7 +114,9 @@ library Controller {
 
         shell.reserves.push(_reserveAssimilator);
 
-        shell.weights.push(_weight.divu(1e18).add(uint256(1).divu(1e18)));
+        int128 __weight = _weight.divu(1e18).add(uint256(1).divu(1e18));
+
+        shell.weights.push(__weight);
 
     }
 
@@ -115,6 +126,10 @@ library Controller {
         address _derivative,
         address _assimilator
     ) internal {
+
+        require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-address");
+        require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
+        require(_assimilator != address(0), "Shell/assimilator-cannot-be-zeroth-address");
 
         Loihi.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
