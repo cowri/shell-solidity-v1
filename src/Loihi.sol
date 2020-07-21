@@ -100,6 +100,7 @@ contract Loihi {
     event Transfer(address indexed from, address indexed to, uint value);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event SetFrozen(bool isFrozen);
+    event PoolPartitioned(bool);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Shell/caller-is-not-owner");
@@ -166,8 +167,10 @@ contract Loihi {
     }
 
     function transferOwnership (address _newOwner) public onlyOwner {
+
         emit OwnershipTransferred(owner, _newOwner);
         owner = _newOwner;
+
     }
 
     function prime () public {
@@ -405,6 +408,8 @@ contract Loihi {
         }
 
         partitioned = true;
+
+        emit PoolPartitioned(true);
 
     }
 
