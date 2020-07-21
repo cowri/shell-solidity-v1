@@ -19,11 +19,13 @@ import "./Assimilators.sol";
 
 import "./Controller.sol";
 
-import "./Shells.sol";
+import "./PartitionedLiquidity.sol";
 
 import "./ProportionalLiquidity.sol";
 
 import "./SelectiveLiquidity.sol";
+
+import "./Shells.sol";
 
 import "./Swaps.sol";
 
@@ -71,9 +73,23 @@ contract Loihi {
 
     Shell public shell;
 
+<<<<<<< HEAD
+=======
+    struct PartitionTicket {
+        uint[] claims;
+        bool active;
+    }
+
+    mapping (address => PartitionTicket) public partitionTickets;
+
+    bool public partitioned = false;
+    bool public frozen = false;
+
+>>>>>>> libraries
     address public owner;
     bool internal notEntered = true;
-    bool public frozen = false;
+
+
     uint public maxFee;
 
     event ShellsMinted(address indexed minter, uint amount, address[] indexed coins, uint[] amounts);
@@ -370,6 +386,61 @@ contract Loihi {
 
     }
 
+    function partition () external onlyOwner {
+
+        require(frozen, "Shell/pool-is-not-frozen");
+
+        uint _length = shell.reserves.length;
+
+        PartitionTicket storage totalSupplyTicket = partitionTickets[address(this)];
+
+        totalSupplyTicket.active = true;
+
+        for (uint i = 0; i < _length; i++) {
+            emit log_uint("i", i);
+            totalSupplyTicket.claims.push(shell.totalSupply);
+        }
+
+        partitioned = true;
+
+    }
+
+    function partitionedWithdraw (
+        address[] calldata _tokens,
+        uint256[] calldata _amounts
+    ) external returns (
+        uint256[] memory withdraws_
+    ) {
+
+        require(frozen, "Shell/pool-is-not-frozen");
+        require(partitioned, "Shell/pool-is-not-partitioned");
+
+        return PartitionedLiquidity.partitionedWithdraw(shell, partitionTickets, _tokens, _amounts);
+
+    }
+
+    function viewPartitionClaims (
+        address _addr
+    ) external returns (
+        uint[] memory
+    ) {
+
+        require(partitioned, "Shell/not-partitioned");
+
+        PartitionTicket storage ticket = partitionTickets[_addr];
+
+        if (ticket.active) return ticket.claims;
+
+        uint _length = shell.reserves.length;
+        uint[] memory claims_ = new uint[](_length);
+        uint _balance = shell.balances[msg.sender];
+
+        for (uint i = 0; i < _length; i++) claims_[i] = _balance;
+
+        return claims_;
+
+    }
+
     function transfer (address _recipient, uint _amount) public nonReentrant returns (bool) {
 
         return Shells.transfer(shell, _recipient, _amount);
@@ -430,8 +501,11 @@ contract Loihi {
 
     }
 
+    event log(bytes32);
     event log_addr(bytes32, address);
     event log_uint(bytes32, uint);
+    event log_uints(bytes32, uint[]);
+    event log_ints(bytes32, int[]);
 
     function TEST_safeApprove (address _token, address _spender, uint _value) public onlyOwner {
         emit log_addr("token", _token);
