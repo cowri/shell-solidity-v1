@@ -144,7 +144,7 @@ library SelectiveLiquidity {
     function selectiveDeposit (
         Loihi.Shell storage shell,
         address[] memory _flvrs,
-        uint[] calldata _amts,
+        uint[] memory _amts,
         uint _minShells
     ) internal returns (
         uint shells_
@@ -201,7 +201,7 @@ library SelectiveLiquidity {
     function selectiveWithdraw (
         Loihi.Shell storage shell,
         address[] memory _flvrs,
-        uint[] calldata _amts,
+        uint[] memory _amts,
         uint _maxShells
     ) internal returns (
         uint256 shells_
