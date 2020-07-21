@@ -653,7 +653,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
     function smartHalt_lower_outOfBounds_to_outOfBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18, 1e50)
+        l.proportionalDeposit(67e18, 1e50);
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
