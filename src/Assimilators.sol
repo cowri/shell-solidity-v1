@@ -19,7 +19,6 @@ pragma solidity >0.4.13;
 library Assimilators {
 
     using ABDKMath64x64 for int128;
-    IAssimilator constant iAsmltr = IAssimilator(address(0));
 
     function delegate(address _callee, bytes memory _data) internal returns (bytes memory) {
 
@@ -35,7 +34,7 @@ library Assimilators {
 
         // amount_ = IAssimilator(_assim).viewRawAmount(_amt); // for production
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewRawAmount.selector, _amt.abs()); // for development
+        bytes memory data = abi.encodeWithSelector(IAssimilator.viewRawAmount.selector, _amt.abs()); // for development
 
         amount_ = abi.decode(delegate(_assim, data), (uint256)); // for development
 
@@ -45,7 +44,7 @@ library Assimilators {
 
         // amount_ = IAssimilator(_assim).viewNumeraireAmount(_amt); // for production
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireAmount.selector, _amt); // for development
+        bytes memory data = abi.encodeWithSelector(IAssimilator.viewNumeraireAmount.selector, _amt); // for development
 
         amt_ = abi.decode(delegate(_assim, data), (int128)); // for development
 
@@ -55,7 +54,7 @@ library Assimilators {
 
         // ( amt_, bal_ ) = IAssimilator(_assim).viewNumeraireAmountAndBalance(_amt); // for production
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireAmountAndBalance.selector, _amt);
+        bytes memory data = abi.encodeWithSelector(IAssimilator.viewNumeraireAmountAndBalance.selector, _amt);
 
         ( amt_, bal_ ) = abi.decode(delegate(_assim, data), (int128,int128));
 
@@ -63,7 +62,7 @@ library Assimilators {
 
     function viewNumeraireBalance (address _assim) internal returns (int128 bal_) {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireBalance.selector, address(this));
+        bytes memory data = abi.encodeWithSelector(IAssimilator.viewNumeraireBalance.selector, address(this));
 
         bal_ = abi.decode(delegate(_assim, data), (int128));
 
@@ -71,7 +70,7 @@ library Assimilators {
 
     function intakeRaw (address _assim, uint256 _amount) internal returns (int128 amt_) {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.intakeRaw.selector, _amount);
+        bytes memory data = abi.encodeWithSelector(IAssimilator.intakeRaw.selector, _amount);
 
         amt_ = abi.decode(delegate(_assim, data), (int128));
 
@@ -79,7 +78,7 @@ library Assimilators {
 
     function intakeRawAndGetBalance (address _assim, uint256 _amount) internal returns (int128 amt_, int128 bal_) {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.intakeRawAndGetBalance.selector, _amount);
+        bytes memory data = abi.encodeWithSelector(IAssimilator.intakeRawAndGetBalance.selector, _amount);
 
         ( amt_, bal_ ) = abi.decode(delegate(_assim, data), (int128,int128));
 
@@ -87,7 +86,7 @@ library Assimilators {
 
     function intakeNumeraire (address _assim, int128 _amt) internal returns (uint256 rawAmt_) {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.intakeNumeraire.selector, _amt);
+        bytes memory data = abi.encodeWithSelector(IAssimilator.intakeNumeraire.selector, _amt);
 
         rawAmt_ = abi.decode(delegate(_assim, data), (uint256));
 
@@ -95,7 +94,7 @@ library Assimilators {
 
     function outputRaw (address _assim, address _dst, uint256 _amount) internal returns (int128 amt_ ) {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.outputRaw.selector, _dst, _amount);
+        bytes memory data = abi.encodeWithSelector(IAssimilator.outputRaw.selector, _dst, _amount);
 
         amt_ = abi.decode(delegate(_assim, data), (int128));
 
@@ -105,7 +104,7 @@ library Assimilators {
 
     function outputRawAndGetBalance (address _assim, address _dst, uint256 _amount) internal returns (int128 amt_, int128 bal_) {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.outputRawAndGetBalance.selector, _dst, _amount);
+        bytes memory data = abi.encodeWithSelector(IAssimilator.outputRawAndGetBalance.selector, _dst, _amount);
 
         ( amt_, bal_ ) = abi.decode(delegate(_assim, data), (int128,int128));
 
@@ -115,7 +114,7 @@ library Assimilators {
 
     function outputNumeraire (address _assim, address _dst, int128 _amt) internal returns (uint256 rawAmt_) {
 
-        bytes memory data = abi.encodeWithSelector(iAsmltr.outputNumeraire.selector, _dst, _amt.abs());
+        bytes memory data = abi.encodeWithSelector(IAssimilator.outputNumeraire.selector, _dst, _amt.abs());
 
         rawAmt_ = abi.decode(delegate(_assim, data), (uint256));
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.17;
+pragma solidity ^0.5.0;
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
