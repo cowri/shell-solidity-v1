@@ -38,7 +38,7 @@ library Controller {
         uint256 _max,
         uint256 _epsilon,
         uint256 _lambda
-    ) internal returns (uint256 max_) {
+    ) external returns (uint256 max_) {
 
         require(_max <= .5e18, "Shell/parameter-invalid-max");
 
@@ -81,13 +81,13 @@ library Controller {
 
     function includeAsset (
         Loihi.Shell storage shell,
-        address[] storage numeraires,
+        // address[] storage numeraires,
         address _numeraire,
         address _numeraireAssim,
         address _reserve,
         address _reserveAssim,
         uint256 _weight
-    ) internal {
+    ) external {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
         require(_numeraireAssim != address(0), "Shell/numeraire-assimilator-cannot-be-zeroth-adress");
@@ -95,7 +95,7 @@ library Controller {
         require(_reserveAssim != address(0), "Shell/reserve-assimilator-cannot-be-zeroth-adress");
         require(_weight < 1e18, "Shell/weight-must-be-less-than-one");
 
-        numeraires.push(_numeraire);
+        // numeraires.push(_numeraire);
 
         Loihi.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
@@ -124,7 +124,7 @@ library Controller {
         address _numeraire,
         address _derivative,
         address _assimilator
-    ) internal {
+    ) external {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-address");
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
@@ -138,7 +138,7 @@ library Controller {
 
     function prime (
         Loihi.Shell storage shell
-    ) internal {
+    ) external {
 
         uint _length = shell.reserves.length;
         int128 _oGLiq;

@@ -19,6 +19,8 @@ import "./Assimilators.sol";
 
 import "./Controller.sol";
 
+import "./Liquidity.sol";
+
 import "./PartitionedLiquidity.sol";
 
 import "./ProportionalLiquidity.sol";
@@ -29,16 +31,7 @@ import "./Shells.sol";
 
 import "./Swaps.sol";
 
-import "./interfaces/IERC20.sol";
-import "./interfaces/IERC20NoBool.sol";
-import "./interfaces/ICToken.sol";
-import "./interfaces/IAToken.sol";
-import "./interfaces/IChai.sol";
-import "./interfaces/IPot.sol";
-
 contract Loihi {
-
-    int128 constant ONE = 0x10000000000000000;
 
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
@@ -67,7 +60,7 @@ contract Loihi {
         Assimilator[] reserves;
         Assimilator[] numeraires;
         mapping (address => Assimilator) assimilators;
-        bool testHalts;
+        // bool testHalts;
     }
 
     struct Assimilator {
@@ -92,18 +85,16 @@ contract Loihi {
     address public owner;
     bool internal notEntered = true;
 
-    uint public maxFee;
+    // uint public maxFee;
 
-    event ShellsMinted(address indexed minter, uint amount, address[] indexed coins, uint[] amounts);
-    event ShellsBurned(address indexed burner, uint amount, address[] indexed coins, uint[] amounts);
-    event Trade(address indexed trader, address indexed origin, address indexed target, uint originAmount, uint targetAmount);
-    event Transfer(address indexed from, address indexed to, uint value);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event SetFrozen(bool isFrozen);
 
     modifier onlyOwner() {
+
         require(msg.sender == owner, "Shell/caller-is-not-owner");
         _;
+
     }
 
     modifier nonReentrant() {
@@ -112,7 +103,7 @@ contract Loihi {
         notEntered = false;
         _;
         notEntered = true;
- 
+
     }
 
     modifier transactable () {
@@ -141,19 +132,21 @@ contract Loihi {
 
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
-        shell.testHalts = true;
+        // shell.testHalts = true;
 
     }
 
     function setParams (uint _alpha, uint _beta, uint _epsilon, uint _max, uint _lambda) external onlyOwner {
 
-        maxFee = Controller.setParams(shell, _alpha, _beta, _epsilon, _max, _lambda);
+        Controller.setParams(shell, _alpha, _beta, _epsilon, _max, _lambda);
+        // maxFee = Controller.setParams(shell, _alpha, _beta, _epsilon, _max, _lambda);
 
     }
 
     function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint _weight) external onlyOwner {
 
-        Controller.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
+        Controller.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _weight);
+        // Controller.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
 
     }
 
@@ -201,7 +194,7 @@ contract Loihi {
 
         tAmt_ = Swaps.originSwap(shell, _origin, _target, _oAmt, msg.sender);
 
-        require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
+        // require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
 
     }
 
@@ -219,7 +212,7 @@ contract Loihi {
 
         tAmt_ = Swaps.originSwap(shell, _origin, _target, _oAmt, _rcpnt);
 
-        require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
+        // require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
 
     }
 
@@ -256,7 +249,7 @@ contract Loihi {
 
         oAmt_ = Swaps.targetSwap(shell, _origin, _target, _tAmt, msg.sender);
 
-        require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
+        // require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
 
     }
 
@@ -280,7 +273,7 @@ contract Loihi {
 
         oAmt_ = Swaps.targetSwap(shell, _origin, _target, _tAmt, _rcpnt);
 
-        require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
+        // require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
 
     }
 
@@ -406,6 +399,7 @@ contract Loihi {
     function proportionalWithdraw (
         uint _withdrawal,
         uint _dline
+    // ) external deadline(_dline) nonReentrant returns (
     ) external deadline(_dline) unpartitioned nonReentrant returns (
         uint[] memory
     ) {
@@ -426,11 +420,9 @@ contract Loihi {
 
     function partition () external onlyOwner {
 
-        require(frozen, "Shell/pool-is-not-frozen");
+        PartitionedLiquidity.partition(shell, partitionTickets);
 
         partitioned = true;
-
-        PartitionedLiquidity.partition(shell, partitionTickets);
 
     }
 
@@ -441,7 +433,7 @@ contract Loihi {
         uint256[] memory withdraws_
     ) {
 
-        require(partitioned, "Shell/pool-is-not-partitioned");
+        // require(partitioned, "Shell/pool-is-not-partitioned");
 
         return PartitionedLiquidity.partitionedWithdraw(shell, partitionTickets, _tokens, _amounts);
 
@@ -453,96 +445,64 @@ contract Loihi {
         uint[] memory
     ) {
 
-        require(partitioned, "Shell/not-partitioned");
+        // require(partitioned, "Shell/not-partitioned");
 
         return PartitionedLiquidity.viewPartitionClaims(shell, partitionTickets, _addr);
 
     }
 
-    function transfer (address _recipient, uint _amount) public nonReentrant returns (bool) {
+    function transfer (address _recipient, uint _amount) public nonReentrant returns (bool success_) {
 
-        return Shells.transfer(shell, _recipient, _amount);
+        success_ = Shells.transfer(shell, _recipient, _amount);
 
     }
 
-    function transferFrom (address _sender, address _recipient, uint _amount) public nonReentrant returns (bool) {
-        // return shell.transferFrom(_sender, _recipient, _amount);
+    function transferFrom (address _sender, address _recipient, uint _amount) public nonReentrant returns (bool success_) {
+
+        success_ = shell.transferFrom(_sender, _recipient, _amount);
+
     }
 
     function approve (address _spender, uint _amount) public nonReentrant returns (bool success_) {
-        // return shell.approve(_spender, _amount);
+
+        success_ = shell.approve(_spender, _amount);
+
     }
 
-    function increaseAllowance(address _spender, uint _addedValue) public returns (bool success_) {
-        // return shell.increaseAllowance(_spender, _addedValue);
-    }
+    // function increaseAllowance(address _spender, uint _addedValue) public returns (bool success_) {
 
-    function decreaseAllowance(address _spender, uint _subtractedValue) public returns (bool success_) {
-        // return shell.decreaseAllowance(_spender, _subtractedValue);
-    }
+    //     success_ = shell.increaseAllowance(_spender, _addedValue);
 
-    function balanceOf (address _account) public view returns (uint) {
-        return shell.balances[_account];
+    // }
+
+    // function decreaseAllowance(address _spender, uint _subtractedValue) public returns (bool success_) {
+
+    //     success_ = shell.decreaseAllowance(_spender, _subtractedValue);
+
+    // }
+
+    function balanceOf (address _account) public view returns (uint balance_) {
+
+        balance_ = shell.balances[_account];
+
     }
 
     function totalSupply () public view returns (uint totalSupply_) {
+
         totalSupply_ = shell.totalSupply;
+
     }
 
-    function allowance (address _owner, address _spender) public view returns (uint) {
-        return shell.allowances[_owner][_spender];
+    function allowance (address _owner, address _spender) public view returns (uint allowance_) {
+
+        allowance_ = shell.allowances[_owner][_spender];
+
     }
 
     function liquidity () public returns (uint, uint[] memory) {
 
-        uint _length = shell.reserves.length;
+        return Liquidity.liquidity(shell);
 
-        uint[] memory liquidity_ = new uint[](_length);
-        uint totalLiquidity_;
-
-        for (uint i = 0; i < _length; i++) {
-
-            uint _liquidity = shell.reserves[i].addr.viewNumeraireBalance().mulu(1e18);
-
-            totalLiquidity_ += _liquidity;
-            liquidity_[i] = _liquidity;
-
-        }
-
-        return (totalLiquidity_, liquidity_);
-
-    }
-
-    function TEST_setTestHalts (bool toTestOrNotToTest) public {
-
-        shell.testHalts = toTestOrNotToTest;
-
-    }
-
-    event log(bytes32);
-    event log_addr(bytes32, address);
-    event log_uint(bytes32, uint);
-    event log_uints(bytes32, uint[]);
-    event log_ints(bytes32, int[]);
-
-    function TEST_safeApprove (address _token, address _spender, uint _value) public onlyOwner {
-
-        (bool success, bytes memory returndata) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
-
-        require(success, "SafeERC20: low-level call failed");
-
-    }
-
-    IERC20 dai; ICToken cdai; IChai chai; IPot pot;
-    IERC20 usdc; ICToken cusdc;
-    IERC20NoBool usdt; IAToken ausdt;
-    IERC20 susd; IAToken asusd;
-
-    function TEST_includeAssimilatorState(IERC20 _dai, ICToken _cdai, IChai _chai, IPot _pot, IERC20 _usdc, ICToken _cusdc, IERC20NoBool _usdt, IAToken _ausdt, IERC20 _susd, IAToken _asusd) public {
-        dai = _dai; cdai = _cdai; chai = _chai; pot = _pot;
-        usdc = _usdc; cusdc = _cusdc;
-        usdt = _usdt; ausdt = _ausdt;
-        susd = _susd; asusd = _asusd;
     }
 
 }
