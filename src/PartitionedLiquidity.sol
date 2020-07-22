@@ -12,6 +12,7 @@ library PartitionedLiquidity {
     using ABDKMath64x64 for int128;
     using UnsafeMath64x64 for int128;
 
+    event PoolPartitioned(bool);
     event PartitionRedeemed(address token, address redeemer, uint value);
 
     int128 constant ONE = 0x10000000000000000;
@@ -21,6 +22,45 @@ library PartitionedLiquidity {
     event log_ints(bytes32, int128[]);
     event log_uint(bytes32, uint);
     event log_uints(bytes32, uint[]);
+
+    function partition (
+        Loihi.Shell storage shell,
+        mapping (address => Loihi.PartitionTicket) storage partitionTickets
+    ) internal {
+
+        uint _length = shell.reserves.length;
+
+        Loihi.PartitionTicket storage totalSupplyTicket = partitionTickets[address(this)];
+
+        totalSupplyTicket.active = true;
+
+        for (uint i = 0; i < _length; i++) totalSupplyTicket.claims.push(shell.totalSupply);
+
+        emit PoolPartitioned(true);
+
+    }
+
+    function viewPartitionClaims (
+        Loihi.Shell storage shell,
+        mapping (address => Loihi.PartitionTicket) storage partitionTickets,
+        address _addr
+    ) internal view returns (
+        uint[] memory
+    ) {
+
+        Loihi.PartitionTicket storage ticket = partitionTickets[_addr];
+
+        if (ticket.active) return ticket.claims;
+
+        uint _length = shell.reserves.length;
+        uint[] memory claims_ = new uint[](_length);
+        uint _balance = shell.balances[msg.sender];
+
+        for (uint i = 0; i < _length; i++) claims_[i] = _balance;
+
+        return claims_;
+
+    }
 
     function partitionedWithdraw (
         Loihi.Shell storage shell,

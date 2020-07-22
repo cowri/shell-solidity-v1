@@ -82,7 +82,7 @@ library SelectiveLiquidity {
         address[] memory _flvrs,
         uint[] memory _amts,
         bool _isDeposit
-    ) private returns (
+    ) private view returns (
         int128 oGLiq_,
         int128 nGLiq_,
         int128[] memory,
@@ -175,7 +175,7 @@ library SelectiveLiquidity {
         uint[] memory _amts
         // address[] calldata _flvrs,
         // uint[] calldata _amts
-    ) internal returns (
+    ) internal view returns (
         uint shells_
     ) {
 
@@ -237,7 +237,7 @@ library SelectiveLiquidity {
         uint[] memory _amts
         // address[] calldata _flvrs,
         // uint[] calldata _amts
-    ) internal returns (
+    ) internal view returns (
         uint shells_
     ) {
 
