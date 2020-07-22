@@ -19,6 +19,8 @@ import "./Assimilators.sol";
 
 import "./Controller.sol";
 
+import "./Liquidity.sol";
+
 import "./PartitionedLiquidity.sol";
 
 import "./ProportionalLiquidity.sol";
@@ -495,21 +497,7 @@ contract Loihi {
 
     function liquidity () public returns (uint, uint[] memory) {
 
-        uint _length = shell.reserves.length;
-
-        uint[] memory liquidity_ = new uint[](_length);
-        uint totalLiquidity_;
-
-        for (uint i = 0; i < _length; i++) {
-
-            uint _liquidity = shell.reserves[i].addr.viewNumeraireBalance().mulu(1e18);
-
-            totalLiquidity_ += _liquidity;
-            liquidity_[i] = _liquidity;
-
-        }
-
-        return (totalLiquidity_, liquidity_);
+        return Liquidity.liquidity(shell);
 
     }
 
