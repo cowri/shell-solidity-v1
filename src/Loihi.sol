@@ -60,7 +60,6 @@ contract Loihi {
         Assimilator[] reserves;
         Assimilator[] numeraires;
         mapping (address => Assimilator) assimilators;
-        // bool testHalts;
     }
 
     struct Assimilator {
@@ -132,7 +131,6 @@ contract Loihi {
 
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
-        // shell.testHalts = true;
 
     }
 
@@ -145,8 +143,7 @@ contract Loihi {
 
     function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint _weight) external onlyOwner {
 
-        Controller.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _weight);
-        // Controller.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
+        Controller.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
 
     }
 
@@ -433,7 +430,7 @@ contract Loihi {
         uint256[] memory withdraws_
     ) {
 
-        // require(partitioned, "Shell/pool-is-not-partitioned");
+        require(partitioned, "Shell/not-partitioned");
 
         return PartitionedLiquidity.partitionedWithdraw(shell, partitionTickets, _tokens, _amounts);
 
@@ -445,7 +442,7 @@ contract Loihi {
         uint[] memory
     ) {
 
-        // require(partitioned, "Shell/not-partitioned");
+        require(partitioned, "Shell/not-partitioned");
 
         return PartitionedLiquidity.viewPartitionClaims(shell, partitionTickets, _addr);
 

@@ -81,7 +81,7 @@ library Controller {
 
     function includeAsset (
         Loihi.Shell storage shell,
-        // address[] storage numeraires,
+        address[] storage numeraires,
         address _numeraire,
         address _numeraireAssim,
         address _reserve,
@@ -95,7 +95,7 @@ library Controller {
         require(_reserveAssim != address(0), "Shell/reserve-assimilator-cannot-be-zeroth-adress");
         require(_weight < 1e18, "Shell/weight-must-be-less-than-one");
 
-        // numeraires.push(_numeraire);
+        numeraires.push(_numeraire);
 
         Loihi.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
