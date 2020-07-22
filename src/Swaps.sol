@@ -163,6 +163,7 @@ library Swaps {
 
     }
 
+    event log_uint(bytes32, uint);
 
     // / @author james foley http://github.com/realisation
     // / @notice view how much of the target currency the origin currency will provide
@@ -194,7 +195,7 @@ library Swaps {
 
         _amt = _amt.us_mul(ONE - shell.epsilon);
 
-        tAmt_ = Assimilators.viewRawAmount(_t.addr, _amt);
+        tAmt_ = Assimilators.viewRawAmount(_t.addr, _amt.abs());
 
     }
 

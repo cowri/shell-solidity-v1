@@ -34,7 +34,7 @@ contract LocalUsdtToAUsdtAssimilator is IAssimilator, Loihi {
 
      }
 
-    function getAUsdt () public returns (IAToken) {
+    function getAUsdt () public view returns (IAToken) {
 
         return ausdt;
 
@@ -115,53 +115,56 @@ contract LocalUsdtToAUsdtAssimilator is IAssimilator, Loihi {
     }
 
     // takes numeraire amount, returns raw amount
-    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
 
     }
 
     // takes raw amount, returns numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
         amount_ = _amount.divu(1e6);
 
     }
 
     // returns numeraire amount of reserve asset, in this case aUSDT
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public view returns (int128 balance_) {
 
-        uint256 _balance = getAUsdt().balanceOf(address(this));
+        uint256 _balance = getAUsdt().balanceOf(_addr);
 
         balance_ = _balance.divu(1e6);
 
     }
 
     // takes raw amount, returns numeraire amount
-    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function viewNumeraireAmountAndBalance (address _addr, uint256 _amount) public view returns (int128 amount_, int128 balance_) {
 
         amount_ = _amount.divu(1e6);
 
-        uint256 _balance = getAUsdt().balanceOf(address(this));
+        uint256 _balance = getAUsdt().balanceOf(_addr);
 
         balance_ = _balance.divu(1e6);
 
     }
 
     function safeTransfer(IERC20NoBool token, address to, uint256 value) internal {
+
         callOptionalReturn(address(token), abi.encodeWithSelector(token.transfer.selector, to, value));
+
     }
 
     function safeTransferFrom(IERC20NoBool token, address from, address to, uint256 value) internal {
+
         callOptionalReturn(address(token), abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+
     }
 
     function callOptionalReturn(address token, bytes memory data) private {
+
         (bool success, bytes memory returnData) = token.call(data);
-        assembly {
-            if eq(success, 0) {
-                revert(add(returnData, 0x20), returndatasize)
-            }
-        }
+
+        assembly { if eq(success, 0) { revert(add(returnData, 0x20), returndatasize) } }
+
     }
 }

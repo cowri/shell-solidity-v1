@@ -166,14 +166,14 @@ contract LocalChaiToCDaiAssimilator is IAssimilator, Loihi {
     event log_uint(bytes32, uint);
 
     // pass it a numeraire amount and get the raw amount
-    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
         amount_ = fromDai(_amount.mulu(1e18), pot.chi());
 
     }
 
     // pass it a raw amount and get the numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
         _amount = toDai(_amount, pot.chi());
 
@@ -182,11 +182,11 @@ contract LocalChaiToCDaiAssimilator is IAssimilator, Loihi {
     }
 
     // returns the numeraire balance for this numeraire's reserve, in this case cDai
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public view returns (int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _balance = cdai.balanceOf(address(this));
+        uint256 _balance = cdai.balanceOf(_addr);
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
@@ -195,7 +195,7 @@ contract LocalChaiToCDaiAssimilator is IAssimilator, Loihi {
     }
 
     // pass it a raw amount and get the numeraire amount
-    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function viewNumeraireAmountAndBalance (address _addr, uint256 _amount) public view returns (int128 amount_, int128 balance_) {
 
         _amount = toDai(_amount, pot.chi());
 
@@ -203,7 +203,7 @@ contract LocalChaiToCDaiAssimilator is IAssimilator, Loihi {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _balance = cdai.balanceOf(address(this));
+        uint256 _balance = cdai.balanceOf(_addr);
 
         if (_balance == 0) return (amount_, ABDKMath64x64.fromUInt(0));
 

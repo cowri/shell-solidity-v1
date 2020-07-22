@@ -133,7 +133,7 @@ contract LocalCDaiToDaiAssimilator is IAssimilator, Loihi {
     }
 
     // takes a numeraire amount and returns the raw amount
-    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -142,7 +142,7 @@ contract LocalCDaiToDaiAssimilator is IAssimilator, Loihi {
     }
 
     // takes a raw amount and returns the numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
@@ -151,9 +151,9 @@ contract LocalCDaiToDaiAssimilator is IAssimilator, Loihi {
     }
 
     // views the numeraire value of the current balance of the reserve, in this case CDai
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public view returns (int128 balance_) {
 
-        uint256 _balance = dai.balanceOf(address(this));
+        uint256 _balance = dai.balanceOf(_addr);
 
         if (_balance == 0) return ABDKMath64x64.fromUInt(0);
 
@@ -162,13 +162,13 @@ contract LocalCDaiToDaiAssimilator is IAssimilator, Loihi {
     }
 
     // views the numeraire value of the current balance of the reserve, in this case CDai
-    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function viewNumeraireAmountAndBalance (address _addr, uint256 _amount) public view returns (int128 amount_, int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
 
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
 
-        uint256 _balance = dai.balanceOf(address(this));
+        uint256 _balance = dai.balanceOf(_addr);
 
         if (_balance == 0) return ( amount_, ABDKMath64x64.fromUInt(0));
 

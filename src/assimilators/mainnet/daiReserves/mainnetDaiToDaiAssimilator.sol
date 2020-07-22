@@ -106,36 +106,34 @@ contract MainnetDaiToDaiAssimilator is IAssimilator {
     }
 
     // takes numeraire amount and returns raw amount
-    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e18);
 
     }
 
     // takes raw amount and returns numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
         amount_ = _amount.divu(1e18);
 
     }
 
     // returns current balance in numeraire
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public view returns (int128 balance_) {
 
         uint256 _balance = dai.balanceOf(_addr);
-
-        // if (_balance == 0) return ZERO;
 
         balance_ = _balance.divu(1e18);
 
     }
 
     // takes raw amount and returns numeraire amount
-    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function viewNumeraireAmountAndBalance (address _addr, uint256 _amount) public view returns (int128 amount_, int128 balance_) {
 
         amount_ = _amount.divu(1e18);
 
-        uint256 _balance = dai.balanceOf(address(this));
+        uint256 _balance = dai.balanceOf(_addr);
 
         balance_ = _balance.divu(1e18);
 

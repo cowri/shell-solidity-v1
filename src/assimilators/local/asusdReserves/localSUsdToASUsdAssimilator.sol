@@ -34,7 +34,7 @@ contract LocalSUsdToASUsdAssimilator is IAssimilator, Loihi {
 
     }
 
-    function getASUsd () public returns (IAToken) {
+    function getASUsd () public view returns (IAToken) {
 
         return asusd;
 
@@ -116,34 +116,34 @@ contract LocalSUsdToASUsdAssimilator is IAssimilator, Loihi {
     }
 
     // takes numeraire amount, returns raw amount
-    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e18);
 
     }
 
     // takes raw amount, returns numeraire amount
-    function viewNumeraireAmount (uint256 _amount) public returns (int128 amount_) {
+    function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
         amount_ = _amount.divu(1e18);
 
     }
 
     // returns numeraire value of reserve asset, in this case ASUsd
-    function viewNumeraireBalance (address _addr) public returns (int128 balance_) {
+    function viewNumeraireBalance (address _addr) public view returns (int128 balance_) {
 
-        uint256 _balance = getASUsd().balanceOf(address(this));
+        uint256 _balance = getASUsd().balanceOf(_addr);
 
         balance_ = _balance.divu(1e18);
 
     }
 
     // takes raw amount, returns numeraire amount
-    function viewNumeraireAmountAndBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+    function viewNumeraireAmountAndBalance (address _addr, uint256 _amount) public view returns (int128 amount_, int128 balance_) {
 
         amount_ = _amount.divu(1e18);
 
-        uint256 _balance = getASUsd().balanceOf(address(this));
+        uint256 _balance = getASUsd().balanceOf(_addr);
 
         balance_ = _balance.divu(1e18);
 

@@ -38,23 +38,15 @@ library ProportionalLiquidity {
 
         int128 _shells = _deposit.divu(1e18);
 
-        emit log_int("_shells", _shells);
-
         int128 _oGLiq;
 
         uint _length = shell.reserves.length;
 
         int128[] memory _oBals = new int128[](_length);
 
-        emit log_ints("_oBals", _oBals);
-
         uint[] memory deposits_ = new uint[](_length);
 
-        emit log_uints("deposits_", deposits_);
-
         for (uint i = 0; i < _length; i++) {
-
-            emit log_uint("i", i);
 
             int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
 
@@ -67,8 +59,6 @@ library ProportionalLiquidity {
 
             for (uint8 i = 0; i < _length; i++) {
 
-                emit log_uint("i", i);
-
                 deposits_[i] = Assimilators.intakeNumeraire(shell.numeraires[i].addr, _shells.mul(shell.weights[i]));
 
             }
@@ -78,8 +68,6 @@ library ProportionalLiquidity {
             int128 _multiplier = _shells.div(_oGLiq);
 
             for (uint8 i = 0; i < _length; i++) {
-
-                emit log_uint("i", i);
 
                 deposits_[i] = Assimilators.intakeNumeraire(shell.numeraires[i].addr, _oBals[i].mul(_multiplier));
 
