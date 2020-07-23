@@ -84,7 +84,7 @@ library SelectiveLiquidity {
         address[] memory _flvrs,
         uint[] memory _amts,
         bool _isDeposit
-    ) private returns (
+    ) private view returns (
         int128 oGLiq_,
         int128 nGLiq_,
         int128[] memory,
@@ -235,7 +235,13 @@ library SelectiveLiquidity {
         Loihi.Shell storage shell,
         address[] memory _flvrs,
         uint[] memory _amts
+<<<<<<< HEAD
     ) internal returns (
+=======
+        // address[] calldata _flvrs,
+        // uint[] calldata _amts
+    ) internal view returns (
+>>>>>>> libraries
         uint shells_
     ) {
 

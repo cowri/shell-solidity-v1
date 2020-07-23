@@ -2,9 +2,9 @@ pragma solidity ^0.5.0;
 
 import "ds-test/test.sol";
 
-import "./depositsTemplate.sol";
+import "./depositsViewsTemplate.sol";
 
-contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
+contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest {
 
     function setUp() public {
 
@@ -12,7 +12,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_balanced_5DAI_1USDC_3USDT_1SUSD () public {
+    function test_s1_selectiveDepositViews_balanced_5DAI_1USDC_3USDT_1SUSD () public {
 
         uint256 newShells = super.balanced_5DAI_1USDC_3USDT_1SUSD();
 
@@ -20,7 +20,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_partialUpperSlippage_145DAI_90USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveDepositViews_partialUpperSlippage_145DAI_90USDC_90USDT_50SUSD () public {
 
         uint256 newShells = super.partialUpperSlippage_145DAI_90USDC_90USDT_50SUSD();
 
@@ -28,7 +28,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_partialLowerSlippage_95DAI_55USDC_95USDT_15SUSD () public {
+    function test_s1_selectiveDepositViews_partialLowerSlippage_95DAI_55USDC_95USDT_15SUSD () public {
 
         uint256 newShells = super.partialLowerSlippage_95DAI_55USDC_95USDT_15SUSD();
 
@@ -36,7 +36,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_partialUpperSlippage_5DAI_5USDC_70USDT_28SUSD_300Proportional () public {
+    function test_s1_selectiveDepositViews_partialUpperSlippage_5DAI_5USDC_70USDT_28SUSD_300Proportional () public {
 
         uint256 newShells = super.partialUpperSlippage_5DAI_5USDC_70USDT_28SUSD_300Proportional();
 
@@ -44,7 +44,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_partialLowerSlippage_moderatelyUnbalanced_1DAI_51USDC_51USDT_1SUSD () public {
+    function test_s1_selectiveDepositViews_partialLowerSlippage_moderatelyUnbalanced_1DAI_51USDC_51USDT_1SUSD () public {
 
         uint256 newShells = super.partialLowerSlippage_moderatelyUnbalanced_1DAI_51USDC_51USDT_1SUSD();
 
@@ -52,7 +52,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_partialLowerSlippage_balanced_0p001DAI_90USDC_90USDT () public {
+    function test_s1_selectiveDepositViews_partialLowerSlippage_balanced_0p001DAI_90USDC_90USDT () public {
 
         uint256 newShells = super.partialLowerSlippage_balanced_0p001DAI_90USDC_90USDT();
 
@@ -60,7 +60,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_partialUpperAntiSlippage_46USDC_53USDT_into_145DAI_90USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveDepositViews_partialUpperAntiSlippage_46USDC_53USDT_into_145DAI_90USDC_90USDT_50SUSD () public {
 
         uint256 newShells = super.partialUpperAntiSlippage_46USDC_53USDT_into_145DAI_90USDC_90USDT_50SUSD();
 
@@ -68,7 +68,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_partialUpperAntiSlippage_unbalanced_1DAI_46USDC_53USDT_1SUSD_into_145DAI_90USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveDepositViews_partialUpperAntiSlippage_unbalanced_1DAI_46USDC_53USDT_1SUSD_into_145DAI_90USDC_90USDT_50SUSD () public {
 
         uint256 newShells = super.partialUpperAntiSlippage_unbalanced_1DAI_46USDC_53USDT_1SUSD_into_145DAI_90USDC_90USDT_50SUSD();
 
@@ -76,7 +76,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_partialLowerAntiSlippage_36USDC_18SUSD_into_95DAI_55USDC_95USDT_15SUSD () public {
+    function test_s1_selectiveDepositViews_partialLowerAntiSlippage_36USDC_18SUSD_into_95DAI_55USDC_95USDT_15SUSD () public {
 
         uint256 newShells = super.partialLowerAntiSlippage_36USDC_18SUSD_into_95DAI_55USDC_95USDT_15SUSD();
 
@@ -84,7 +84,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_fullUpperSlippage_5USDC_3SUSD_into_90DAI_145USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveDepositViews_fullUpperSlippage_5USDC_3SUSD_into_90DAI_145USDC_90USDT_50SUSD () public {
 
         uint256 newShells = super.fullUpperSlippage_5USDC_3SUSD_into_90DAI_145USDC_90USDT_50SUSD();
 
@@ -92,7 +92,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_fullLowerSlippage_12DAI_12USDC_1USDT_1SUSD_into_95DAI_95USDC_55USDT_15SUSD () public {
+    function test_s1_selectiveDepositViews_fullLowerSlippage_12DAI_12USDC_1USDT_1SUSD_into_95DAI_95USDC_55USDT_15SUSD () public {
 
         uint256 newShells = super.fullLowerSlippage_12DAI_12USDC_1USDT_1SUSD_into_95DAI_95USDC_55USDT_15SUSD();
 
@@ -100,7 +100,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_fullLowerSlippage_9DAI_9USDC_into_95DAI_95USDC_55USDT_15SUSD () public {
+    function test_s1_selectiveDepositViews_fullLowerSlippage_9DAI_9USDC_into_95DAI_95USDC_55USDT_15SUSD () public {
 
         uint256 newShells = super.fullLowerSlippage_9DAI_9USDC_into_95DAI_95USDC_55USDT_15SUSD();
 
@@ -108,7 +108,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_fullUpperAntiSlippage_8DAI_12USDC_10USDT_2SUSD_into_145DAI_90USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveDepositViews_fullUpperAntiSlippage_8DAI_12USDC_10USDT_2SUSD_into_145DAI_90USDC_90USDT_50SUSD () public {
 
         uint256 newShells = super.fullUpperAntiSlippage_8DAI_12USDC_10USDT_2SUSD_into_145DAI_90USDC_90USDT_50SUSD();
 
@@ -116,7 +116,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_fullLowerAntiSlippage_5DAI_5USDC_5USDT_2SUSD_into_55DAI_95USDC_95USDT_15SUSD  () public {
+    function test_s1_selectiveDepositViews_fullLowerAntiSlippage_5DAI_5USDC_5USDT_2SUSD_into_55DAI_95USDC_95USDT_15SUSD  () public {
 
         uint256 newShells = super.fullLowerAntiSlippage_5DAI_5USDC_5USDT_2SUSD_into_55DAI_95USDC_95USDT_15SUSD();
 
@@ -124,7 +124,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_noSlippage_36DAI_from_300Proportional () public {
+    function test_s1_selectiveDepositViews_noSlippage_36DAI_from_300Proportional () public {
 
         uint256 shellsMinted = super.noSlippage_36DAI_from_300Proportional();
 
@@ -132,7 +132,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_upperSlippage_36Point001Dai_into_300Proportional () public {
+    function test_s1_selectiveDepositViews_upperSlippage_36Point001Dai_into_300Proportional () public {
 
         uint256 shellsMinted = super.upperSlippage_36Point001Dai_into_300Proportional();
 
@@ -140,7 +140,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_megaDepositDirectLowerToUpper_105DAI_37SUSD_from_55DAI_95USDC_95USDT_15SUSD () public {
+    function test_s1_selectiveDepositViews_megaDepositDirectLowerToUpper_105DAI_37SUSD_from_55DAI_95USDC_95USDT_15SUSD () public {
 
         uint256 newShells = super.megaDepositDirectLowerToUpper_105DAI_37SUSD_from_55DAI_95USDC_95USDT_15SUSD();
 
@@ -148,7 +148,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_megaDepositIndirectUpperToLower_165DAI_165USDT_into_90DAI_145USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveDepositViews_megaDepositIndirectUpperToLower_165DAI_165USDT_into_90DAI_145USDC_90USDT_50SUSD () public {
 
         uint256 newShells = super.megaDepositIndirectUpperToLower_165DAI_165USDT_into_90DAI_145USDC_90USDT_50SUSD();
 
@@ -156,7 +156,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_megaDepositIndirectUpperToLower_165DAI_0p0001USDC_165USDT_0p5SUSD_from_90DAI_145USDC_90USDT_50SUSD () public {
+    function test_s1_selectiveDepositViews_megaDepositIndirectUpperToLower_165DAI_0p0001USDC_165USDT_0p5SUSD_from_90DAI_145USDC_90USDT_50SUSD () public {
 
         uint256 newShells = super.megaDepositIndirectUpperToLower_165DAI_0p0001USDC_165USDT_0p5SUSD_from_90DAI_145USDC_90USDT_50SUSD();
 
@@ -179,7 +179,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
         l.deposit(
             address(dai), 300e18,
             address(usdt), 300e6,
-            address(susd), 100e6
+            address(susd), 100e18
         );
 
     }
@@ -188,7 +188,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(address(susd), 500e6);
+        l.deposit(address(susd), 500e18);
 
     }
 
@@ -237,7 +237,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_smartHalt_upper_outOfBounds_to_outOfBounds () public {
+    function test_s1_selectiveDepositViews_smartHalt_upper_outOfBounds_to_outOfBounds () public {
 
         bool success = super.smartHalt_upper_outOfBounds_to_outOfBounds();
 
@@ -245,14 +245,14 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_smartHalt_upper_outOfBounds_to_inBounds () public {
+    function test_s1_selectiveDepositViews_smartHalt_upper_outOfBounds_to_inBounds () public {
 
         bool success = super.smartHalt_upper_outOfBounds_to_inBounds();
 
         assertTrue(success);
 
     }
-    function test_s1_selectiveDeposit_smartHalt_upper_outOfBounds_exacerbated () public {
+    function test_s1_selectiveDepositViews_smartHalt_upper_outOfBounds_exacerbated () public {
 
         bool success = super.smartHalt_upper_outOfBounds_exacerbated();
 
@@ -260,7 +260,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_smartHalt_lower_outOfBounds_to_outOfBounds () public {
+    function test_s1_selectiveDepositViews_smartHalt_lower_outOfBounds_to_outOfBounds () public {
 
         bool success = super.smartHalt_lower_outOfBounds_to_outOfBounds();
 
@@ -268,7 +268,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_smartHalt_lower_outOfBounds_to_inBounds () public {
+    function test_s1_selectiveDepositViews_smartHalt_lower_outOfBounds_to_inBounds () public {
 
         bool success = super.smartHalt_lower_outOfBounds_to_inBounds();
 
@@ -276,7 +276,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_smartHalt_lower_unrelated () public {
+    function test_s1_selectiveDepositViews_smartHalt_lower_unrelated () public {
 
         bool success = super.smartHalt_lower_unrelated();
 

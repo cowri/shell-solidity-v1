@@ -19,6 +19,8 @@ import "./Assimilators.sol";
 
 import "./Controller.sol";
 
+import "./Liquidity.sol";
+
 import "./PartitionedLiquidity.sol";
 
 import "./ProportionalLiquidity.sol";
@@ -80,12 +82,13 @@ contract Loihi {
 
     mapping (address => PartitionTicket) public partitionTickets;
 
+    address[] public numeraires;
+
     bool public partitioned = false;
     bool public frozen = false;
 
     address public owner;
     bool internal notEntered = true;
-
 
     uint public maxFee;
 
@@ -102,15 +105,26 @@ contract Loihi {
     }
 
     modifier nonReentrant() {
+
         require(notEntered, "Shell/re-entered");
         notEntered = false;
         _;
         notEntered = true;
+ 
     }
 
-    modifier notFrozen () {
+    modifier transactable () {
+
         require(!frozen, "Shell/frozen-only-allowing-proportional-withdraw");
         _;
+
+    }
+
+    modifier unpartitioned () {
+
+        require(!partitioned, "Shell/pool-partitioned");
+        _;
+
     }
 
     modifier deadline (uint _deadline) {
@@ -137,7 +151,7 @@ contract Loihi {
 
     function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint _weight) external onlyOwner {
 
-        Controller.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _weight);
+        Controller.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
 
     }
 
@@ -161,8 +175,13 @@ contract Loihi {
     }
 
     function transferOwnership (address _newOwner) external onlyOwner {
+<<<<<<< HEAD
+=======
+
+>>>>>>> libraries
         emit OwnershipTransferred(owner, _newOwner);
         owner = _newOwner;
+
     }
 
     function prime () external {
@@ -177,7 +196,7 @@ contract Loihi {
         uint _oAmt,
         uint _minTAmt,
         uint _dline
-    ) public deadline(_dline) notFrozen nonReentrant returns (
+    ) external deadline(_dline) transactable nonReentrant returns (
         uint tAmt_
     ) {
 
@@ -194,7 +213,7 @@ contract Loihi {
         uint _minTAmt,
         uint _dline,
         address _rcpnt
-    ) public deadline(_dline) notFrozen nonReentrant returns (
+    ) external deadline(_dline) transactable nonReentrant returns (
         uint tAmt_
     ) {
 
@@ -208,7 +227,7 @@ contract Loihi {
         address _origin,
         address _target,
         uint _oAmt
-    ) public notFrozen returns (
+    ) external view transactable returns (
         uint tAmt_
     ) {
 
@@ -231,7 +250,7 @@ contract Loihi {
         uint _maxOAmt,
         uint _tAmt,
         uint _dline
-    ) public deadline(_dline) notFrozen nonReentrant returns (
+    ) external deadline(_dline) transactable nonReentrant returns (
         uint oAmt_
     ) {
 
@@ -257,7 +276,7 @@ contract Loihi {
         uint _tAmt,
         uint _dline,
         address _rcpnt
-    ) public deadline(_dline) notFrozen nonReentrant returns (uint oAmt_) {
+    ) external deadline(_dline) transactable nonReentrant returns (uint oAmt_) {
 
         oAmt_ = Swaps.targetSwap(shell, _origin, _target, _tAmt, _rcpnt);
 
@@ -275,11 +294,11 @@ contract Loihi {
         address _origin,
         address _target,
         uint _tAmt
-    ) public notFrozen returns (
+    ) external view transactable returns (
         uint oAmt_
     ) {
 
-        oAmt_ = Swaps.viewOriginSwap(shell, _origin, _target, _tAmt);
+        oAmt_ = Swaps.viewTargetSwap(shell, _origin, _target, _tAmt);
 
     }
 
@@ -295,7 +314,7 @@ contract Loihi {
         uint[] calldata _amts,
         uint _minShells,
         uint _dline
-    ) external deadline(_dline) notFrozen nonReentrant returns (
+    ) external deadline(_dline) transactable nonReentrant returns (
         uint shells_
     ) {
 
@@ -311,7 +330,7 @@ contract Loihi {
     function viewSelectiveDeposit (
         address[] calldata _flvrs,
         uint[] calldata _amts
-    ) external notFrozen returns (
+    ) external view transactable returns (
         uint shells_
     ) {
 
@@ -326,12 +345,24 @@ contract Loihi {
     function proportionalDeposit (
         uint _deposit,
         uint _dline
-    ) public deadline(_dline) notFrozen nonReentrant returns (
+    ) external deadline(_dline) transactable nonReentrant returns (
         uint shells_,
         uint[] memory
     ) {
 
         return ProportionalLiquidity.proportionalDeposit(shell, _deposit);
+
+    }
+
+    function viewProportionalDeposit (
+        uint _deposit,
+        uint _dline
+    ) external view deadline(_dline) transactable returns (
+        uint shells_,
+        uint[] memory
+    ) {
+
+        return ProportionalLiquidity.viewProportionalDeposit(shell, _deposit);
 
     }
 
@@ -345,7 +376,7 @@ contract Loihi {
         uint[] calldata _amts,
         uint _maxShells,
         uint _dline
-    ) external deadline(_dline) notFrozen nonReentrant returns (
+    ) external deadline(_dline) transactable nonReentrant returns (
         uint shells_
     ) {
 
@@ -361,7 +392,7 @@ contract Loihi {
     function viewSelectiveWithdraw (
         address[] calldata _flvrs,
         uint[] calldata _amts
-    ) external notFrozen returns (
+    ) external view transactable returns (
         uint shells_
     ) {
 
@@ -375,7 +406,7 @@ contract Loihi {
     function proportionalWithdraw (
         uint _withdrawal,
         uint _dline
-    ) public deadline(_dline) nonReentrant returns (
+    ) external deadline(_dline) unpartitioned nonReentrant returns (
         uint[] memory
     ) {
 
@@ -383,22 +414,23 @@ contract Loihi {
 
     }
 
+    function viewProportionalWithdraw (
+        uint _withdrawal
+    ) external view unpartitioned returns (
+        uint[] memory
+    ) {
+
+        return ProportionalLiquidity.viewProportionalWithdraw(shell, _withdrawal);
+
+    }
+
     function partition () external onlyOwner {
 
         require(frozen, "Shell/pool-is-not-frozen");
 
-        uint _length = shell.reserves.length;
-
-        PartitionTicket storage totalSupplyTicket = partitionTickets[address(this)];
-
-        totalSupplyTicket.active = true;
-
-        for (uint i = 0; i < _length; i++) {
-            emit log_uint("i", i);
-            totalSupplyTicket.claims.push(shell.totalSupply);
-        }
-
         partitioned = true;
+
+        PartitionedLiquidity.partition(shell, partitionTickets);
 
     }
 
@@ -409,7 +441,6 @@ contract Loihi {
         uint256[] memory withdraws_
     ) {
 
-        require(frozen, "Shell/pool-is-not-frozen");
         require(partitioned, "Shell/pool-is-not-partitioned");
 
         return PartitionedLiquidity.partitionedWithdraw(shell, partitionTickets, _tokens, _amounts);
@@ -418,23 +449,13 @@ contract Loihi {
 
     function viewPartitionClaims (
         address _addr
-    ) external returns (
+    ) external view returns (
         uint[] memory
     ) {
 
         require(partitioned, "Shell/not-partitioned");
 
-        PartitionTicket storage ticket = partitionTickets[_addr];
-
-        if (ticket.active) return ticket.claims;
-
-        uint _length = shell.reserves.length;
-        uint[] memory claims_ = new uint[](_length);
-        uint _balance = shell.balances[msg.sender];
-
-        for (uint i = 0; i < _length; i++) claims_[i] = _balance;
-
-        return claims_;
+        return PartitionedLiquidity.viewPartitionClaims(shell, partitionTickets, _addr);
 
     }
 
@@ -474,21 +495,7 @@ contract Loihi {
 
     function liquidity () public returns (uint, uint[] memory) {
 
-        uint _length = shell.reserves.length;
-
-        uint[] memory liquidity_ = new uint[](_length);
-        uint totalLiquidity_;
-
-        for (uint i = 0; i < _length; i++) {
-
-            uint _liquidity = shell.reserves[i].addr.viewNumeraireBalance().mulu(1e18);
-
-            totalLiquidity_ += _liquidity;
-            liquidity_[i] = _liquidity;
-
-        }
-
-        return (totalLiquidity_, liquidity_);
+        return Liquidity.liquidity(shell);
 
     }
 
@@ -505,9 +512,6 @@ contract Loihi {
     event log_ints(bytes32, int[]);
 
     function TEST_safeApprove (address _token, address _spender, uint _value) public onlyOwner {
-        emit log_addr("token", _token);
-        emit log_addr("spender", _spender);
-        emit log_uint("_value", _value);
 
         (bool success, bytes memory returndata) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
 
@@ -520,11 +524,11 @@ contract Loihi {
     IERC20NoBool usdt;
     IERC20 susd;
 
-    function includeTestAssimilatorState(IERC20 _dai, IERC20 _usdc, IERC20NoBool _usdt, IERC20 _susd) public {
-        dai = _dai;
-        usdc = _usdc;
-        usdt = _usdt;
-        susd = _susd;
+    function TEST_includeAssimilatorState(IERC20 _dai, ICToken _cdai, IChai _chai, IPot _pot, IERC20 _usdc, ICToken _cusdc, IERC20NoBool _usdt, IAToken _ausdt, IERC20 _susd, IAToken _asusd) public {
+        dai = _dai; cdai = _cdai; chai = _chai; pot = _pot;
+        usdc = _usdc; cusdc = _cusdc;
+        usdt = _usdt; ausdt = _ausdt;
+        susd = _susd; asusd = _asusd;
     }
 
 }

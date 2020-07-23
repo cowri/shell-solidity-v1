@@ -1,4 +1,3 @@
-
 pragma solidity ^0.5.0;
 
 import "./Assimilators.sol";
@@ -24,7 +23,7 @@ library Swaps {
         Loihi.Shell storage shell,
         address _o,
         address _t
-    ) private returns (
+    ) private view returns (
         Loihi.Assimilator memory,
         Loihi.Assimilator memory
     ) {
@@ -94,7 +93,7 @@ library Swaps {
         uint _amt,
         bool _isOrigin,
         address _assim
-    ) private returns (
+    ) private view returns (
         int128 amt_,
         int128 oGLiq_,
         int128 nGLiq_,
@@ -164,6 +163,7 @@ library Swaps {
 
     }
 
+    event log_uint(bytes32, uint);
 
     // / @author james foley http://github.com/realisation
     // / @notice view how much of the target currency the origin currency will provide
@@ -176,7 +176,11 @@ library Swaps {
         address _origin,
         address _target,
         uint256 _oAmt
+<<<<<<< HEAD
     ) external returns (
+=======
+    ) internal view returns (
+>>>>>>> libraries
         uint256 tAmt_
     ) {
 
@@ -195,7 +199,7 @@ library Swaps {
 
         _amt = _amt.us_mul(ONE - shell.epsilon);
 
-        tAmt_ = Assimilators.viewRawAmount(_t.addr, _amt);
+        tAmt_ = Assimilators.viewRawAmount(_t.addr, _amt.abs());
 
     }
 
@@ -251,7 +255,11 @@ library Swaps {
         address _origin,
         address _target,
         uint256 _tAmt
+<<<<<<< HEAD
     ) external returns (
+=======
+    ) internal view returns (
+>>>>>>> libraries
         uint256 oAmt_
     ) {
 

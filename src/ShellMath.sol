@@ -98,7 +98,7 @@ library ShellMath {
         int128[] memory _nBals,
         int128 _lAmt,
         uint _rIx
-    ) internal returns (int128 rAmt_ , int128 psi_) {
+    ) internal view returns (int128 rAmt_ , int128 psi_) {
 
         rAmt_ = - _lAmt;
 
@@ -145,7 +145,7 @@ library ShellMath {
         int128 _nGLiq,
         int128[] memory _oBals,
         int128[] memory _nBals
-    ) internal returns (int128 shells_, int128 psi_) {
+    ) internal view returns (int128 shells_, int128 psi_) {
 
         enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, shell.weights);
 
@@ -171,7 +171,7 @@ library ShellMath {
         int128[] memory _oBals,
         int128[] memory _nBals,
         int128[] memory _weights
-    ) internal {
+    ) internal view {
 
         uint256 _length = _nBals.length;
         int128 _alpha = shell.alpha;
