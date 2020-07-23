@@ -121,11 +121,7 @@ contract KovanUsdtToUsdtAssimilator is IAssimilator {
     // returns numeraire amount of reserve asset, in this case aUSDT
     function viewNumeraireBalance (address _addr) public view returns (int128 balance_) {
 
-        emit log_addr("_addr", _addr);
-
         uint256 _balance = usdt.balanceOf(_addr);
-
-        emit log_uint("_balance", _balance);
 
         balance_ = _balance.divu(1e6);
 

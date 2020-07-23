@@ -59,15 +59,8 @@ contract KovanDaiToDaiAssimilator is IAssimilator {
     // transfers numeraire amount of dai in, wraps it in cDai, returns raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        emit log_int("i amount", _amount.muli(1e18));
-
         // truncate stray decimals caused by conversion
         amount_ = _amount.mulu(1e18) / 1e3 * 1e3;
-
-        emit log_uint("amount", amount_);
-
-        emit log_addr("msg.sender", msg.sender);
-        emit log_addr("address(this)", address(this));
 
         bool _success = dai.transferFrom(msg.sender, address(this), amount_);
 
@@ -134,11 +127,7 @@ contract KovanDaiToDaiAssimilator is IAssimilator {
     // returns current balance in numeraire
     function viewNumeraireBalance (address _addr) public view returns (int128 balance_) {
 
-        emit log_addr("_addr", _addr);
-
         uint256 _balance = dai.balanceOf(_addr);
-
-        emit log_uint("balance", _balance);
 
         // if (_balance == 0) return ZERO;
 

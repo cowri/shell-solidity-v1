@@ -175,10 +175,7 @@ contract Loihi {
     }
 
     function transferOwnership (address _newOwner) external onlyOwner {
-<<<<<<< HEAD
-=======
 
->>>>>>> libraries
         emit OwnershipTransferred(owner, _newOwner);
         owner = _newOwner;
 
@@ -517,18 +514,6 @@ contract Loihi {
 
         require(success, "SafeERC20: low-level call failed");
 
-    }
-
-    IERC20 dai;
-    IERC20 usdc;
-    IERC20NoBool usdt;
-    IERC20 susd;
-
-    function TEST_includeAssimilatorState(IERC20 _dai, ICToken _cdai, IChai _chai, IPot _pot, IERC20 _usdc, ICToken _cusdc, IERC20NoBool _usdt, IAToken _ausdt, IERC20 _susd, IAToken _asusd) public {
-        dai = _dai; cdai = _cdai; chai = _chai; pot = _pot;
-        usdc = _usdc; cusdc = _cusdc;
-        usdt = _usdt; ausdt = _ausdt;
-        susd = _susd; asusd = _asusd;
     }
 
 }

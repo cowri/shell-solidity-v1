@@ -39,19 +39,19 @@ contract SelectiveDepositTemplate is Setup {
 
     function balanced_5DAI_1USDC_3USDT_1SUSD () public returns (uint256 shellsMinted_) {
 
-        // uint256 startingShells = l.deposit(
-        //     address(dai), 80e18,
-        //     address(usdc), 100e6,
-        //     address(usdt), 85e6,
-        //     address(susd), 35e6
-        // );
+        uint256 startingShells = l.deposit(
+            address(dai), 80e18,
+            address(usdc), 100e6,
+            address(usdt), 85e6,
+            address(susd), 35e6
+        );
 
-        // shellsMinted_ = l.deposit(
-        //     address(dai), 5e18,
-        //     address(usdc), 1e6,
-        //     address(usdt), 3e6,
-        //     address(susd), 1e6
-        // );
+        shellsMinted_ = l.deposit(
+            address(dai), 5e18,
+            address(usdc), 1e6,
+            address(usdt), 3e6,
+            address(susd), 1e6
+        );
 
     }
 

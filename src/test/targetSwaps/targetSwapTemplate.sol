@@ -186,25 +186,6 @@ contract TargetSwapTemplate is Setup {
 
     }
 
-    function partialUpperAndLowerAntiSlippage_unbalanced_CHAI_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
-
-        l.deposit(
-            address(dai), 135e18,
-            address(usdc), 90e6,
-            address(usdt), 90e6,
-            address(susd), 25e18
-        );
-
-        uint256 chaiOf10Numeraire = chaiAssimilator.viewRawAmount(uint(10e18).divu(1e18));
-
-        originAmount_ = l.targetSwap(
-            address(susd),
-            address(chai),
-            chaiOf10Numeraire
-        );
-
-    }
-
     function partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(

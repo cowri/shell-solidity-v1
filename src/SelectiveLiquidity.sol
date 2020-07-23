@@ -177,7 +177,7 @@ library SelectiveLiquidity {
         Loihi.Shell storage shell,
         address[] memory _flvrs,
         uint[] memory _amts
-    ) internal returns (
+    ) internal view returns (
         uint shells_
     ) {
 
@@ -235,13 +235,7 @@ library SelectiveLiquidity {
         Loihi.Shell storage shell,
         address[] memory _flvrs,
         uint[] memory _amts
-<<<<<<< HEAD
-    ) internal returns (
-=======
-        // address[] calldata _flvrs,
-        // uint[] calldata _amts
     ) internal view returns (
->>>>>>> libraries
         uint shells_
     ) {
 
