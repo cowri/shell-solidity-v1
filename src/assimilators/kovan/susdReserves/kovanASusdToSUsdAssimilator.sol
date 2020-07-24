@@ -54,9 +54,9 @@ contract KovanASUsdToSUsdAssimilator is IAssimilator {
 
         uint256 _balance = susd.balanceOf(address(this));
 
-        amount_ = _amount.divu(1e18);
+        amount_ = _amount.divu(1e6);
 
-        balance_ = _balance.divu(1e18);
+        balance_ = _balance.divu(1e6);
 
     }
 
@@ -71,14 +71,14 @@ contract KovanASUsdToSUsdAssimilator is IAssimilator {
 
         _asusd.redeem(_amount);
 
-        amount_ = _amount.divu(1e18);
+        amount_ = _amount.divu(1e6);
 
     }
 
     // intakes a numeraire amount of ASUsd and returns the corresponding raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = _amount.mulu(1e18);
+        amount_ = _amount.mulu(1e6);
 
         IAToken _asusd = getASUsd();
 
@@ -103,9 +103,9 @@ contract KovanASUsdToSUsdAssimilator is IAssimilator {
 
         uint256 _balance = susd.balanceOf(address(this));
 
-        amount_ = _amount.divu(1e18);
+        amount_ = _amount.divu(1e6);
 
-        balance_ = _balance.divu(1e18);
+        balance_ = _balance.divu(1e6);
 
     }
 
@@ -120,14 +120,14 @@ contract KovanASUsdToSUsdAssimilator is IAssimilator {
 
         require(_success, "Shell/aSUSD-transfer-failed");
 
-        amount_ = _amount.divu(1e18);
+        amount_ = _amount.divu(1e6);
 
     }
 
     // outputs a numeraire amount of ASUsd and returns the corresponding numeraire amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = _amount.mulu(1e18);
+        amount_ = _amount.mulu(1e6);
 
         IAToken _asusd = getASUsd();
 
@@ -142,25 +142,25 @@ contract KovanASUsdToSUsdAssimilator is IAssimilator {
     // takes a numeraire amount and returns the raw amount
     function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
-        amount_ = _amount.mulu(1e18);
+        amount_ = _amount.mulu(1e6);
 
     }
 
     // takes a raw amount and returns the numeraire amount
     function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
-        amount_ = _amount.divu(1e18);
+        amount_ = _amount.divu(1e6);
 
     }
 
     // takes a raw amount and returns the numeraire amount
     function viewNumeraireAmountAndBalance (address _addr, uint256 _amount) public view returns (int128 amount_, int128 balance_) {
 
-        amount_ = _amount.divu(1e18);
+        amount_ = _amount.divu(1e6);
 
         uint256 _balance = susd.balanceOf(_addr);
 
-        balance_ = _balance.divu(1e18);
+        balance_ = _balance.divu(1e6);
 
     }
 
@@ -169,7 +169,7 @@ contract KovanASUsdToSUsdAssimilator is IAssimilator {
 
         uint256 _balance = susd.balanceOf(_addr);
 
-        amount_ = _balance.divu(1e18);
+        amount_ = _balance.divu(1e6);
 
     }
 
