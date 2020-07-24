@@ -506,7 +506,7 @@ contract Loihi {
 
         (bool success, bytes memory returndata) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
 
-        require(success, "SafeERC20: low-level call failed");
+    function liquidity () public view returns (uint, uint[] memory) {
 
     }
 
