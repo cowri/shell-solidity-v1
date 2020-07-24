@@ -94,8 +94,6 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
 
         require(_redeemSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
 
-        uint256 _rate = cdai.exchangeRateStored();
-
         bool _transferSuccess = dai.transfer(_dst, _amount);
 
         require(_transferSuccess, "Shell/DAI-transfer-failed");
