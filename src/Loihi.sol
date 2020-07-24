@@ -485,7 +485,7 @@ contract Loihi {
 
     }
 
-    function liquidity () public returns (uint, uint[] memory) {
+    function liquidity () public view returns (uint, uint[] memory) {
 
         return Liquidity.liquidity(shell);
 
