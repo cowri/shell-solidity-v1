@@ -67,8 +67,6 @@ library PartitionedLiquidity {
         mapping (address => Loihi.PartitionTicket) storage partitionTickets,
         address[] calldata _tokens,
         uint[] calldata _withdrawals
-        // address[] memory _tokens,
-        // uint[] memory _withdrawals
     ) external returns (
         uint[] memory
     ) {
