@@ -506,8 +506,6 @@ contract Loihi {
 
         (bool success, bytes memory returndata) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
 
-    function liquidity () public view returns (uint, uint[] memory) {
-
     }
 
     IERC20 dai; ICToken cdai; IChai chai; IPot pot;
