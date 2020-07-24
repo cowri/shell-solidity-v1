@@ -40,20 +40,9 @@ import "./interfaces/IPot.sol";
 
 contract Loihi {
 
-    int128 constant ONE = 0x10000000000000000;
-
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
-
-    using ABDKMath64x64 for int128;
-    using UnsafeMath64x64 for int128;
-    using ABDKMath64x64 for uint;
-
-    using Assimilators for address;
-    using ShellMath for Shell;
-    using Shells for Shell;
-    using Controller for Shell;
 
     struct Shell {
         int128 alpha;
@@ -468,19 +457,19 @@ contract Loihi {
     }
 
     function transferFrom (address _sender, address _recipient, uint _amount) public nonReentrant returns (bool) {
-        // return shell.transferFrom(_sender, _recipient, _amount);
+        return Shells.transferFrom(shell, _sender, _recipient, _amount);
     }
 
     function approve (address _spender, uint _amount) public nonReentrant returns (bool success_) {
-        // return shell.approve(_spender, _amount);
+        return Shells.approve(shell, _spender, _amount);
     }
 
     function increaseAllowance(address _spender, uint _addedValue) public returns (bool success_) {
-        // return shell.increaseAllowance(_spender, _addedValue);
+        return Shells.increaseAllowance(shell, _spender, _addedValue);
     }
 
     function decreaseAllowance(address _spender, uint _subtractedValue) public returns (bool success_) {
-        // return shell.decreaseAllowance(_spender, _subtractedValue);
+        return Shells.decreaseAllowance(shell, _spender, _subtractedValue);
     }
 
     function balanceOf (address _account) public view returns (uint) {
