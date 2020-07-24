@@ -39,7 +39,7 @@ contract PartitionedWithdrawSuiteOne is PartitionedLiquidityTemplate, DSTest {
 
         bool success = super.from_proprotional_state_underflow();
 
-        assertTrue(!success);
+        assertTrue(success);
 
     }
 

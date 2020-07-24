@@ -1,7 +1,8 @@
 pragma solidity ^0.5.0;
 
-import "../../Loihi.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
+import "../../Loihi.sol";
 
 library AssimilatorMethods {
 
@@ -677,7 +678,7 @@ library LoihiMethods {
         uint256 _originAmount
     ) internal returns (uint256 targetAmount_) {
 
-        targetAmount_ = loihi.swapByOrigin(_origin, _target, _originAmount, 0, 1e50);
+        targetAmount_ = loihi.originSwap(_origin, _target, _originAmount, 0, 1e50);
 
     }
 
@@ -688,8 +689,8 @@ library LoihiMethods {
         uint256 _originAmount
     ) internal returns (bool success_) {
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
-            loihi.swapByOrigin.selector,
+        ( success_, ) = address(loihi).call(abi.encodeWithSignature(
+            "originSwap(address,address,uint256,uint256,uint256)",
             _origin,
             _target,
             _originAmount,
@@ -706,7 +707,7 @@ library LoihiMethods {
         uint256 _targetAmount
     ) internal returns (uint256 originAmount_) {
 
-        originAmount_ = loihi.swapByTarget(_origin, _target, 1e50, _targetAmount, 1e50);
+        originAmount_ = loihi.targetSwap(_origin, _target, 1e50, _targetAmount, 1e50);
 
     }
 
@@ -717,8 +718,8 @@ library LoihiMethods {
         uint256 _targetAmount
     ) internal returns (bool success_) {
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
-            loihi.swapByTarget.selector,
+        ( success_, ) = address(loihi).call(abi.encodeWithSignature(
+            "targetSwap(address,address,uint256,uint256,uint256)",
             _origin,
             _target,
             1e50,

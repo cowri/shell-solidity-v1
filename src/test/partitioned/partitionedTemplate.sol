@@ -26,9 +26,11 @@ contract PartitionedLiquidityTemplate is Setup {
 
         l.partition();
 
-        l.partitionedWithdraw(
-            address(dai), 301e18
-        );
+        ( success_, ) = address(l).call(abi.encodeWithSignature(
+            "partxxitionedWithdraw(address[],uint256[])",
+            address(dai),
+            301e18
+        ));
 
     }
 

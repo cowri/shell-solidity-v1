@@ -191,7 +191,7 @@ contract Loihi {
 
     }
 
-    function swapByOrigin (
+    function originSwap (
         address _origin,
         address _target,
         uint _oAmt,
@@ -208,7 +208,7 @@ contract Loihi {
     }
 
 
-    function transferByOrigin (
+    function originSwapTo (
         address _origin,
         address _target,
         uint _oAmt,
@@ -246,7 +246,7 @@ contract Loihi {
     // / @param _tAmt the target amount
     // / @param _dline deadline in block number after which the trade will not execute
     // / @return oAmt_ the amount of origin that has been swapped for the target
-    function swapByTarget (
+    function targetSwap (
         address _origin,
         address _target,
         uint _maxOAmt,
@@ -271,7 +271,7 @@ contract Loihi {
     // / @param _dline deadline in block number after which the trade will not execute
     // / @param _rcpnt the address of the recipient of the target
     // / @return oAmt_ the amount of origin that has been swapped for the target
-    function transferByTarget (
+    function targetSwapTo (
         address _origin,
         address _target,
         uint _maxOAmt,
