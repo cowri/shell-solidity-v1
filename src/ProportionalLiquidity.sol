@@ -147,7 +147,7 @@ library ProportionalLiquidity {
         Loihi.Shell storage shell,
         uint256 _withdrawal
     ) external returns (
-        uint[] memory withdrawals_
+        uint[] memory
     ) {
 
         uint _length = shell.reserves.length;
@@ -191,7 +191,7 @@ library ProportionalLiquidity {
         Loihi.Shell storage shell,
         uint256 _withdrawal
     ) external view returns (
-        uint[] memory withdrawals_
+        uint[] memory
     ) {
 
         uint _length = shell.reserves.length;
