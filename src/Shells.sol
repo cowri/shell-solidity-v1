@@ -159,24 +159,4 @@ library Shells {
         emit Approval(_owner, spender, amount);
     }
 
-    function liquidity (Loihi.Shell storage shell) external returns (uint, uint[] memory) {
-
-        uint _length = shell.reserves.length;
-
-        uint[] memory liquidity_ = new uint[](_length);
-        uint totalLiquidity_;
-
-        for (uint i = 0; i < _length; i++) {
-
-            uint _liquidity = Assimilators.viewNumeraireBalance(shell.reserves[i].addr).mulu(1e18);
-
-            totalLiquidity_ += _liquidity;
-            liquidity_[i] = _liquidity;
-
-        }
-
-        return (totalLiquidity_, liquidity_);
-
-    }
-
 }
