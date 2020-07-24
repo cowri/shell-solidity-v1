@@ -117,9 +117,25 @@ interface ILoihi {
     function excluseAssimilator (address _assimilator) external;
     function freeze (bool _toFreezeOrNotToFreeze) external;
     function transferOwnership (address _newOwner) external;
-    function setParams (uint _alpha, uint _beta, uint _epsilon, uint _max, uint _lambda) external;
+    function setParams (
+        uint _alpha,
+        uint _beta,
+        uint _max,
+        uint _epsilon,
+        uint _lambda
+    ) external;
     function prime () external;
     function liquidity () external view returns (uint, uint[] memory);
+
+    function shell () external view returns (
+        int128 alpha,
+        int128 beta,
+        int128 delta,
+        int128 epsilon,
+        int128 lambda,
+        int128 omega,
+        uint totalSupply
+    );
 
     function decimals() external view returns (uint);
     function totalSupply() external view returns (uint);
