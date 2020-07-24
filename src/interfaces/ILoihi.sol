@@ -16,19 +16,7 @@ pragma solidity ^0.5.0;
 
 interface ILoihi {
 
-    function viewOriginTrade (
-        address origin,
-        address target,
-        uint originAmount
-    ) external view returns (uint);
-
-    function viewTargetTrade (
-        address origin,
-        address target,
-        uint targetAmount
-    ) external view returns (uint);
-
-    function swapByOrigin (
+    function originSwap (
         address origin,
         address target,
         uint originAmount,
@@ -36,7 +24,7 @@ interface ILoihi {
         uint deadline
     ) external returns (uint);
 
-    function transferByOrigin (
+    function originSwapTo (
         address origin,
         address target,
         uint originAmount,
@@ -45,7 +33,13 @@ interface ILoihi {
         address recipient
     ) external returns (uint);
 
-    function swapByTarget (
+    function viewOriginSwap (
+        address origin,
+        address target,
+        uint originAmount
+    ) external view returns (uint);
+
+    function targetSwap (
         address origin,
         address target,
         uint targetAmount,
@@ -61,6 +55,12 @@ interface ILoihi {
         address recipient,
         uint deadline
     ) external returns (uint);
+
+    function viewTargetSwap (
+        address origin,
+        address target,
+        uint targetAmount
+    ) external view returns (uint);
 
     function selectiveDeposit (
         address[] calldata _flavors,

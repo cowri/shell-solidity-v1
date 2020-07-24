@@ -37,15 +37,6 @@ contract Loihi {
     string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
 
-    using ABDKMath64x64 for int128;
-    using UnsafeMath64x64 for int128;
-    using ABDKMath64x64 for uint;
-
-    using Assimilators for address;
-    using ShellMath for Shell;
-    using Shells for Shell;
-    using Controller for Shell;
-
     struct Shell {
         int128 alpha;
         int128 beta;
@@ -84,7 +75,7 @@ contract Loihi {
     address public owner;
     bool internal notEntered = true;
 
-    // uint public maxFee;
+    uint public maxFee;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event SetFrozen(bool isFrozen);
@@ -136,8 +127,7 @@ contract Loihi {
 
     function setParams (uint _alpha, uint _beta, uint _epsilon, uint _max, uint _lambda) external onlyOwner {
 
-        Controller.setParams(shell, _alpha, _beta, _epsilon, _max, _lambda);
-        // maxFee = Controller.setParams(shell, _alpha, _beta, _epsilon, _max, _lambda);
+        maxFee = Controller.setParams(shell, _alpha, _beta, _epsilon, _max, _lambda);
 
     }
 
@@ -179,7 +169,7 @@ contract Loihi {
 
     }
 
-    function swapByOrigin (
+    function originSwap (
         address _origin,
         address _target,
         uint _oAmt,
@@ -191,12 +181,12 @@ contract Loihi {
 
         tAmt_ = Swaps.originSwap(shell, _origin, _target, _oAmt, msg.sender);
 
-        // require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
+        require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
 
     }
 
 
-    function transferByOrigin (
+    function originSwapTo (
         address _origin,
         address _target,
         uint _oAmt,
@@ -209,7 +199,7 @@ contract Loihi {
 
         tAmt_ = Swaps.originSwap(shell, _origin, _target, _oAmt, _rcpnt);
 
-        // require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
+        require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
 
     }
 
@@ -234,7 +224,7 @@ contract Loihi {
     // / @param _tAmt the target amount
     // / @param _dline deadline in block number after which the trade will not execute
     // / @return oAmt_ the amount of origin that has been swapped for the target
-    function swapByTarget (
+    function targetSwap (
         address _origin,
         address _target,
         uint _maxOAmt,
@@ -246,7 +236,7 @@ contract Loihi {
 
         oAmt_ = Swaps.targetSwap(shell, _origin, _target, _tAmt, msg.sender);
 
-        // require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
+        require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
 
     }
 
@@ -259,7 +249,7 @@ contract Loihi {
     // / @param _dline deadline in block number after which the trade will not execute
     // / @param _rcpnt the address of the recipient of the target
     // / @return oAmt_ the amount of origin that has been swapped for the target
-    function transferByTarget (
+    function targetSwapTo (
         address _origin,
         address _target,
         uint _maxOAmt,
@@ -270,7 +260,7 @@ contract Loihi {
 
         oAmt_ = Swaps.targetSwap(shell, _origin, _target, _tAmt, _rcpnt);
 
-        // require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
+        require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
 
     }
 
@@ -396,7 +386,6 @@ contract Loihi {
     function proportionalWithdraw (
         uint _withdrawal,
         uint _dline
-    // ) external deadline(_dline) nonReentrant returns (
     ) external deadline(_dline) unpartitioned nonReentrant returns (
         uint[] memory
     ) {
@@ -456,27 +445,27 @@ contract Loihi {
 
     function transferFrom (address _sender, address _recipient, uint _amount) public nonReentrant returns (bool success_) {
 
-        success_ = shell.transferFrom(_sender, _recipient, _amount);
+        success_ = Shells.transferFrom(shell, _sender, _recipient, _amount);
 
     }
 
     function approve (address _spender, uint _amount) public nonReentrant returns (bool success_) {
 
-        success_ = shell.approve(_spender, _amount);
+        success_ = Shells.approve(shell, _spender, _amount);
 
     }
 
-    // function increaseAllowance(address _spender, uint _addedValue) public returns (bool success_) {
+    function increaseAllowance(address _spender, uint _addedValue) public returns (bool success_) {
 
-    //     success_ = shell.increaseAllowance(_spender, _addedValue);
+        success_ = Shells.increaseAllowance(shell, _spender, _addedValue);
 
-    // }
+    }
 
-    // function decreaseAllowance(address _spender, uint _subtractedValue) public returns (bool success_) {
+    function decreaseAllowance(address _spender, uint _subtractedValue) public returns (bool success_) {
 
-    //     success_ = shell.decreaseAllowance(_spender, _subtractedValue);
+        success_ = Shells.decreaseAllowance(shell, _spender, _subtractedValue);
 
-    // }
+    }
 
     function balanceOf (address _account) public view returns (uint balance_) {
 
