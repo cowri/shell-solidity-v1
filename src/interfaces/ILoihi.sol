@@ -69,6 +69,13 @@ interface ILoihi {
         uint _deadline
     ) external returns (uint);
 
+    function viewSelectiveDeposit (
+        address[] calldata _flavors,
+        uint[] calldata _amounts,
+        uint _minShells,
+        uint _deadline
+    ) external view returns (uint);
+
     function selectiveWithdraw (
         address[] calldata _flavors,
         uint[] calldata _amounts,
@@ -76,15 +83,32 @@ interface ILoihi {
         uint _deadline
     ) external returns (uint);
 
+    function viewSelectiveWithdraw (
+        address[] calldata _flavors,
+        uint[] calldata _amounts,
+        uint _maxShells,
+        uint _deadline
+    ) external view returns (uint);
+
     function proportionalDeposit (
         uint totalStablecoins,
         uint deadline
     ) external returns (uint shells_, uint[] memory);
 
+    function viewProportionalDeposit (
+        uint totalStablecoins,
+        uint deadline
+    ) external view returns (uint shells_, uint[] memory);
+
     function proportionalWithdraw (
         uint shellTokens,
         uint deadline
     ) external returns (uint[] memory);
+
+    function viewProportionalWithdraw (
+        uint shellTokens,
+        uint deadline
+    ) external view returns (uint[] memory);
 
     function owner () external view returns (address);
 
