@@ -3,9 +3,13 @@ pragma solidity ^0.5.0;
 
 import "ds-test/test.sol";
 
+import "../../Loihi.sol";
+
 import "../setup/setup.sol";
 
 contract MiscSuiteOneTest is Setup, DSTest {
+
+    Loihi l;
 
     function setUp() public {
 
