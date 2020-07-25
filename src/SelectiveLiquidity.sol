@@ -132,8 +132,6 @@ library SelectiveLiquidity {
 
     }
 
-    event log_int(bytes32, int);
-
     // / @author james foley http://github.com/realisation
     // / @notice selectively deposit any supported stablecoin flavor into the contract in return for corresponding amount of shell tokens
     // / @param _flvrs an array containing the addresses of the flavors being deposited into
@@ -143,10 +141,10 @@ library SelectiveLiquidity {
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (
         Loihi.Shell storage shell,
-        address[] memory _flvrs,
-        uint[] memory _amts,
+        address[] calldata _flvrs,
+        uint[] calldata _amts,
         uint _minShells
-    ) internal returns (
+    ) external returns (
         uint shells_
     ) {
 
@@ -175,9 +173,9 @@ library SelectiveLiquidity {
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function viewSelectiveDeposit (
         Loihi.Shell storage shell,
-        address[] memory _flvrs,
-        uint[] memory _amts
-    ) internal view returns (
+        address[] calldata _flvrs,
+        uint[] calldata _amts
+    ) external view returns (
         uint shells_
     ) {
 
@@ -200,10 +198,10 @@ library SelectiveLiquidity {
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (
         Loihi.Shell storage shell,
-        address[] memory _flvrs,
-        uint[] memory _amts,
+        address[] calldata _flvrs,
+        uint[] calldata _amts,
         uint _maxShells
-    ) internal returns (
+    ) external returns (
         uint256 shells_
     ) {
 
@@ -233,9 +231,9 @@ library SelectiveLiquidity {
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function viewSelectiveWithdraw (
         Loihi.Shell storage shell,
-        address[] memory _flvrs,
-        uint[] memory _amts
-    ) internal view returns (
+        address[] calldata _flvrs,
+        uint[] calldata _amts
+    ) external view returns (
         uint shells_
     ) {
 

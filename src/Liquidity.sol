@@ -24,7 +24,7 @@ library Liquidity {
 
     using ABDKMath64x64 for int128;
 
-    function liquidity (Loihi.Shell storage shell) internal returns (uint, uint[] memory) {
+    function liquidity (Loihi.Shell storage shell) external view returns (uint, uint[] memory) {
 
         uint _length = shell.reserves.length;
 

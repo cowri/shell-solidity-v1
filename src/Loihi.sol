@@ -31,25 +31,17 @@ import "./Shells.sol";
 
 import "./Swaps.sol";
 
+<<<<<<< HEAD
 import "./interfaces/IERC20.sol";
 import "./interfaces/IERC20NoBool.sol";
 
+=======
+>>>>>>> audit-remediations
 contract Loihi {
-
-    int128 constant ONE = 0x10000000000000000;
 
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
-
-    using ABDKMath64x64 for int128;
-    using UnsafeMath64x64 for int128;
-    using ABDKMath64x64 for uint;
-
-    using Assimilators for address;
-    using ShellMath for Shell;
-    using Shells for Shell;
-    using Controller for Shell;
 
     struct Shell {
         int128 alpha;
@@ -65,7 +57,6 @@ contract Loihi {
         Assimilator[] reserves;
         Assimilator[] numeraires;
         mapping (address => Assimilator) assimilators;
-        bool testHalts;
     }
 
     struct Assimilator {
@@ -92,16 +83,14 @@ contract Loihi {
 
     uint public maxFee;
 
-    event ShellsMinted(address indexed minter, uint amount, address[] indexed coins, uint[] amounts);
-    event ShellsBurned(address indexed burner, uint amount, address[] indexed coins, uint[] amounts);
-    event Trade(address indexed trader, address indexed origin, address indexed target, uint originAmount, uint targetAmount);
-    event Transfer(address indexed from, address indexed to, uint value);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event SetFrozen(bool isFrozen);
 
     modifier onlyOwner() {
+
         require(msg.sender == owner, "Shell/caller-is-not-owner");
         _;
+
     }
 
     modifier nonReentrant() {
@@ -110,7 +99,7 @@ contract Loihi {
         notEntered = false;
         _;
         notEntered = true;
- 
+
     }
 
     modifier transactable () {
@@ -139,7 +128,6 @@ contract Loihi {
 
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
-        shell.testHalts = true;
 
     }
 
@@ -187,7 +175,7 @@ contract Loihi {
 
     }
 
-    function swapByOrigin (
+    function originSwap (
         address _origin,
         address _target,
         uint _oAmt,
@@ -203,7 +191,12 @@ contract Loihi {
 
     }
 
+<<<<<<< HEAD
     function transferByOrigin (
+=======
+
+    function originSwapTo (
+>>>>>>> audit-remediations
         address _origin,
         address _target,
         uint _oAmt,
@@ -241,7 +234,7 @@ contract Loihi {
     // / @param _tAmt the target amount
     // / @param _dline deadline in block number after which the trade will not execute
     // / @return oAmt_ the amount of origin that has been swapped for the target
-    function swapByTarget (
+    function targetSwap (
         address _origin,
         address _target,
         uint _maxOAmt,
@@ -266,7 +259,7 @@ contract Loihi {
     // / @param _dline deadline in block number after which the trade will not execute
     // / @param _rcpnt the address of the recipient of the target
     // / @return oAmt_ the amount of origin that has been swapped for the target
-    function transferByTarget (
+    function targetSwapTo (
         address _origin,
         address _target,
         uint _maxOAmt,
@@ -423,11 +416,9 @@ contract Loihi {
 
     function partition () external onlyOwner {
 
-        require(frozen, "Shell/pool-is-not-frozen");
+        PartitionedLiquidity.partition(shell, partitionTickets);
 
         partitioned = true;
-
-        PartitionedLiquidity.partition(shell, partitionTickets);
 
     }
 
@@ -438,7 +429,7 @@ contract Loihi {
         uint256[] memory withdraws_
     ) {
 
-        require(partitioned, "Shell/pool-is-not-partitioned");
+        require(partitioned, "Shell/not-partitioned");
 
         return PartitionedLiquidity.partitionedWithdraw(shell, partitionTickets, _tokens, _amounts);
 
@@ -456,63 +447,57 @@ contract Loihi {
 
     }
 
-    function transfer (address _recipient, uint _amount) public nonReentrant returns (bool) {
+    function transfer (address _recipient, uint _amount) public nonReentrant returns (bool success_) {
 
-        return Shells.transfer(shell, _recipient, _amount);
+        success_ = Shells.transfer(shell, _recipient, _amount);
 
     }
 
-    function transferFrom (address _sender, address _recipient, uint _amount) public nonReentrant returns (bool) {
-        // return shell.transferFrom(_sender, _recipient, _amount);
+    function transferFrom (address _sender, address _recipient, uint _amount) public nonReentrant returns (bool success_) {
+
+        success_ = Shells.transferFrom(shell, _sender, _recipient, _amount);
+
     }
 
     function approve (address _spender, uint _amount) public nonReentrant returns (bool success_) {
-        // return shell.approve(_spender, _amount);
+
+        success_ = Shells.approve(shell, _spender, _amount);
+
     }
 
     function increaseAllowance(address _spender, uint _addedValue) public returns (bool success_) {
-        // return shell.increaseAllowance(_spender, _addedValue);
+
+        success_ = Shells.increaseAllowance(shell, _spender, _addedValue);
+
     }
 
     function decreaseAllowance(address _spender, uint _subtractedValue) public returns (bool success_) {
-        // return shell.decreaseAllowance(_spender, _subtractedValue);
+
+        success_ = Shells.decreaseAllowance(shell, _spender, _subtractedValue);
+
     }
 
-    function balanceOf (address _account) public view returns (uint) {
-        return shell.balances[_account];
+    function balanceOf (address _account) public view returns (uint balance_) {
+
+        balance_ = shell.balances[_account];
+
     }
 
     function totalSupply () public view returns (uint totalSupply_) {
+
         totalSupply_ = shell.totalSupply;
+
     }
 
-    function allowance (address _owner, address _spender) public view returns (uint) {
-        return shell.allowances[_owner][_spender];
+    function allowance (address _owner, address _spender) public view returns (uint allowance_) {
+
+        allowance_ = shell.allowances[_owner][_spender];
+
     }
 
-    function liquidity () public returns (uint, uint[] memory) {
+    function liquidity () public view returns (uint, uint[] memory) {
 
         return Liquidity.liquidity(shell);
-
-    }
-
-    function TEST_setTestHalts (bool toTestOrNotToTest) public {
-
-        shell.testHalts = toTestOrNotToTest;
-
-    }
-
-    event log(bytes32);
-    event log_addr(bytes32, address);
-    event log_uint(bytes32, uint);
-    event log_uints(bytes32, uint[]);
-    event log_ints(bytes32, int[]);
-
-    function TEST_safeApprove (address _token, address _spender, uint _value) public onlyOwner {
-
-        (bool success, bytes memory returndata) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
-
-        require(success, "SafeERC20: low-level call failed");
 
     }
 

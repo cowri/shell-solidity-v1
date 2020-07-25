@@ -42,7 +42,7 @@ library Controller {
         uint256 _max,
         uint256 _epsilon,
         uint256 _lambda
-    ) internal returns (uint256 max_) {
+    ) external returns (uint256 max_) {
 
         emit log("hello");
 
@@ -97,7 +97,7 @@ library Controller {
         address _reserve,
         address _reserveAssim,
         uint256 _weight
-    ) internal {
+    ) external {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
         require(_numeraireAssim != address(0), "Shell/numeraire-assimilator-cannot-be-zeroth-adress");
@@ -134,7 +134,7 @@ library Controller {
         address _numeraire,
         address _derivative,
         address _assimilator
-    ) internal {
+    ) external {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-address");
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
@@ -148,7 +148,7 @@ library Controller {
 
     function prime (
         Loihi.Shell storage shell
-    ) internal {
+    ) external {
 
         uint _length = shell.reserves.length;
         int128 _oGLiq;
