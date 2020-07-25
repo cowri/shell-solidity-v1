@@ -331,8 +331,8 @@ contract TargetSwapTemplate is Setup {
             address(susd), 30e6
         );
 
-        ( success_, ) = address(l).call(abi.encodeWithSelector(
-            l.swapByTarget.selector,
+        ( success_, ) = address(l).call(abi.encodeWithSignature(
+            "targetSwap(address,address,uint256,uint256,uint256)",
             address(usdc),
             address(usdt),
             31e6,
@@ -351,8 +351,8 @@ contract TargetSwapTemplate is Setup {
             address(susd), 30e6
         );
 
-        ( success_, ) = address(l).call(abi.encodeWithSelector(
-            l.swapByTarget.selector,
+        ( success_, ) = address(l).call(abi.encodeWithSignature(
+            "targetSwap(address,address,uint256,uint256,uint256)",
             address(usdc),
             address(dai),
             31e18,
@@ -366,8 +366,8 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        ( success_, ) = address(l).call(abi.encodeWithSelector(
-            l.swapByTarget.selector,
+        ( success_, ) = address(l).call(abi.encodeWithSignature(
+            "targetSwap(address,address,uint256,uint256,uint256)",
             address(susd),
             address(usdt),
             21e18,
@@ -381,8 +381,8 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        ( success_, ) = address(l).call(abi.encodeWithSelector(
-            l.swapByTarget.selector,
+        ( success_, ) = address(l).call(abi.encodeWithSignature(
+            "targetSwap(address,address,uint256,uint256,uint256)",
             address(dai),
             address(susd),
             21e18,

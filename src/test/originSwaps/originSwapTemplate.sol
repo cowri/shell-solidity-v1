@@ -323,8 +323,8 @@ contract OriginSwapTemplate is Setup {
             address(susd), 30e6
         );
 
-        ( success_, ) = address(l).call(abi.encodeWithSelector(
-            l.swapByOrigin.selector,
+        ( success_, ) = address(l).call(abi.encodeWithSignature(
+            "originSwap(address,address,uint256,uint256,uint256)",
             address(usdc),
             address(usdt),
             30e6,
@@ -343,8 +343,8 @@ contract OriginSwapTemplate is Setup {
             address(susd), 30e6
         );
 
-        ( success_, ) = address(l).call(abi.encodeWithSelector(
-            l.swapByOrigin.selector,
+        ( success_, ) = address(l).call(abi.encodeWithSignature(
+            "originSwap(address,address,uint256,uint256,uint256)",
             address(usdc),
             address(dai),
             30e6,
@@ -358,8 +358,8 @@ contract OriginSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        ( success_, ) = address(l).call(abi.encodeWithSelector(
-            l.swapByOrigin.selector,
+        ( success_, ) = address(l).call(abi.encodeWithSignature(
+            "originSwap(address,address,uint256,uint256,uint256)",
             address(susd),
             address(usdt),
             20e6,
@@ -373,8 +373,8 @@ contract OriginSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        ( success_, ) = address(l).call(abi.encodeWithSelector(
-            l.swapByOrigin.selector,
+        ( success_, ) = address(l).call(abi.encodeWithSignature(
+            "originSwap(address,address,uint256,uint256,uint256)",
             address(dai),
             address(susd),
             20e6,

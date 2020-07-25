@@ -19,8 +19,8 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         setupStablecoinsKovan();
         setupAssimilatorsSetOneKovan();
 
-        // loihi_ = new Loihi();
-        loihi_ = Loihi(0x250579b9EED23129b2Bbb16c4f9d6e25A2E979DE);
+        loihi_ = new Loihi();
+        // loihi_ = Loihi(0x250579b9EED23129b2Bbb16c4f9d6e25A2E979DE);
 
         includeAssetsSetOne(loihi_);
         setParamsSetOne(loihi_);
