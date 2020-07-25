@@ -31,12 +31,6 @@ import "./Shells.sol";
 
 import "./Swaps.sol";
 
-<<<<<<< HEAD
-import "./interfaces/IERC20.sol";
-import "./interfaces/IERC20NoBool.sol";
-
-=======
->>>>>>> audit-remediations
 contract Loihi {
 
     string  public constant name = "Shells";
@@ -191,12 +185,8 @@ contract Loihi {
 
     }
 
-<<<<<<< HEAD
-    function transferByOrigin (
-=======
 
     function originSwapTo (
->>>>>>> audit-remediations
         address _origin,
         address _target,
         uint _oAmt,
