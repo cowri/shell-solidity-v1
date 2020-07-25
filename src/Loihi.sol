@@ -51,6 +51,7 @@ contract Loihi {
         Assimilator[] reserves;
         Assimilator[] numeraires;
         mapping (address => Assimilator) assimilators;
+        bool testHalts;
     }
 
     struct Assimilator {
@@ -122,6 +123,7 @@ contract Loihi {
 
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
+        shell.testHalts = true;
 
     }
 
@@ -488,6 +490,12 @@ contract Loihi {
     function liquidity () public view returns (uint, uint[] memory) {
 
         return Liquidity.liquidity(shell);
+
+    }
+
+    function TEST_setTestHalts (bool toTestOrNotToTest) external {
+
+        shell.testHalts = toTestOrNotToTest;
 
     }
 

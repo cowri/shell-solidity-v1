@@ -30,7 +30,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 10e18,
             address(usdc), 10e6,
             address(usdt), 10e6,
-            address(susd), 2.5e18
+            address(susd), 2.5e6
         );
 
         emit log_uint("gas for deposit", gas - gasleft());
@@ -347,7 +347,7 @@ contract SelectiveDepositTemplate is Setup {
             address(dai), 165e18,
             address(usdc), 0.0001e6,
             address(usdt), 165e6,
-            address(susd), .5e18
+            address(susd), .5e6
         );
 
     }

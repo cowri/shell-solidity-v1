@@ -156,8 +156,6 @@ library SelectiveLiquidity {
         int128 _shells;
         ( _shells, shell.omega ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
-        emit log_int("_shells", _shells.muli(1e18));
-
         shells_ = _shells.mulu(1e18);
 
         require(_minShells < shells_, "Shell/under-minimum-shells");

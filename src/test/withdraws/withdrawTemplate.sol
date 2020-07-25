@@ -30,7 +30,7 @@ contract SelectiveWithdrawTemplate is Setup {
             address(dai), 10e18,
             address(usdc), 10e6,
             address(usdt), 10e6,
-            address(susd), 2.5e18
+            address(susd), 2.5e6
         );
 
     }
@@ -227,7 +227,7 @@ contract SelectiveWithdrawTemplate is Setup {
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 0.5e6,
-            address(susd), 0.2e18
+            address(susd), 0.2e6
         );
 
     }
@@ -294,7 +294,7 @@ contract SelectiveWithdrawTemplate is Setup {
             address(dai), 11e18,
             address(usdc), 74e6,
             address(usdt), 74e6,
-            address(susd), 0.0001e18
+            address(susd), 0.0001e6
         );
 
     }
