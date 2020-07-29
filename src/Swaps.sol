@@ -199,9 +199,6 @@ library Swaps {
 
     }
 
-    event log_int(bytes32, int);
-
-
     // / @author james foley http://github.com/realisation
     // / @notice transfer a dynamic origin amount into a fixed target amount at the recipients address
     // / @param _origin the address of the origin
@@ -232,20 +229,11 @@ library Swaps {
             int128[] memory _oBals,
             int128[] memory _nBals) = getSwapData(shell, _t.ix, _o.ix, _t.addr, _recipient, _targetAmount, false);
 
-        emit log_int("_oGLiq", _oGLiq.muli(1e18));
-        for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
-        emit log_int("_nGLiq", _nGLiq.muli(1e18));
-        for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
-
         ( _amt, shell.omega ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
-
-        emit log_int("_amt", _amt.muli(1e18));
 
         _amt = _amt.us_mul(ONE + shell.epsilon);
 
         oAmt_ = Assimilators.intakeNumeraire(_o.addr, _amt);
-
-        emit log_uint("oAmt_", oAmt_);
 
         emit Trade(msg.sender, _origin, _target, oAmt_, _targetAmount);
 
