@@ -79,12 +79,23 @@ contract Loihi {
     uint public maxFee;
 
     event Approval(address indexed _owner, address indexed spender, uint256 value);
+
     event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
+
+    event AssetIncluded(address numeraire, address reserve, uint weight);
+
+    event AssimilatorIncluded(address numeraire, address derivative, address assimilator);
+
     event PartitionRedeemed(address token, address redeemer, uint value);
+
     event PoolPartitioned(bool);
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
     event SetFrozen(bool isFrozen);
+
     event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     modifier onlyOwner() {

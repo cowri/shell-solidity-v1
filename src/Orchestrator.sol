@@ -29,6 +29,8 @@ library Orchestrator {
     using Assimilators for address;
 
     event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
+    event AssetIncluded(address numeraire, address reserve, uint weight);
+    event AssimilatorIncluded(address numeraire, address derivative, address assimilator);
 
     event log(bytes32);
     event log_addr(bytes32, address);
@@ -132,6 +134,16 @@ library Orchestrator {
 
         shell.weights.push(__weight);
 
+        emit AssetIncluded(_numeraire, _reserve, _weight);
+
+        emit AssimilatorIncluded(_numeraire, _numeraire, _numeraireAssim);
+
+        if (_numeraireAssim != _reserveAssim) {
+
+            emit AssimilatorIncluded(_numeraire, _reserve, _reserveAssim);
+
+        }
+
     }
 
     function includeAssimilator (
@@ -150,6 +162,8 @@ library Orchestrator {
         Loihi.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
         shell.assimilators[_derivative] = Loihi.Assimilator(_assimilator, _numeraireAssim.ix);
+
+        emit AssimilatorIncluded(_numeraire, _derivative, _assimilator);
 
     }
 
