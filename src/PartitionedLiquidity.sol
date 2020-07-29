@@ -26,7 +26,7 @@ library PartitionedLiquidity {
     function partition (
         Loihi.Shell storage shell,
         mapping (address => Loihi.PartitionTicket) storage partitionTickets
-    ) external {
+    ) internal {
 
         uint _length = shell.reserves.length;
 
@@ -44,7 +44,7 @@ library PartitionedLiquidity {
         Loihi.Shell storage shell,
         mapping (address => Loihi.PartitionTicket) storage partitionTickets,
         address _addr
-    ) external view returns (
+    ) internal view returns (
         uint[] memory
     ) {
 
@@ -65,9 +65,9 @@ library PartitionedLiquidity {
     function partitionedWithdraw (
         Loihi.Shell storage shell,
         mapping (address => Loihi.PartitionTicket) storage partitionTickets,
-        address[] calldata _tokens,
-        uint[] calldata _withdrawals
-    ) external returns (
+        address[] memory _derivatives,
+        uint[] memory _withdrawals
+    ) internal returns (
         uint[] memory
     ) {
 
@@ -84,13 +84,13 @@ library PartitionedLiquidity {
 
         }
 
-        _length = _tokens.length;
+        _length = _derivatives.length;
 
         uint[] memory withdrawals_ = new uint[](_length);
 
         for (uint i = 0; i < _length; i++) {
 
-            Loihi.Assimilator memory _assim = shell.assimilators[_tokens[i]];
+            Loihi.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
             require(_assim.addr != address(0), "Shell/unsupported-asset");
 
@@ -117,7 +117,7 @@ library PartitionedLiquidity {
 
             withdrawals_[i] = _withdrawal;
 
-            emit PartitionRedeemed(_tokens[i], msg.sender, withdrawals_[i]);
+            emit PartitionRedeemed(_derivatives[i], msg.sender, withdrawals_[i]);
 
         }
 

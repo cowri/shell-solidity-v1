@@ -21,9 +21,7 @@ import "./Loihi.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-library Controller {
-
-    int128 constant ONE = 0x10000000000000000;
+library Orchestrator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -39,25 +37,28 @@ library Controller {
         Loihi.Shell storage shell,
         uint256 _alpha,
         uint256 _beta,
-        uint256 _max,
+        uint256 _deltaDerivative,
         uint256 _epsilon,
         uint256 _lambda
-    ) external returns (uint256 max_) {
+    ) internal returns (uint256 max_) {
 
-        emit log("hello");
+        require(_alpha < 1e18 && _alpha > 0, "Shell/parameter-invalid-alpha");
 
-        require(_max <= .5e18, "Shell/parameter-invalid-max");
+        require(_beta <= _alpha && _beta >= 0, "Shell/parameter-invalid-beta");
+
+        require(_deltaDerivative <= .5e18, "Shell/parameter-invalid-max");
+
+        require(_epsilon < 1e16 && _epsilon >= 0, "Shell/parameter-invalid-epsilon");
+
+        require(shell.lambda <= 1e18 && _lambda >= 0, "Shell/parameter-invalid-lambda");
 
         int128 _gLiq;
+
         int128[] memory _bals = new int128[](shell.reserves.length);
 
         for (uint i = 0; i < _bals.length; i++) {
-            
-        emit log_addr("hello", shell.reserves[i].addr);
 
             int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
-            
-        emit log("hello");
 
             _bals[i] = _bal;
 
@@ -66,16 +67,16 @@ library Controller {
         }
 
         shell.alpha = _alpha.divu(1e18);
-        shell.beta = _beta.divu(1e18);
-        shell.delta = _max.divu(1e18).div(uint(2).fromUInt().mul(shell.alpha.sub(shell.beta)));
-        shell.epsilon = _epsilon.divu(1e18);
-        if (shell.epsilon.mulu(1e18) < _epsilon) shell.epsilon = shell.epsilon.add(uint(1).divu(1e18));
-        shell.lambda = _lambda.divu(1e18);
 
-        require(shell.alpha < ONE && shell.alpha > 0, "Shell/parameter-invalid-alpha");
-        require(shell.beta <= shell.alpha && shell.beta >= 0, "Shell/parameter-invalid-beta");
-        require(shell.epsilon >= 0 && _epsilon < 1e16, "Shell/parameter-invalid-epsilon");
-        require(shell.lambda >= 0 && shell.lambda <= ONE, "Shell/parameter-invalid-lambda");
+        shell.beta = _beta.divu(1e18);
+
+        shell.delta = _deltaDerivative.divu(1e18).div(uint(2).fromUInt().mul(shell.alpha.sub(shell.beta)));
+
+        shell.epsilon = _epsilon.divu(1e18);
+
+        if (shell.epsilon.mulu(1e18) < _epsilon) shell.epsilon = shell.epsilon.add(uint(1).divu(1e18));
+
+        shell.lambda = _lambda.divu(1e18);
 
         int128 _psi = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
 
@@ -85,7 +86,7 @@ library Controller {
 
         emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda);
 
-        max_ = _max;
+        max_ = _deltaDerivative;
 
     }
 
@@ -97,12 +98,16 @@ library Controller {
         address _reserve,
         address _reserveAssim,
         uint256 _weight
-    ) external {
+    ) internal {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
+
         require(_numeraireAssim != address(0), "Shell/numeraire-assimilator-cannot-be-zeroth-adress");
+
         require(_reserve != address(0), "Shell/reserve-cannot-be-zeroth-adress");
+
         require(_reserveAssim != address(0), "Shell/reserve-assimilator-cannot-be-zeroth-adress");
+
         require(_weight < 1e18, "Shell/weight-must-be-less-than-one");
 
         numeraires.push(_numeraire);
@@ -134,10 +139,12 @@ library Controller {
         address _numeraire,
         address _derivative,
         address _assimilator
-    ) external {
+    ) internal {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-address");
+
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
+
         require(_assimilator != address(0), "Shell/assimilator-cannot-be-zeroth-address");
 
         Loihi.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
@@ -148,11 +155,13 @@ library Controller {
 
     function prime (
         Loihi.Shell storage shell
-    ) external {
+    ) internal {
 
         uint _length = shell.reserves.length;
-        int128 _oGLiq;
+
         int128[] memory _oBals = new int128[](_length);
+
+        int128 _oGLiq;
 
         for (uint i = 0; i < _length; i++) {
             int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
@@ -161,6 +170,29 @@ library Controller {
         }
 
         shell.omega = ShellMath.calculateFee(_oGLiq, _oBals, shell.beta, shell.delta, shell.weights);
+
+    }
+
+    function viewShell (Loihi.Shell storage shell) internal view returns (
+        uint alpha_,
+        uint beta_,
+        uint delta_,
+        uint epsilon_,
+        uint lambda_,
+        uint omega_
+    ) {
+
+        alpha_ = shell.alpha.mulu(1e18);
+
+        beta_ = shell.beta.mulu(1e18);
+
+        delta_ = shell.delta.mulu(1e18);
+
+        epsilon_ = shell.epsilon.mulu(1e18);
+
+        lambda_ = shell.lambda.mulu(1e18);
+
+        omega_ = shell.omega.mulu(1e18);
 
     }
 

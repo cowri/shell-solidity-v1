@@ -43,7 +43,7 @@ library Swaps {
         uint _lIx,
         uint _rIx,
         address _assim,
-        address _rcpnt,
+        address _recipient,
         uint _amt,
         bool _isOrigin
     ) private returns (
@@ -67,7 +67,7 @@ library Swaps {
 
                 int128 _bal;
                 if (_isOrigin) ( amt_, _bal ) = Assimilators.intakeRawAndGetBalance(_assim, _amt);
-                else ( amt_, _bal ) = Assimilators.outputRawAndGetBalance(_assim, _rcpnt, _amt);
+                else ( amt_, _bal ) = Assimilators.outputRawAndGetBalance(_assim, _recipient, _amt);
 
                 oBals_[i] = _bal - amt_;
                 nBals_[i] = _bal;
@@ -136,30 +136,30 @@ library Swaps {
         Loihi.Shell storage shell,
         address _origin,
         address _target,
-        uint256 _oAmt,
-        address _rcpnt
-    ) external returns (
+        uint256 _originAmount,
+        address _recipient
+    ) internal returns (
         uint256 tAmt_
     ) {
 
         (   Loihi.Assimilator memory _o,
             Loihi.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
-        if (_o.ix == _t.ix) return Assimilators.outputNumeraire(_t.addr, _rcpnt, Assimilators.intakeRaw(_o.addr, _oAmt));
+        if (_o.ix == _t.ix) return Assimilators.outputNumeraire(_t.addr, _recipient, Assimilators.intakeRaw(_o.addr, _originAmount));
 
         (   int128 _amt,
             int128 _oGLiq,
             int128 _nGLiq,
             int128[] memory _oBals,
-            int128[] memory _nBals ) = getSwapData(shell, _o.ix, _t.ix, _o.addr, address(0), _oAmt, true);
+            int128[] memory _nBals ) = getSwapData(shell, _o.ix, _t.ix, _o.addr, address(0), _originAmount, true);
 
         ( _amt, shell.omega ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
         _amt = _amt.us_mul(ONE - shell.epsilon);
 
-        tAmt_ = Assimilators.outputNumeraire(_t.addr, _rcpnt, _amt);
+        tAmt_ = Assimilators.outputNumeraire(_t.addr, _recipient, _amt);
 
-        emit Trade(msg.sender, _origin, _target, _oAmt, tAmt_);
+        emit Trade(msg.sender, _origin, _target, _originAmount, tAmt_);
 
     }
 
@@ -169,27 +169,27 @@ library Swaps {
     // / @notice view how much of the target currency the origin currency will provide
     // / @param _origin the address of the origin
     // / @param _target the address of the target
-    // / @param _oAmt the origin amount
+    // / @param _originAmount the origin amount
     // / @return tAmt_ the amount of target that has been swapped for the origin
     function viewOriginSwap (
         Loihi.Shell storage shell,
         address _origin,
         address _target,
-        uint256 _oAmt
-    ) external view returns (
+        uint256 _originAmount
+    ) internal view returns (
         uint256 tAmt_
     ) {
 
         (   Loihi.Assimilator memory _o,
             Loihi.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
-        if (_o.ix == _t.ix) return Assimilators.viewRawAmount(_t.addr, Assimilators.viewNumeraireAmount(_o.addr, _oAmt));
+        if (_o.ix == _t.ix) return Assimilators.viewRawAmount(_t.addr, Assimilators.viewNumeraireAmount(_o.addr, _originAmount));
 
         (   int128 _amt,
             int128 _oGLiq,
             int128 _nGLiq,
             int128[] memory _nBals,
-            int128[] memory _oBals ) = viewSwapData(shell, _o.ix, _t.ix, _oAmt, true, _o.addr);
+            int128[] memory _oBals ) = viewSwapData(shell, _o.ix, _t.ix, _originAmount, true, _o.addr);
 
         ( _amt, ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
@@ -199,44 +199,55 @@ library Swaps {
 
     }
 
+    event log_int(bytes32, int);
+
 
     // / @author james foley http://github.com/realisation
     // / @notice transfer a dynamic origin amount into a fixed target amount at the recipients address
     // / @param _origin the address of the origin
     // / @param _target the address of the target
     // / @param _mOAmt the maximum origin amount
-    // / @param _tAmt the target amount
+    // / @param _targetAmount the target amount
     // / @param _dline deadline in block number after which the trade will not execute
-    // / @param _rcpnt the address of the recipient of the target
+    // / @param _recipient the address of the recipient of the target
     // / @return oAmt_ the amount of origin that has been swapped for the target
     function targetSwap (
         Loihi.Shell storage shell,
         address _origin,
         address _target,
-        uint256 _tAmt,
-        address _rcpnt
-    ) external returns (
+        uint256 _targetAmount,
+        address _recipient
+    ) internal returns (
         uint256 oAmt_
     ) {
 
         (   Loihi.Assimilator memory _o,
             Loihi.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
-        if (_o.ix == _t.ix) return Assimilators.intakeNumeraire(_o.addr, Assimilators.outputRaw(_t.addr, _rcpnt, _tAmt));
+        if (_o.ix == _t.ix) return Assimilators.intakeNumeraire(_o.addr, Assimilators.outputRaw(_t.addr, _recipient, _targetAmount));
 
         (   int128 _amt,
             int128 _oGLiq,
             int128 _nGLiq,
             int128[] memory _oBals,
-            int128[] memory _nBals) = getSwapData(shell, _t.ix, _o.ix, _t.addr, _rcpnt, _tAmt, false);
+            int128[] memory _nBals) = getSwapData(shell, _t.ix, _o.ix, _t.addr, _recipient, _targetAmount, false);
+
+        emit log_int("_oGLiq", _oGLiq.muli(1e18));
+        for (uint i = 0; i < _oBals.length; i++) emit log_int("_oBals[i]", _oBals[i].muli(1e18));
+        emit log_int("_nGLiq", _nGLiq.muli(1e18));
+        for (uint i = 0; i < _nBals.length; i++) emit log_int("_nBals[i]", _nBals[i].muli(1e18));
 
         ( _amt, shell.omega ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
+
+        emit log_int("_amt", _amt.muli(1e18));
 
         _amt = _amt.us_mul(ONE + shell.epsilon);
 
         oAmt_ = Assimilators.intakeNumeraire(_o.addr, _amt);
 
-        emit Trade(msg.sender, _origin, _target, oAmt_, _tAmt);
+        emit log_uint("oAmt_", oAmt_);
+
+        emit Trade(msg.sender, _origin, _target, oAmt_, _targetAmount);
 
     }
 
@@ -244,27 +255,27 @@ library Swaps {
     // / @notice view how much of the origin currency the target currency will take
     // / @param _origin the address of the origin
     // / @param _target the address of the target
-    // / @param _tAmt the target amount
+    // / @param _targetAmount the target amount
     // / @return oAmt_ the amount of target that has been swapped for the origin
     function viewTargetSwap (
         Loihi.Shell storage shell,
         address _origin,
         address _target,
-        uint256 _tAmt
-    ) external view returns (
+        uint256 _targetAmount
+    ) internal view returns (
         uint256 oAmt_
     ) {
 
         (   Loihi.Assimilator memory _o,
             Loihi.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
-        if (_o.ix == _t.ix) return Assimilators.viewRawAmount(_o.addr, Assimilators.viewNumeraireAmount(_t.addr, _tAmt));
+        if (_o.ix == _t.ix) return Assimilators.viewRawAmount(_o.addr, Assimilators.viewNumeraireAmount(_t.addr, _targetAmount));
 
         (   int128 _amt,
             int128 _oGLiq,
             int128 _nGLiq,
             int128[] memory _nBals,
-            int128[] memory _oBals ) = viewSwapData(shell, _t.ix, _o.ix, _tAmt, false, _t.addr);
+            int128[] memory _oBals ) = viewSwapData(shell, _t.ix, _o.ix, _targetAmount, false, _t.addr);
 
         ( _amt, ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
 
