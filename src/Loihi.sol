@@ -512,7 +512,10 @@ contract Loihi {
 
     }
 
-    function liquidity () public view returns (uint, uint[] memory) {
+    function liquidity () public view returns (
+        uint total_,
+        uint[] memory individual_
+    ) {
 
         return Liquidity.liquidity(shell);
 

@@ -186,8 +186,8 @@ interface ILoihi {
     function prime () external;
 
     function liquidity () external view returns (
-        uint totalLiquidity_,
-        uint[] memory reservesLiquidity_
+        uint total_,
+        uint[] memory individual_
     );
 
     function name () external view returns (string memory);
