@@ -156,11 +156,11 @@ library ShellMath {
         int128 _liqDiff = _nGLiq.sub(_oGLiq);
         int128 _oUtil = _oGLiq.sub(_omega);
 
-        if (_oGLiq == 0) shells_ = _nGLiq.sub(psi_);
+        if (shell.totalSupply == 0) shells_ = _nGLiq.sub(psi_);
         else if (_feeDiff >= 0) shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
         else shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff)).div(_oUtil);
 
-        if ( shell.totalSupply != 0 ) shells_ = shells_.mul(shell.totalSupply.divu(1e18));
+        if (shell.totalSupply != 0) shells_ = shells_.mul(shell.totalSupply.divu(1e18));
 
     }
 
