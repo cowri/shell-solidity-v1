@@ -90,9 +90,9 @@ contract Loihi {
 
     event PoolPartitioned(bool partitioned);
 
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransfered(address indexed previousOwner, address indexed newOwner);
 
-    event SetFrozen(bool isFrozen);
+    event FrozenSet(bool isFrozen);
 
     event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
 
@@ -146,7 +146,7 @@ contract Loihi {
     constructor () public {
 
         owner = msg.sender;
-        emit OwnershipTransferred(address(0), msg.sender);
+        emit OwnershipTransfered(address(0), msg.sender);
         shell.testHalts = true;
 
     }
@@ -188,16 +188,18 @@ contract Loihi {
 
     }
 
-    function freeze (bool _toFreezeOrNotToFreeze) external onlyOwner {
+    function setFrozen (bool _toFreezeOrNotToFreeze) external onlyOwner {
 
-        emit SetFrozen(_toFreezeOrNotToFreeze);
+        emit FrozenSet(_toFreezeOrNotToFreeze);
+
         frozen = _toFreezeOrNotToFreeze;
 
     }
 
     function transferOwnership (address _newOwner) external onlyOwner {
 
-        emit OwnershipTransferred(owner, _newOwner);
+        emit OwnershipTransfered(owner, _newOwner);
+
         owner = _newOwner;
 
     }
