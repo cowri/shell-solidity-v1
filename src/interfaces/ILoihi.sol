@@ -158,12 +158,13 @@ interface ILoihi {
     ) external;
 
     function includeAssimilator (
-        address _numeraire,
         address _derivative,
+        address _numeraire,
+        address _reserve,
         address _assimilator
     ) external;
 
-    function excluseAssimilator (
+    function excludeAssimilator (
         address _assimilator
     ) external;
 
@@ -174,6 +175,15 @@ interface ILoihi {
     function transferOwnership (
         address _newOwner
     ) external;
+
+    function viewShell () external view returns (
+        uint alpha_,
+        uint beta_,
+        uint delta_,
+        uint epsilon_,
+        uint lambda_,
+        uint omega_
+    );
 
     function setParams (
         uint _alpha,
@@ -221,6 +231,37 @@ interface ILoihi {
         address _owner,
         address _spender
     ) external view returns (uint);
+
+    event ParametersSet(
+        uint256 alpha,
+        uint256 beta,
+        uint256 delta,
+        uint256 epsilon,
+        uint256 lambda
+    );
+
+    event AssetIncluded(
+        address numeraire,
+        address reserve,
+        uint weight
+    );
+
+    event AssimilatorIncluded(
+        address derivative,
+        address numeraire,
+        address reserve,
+        address assimilator
+    );
+
+    event PartitionRedeemed(
+        address token,
+        address redeemer,
+        uint value
+    );
+
+    event PoolPartitioned(
+        bool partitioned
+    );
 
     event Transfer(
         address indexed from,

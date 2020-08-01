@@ -88,7 +88,7 @@ contract Loihi {
 
     event PartitionRedeemed(address token, address redeemer, uint value);
 
-    event PoolPartitioned(bool);
+    event PoolPartitioned(bool partitioned);
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
@@ -163,9 +163,9 @@ contract Loihi {
 
     }
 
-    function includeAssimilator (address _numeraire, address _derivative, address _assimilator) external onlyOwner {
+    function includeAssimilator (address _derivative, address _numeraire, address _reserve, address _assimilator) external onlyOwner {
 
-        Orchestrator.includeAssimilator(shell, _numeraire, _derivative, _assimilator);
+        Orchestrator.includeAssimilator(shell, _derivative, _numeraire, _reserve, _assimilator);
 
     }
 
@@ -295,7 +295,9 @@ contract Loihi {
         uint _targetAmount,
         uint _deadline,
         address _recipient
-    ) external deadline(_deadline) transactable nonReentrant returns (uint originAmount_) {
+    ) external deadline(_deadline) transactable nonReentrant returns (
+        uint originAmount_
+    ) {
 
         originAmount_ = Swaps.targetSwap(shell, _origin, _target, _targetAmount, _recipient);
 

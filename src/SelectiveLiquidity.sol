@@ -141,10 +141,10 @@ library SelectiveLiquidity {
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (
         Loihi.Shell storage shell,
-        address[] memory _derivatives,
-        uint[] memory _amounts,
+        address[] calldata _derivatives,
+        uint[] calldata _amounts,
         uint _minShells
-    ) internal returns (
+    ) external returns (
         uint shells_
     ) {
 
@@ -171,9 +171,9 @@ library SelectiveLiquidity {
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function viewSelectiveDeposit (
         Loihi.Shell storage shell,
-        address[] memory _derivatives,
-        uint[] memory _amounts
-    ) internal view returns (
+        address[] calldata _derivatives,
+        uint[] calldata _amounts
+    ) external view returns (
         uint shells_
     ) {
 
@@ -196,10 +196,10 @@ library SelectiveLiquidity {
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (
         Loihi.Shell storage shell,
-        address[] memory _derivatives,
-        uint[] memory _amounts,
+        address[] calldata _derivatives,
+        uint[] calldata _amounts,
         uint _maxShells
-    ) internal returns (
+    ) external returns (
         uint256 shells_
     ) {
 
@@ -229,9 +229,9 @@ library SelectiveLiquidity {
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function viewSelectiveWithdraw (
         Loihi.Shell storage shell,
-        address[] memory _derivatives,
-        uint[] memory _amounts
-    ) internal view returns (
+        address[] calldata _derivatives,
+        uint[] calldata _amounts
+    ) external view returns (
         uint shells_
     ) {
 
