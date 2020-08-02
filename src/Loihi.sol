@@ -17,7 +17,7 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "./Assimilators.sol";
 
-import "./Controller.sol";
+import "./Orchestrator.sol";
 
 import "./Liquidity.sol";
 
@@ -51,6 +51,7 @@ contract Loihi {
         Assimilator[] reserves;
         Assimilator[] numeraires;
         mapping (address => Assimilator) assimilators;
+        bool testHalts;
     }
 
     struct Assimilator {
@@ -77,8 +78,25 @@ contract Loihi {
 
     uint public maxFee;
 
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    event SetFrozen(bool isFrozen);
+    event Approval(address indexed _owner, address indexed spender, uint256 value);
+
+    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
+
+    event AssetIncluded(address numeraire, address reserve, uint weight);
+
+    event AssimilatorIncluded(address numeraire, address derivative, address assimilator);
+
+    event PartitionRedeemed(address token, address redeemer, uint value);
+
+    event PoolPartitioned(bool partitioned);
+
+    event OwnershipTransfered(address indexed previousOwner, address indexed newOwner);
+
+    event FrozenSet(bool isFrozen);
+
+    event Trade(address indexed trader, address indexed origin, address indexed target, uint256 originAmount, uint256 targetAmount);
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
     modifier onlyOwner() {
 
@@ -110,6 +128,13 @@ contract Loihi {
 
     }
 
+    modifier isPartitioned () {
+
+        require(partitioned, "Shell/pool-not-partitioned");
+        _;
+
+    }
+
     modifier deadline (uint _deadline) {
 
         require(block.timestamp < _deadline, "Shell/tx-deadline-passed");
@@ -121,25 +146,26 @@ contract Loihi {
     constructor () public {
 
         owner = msg.sender;
-        emit OwnershipTransferred(address(0), msg.sender);
+        emit OwnershipTransfered(address(0), msg.sender);
+        shell.testHalts = true;
 
     }
 
-    function setParams (uint _alpha, uint _beta, uint _epsilon, uint _max, uint _lambda) external onlyOwner {
+    function setParams (uint _alpha, uint _beta, uint _deltaDerivative, uint _epsilon, uint _lambda) external onlyOwner {
 
-        maxFee = Controller.setParams(shell, _alpha, _beta, _epsilon, _max, _lambda);
+        maxFee = Orchestrator.setParams(shell, _alpha, _beta, _deltaDerivative, _epsilon, _lambda);
 
     }
 
     function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint _weight) external onlyOwner {
 
-        Controller.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
+        Orchestrator.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
 
     }
 
-    function includeAssimilator (address _numeraire, address _derivative, address _assimilator) external onlyOwner {
+    function includeAssimilator (address _derivative, address _numeraire, address _reserve, address _assimilator) external onlyOwner {
 
-        Controller.includeAssimilator(shell, _numeraire, _derivative, _assimilator);
+        Orchestrator.includeAssimilator(shell, _derivative, _numeraire, _reserve, _assimilator);
 
     }
 
@@ -149,39 +175,54 @@ contract Loihi {
 
     }
 
-    function freeze (bool _toFreezeOrNotToFreeze) external onlyOwner {
+    function viewShell () external view returns (
+        uint alpha_,
+        uint beta_,
+        uint delta_,
+        uint epsilon_,
+        uint lambda_,
+        uint omega_
+    ) {
 
-        emit SetFrozen(_toFreezeOrNotToFreeze);
+        return Orchestrator.viewShell(shell);
+
+    }
+
+    function setFrozen (bool _toFreezeOrNotToFreeze) external onlyOwner {
+
+        emit FrozenSet(_toFreezeOrNotToFreeze);
+
         frozen = _toFreezeOrNotToFreeze;
 
     }
 
     function transferOwnership (address _newOwner) external onlyOwner {
 
-        emit OwnershipTransferred(owner, _newOwner);
+        emit OwnershipTransfered(owner, _newOwner);
+
         owner = _newOwner;
 
     }
 
     function prime () external {
 
-        Controller.prime(shell);
+        Orchestrator.prime(shell);
 
     }
 
     function originSwap (
         address _origin,
         address _target,
-        uint _oAmt,
-        uint _minTAmt,
-        uint _dline
-    ) external deadline(_dline) transactable nonReentrant returns (
-        uint tAmt_
+        uint _originAmount,
+        uint _minTargetAmount,
+        uint _deadline
+    ) external deadline(_deadline) transactable nonReentrant returns (
+        uint targetAmount_
     ) {
 
-        tAmt_ = Swaps.originSwap(shell, _origin, _target, _oAmt, msg.sender);
+        targetAmount_ = Swaps.originSwap(shell, _origin, _target, _originAmount, msg.sender);
 
-        require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
+        require(targetAmount_ > _minTargetAmount, "Shell/below-min-target-amount");
 
     }
 
@@ -189,29 +230,29 @@ contract Loihi {
     function originSwapTo (
         address _origin,
         address _target,
-        uint _oAmt,
-        uint _minTAmt,
-        uint _dline,
-        address _rcpnt
-    ) external deadline(_dline) transactable nonReentrant returns (
-        uint tAmt_
+        uint _originAmount,
+        uint _minTargetAmount,
+        uint _deadline,
+        address _recipient
+    ) external deadline(_deadline) transactable nonReentrant returns (
+        uint targetAmount_
     ) {
 
-        tAmt_ = Swaps.originSwap(shell, _origin, _target, _oAmt, _rcpnt);
+        targetAmount_ = Swaps.originSwap(shell, _origin, _target, _originAmount, _recipient);
 
-        require(tAmt_ > _minTAmt, "Shell/below-min-target-amount");
+        require(targetAmount_ > _minTargetAmount, "Shell/below-min-target-amount");
 
     }
 
     function viewOriginSwap (
         address _origin,
         address _target,
-        uint _oAmt
+        uint _originAmount
     ) external view transactable returns (
-        uint tAmt_
+        uint targetAmount_
     ) {
 
-        tAmt_ = Swaps.viewOriginSwap(shell, _origin, _target, _oAmt);
+        targetAmount_ = Swaps.viewOriginSwap(shell, _origin, _target, _originAmount);
 
     }
 
@@ -220,23 +261,23 @@ contract Loihi {
     // / @notice swap a dynamic origin amount for a fixed target amount
     // / @param _origin the address of the origin
     // / @param _target the address of the target
-    // / @param _mOAmt the maximum origin amount
-    // / @param _tAmt the target amount
-    // / @param _dline deadline in block number after which the trade will not execute
-    // / @return oAmt_ the amount of origin that has been swapped for the target
+    // / @param _maxOriginAmount the maximum origin amount
+    // / @param _targetAmount the target amount
+    // / @param _deadline deadline in block number after which the trade will not execute
+    // / @return originAmount_ the amount of origin that has been swapped for the target
     function targetSwap (
         address _origin,
         address _target,
-        uint _maxOAmt,
-        uint _tAmt,
-        uint _dline
-    ) external deadline(_dline) transactable nonReentrant returns (
-        uint oAmt_
+        uint _maxOriginAmount,
+        uint _targetAmount,
+        uint _deadline
+    ) external deadline(_deadline) transactable nonReentrant returns (
+        uint originAmount_
     ) {
 
-        oAmt_ = Swaps.targetSwap(shell, _origin, _target, _tAmt, msg.sender);
+        originAmount_ = Swaps.targetSwap(shell, _origin, _target, _targetAmount, msg.sender);
 
-        require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
+        require(originAmount_ < _maxOriginAmount, "Shell/above-max-origin-amount");
 
     }
 
@@ -244,23 +285,25 @@ contract Loihi {
     // / @notice transfer a dynamic origin amount into a fixed target amount at the recipients address
     // / @param _origin the address of the origin
     // / @param _target the address of the target
-    // / @param _mOAmt the maximum origin amount
-    // / @param _tAmt the target amount
-    // / @param _dline deadline in block number after which the trade will not execute
-    // / @param _rcpnt the address of the recipient of the target
-    // / @return oAmt_ the amount of origin that has been swapped for the target
+    // / @param _maxOriginAmount the maximum origin amount
+    // / @param _targetAmount the target amount
+    // / @param _deadline deadline in block number after which the trade will not execute
+    // / @param _recipient the address of the recipient of the target
+    // / @return originAmount_ the amount of origin that has been swapped for the target
     function targetSwapTo (
         address _origin,
         address _target,
-        uint _maxOAmt,
-        uint _tAmt,
-        uint _dline,
-        address _rcpnt
-    ) external deadline(_dline) transactable nonReentrant returns (uint oAmt_) {
+        uint _maxOriginAmount,
+        uint _targetAmount,
+        uint _deadline,
+        address _recipient
+    ) external deadline(_deadline) transactable nonReentrant returns (
+        uint originAmount_
+    ) {
 
-        oAmt_ = Swaps.targetSwap(shell, _origin, _target, _tAmt, _rcpnt);
+        originAmount_ = Swaps.targetSwap(shell, _origin, _target, _targetAmount, _recipient);
 
-        require(oAmt_ < _maxOAmt, "Shell/above-max-origin-amount");
+        require(originAmount_ < _maxOriginAmount, "Shell/above-max-origin-amount");
 
     }
 
@@ -268,53 +311,53 @@ contract Loihi {
     // / @notice view how much of the origin currency the target currency will take
     // / @param _origin the address of the origin
     // / @param _target the address of the target
-    // / @param _tAmt the target amount
-    // / @return oAmt_ the amount of target that has been swapped for the origin
+    // / @param _targetAmount the target amount
+    // / @return originAmount_ the amount of target that has been swapped for the origin
     function viewTargetSwap (
         address _origin,
         address _target,
-        uint _tAmt
+        uint _targetAmount
     ) external view transactable returns (
-        uint oAmt_
+        uint originAmount_
     ) {
 
-        oAmt_ = Swaps.viewTargetSwap(shell, _origin, _target, _tAmt);
+        originAmount_ = Swaps.viewTargetSwap(shell, _origin, _target, _targetAmount);
 
     }
 
     // / @author james foley http://github.com/realisation
     // / @notice selectively deposit any supported stablecoin flavor into the contract in return for corresponding amount of shell tokens
-    // / @param _flvrs an array containing the addresses of the flavors being deposited into
-    // / @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
+    // / @param _derivatives an array containing the addresses of the flavors being deposited into
+    // / @param _amounts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     // / @param _minShells minimum acceptable amount of shells
-    // / @param _dline deadline for tx
+    // / @param _deadline deadline for tx
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (
-        address[] calldata _flvrs,
-        uint[] calldata _amts,
+        address[] calldata _derivatives,
+        uint[] calldata _amounts,
         uint _minShells,
-        uint _dline
-    ) external deadline(_dline) transactable nonReentrant returns (
-        uint shells_
+        uint _deadline
+    ) external deadline(_deadline) transactable nonReentrant returns (
+        uint shellsMinted_
     ) {
 
-        shells_ = SelectiveLiquidity.selectiveDeposit(shell, _flvrs, _amts, _minShells);
+        shellsMinted_ = SelectiveLiquidity.selectiveDeposit(shell, _derivatives, _amounts, _minShells);
 
     }
 
     // / @author james folew http://github.com/realisation
     // / @notice view how many shell tokens a deposit will mint
-    // / @param _flvrs an array containing the addresses of the flavors being deposited into
-    // / @param _amts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
+    // / @param _derivatives an array containing the addresses of the flavors being deposited into
+    // / @param _amounts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function viewSelectiveDeposit (
-        address[] calldata _flvrs,
-        uint[] calldata _amts
+        address[] calldata _derivatives,
+        uint[] calldata _amounts
     ) external view transactable returns (
-        uint shells_
+        uint shellsToMint_
     ) {
 
-        shells_ = SelectiveLiquidity.viewSelectiveDeposit(shell, _flvrs, _amts);
+        shellsToMint_ = SelectiveLiquidity.viewSelectiveDeposit(shell, _derivatives, _amounts);
 
     }
 
@@ -324,10 +367,10 @@ contract Loihi {
     // / @return shellsToMint_ the amount of shells you receive in return for your deposit
     function proportionalDeposit (
         uint _deposit,
-        uint _dline
-    ) external deadline(_dline) transactable nonReentrant returns (
-        uint shells_,
-        uint[] memory
+        uint _deadline
+    ) external deadline(_deadline) transactable nonReentrant returns (
+        uint shellsMinted_,
+        uint[] memory deposits_
     ) {
 
         return ProportionalLiquidity.proportionalDeposit(shell, _deposit);
@@ -335,11 +378,10 @@ contract Loihi {
     }
 
     function viewProportionalDeposit (
-        uint _deposit,
-        uint _dline
-    ) external view deadline(_dline) transactable returns (
-        uint shells_,
-        uint[] memory
+        uint _deposit
+    ) external view transactable returns (
+        uint shellsToMint_,
+        uint[] memory deposits_
     ) {
 
         return ProportionalLiquidity.viewProportionalDeposit(shell, _deposit);
@@ -348,35 +390,35 @@ contract Loihi {
 
     // / @author james foley http://github.com/realisation
     // / @notice selectively withdrawal any supported stablecoin flavor from the contract by burning a corresponding amount of shell tokens
-    // / @param _flvrs an array of flavors to withdraw from the reserves
-    // / @param _amts an array of amounts to withdraw that maps to _flavors
+    // / @param _derivatives an array of flavors to withdraw from the reserves
+    // / @param _amounts an array of amounts to withdraw that maps to _flavors
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (
-        address[] calldata _flvrs,
-        uint[] calldata _amts,
+        address[] calldata _derivatives,
+        uint[] calldata _amounts,
         uint _maxShells,
-        uint _dline
-    ) external deadline(_dline) transactable nonReentrant returns (
-        uint shells_
+        uint _deadline
+    ) external deadline(_deadline) transactable nonReentrant returns (
+        uint shellsBurned_
     ) {
 
-        shells_ = SelectiveLiquidity.selectiveWithdraw(shell, _flvrs, _amts, _maxShells);
+        shellsBurned_ = SelectiveLiquidity.selectiveWithdraw(shell, _derivatives, _amounts, _maxShells);
 
     }
 
     // / @author james foley http://github.com/realisation
     // / @notice view how many shell tokens a withdraw will consume
-    // / @param _flvrs an array of flavors to withdraw from the reserves
-    // / @param _amts an array of amounts to withdraw that maps to _flavors
+    // / @param _derivatives an array of flavors to withdraw from the reserves
+    // / @param _amounts an array of amounts to withdraw that maps to _flavors
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function viewSelectiveWithdraw (
-        address[] calldata _flvrs,
-        uint[] calldata _amts
+        address[] calldata _derivatives,
+        uint[] calldata _amounts
     ) external view transactable returns (
-        uint shells_
+        uint shellsToBurn_
     ) {
 
-        shells_ = SelectiveLiquidity.viewSelectiveWithdraw(shell, _flvrs, _amts);
+        shellsToBurn_ = SelectiveLiquidity.viewSelectiveWithdraw(shell, _derivatives, _amounts);
 
     }
 
@@ -384,23 +426,23 @@ contract Loihi {
     // / @notice  withdrawas amount of shell tokens from the the pool equally from the numeraire assets of the pool with no slippage
     // / @param   _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     function proportionalWithdraw (
-        uint _withdrawal,
-        uint _dline
-    ) external deadline(_dline) unpartitioned nonReentrant returns (
-        uint[] memory
+        uint _shellsToBurn,
+        uint _deadline
+    ) external deadline(_deadline) unpartitioned nonReentrant returns (
+        uint[] memory withdrawals_
     ) {
 
-        return ProportionalLiquidity.proportionalWithdraw(shell, _withdrawal);
+        return ProportionalLiquidity.proportionalWithdraw(shell, _shellsToBurn);
 
     }
 
     function viewProportionalWithdraw (
-        uint _withdrawal
+        uint _shellsToBurn
     ) external view unpartitioned returns (
-        uint[] memory
+        uint[] memory withdrawals_
     ) {
 
-        return ProportionalLiquidity.viewProportionalWithdraw(shell, _withdrawal);
+        return ProportionalLiquidity.viewProportionalWithdraw(shell, _shellsToBurn);
 
     }
 
@@ -415,11 +457,9 @@ contract Loihi {
     function partitionedWithdraw (
         address[] calldata _tokens,
         uint256[] calldata _amounts
-    ) external returns (
-        uint256[] memory withdraws_
+    ) external isPartitioned returns (
+        uint256[] memory withdrawals_
     ) {
-
-        require(partitioned, "Shell/not-partitioned");
 
         return PartitionedLiquidity.partitionedWithdraw(shell, partitionTickets, _tokens, _amounts);
 
@@ -427,11 +467,9 @@ contract Loihi {
 
     function viewPartitionClaims (
         address _addr
-    ) external view returns (
-        uint[] memory
+    ) external view isPartitioned returns (
+        uint[] memory claims_
     ) {
-
-        require(partitioned, "Shell/not-partitioned");
 
         return PartitionedLiquidity.viewPartitionClaims(shell, partitionTickets, _addr);
 
@@ -485,9 +523,18 @@ contract Loihi {
 
     }
 
-    function liquidity () public view returns (uint, uint[] memory) {
+    function liquidity () public view returns (
+        uint total_,
+        uint[] memory individual_
+    ) {
 
         return Liquidity.liquidity(shell);
+
+    }
+
+    function TEST_setTestHalts (bool toTestOrNotToTest) external {
+
+        shell.testHalts = toTestOrNotToTest;
 
     }
 

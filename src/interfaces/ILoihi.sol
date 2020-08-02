@@ -17,100 +17,298 @@ pragma solidity ^0.5.0;
 interface ILoihi {
 
     function originSwap (
-        address origin,
-        address target,
-        uint originAmount,
-        uint minTargetAmount,
-        uint deadline
-    ) external returns (uint);
+        address _origin,
+        address _target,
+        uint _originAmount,
+        uint _minTargetAmount,
+        uint _deadline
+    ) external returns (
+        uint
+    );
 
     function originSwapTo (
-        address origin,
-        address target,
-        uint originAmount,
-        uint targetMin,
-        uint deadline,
-        address recipient
-    ) external returns (uint);
+        address _origin,
+        address _target,
+        uint _originAmount,
+        uint _minTargetAmount,
+        uint _deadline,
+        address _recipient
+    ) external returns (
+        uint targetAmount_
+    );
 
     function viewOriginSwap (
-        address origin,
-        address target,
-        uint originAmount
-    ) external view returns (uint);
+        address _origin,
+        address _target,
+        uint _originAmount
+    ) external view returns (
+        uint targetAmount_
+    );
 
     function targetSwap (
-        address origin,
-        address target,
-        uint targetAmount,
-        uint maxOriginAmount,
-        uint deadline
-    ) external returns (uint);
+        address _origin,
+        address _target,
+        uint _targetAmount,
+        uint _maxOriginAmount,
+        uint _deadline
+    ) external returns (
+        uint originAmount_
+    );
 
     function tansferByTarget (
-        address origin,
-        address target,
-        uint targetAmount,
-        uint maxOriginAmount,
-        address recipient,
-        uint deadline
-    ) external returns (uint);
+        address _origin,
+        address _target,
+        uint _targetAmount,
+        uint _maxOriginAmount,
+        address _recipient,
+        uint _deadline
+    ) external returns (
+        uint originAmount_
+    );
 
     function viewTargetSwap (
-        address origin,
-        address target,
-        uint targetAmount
-    ) external view returns (uint);
+        address _origin,
+        address _target,
+        uint _targetAmount
+    ) external view returns (
+        uint originAmount_
+    );
+
+    function proportionalDeposit (
+        uint _totalStablecoins,
+        uint _deadline
+    ) external returns (
+        uint shellsMinted_,
+        uint[] memory deposits_
+    );
+
+    function viewProportionalDeposit (
+        uint _totalStablecoins
+    ) external view returns (
+        uint shellsToMint_,
+        uint[] memory depositsToMake_
+    );
 
     function selectiveDeposit (
-        address[] calldata _flavors,
+        address[] calldata _derivatives,
         uint[] calldata _amounts,
         uint _minShells,
         uint _deadline
-    ) external returns (uint);
+    ) external returns (
+        uint shellsMinted_
+    );
+
+    function viewSelectiveDeposit (
+        address[] calldata _derivatives,
+        uint[] calldata _amounts
+    ) external view returns (
+        uint shellsToMint_
+    );
+
+    function proportionalWithdraw (
+        uint _shellTokens,
+        uint _deadline
+    ) external returns (
+        uint[] memory withdrawals_
+    );
+
+    function viewProportionalWithdraw (
+        uint _shellTokens
+    ) external view returns (
+        uint[] memory withdrawalsToMake_
+    );
 
     function selectiveWithdraw (
-        address[] calldata _flavors,
+        address[] calldata _derivatives,
         uint[] calldata _amounts,
         uint _maxShells,
         uint _deadline
-    ) external returns (uint);
+    ) external returns (
+        uint shellsBurned_
+    );
 
-    function proportionalDeposit (
-        uint totalStablecoins,
-        uint deadline
-    ) external returns (uint shells_, uint[] memory);
+    function viewSelectiveWithdraw (
+        address[] calldata _derivatives,
+        uint[] calldata _amounts
+    ) external view returns (
+        uint shellsToBurn_
+    );
 
-    function proportionalWithdraw (
-        uint shellTokens,
-        uint deadline
-    ) external returns (uint[] memory);
+    function partitionedWithdraw (
+        address[] calldata _derivatives,
+        uint[] calldata _amounts
+    ) external returns (
+        uint[] memory withdrawals_
+    );
+
+    function viewPartitionClaims (
+        address _addr
+    ) external view returns (
+        uint[] memory claims_
+    );
 
     function owner () external view returns (address);
 
-    function includeAsset (address _numeraire, address _nAssim, address _reserve, address _rAssim, uint _weight) external;
-    function includeAssimilator (address _numeraire, address _derivative, address _assimilator) external;
-    function excluseAssimilator (address _assimilator) external;
-    function freeze (bool _toFreezeOrNotToFreeze) external;
-    function transferOwnership (address _newOwner) external;
-    function setParams (uint _alpha, uint _beta, uint _epsilon, uint _max, uint _lambda) external;
+    function includeAsset (
+        address _numeraire,
+        address _numeraireAssimilator,
+        address _reserve,
+        address _reserveAssimilator,
+        uint _weight
+    ) external;
+
+    function includeAssimilator (
+        address _derivative,
+        address _numeraire,
+        address _reserve,
+        address _assimilator
+    ) external;
+
+    function excludeAssimilator (
+        address _assimilator
+    ) external;
+
+    function setFrozen (
+        bool _toFreezeOrNotToFreeze
+    ) external;
+
+    function transferOwnership (
+        address _newOwner
+    ) external;
+
+    function viewShell () external view returns (
+        uint alpha_,
+        uint beta_,
+        uint delta_,
+        uint epsilon_,
+        uint lambda_,
+        uint omega_
+    );
+
+    function setParams (
+        uint _alpha,
+        uint _beta,
+        uint _deltaDerivative,
+        uint _epsilon,
+        uint _lambda
+    ) external;
+
     function prime () external;
-    function liquidity () external view returns (uint, uint[] memory);
+
+    function liquidity () external view returns (
+        uint total_,
+        uint[] memory individual_
+    );
+
+    function name () external view returns (string memory);
+    function symbol () external view returns (string memory);
 
     function decimals() external view returns (uint);
-    function totalSupply() external view returns (uint);
-    function balanceOf(address account) external view returns (uint);
-    function transfer(address recipient, uint amount) external returns (bool);
-    function transferFrom(address sender, address recipient, uint amount) external returns (bool);
-    function approve(address spender, uint amount) external returns (bool);
-    function allowance(address _owner, address _spender) external view returns (uint);
 
-    event Transfer(address indexed from, address indexed to, uint value);
-    event Approval(address indexed owner, address indexed spender, uint value);
-    event ShellsMinted(address indexed minter, uint amount, address[] indexed coins, uint[] amounts);
-    event ShellsBurned(address indexed burner, uint amount, address[] indexed coins, uint[] amounts);
-    event ShellsBurned(address indexed burner, uint amount);
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    event Trade(address indexed trader, address indexed origin, address indexed target, uint originAmount, uint targetAmount);
+    function totalSupply() external view returns (uint);
+
+    function balanceOf(
+        address account
+    ) external view returns (uint);
+
+    function transfer(
+        address recipient,
+        uint amount
+    ) external returns (bool);
+
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint amount
+    ) external returns (bool);
+
+    function approve(
+        address spender,
+        uint amount
+    ) external returns (bool);
+
+    function allowance(
+        address _owner,
+        address _spender
+    ) external view returns (uint);
+
+    event ParametersSet(
+        uint256 alpha,
+        uint256 beta,
+        uint256 delta,
+        uint256 epsilon,
+        uint256 lambda
+    );
+
+    event AssetIncluded(
+        address numeraire,
+        address reserve,
+        uint weight
+    );
+
+    event AssimilatorIncluded(
+        address derivative,
+        address numeraire,
+        address reserve,
+        address assimilator
+    );
+
+    event PartitionRedeemed(
+        address token,
+        address redeemer,
+        uint value
+    );
+
+    event PoolPartitioned(
+        bool partitioned
+    );
+
+    event Transfer(
+        address indexed from,
+        address indexed to,
+        uint value
+    );
+
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint value
+    );
+
+    event ShellsMinted(
+        address indexed minter,
+        uint amount,
+        address[] indexed coins,
+        uint[] amounts
+    );
+
+    event ShellsBurned(
+        address indexed burner,
+        uint amount,
+        address[] indexed coins,
+        uint[] amounts
+    );
+
+    event ShellsBurned(
+        address indexed burner,
+        uint amount
+    );
+
+    event OwnershipTransfered(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
+
+    event Trade(
+        address indexed trader,
+        address indexed origin,
+        address indexed target,
+        uint originAmount,
+        uint targetAmount
+    );
+
+    event FrozenSet(
+        bool isFrozen
+    );
 
 }
