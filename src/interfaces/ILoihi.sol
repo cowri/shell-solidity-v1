@@ -168,7 +168,7 @@ interface ILoihi {
         address _assimilator
     ) external;
 
-    function freeze (
+    function setFrozen (
         bool _toFreezeOrNotToFreeze
     ) external;
 
@@ -294,7 +294,7 @@ interface ILoihi {
         uint amount
     );
 
-    event OwnershipTransferred(
+    event OwnershipTransfered(
         address indexed previousOwner,
         address indexed newOwner
     );
@@ -305,6 +305,10 @@ interface ILoihi {
         address indexed target,
         uint originAmount,
         uint targetAmount
+    );
+
+    event FrozenSet(
+        bool isFrozen
     );
 
 }
