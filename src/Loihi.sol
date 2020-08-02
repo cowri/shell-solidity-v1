@@ -457,11 +457,9 @@ contract Loihi {
     function partitionedWithdraw (
         address[] calldata _tokens,
         uint256[] calldata _amounts
-    ) external returns (
+    ) external isPartitioned returns (
         uint256[] memory withdrawals_
     ) {
-
-        require(partitioned, "Shell/not-partitioned");
 
         return PartitionedLiquidity.partitionedWithdraw(shell, partitionTickets, _tokens, _amounts);
 
@@ -469,11 +467,9 @@ contract Loihi {
 
     function viewPartitionClaims (
         address _addr
-    ) external view returns (
+    ) external view isPartitioned returns (
         uint[] memory claims_
     ) {
-
-        require(partitioned, "Shell/not-partitioned");
 
         return PartitionedLiquidity.viewPartitionClaims(shell, partitionTickets, _addr);
 
