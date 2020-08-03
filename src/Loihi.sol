@@ -82,11 +82,11 @@ contract Loihi {
 
     event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
 
-    event AssetIncluded(address numeraire, address reserve, uint weight);
+    event AssetIncluded(address indexed numeraire, address indexed reserve, uint weight);
 
-    event AssimilatorIncluded(address numeraire, address derivative, address assimilator);
+    event AssimilatorIncluded(address indexed derivative, address indexed numeraire, address indexed reserve, address indexed assimilator);
 
-    event PartitionRedeemed(address token, address redeemer, uint value);
+    event PartitionRedeemed(address indexed token, address indexed redeemer, uint value);
 
     event PoolPartitioned(bool partitioned);
 

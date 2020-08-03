@@ -29,11 +29,10 @@ library Orchestrator {
     using Assimilators for address;
 
     event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
-    event AssetIncluded(address numeraire, address reserve, uint weight);
-    event AssimilatorIncluded(address derivative, address numeraire, address reserve, address assimilator);
 
-    event log(bytes32);
-    event log_addr(bytes32, address);
+    event AssetIncluded(address indexed numeraire, address indexed reserve, uint weight);
+
+    event AssimilatorIncluded(address indexed derivative, address indexed numeraire, address indexed reserve, address assimilator);
 
     function setParams (
         Loihi.Shell storage shell,

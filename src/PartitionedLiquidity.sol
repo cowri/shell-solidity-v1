@@ -13,15 +13,10 @@ library PartitionedLiquidity {
     using UnsafeMath64x64 for int128;
 
     event PoolPartitioned(bool);
-    event PartitionRedeemed(address token, address redeemer, uint value);
+
+    event PartitionRedeemed(address indexed token, address indexed redeemer, uint value);
 
     int128 constant ONE = 0x10000000000000000;
-
-    event log(bytes32);
-    event log_int(bytes32, int128);
-    event log_ints(bytes32, int128[]);
-    event log_uint(bytes32, uint);
-    event log_uints(bytes32, uint[]);
 
     function partition (
         Loihi.Shell storage shell,
