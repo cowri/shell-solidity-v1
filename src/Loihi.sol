@@ -84,7 +84,7 @@ contract Loihi {
 
     event AssetIncluded(address indexed numeraire, address indexed reserve, uint weight);
 
-    event AssimilatorIncluded(address indexed derivative, address indexed numeraire, address indexed reserve, address indexed assimilator);
+    event AssimilatorIncluded(address indexed derivative, address indexed numeraire, address indexed reserve, address assimilator);
 
     event PartitionRedeemed(address indexed token, address indexed redeemer, uint value);
 
