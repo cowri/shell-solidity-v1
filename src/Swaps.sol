@@ -38,99 +38,6 @@ library Swaps {
 
     }
 
-    function getSwapData (
-        Loihi.Shell storage shell,
-        uint _lIx,
-        uint _rIx,
-        address _assim,
-        address _recipient,
-        uint _amt,
-        bool _isOrigin
-    ) private returns (
-        int128 amt_,
-        int128 oGLiq_,
-        int128 nGLiq_,
-        int128[] memory,
-        int128[] memory
-    ) {
-
-        uint _length = shell.reserves.length;
-
-        int128[] memory oBals_ = new int128[](_length);
-        int128[] memory nBals_ = new int128[](_length);
-        Loihi.Assimilator[] memory _reserves = shell.reserves;
-
-        for (uint i = 0; i < _length; i++) {
-
-            if (i != _lIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(_reserves[i].addr);
-            else {
-
-                int128 _bal;
-                if (_isOrigin) ( amt_, _bal ) = Assimilators.intakeRawAndGetBalance(_assim, _amt);
-                else ( amt_, _bal ) = Assimilators.outputRawAndGetBalance(_assim, _recipient, _amt);
-
-                oBals_[i] = _bal - amt_;
-                nBals_[i] = _bal;
-
-            }
-
-            oGLiq_ += oBals_[i];
-            nGLiq_ += nBals_[i];
-
-        }
-
-        nGLiq_ = nGLiq_.sub(amt_);
-        nBals_[_rIx] = ABDKMath64x64.sub(nBals_[_rIx], amt_);
-
-        return ( amt_, oGLiq_, nGLiq_, oBals_, nBals_ );
-
-    }
-
-    function viewSwapData (
-        Loihi.Shell storage shell,
-        uint _lIx,
-        uint _rIx,
-        uint _amt,
-        bool _isOrigin,
-        address _assim
-    ) private view returns (
-        int128 amt_,
-        int128 oGLiq_,
-        int128 nGLiq_,
-        int128[] memory,
-        int128[] memory
-    ) {
-
-        uint _length = shell.reserves.length;
-        int128[] memory nBals_ = new int128[](_length);
-        int128[] memory oBals_ = new int128[](_length);
-
-        for (uint i = 0; i < _length; i++) {
-
-            if (i != _lIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
-            else {
-
-                int128 _bal;
-                ( amt_, _bal ) = Assimilators.viewNumeraireAmountAndBalance(_assim, _amt);
-                if (!_isOrigin) amt_ = amt_.neg();
-
-                oBals_[i] = _bal;
-                nBals_[i] = _bal.add(amt_);
-
-            }
-
-            oGLiq_ += oBals_[i];
-            nGLiq_ += nBals_[i];
-
-        }
-
-        nGLiq_ = nGLiq_.sub(amt_);
-        nBals_[_rIx] = ABDKMath64x64.sub(nBals_[_rIx], amt_);
-
-
-        return ( amt_, oGLiq_, nGLiq_, nBals_, oBals_ );
-
-    }
 
     function originSwap (
         Loihi.Shell storage shell,
@@ -138,7 +45,7 @@ library Swaps {
         address _target,
         uint256 _originAmount,
         address _recipient
-    ) external returns (
+    ) internal returns (
         uint256 tAmt_
     ) {
 
@@ -151,7 +58,7 @@ library Swaps {
             int128 _oGLiq,
             int128 _nGLiq,
             int128[] memory _oBals,
-            int128[] memory _nBals ) = getSwapData(shell, _o.ix, _t.ix, _o.addr, address(0), _originAmount, true);
+            int128[] memory _nBals ) = getOriginSwapData(shell, _o.ix, _t.ix, _o.addr, address(0), _originAmount);
 
         ( _amt, shell.omega ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
@@ -176,7 +83,7 @@ library Swaps {
         address _origin,
         address _target,
         uint256 _originAmount
-    ) external view returns (
+    ) internal view returns (
         uint256 tAmt_
     ) {
 
@@ -189,7 +96,7 @@ library Swaps {
             int128 _oGLiq,
             int128 _nGLiq,
             int128[] memory _nBals,
-            int128[] memory _oBals ) = viewSwapData(shell, _o.ix, _t.ix, _originAmount, true, _o.addr);
+            int128[] memory _oBals ) = viewOriginSwapData(shell, _o.ix, _t.ix, _originAmount, _o.addr);
 
         ( _amt, ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
@@ -214,7 +121,7 @@ library Swaps {
         address _target,
         uint256 _targetAmount,
         address _recipient
-    ) external returns (
+    ) internal returns (
         uint256 oAmt_
     ) {
 
@@ -227,7 +134,7 @@ library Swaps {
             int128 _oGLiq,
             int128 _nGLiq,
             int128[] memory _oBals,
-            int128[] memory _nBals) = getSwapData(shell, _t.ix, _o.ix, _t.addr, _recipient, _targetAmount, false);
+            int128[] memory _nBals) = getTargetSwapData(shell, _t.ix, _o.ix, _t.addr, _recipient, _targetAmount);
 
         ( _amt, shell.omega ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
 
@@ -250,7 +157,7 @@ library Swaps {
         address _origin,
         address _target,
         uint256 _targetAmount
-    ) external view returns (
+    ) internal view returns (
         uint256 oAmt_
     ) {
 
@@ -263,13 +170,194 @@ library Swaps {
             int128 _oGLiq,
             int128 _nGLiq,
             int128[] memory _nBals,
-            int128[] memory _oBals ) = viewSwapData(shell, _t.ix, _o.ix, _targetAmount, false, _t.addr);
+            int128[] memory _oBals ) = viewTargetSwapData(shell, _t.ix, _o.ix, _targetAmount, _t.addr);
 
         ( _amt, ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
 
         _amt = _amt.us_mul(ONE + shell.epsilon);
 
         oAmt_ = Assimilators.viewRawAmount(_o.addr, _amt);
+
+    }
+
+    function getOriginSwapData (
+        Loihi.Shell storage shell,
+        uint _inputIx,
+        uint _outputIndex,
+        address _assim,
+        address _recipient,
+        uint _amt
+    ) private returns (
+        int128 amt_,
+        int128 oGLiq_,
+        int128 nGLiq_,
+        int128[] memory,
+        int128[] memory
+    ) {
+
+        uint _length = shell.reserves.length;
+
+        int128[] memory oBals_ = new int128[](_length);
+        int128[] memory nBals_ = new int128[](_length);
+        Loihi.Assimilator[] memory _reserves = shell.reserves;
+
+        for (uint i = 0; i < _length; i++) {
+
+            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(_reserves[i].addr);
+            else {
+
+                int128 _bal;
+                ( amt_, _bal ) = Assimilators.intakeRawAndGetBalance(_assim, _amt);
+
+                oBals_[i] = _bal - amt_;
+                nBals_[i] = _bal;
+
+            }
+
+            oGLiq_ += oBals_[i];
+            nGLiq_ += nBals_[i];
+
+        }
+
+        nGLiq_ = nGLiq_.sub(amt_);
+        nBals_[_outputIndex] = ABDKMath64x64.sub(nBals_[_outputIndex], amt_);
+
+        return ( amt_, oGLiq_, nGLiq_, oBals_, nBals_ );
+
+    }
+
+    function getTargetSwapData (
+        Loihi.Shell storage shell,
+        uint _inputIx,
+        uint _outputIndex,
+        address _assim,
+        address _recipient,
+        uint _amt
+    ) private returns (
+        int128 amt_,
+        int128 oGLiq_,
+        int128 nGLiq_,
+        int128[] memory,
+        int128[] memory
+    ) {
+
+        uint _length = shell.reserves.length;
+
+        int128[] memory oBals_ = new int128[](_length);
+        int128[] memory nBals_ = new int128[](_length);
+        Loihi.Assimilator[] memory _reserves = shell.reserves;
+
+        for (uint i = 0; i < _length; i++) {
+
+            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(_reserves[i].addr);
+            else {
+
+                int128 _bal;
+                ( amt_, _bal ) = Assimilators.outputRawAndGetBalance(_assim, _recipient, _amt);
+
+                oBals_[i] = _bal - amt_;
+                nBals_[i] = _bal;
+
+            }
+
+            oGLiq_ += oBals_[i];
+            nGLiq_ += nBals_[i];
+
+        }
+
+        nGLiq_ = nGLiq_.sub(amt_);
+        nBals_[_outputIndex] = ABDKMath64x64.sub(nBals_[_outputIndex], amt_);
+
+        return ( amt_, oGLiq_, nGLiq_, oBals_, nBals_ );
+
+    }
+
+    function viewOriginSwapData (
+        Loihi.Shell storage shell,
+        uint _inputIx,
+        uint _outputIndex,
+        uint _amt,
+        address _assim
+    ) private view returns (
+        int128 amt_,
+        int128 oGLiq_,
+        int128 nGLiq_,
+        int128[] memory,
+        int128[] memory
+    ) {
+
+        uint _length = shell.reserves.length;
+        int128[] memory nBals_ = new int128[](_length);
+        int128[] memory oBals_ = new int128[](_length);
+
+        for (uint i = 0; i < _length; i++) {
+
+            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            else {
+
+                int128 _bal;
+                ( amt_, _bal ) = Assimilators.viewNumeraireAmountAndBalance(_assim, _amt);
+
+                oBals_[i] = _bal;
+                nBals_[i] = _bal.add(amt_);
+
+            }
+
+            oGLiq_ += oBals_[i];
+            nGLiq_ += nBals_[i];
+
+        }
+
+        nGLiq_ = nGLiq_.sub(amt_);
+        nBals_[_outputIndex] = ABDKMath64x64.sub(nBals_[_outputIndex], amt_);
+
+
+        return ( amt_, oGLiq_, nGLiq_, nBals_, oBals_ );
+
+    }
+
+    function viewTargetSwapData (
+        Loihi.Shell storage shell,
+        uint _inputIx,
+        uint _outputIndex,
+        uint _amt,
+        address _assim
+    ) private view returns (
+        int128 amt_,
+        int128 oGLiq_,
+        int128 nGLiq_,
+        int128[] memory,
+        int128[] memory
+    ) {
+
+        uint _length = shell.reserves.length;
+        int128[] memory nBals_ = new int128[](_length);
+        int128[] memory oBals_ = new int128[](_length);
+
+        for (uint i = 0; i < _length; i++) {
+
+            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            else {
+
+                int128 _bal;
+                ( amt_, _bal ) = Assimilators.viewNumeraireAmountAndBalance(_assim, _amt);
+                amt_ = amt_.neg();
+
+                oBals_[i] = _bal;
+                nBals_[i] = _bal.add(amt_);
+
+            }
+
+            oGLiq_ += oBals_[i];
+            nGLiq_ += nBals_[i];
+
+        }
+
+        nGLiq_ = nGLiq_.sub(amt_);
+        nBals_[_outputIndex] = ABDKMath64x64.sub(nBals_[_outputIndex], amt_);
+
+
+        return ( amt_, oGLiq_, nGLiq_, nBals_, oBals_ );
 
     }
 
