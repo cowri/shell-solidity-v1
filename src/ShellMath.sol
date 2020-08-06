@@ -37,7 +37,7 @@ library ShellMath {
         int128 _beta,
         int128 _delta,
         int128[] memory _weights
-    ) internal pure returns (int128 psi_) {
+    ) external pure returns (int128 psi_) {
 
         for (uint i = 0; i < _weights.length; i++) {
             int128 _ideal = _gLiq.us_mul(_weights[i]);
@@ -97,11 +97,11 @@ library ShellMath {
         int128 _nGLiq,
         int128[] memory _oBals,
         int128[] memory _nBals,
-        int128 _lAmt,
+        int128 _inputAmt,
         uint _outputIndex
-    ) internal view returns (int128 rAmt_ , int128 psi_) {
+    ) external view returns (int128 rAmt_ , int128 psi_) {
 
-        rAmt_ = - _lAmt;
+        rAmt_ = - _inputAmt;
 
         int128 _lambda = shell.lambda;
         int128 _omega = shell.omega;
@@ -114,11 +114,11 @@ library ShellMath {
             psi_ = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
 
             if (( rAmt_ = _omega < psi_
-                    ? - ( _lAmt + _omega - psi_ )
-                    : - ( _lAmt + _lambda.us_mul(_omega - psi_))
+                    ? - ( _inputAmt + _omega - psi_ )
+                    : - ( _inputAmt + _lambda.us_mul(_omega - psi_))
                 ) / 1e13 == rAmt_ / 1e13 ) {
 
-                _nGLiq = _oGLiq + _lAmt + rAmt_;
+                _nGLiq = _oGLiq + _inputAmt + rAmt_;
 
                 _nBals[_outputIndex] = _oBals[_outputIndex] + rAmt_;
 
@@ -130,7 +130,7 @@ library ShellMath {
 
             } else {
 
-                _nGLiq = _oGLiq + _lAmt + rAmt_;
+                _nGLiq = _oGLiq + _inputAmt + rAmt_;
 
                 _nBals[_outputIndex] = _oBals[_outputIndex].add(rAmt_);
 
@@ -150,7 +150,7 @@ library ShellMath {
         int128 _nGLiq,
         int128[] memory _oBals,
         int128[] memory _nBals
-    ) internal view returns (int128 shells_, int128 psi_) {
+    ) external view returns (int128 shells_, int128 psi_) {
 
         enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, shell.weights);
 
@@ -190,7 +190,7 @@ library ShellMath {
         int128[] memory _oBals,
         int128[] memory _nBals,
         int128[] memory _weights
-    ) internal view {
+    ) external view {
 
         uint256 _length = _nBals.length;
         int128 _alpha = shell.alpha;
