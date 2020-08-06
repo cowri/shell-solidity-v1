@@ -37,7 +37,7 @@ library ShellMath {
         int128 _beta,
         int128 _delta,
         int128[] memory _weights
-    ) external pure returns (int128 psi_) {
+    ) internal pure returns (int128 psi_) {
 
         for (uint i = 0; i < _weights.length; i++) {
             int128 _ideal = _gLiq.us_mul(_weights[i]);
@@ -99,7 +99,7 @@ library ShellMath {
         int128[] memory _nBals,
         int128 _inputAmt,
         uint _outputIndex
-    ) external view returns (int128 rAmt_ , int128 psi_) {
+    ) internal view returns (int128 rAmt_ , int128 psi_) {
 
         rAmt_ = - _inputAmt;
 
@@ -142,15 +142,13 @@ library ShellMath {
 
     }
 
-    event log_int(bytes32, int);
-
     function calculateLiquidityMembrane (
         Loihi.Shell storage shell,
         int128 _oGLiq,
         int128 _nGLiq,
         int128[] memory _oBals,
         int128[] memory _nBals
-    ) external view returns (int128 shells_, int128 psi_) {
+    ) internal view returns (int128 shells_, int128 psi_) {
 
         enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, shell.weights);
 
@@ -190,7 +188,7 @@ library ShellMath {
         int128[] memory _oBals,
         int128[] memory _nBals,
         int128[] memory _weights
-    ) external view {
+    ) private view {
 
         uint256 _length = _nBals.length;
         int128 _alpha = shell.alpha;

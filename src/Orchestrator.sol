@@ -28,7 +28,7 @@ library Orchestrator {
 
     using Assimilators for address;
 
-    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
+    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda, uint256 omega);
 
     event AssetIncluded(address indexed numeraire, address indexed reserve, uint weight);
 
@@ -38,20 +38,41 @@ library Orchestrator {
         Loihi.Shell storage shell,
         uint256 _alpha,
         uint256 _beta,
-        uint256 _deltaDerivative,
+        uint256 _feeAtHalt,
         uint256 _epsilon,
-        uint256 _lambda
-    ) external returns (uint256 max_) {
+        uint256 _lambda,
+        uint256[] memory _weights
+    ) internal returns (uint256 max_) {
 
         require(_alpha < 1e18 && _alpha > 0, "Shell/parameter-invalid-alpha");
 
         require(_beta <= _alpha && _beta >= 0, "Shell/parameter-invalid-beta");
 
-        require(_deltaDerivative <= .5e18, "Shell/parameter-invalid-max");
+        require(_feeAtHalt <= .5e18, "Shell/parameter-invalid-max");
 
         require(_epsilon < 1e16 && _epsilon >= 0, "Shell/parameter-invalid-epsilon");
 
         require(shell.lambda <= 1e18 && _lambda >= 0, "Shell/parameter-invalid-lambda");
+
+        shell.alpha = _alpha.divu(1e18);
+
+        shell.beta = _beta.divu(1e18);
+
+        shell.delta = _feeAtHalt.divu(1e18).div(uint(2).fromUInt().mul(shell.alpha.sub(shell.beta)));
+
+        shell.epsilon = _epsilon.divu(1e18);
+
+        shell.lambda = _lambda.divu(1e18);
+
+        shell.omega = resetOmega(shell);
+
+        emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda, shell.omega.mulu(1e18));
+
+        max_ = _feeAtHalt;
+
+    }
+
+    function resetOmega (Loihi.Shell storage shell) private returns (int128 omega_) {
 
         int128 _gLiq;
 
@@ -67,27 +88,34 @@ library Orchestrator {
 
         }
 
-        shell.alpha = _alpha.divu(1e18);
+        omega_ = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
 
-        shell.beta = _beta.divu(1e18);
+        require(shell.omega >= omega_, "Shell/paramter-invalid-psi");
 
-        shell.delta = _deltaDerivative.divu(1e18).div(uint(2).fromUInt().mul(shell.alpha.sub(shell.beta)));
+    }
 
-        shell.epsilon = _epsilon.divu(1e18);
+    function setWeights (
+        Loihi.Shell storage shell,
+        uint[] memory _weights
+    ) internal {
 
-        if (shell.epsilon.mulu(1e18) < _epsilon) shell.epsilon = shell.epsilon.add(uint(1).divu(1e18));
+        if (_weights.length == 0) return;
 
-        shell.lambda = _lambda.divu(1e18);
+        require(_weights.length == shell.weights.length, "Shell/parameters-invalid-number-of-weights");
 
-        int128 _psi = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
+        uint sum;
 
-        require(shell.omega >= _psi, "Shell/paramter-invalid-psi");
+        for (uint i = 0; i < _weights.length; i++) {
 
-        shell.omega = _psi;
+            require(_weights[i] > 0 && _weights[i] <= 1e18, "Shell/parameters-invalid-weight");
 
-        emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda);
+            shell.weights[i] = _weights[i].divu(1e18);
 
-        max_ = _deltaDerivative;
+            sum += _weights[i];
+
+        }
+
+        require(sum == 1e18, "Shell/parameters-invalid-weights");
 
     }
 
@@ -99,7 +127,7 @@ library Orchestrator {
         address _reserve,
         address _reserveAssim,
         uint256 _weight
-    ) external {
+    ) internal {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
 
@@ -151,7 +179,7 @@ library Orchestrator {
         address _numeraire,
         address _reserve,
         address _assimilator
-    ) external {
+    ) internal {
 
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
 
@@ -171,7 +199,7 @@ library Orchestrator {
 
     function prime (
         Loihi.Shell storage shell
-    ) external {
+    ) internal {
 
         uint _length = shell.reserves.length;
 
@@ -189,7 +217,7 @@ library Orchestrator {
 
     }
 
-    function viewShell (Loihi.Shell storage shell) external view returns (
+    function viewShell (Loihi.Shell storage shell) internal view returns (
         uint alpha_,
         uint beta_,
         uint delta_,

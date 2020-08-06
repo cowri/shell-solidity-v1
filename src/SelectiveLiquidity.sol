@@ -30,10 +30,10 @@ library SelectiveLiquidity {
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (
         Loihi.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts,
+        address[] memory _derivatives,
+        uint[] memory _amounts,
         uint _minShells
-    ) external returns (
+    ) internal returns (
         uint shells_
     ) {
 
@@ -60,9 +60,9 @@ library SelectiveLiquidity {
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function viewSelectiveDeposit (
         Loihi.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts
-    ) external view returns (
+        address[] memory _derivatives,
+        uint[] memory _amounts
+    ) internal view returns (
         uint shells_
     ) {
 
@@ -85,10 +85,10 @@ library SelectiveLiquidity {
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (
         Loihi.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts,
+        address[] memory _derivatives,
+        uint[] memory _amounts,
         uint _maxShells
-    ) external returns (
+    ) internal returns (
         uint256 shells_
     ) {
 
@@ -118,9 +118,9 @@ library SelectiveLiquidity {
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function viewSelectiveWithdraw (
         Loihi.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts
-    ) external view returns (
+        address[] memory _derivatives,
+        uint[] memory _amounts
+    ) internal view returns (
         uint shells_
     ) {
 
@@ -313,7 +313,7 @@ library SelectiveLiquidity {
         Loihi.Shell storage shell,
         int128[] memory oBals_,
         int128[] memory nBals_
-    ) external view returns (
+    ) internal view returns (
         int128 oGLiq_,
         int128 nGLiq_,
         int128[] memory,
