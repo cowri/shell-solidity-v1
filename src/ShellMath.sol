@@ -25,6 +25,7 @@ library ShellMath {
 
     int128 constant ONE = 0x10000000000000000;
     int128 constant MAX = 0x4000000000000000; // .25 in laments terms
+    int128 constant ONE_WEI = 0x12;
 
     using ABDKMath64x64 for int128;
     using UnsafeMath64x64 for int128;
@@ -97,7 +98,7 @@ library ShellMath {
         int128[] memory _oBals,
         int128[] memory _nBals,
         int128 _lAmt,
-        uint _rIx
+        uint _outputIndex
     ) internal view returns (int128 rAmt_ , int128 psi_) {
 
         rAmt_ = - _lAmt;
@@ -119,9 +120,11 @@ library ShellMath {
 
                 _nGLiq = _oGLiq + _lAmt + rAmt_;
 
-                _nBals[_rIx] = _oBals[_rIx] + rAmt_;
+                _nBals[_outputIndex] = _oBals[_outputIndex] + rAmt_;
 
                 enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, _weights);
+
+                require(ABDKMath64x64.sub(_oGLiq, _omega) <= ABDKMath64x64.sub(_nGLiq, psi_), "Shell/swap-invariant-violation");
 
                 return ( rAmt_, psi_ );
 
@@ -129,7 +132,7 @@ library ShellMath {
 
                 _nGLiq = _oGLiq + _lAmt + rAmt_;
 
-                _nBals[_rIx] = _oBals[_rIx].add(rAmt_);
+                _nBals[_outputIndex] = _oBals[_outputIndex].add(rAmt_);
 
             }
 
@@ -138,6 +141,8 @@ library ShellMath {
         revert("Shell/swap-convergence-failed");
 
     }
+
+    event log_int(bytes32, int);
 
     function calculateLiquidityMembrane (
         Loihi.Shell storage shell,
@@ -160,7 +165,21 @@ library ShellMath {
         else if (_feeDiff >= 0) shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
         else shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff)).div(_oUtil);
 
-        if (shell.totalSupply != 0) shells_ = shells_.mul(shell.totalSupply.divu(1e18));
+        int128 _shellsPrev = shell.totalSupply.divu(1e18);
+
+        if (shell.totalSupply != 0) {
+
+            shells_ = shells_.mul(_shellsPrev);
+
+            int128 _prevUtilPerShell = _oGLiq.sub(_omega).div(_shellsPrev);
+
+            int128 _nextUtilPerShell = _nGLiq.sub(psi_).div(_shellsPrev.add(shells_));
+
+            _nextUtilPerShell += ONE_WEI;
+
+            require(_prevUtilPerShell <= _nextUtilPerShell, "Shell/invariant-violation");
+
+        }
 
     }
 
