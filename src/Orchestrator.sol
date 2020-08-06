@@ -26,13 +26,15 @@ library Orchestrator {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    using Assimilators for address;
+    int128 constant ONE_WEI = 0x12;
 
     event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
 
     event AssetIncluded(address indexed numeraire, address indexed reserve, uint weight);
 
     event AssimilatorIncluded(address indexed derivative, address indexed numeraire, address indexed reserve, address assimilator);
+
+    event log_int(bytes32, int);
 
     function setParams (
         Loihi.Shell storage shell,
@@ -53,6 +55,34 @@ library Orchestrator {
 
         require(shell.lambda <= 1e18 && _lambda >= 0, "Shell/parameter-invalid-lambda");
 
+        shell.alpha = to64x64(_alpha);
+
+        shell.beta = to64x64(_beta);
+
+        shell.delta = _feeAtHalt.divu(1e18).div(uint(2).fromUInt().mul(shell.alpha.sub(shell.beta))) + ONE_WEI;
+
+        shell.epsilon = to64x64(_epsilon);
+
+        shell.lambda = to64x64(_lambda);
+
+        shell.omega = resetOmega(shell);
+
+        emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda, shell.omega.mulu(1e18));
+
+        max_ = _feeAtHalt;
+
+    }
+
+    function to64x64 (uint _number) private pure returns (int128 number_) {
+
+        number_ = _number.divu(1e18);
+
+        if (number_.mulu(1e18) != _number) number_ += ONE_WEI;
+
+    }
+
+    function resetOmega (Loihi.Shell storage shell) private returns (int128 omega_) {
+
         int128 _gLiq;
 
         int128[] memory _bals = new int128[](shell.reserves.length);
@@ -67,27 +97,7 @@ library Orchestrator {
 
         }
 
-        shell.alpha = _alpha.divu(1e18);
-
-        shell.beta = _beta.divu(1e18);
-
-        shell.delta = _deltaDerivative.divu(1e18).div(uint(2).fromUInt().mul(shell.alpha.sub(shell.beta)));
-
-        shell.epsilon = _epsilon.divu(1e18);
-
-        if (shell.epsilon.mulu(1e18) < _epsilon) shell.epsilon = shell.epsilon.add(uint(1).divu(1e18));
-
-        shell.lambda = _lambda.divu(1e18);
-
-        int128 _psi = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
-
-        require(shell.omega >= _psi, "Shell/paramter-invalid-psi");
-
-        shell.omega = _psi;
-
-        emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda);
-
-        max_ = _deltaDerivative;
+        omega_ = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
 
     }
 
@@ -180,9 +190,13 @@ library Orchestrator {
         int128 _oGLiq;
 
         for (uint i = 0; i < _length; i++) {
-            int128 _bal = shell.reserves[i].addr.viewNumeraireBalance();
+
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+
             _oGLiq += _bal;
+
             _oBals[i] = _bal;
+
         }
 
         shell.omega = ShellMath.calculateFee(_oGLiq, _oBals, shell.beta, shell.delta, shell.weights);
