@@ -56,29 +56,21 @@ library Orchestrator {
 
         require(shell.lambda <= 1e18 && _lambda >= 0, "Shell/parameter-invalid-lambda");
 
-        shell.alpha = to64x64(_alpha);
+        shell.alpha = (_alpha + 1).divu(1e18);
 
-        shell.beta = to64x64(_beta);
+        shell.beta = (_beta + 1).divu(1e18);
 
-        shell.delta = _feeAtHalt.divu(1e18).div(uint(2).fromUInt().mul(shell.alpha.sub(shell.beta))) + ONE_WEI;
+        shell.delta = ( _feeAtHalt ).divu(1e18).div(uint(2).fromUInt().mul(shell.alpha.sub(shell.beta))) + ONE_WEI;
 
-        shell.epsilon = to64x64(_epsilon);
+        shell.epsilon = (_epsilon + 1).divu(1e18);
 
-        shell.lambda = to64x64(_lambda);
+        shell.lambda = (_lambda + 1).divu(1e18);
 
         shell.omega = resetOmega(shell);
 
         emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda, shell.omega.mulu(1e18));
 
         max_ = _feeAtHalt;
-
-    }
-
-    function to64x64 (uint _number) private pure returns (int128 number_) {
-
-        number_ = _number.divu(1e18);
-
-        if (number_.mulu(1e18) != _number) number_ += ONE_WEI;
 
     }
 
