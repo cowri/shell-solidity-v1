@@ -158,20 +158,37 @@ library ShellMath {
         int128 _feeDiff = psi_.sub(_omega);
         int128 _liqDiff = _nGLiq.sub(_oGLiq);
         int128 _oUtil = _oGLiq.sub(_omega);
+        uint _totalSupply = shell.totalSupply;
 
-        if (shell.totalSupply == 0) shells_ = _nGLiq.sub(psi_);
-        else if (_feeDiff >= 0) shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
-        else shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff)).div(_oUtil);
+        if (_totalSupply == 0) {
 
-        int128 _shellsPrev = shell.totalSupply.divu(1e18);
+            shells_ = _nGLiq.sub(psi_);
+
+        } else if (_feeDiff >= 0) {
+
+            shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
+
+        } else {
+            
+            shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff));
+            
+            shells_ = shells_.div(_oUtil);
+
+        }
+
+        int128 _shellsPrev = _totalSupply.divu(1e18);
 
         if (shell.totalSupply != 0) {
 
             shells_ = shells_.mul(_shellsPrev);
 
-            int128 _prevUtilPerShell = _oGLiq.sub(_omega).div(_shellsPrev);
+            int128 _prevUtilPerShell = _oGLiq.sub(_omega);
+            
+            _prevUtilPerShell = _prevUtilPerShell.div(_shellsPrev);
 
-            int128 _nextUtilPerShell = _nGLiq.sub(psi_).div(_shellsPrev.add(shells_));
+            int128 _nextUtilPerShell = _nGLiq.sub(psi_);
+            
+            _nextUtilPerShell = _nextUtilPerShell.div(_shellsPrev.add(shells_));
 
             _nextUtilPerShell += ONE_WEI;
 
