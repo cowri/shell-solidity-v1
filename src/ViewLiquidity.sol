@@ -20,11 +20,11 @@ import "./Assimilators.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-library Liquidity {
+library ViewLiquidity {
 
     using ABDKMath64x64 for int128;
 
-    function liquidity (
+    function viewLiquidity (
         Loihi.Shell storage shell
     ) external view returns (
         uint total_,

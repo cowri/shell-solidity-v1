@@ -19,8 +19,6 @@ import "./Assimilators.sol";
 
 import "./Orchestrator.sol";
 
-import "./Liquidity.sol";
-
 import "./PartitionedLiquidity.sol";
 
 import "./ProportionalLiquidity.sol";
@@ -30,6 +28,8 @@ import "./SelectiveLiquidity.sol";
 import "./Shells.sol";
 
 import "./Swaps.sol";
+
+import "./ViewLiquidity.sol";
 
 contract Loihi {
 
@@ -528,7 +528,7 @@ contract Loihi {
         uint[] memory individual_
     ) {
 
-        return Liquidity.liquidity(shell);
+        return ViewLiquidity.viewLiquidity(shell);
 
     }
 
