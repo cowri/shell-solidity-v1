@@ -27,7 +27,7 @@ library PartitionedLiquidity {
 
         Loihi.PartitionTicket storage totalSupplyTicket = partitionTickets[address(this)];
 
-        totalSupplyTicket.active = true;
+        totalSupplyTicket.initialized = true;
 
         for (uint i = 0; i < _length; i++) totalSupplyTicket.claims.push(shell.totalSupply);
 
@@ -45,7 +45,7 @@ library PartitionedLiquidity {
 
         Loihi.PartitionTicket storage ticket = partitionTickets[_addr];
 
-        if (ticket.active) return ticket.claims;
+        if (ticket.initialized) return ticket.claims;
 
         uint _length = shell.reserves.length;
         uint[] memory claims_ = new uint[](_length);
@@ -72,10 +72,10 @@ library PartitionedLiquidity {
         Loihi.PartitionTicket storage totalSuppliesTicket = partitionTickets[address(this)];
         Loihi.PartitionTicket storage ticket = partitionTickets[msg.sender];
 
-        if (!ticket.active) {
+        if (!ticket.initialized) {
 
             for (uint i = 0; i < _length; i++) ticket.claims.push(_balance);
-            ticket.active = true;
+            ticket.initialized = true;
 
         }
 

@@ -142,8 +142,6 @@ library ShellMath {
 
     }
 
-    event log_int(bytes32, int);
-
     function calculateLiquidityMembrane (
         Loihi.Shell storage shell,
         int128 _oGLiq,

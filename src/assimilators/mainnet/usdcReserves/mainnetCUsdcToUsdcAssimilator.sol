@@ -110,8 +110,6 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
 
     }
 
-    event log_uint(bytes32, uint256);
-
     // takes raw amount
     // transfers that amount to destination
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {

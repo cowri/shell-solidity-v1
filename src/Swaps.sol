@@ -70,8 +70,6 @@ library Swaps {
 
     }
 
-    event log_uint(bytes32, uint);
-
     // / @author james foley http://github.com/realisation
     // / @notice view how much of the target currency the origin currency will provide
     // / @param _origin the address of the origin
