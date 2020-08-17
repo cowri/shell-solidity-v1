@@ -63,7 +63,7 @@ contract Loihi {
 
     struct PartitionTicket {
         uint[] claims;
-        bool active;
+        bool initialized;
     }
 
     mapping (address => PartitionTicket) public partitionTickets;
