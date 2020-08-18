@@ -99,9 +99,9 @@ library ShellMath {
         int128[] memory _nBals,
         int128 _inputAmt,
         uint _outputIndex
-    ) internal view returns (int128 rAmt_ , int128 psi_) {
+    ) internal view returns (int128 outputAmt_ , int128 psi_) {
 
-        rAmt_ = - _inputAmt;
+        outputAmt_ = - _inputAmt;
 
         int128 _lambda = shell.lambda;
         int128 _omega = shell.omega;
@@ -113,26 +113,26 @@ library ShellMath {
 
             psi_ = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
 
-            if (( rAmt_ = _omega < psi_
+            if (( outputAmt_ = _omega < psi_
                     ? - ( _inputAmt + _omega - psi_ )
                     : - ( _inputAmt + _lambda.us_mul(_omega - psi_))
-                ) / 1e13 == rAmt_ / 1e13 ) {
+                ) / 1e13 == outputAmt_ / 1e13 ) {
 
-                _nGLiq = _oGLiq + _inputAmt + rAmt_;
+                _nGLiq = _oGLiq + _inputAmt + outputAmt_;
 
-                _nBals[_outputIndex] = _oBals[_outputIndex] + rAmt_;
+                _nBals[_outputIndex] = _oBals[_outputIndex] + outputAmt_;
 
                 enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, _weights);
 
                 require(ABDKMath64x64.sub(_oGLiq, _omega) <= ABDKMath64x64.sub(_nGLiq, psi_), "Shell/swap-invariant-violation");
 
-                return ( rAmt_, psi_ );
+                return ( outputAmt_, psi_ );
 
             } else {
 
-                _nGLiq = _oGLiq + _inputAmt + rAmt_;
+                _nGLiq = _oGLiq + _inputAmt + outputAmt_;
 
-                _nBals[_outputIndex] = _oBals[_outputIndex].add(rAmt_);
+                _nBals[_outputIndex] = _oBals[_outputIndex].add(outputAmt_);
 
             }
 
