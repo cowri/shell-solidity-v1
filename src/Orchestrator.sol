@@ -28,7 +28,7 @@ library Orchestrator {
 
     int128 constant ONE_WEI = 0x12;
 
-    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda, uint26 omega);
+    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda, uint256 omega);
 
     event AssetIncluded(address indexed numeraire, address indexed reserve, uint weight);
 
