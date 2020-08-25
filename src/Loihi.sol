@@ -448,6 +448,8 @@ contract Loihi {
 
     function partition () external onlyOwner {
 
+        require(frozen, "Shell/must-be-frozen");
+
         PartitionedLiquidity.partition(shell, partitionTickets);
 
         partitioned = true;

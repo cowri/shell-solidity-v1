@@ -38,7 +38,7 @@ library Orchestrator {
         Loihi.Shell storage shell,
         uint256 _alpha,
         uint256 _beta,
-        uint256 _deltaDerivative,
+        uint256 _feeAtHalt,
         uint256 _epsilon,
         uint256 _lambda
     ) external returns (uint256 max_) {
@@ -47,7 +47,7 @@ library Orchestrator {
 
         require(_beta <= _alpha && _beta >= 0, "Shell/parameter-invalid-beta");
 
-        require(_deltaDerivative <= .5e18, "Shell/parameter-invalid-max");
+        require(_feeAtHalt <= .5e18, "Shell/parameter-invalid-max");
 
         require(_epsilon < 1e16 && _epsilon >= 0, "Shell/parameter-invalid-epsilon");
 

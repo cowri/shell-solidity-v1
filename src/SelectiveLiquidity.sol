@@ -313,7 +313,7 @@ library SelectiveLiquidity {
         Loihi.Shell storage shell,
         int128[] memory oBals_,
         int128[] memory nBals_
-    ) external view returns (
+    ) private view returns (
         int128 oGLiq_,
         int128 nGLiq_,
         int128[] memory,
