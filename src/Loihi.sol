@@ -534,10 +534,4 @@ contract Loihi {
 
     }
 
-    function TEST_setTestHalts (bool toTestOrNotToTest) external {
-
-        shell.testHalts = toTestOrNotToTest;
-
-    }
-
 }

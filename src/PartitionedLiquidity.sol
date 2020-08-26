@@ -87,6 +87,10 @@ library PartitionedLiquidity {
 
             Loihi.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
+            require(totalSuppliesTicket.claims[_assim.ix] >= _withdrawals[i], "Shell/burn-exceeds-total-supply");
+            
+            require(ticket.claims[_assim.ix] >= _withdrawals[i], "Shell/insufficient-balance");
+
             require(_assim.addr != address(0), "Shell/unsupported-asset");
 
             int128 _reserveBalance = Assimilators.viewNumeraireBalance(_assim.addr);
@@ -94,15 +98,9 @@ library PartitionedLiquidity {
             int128 _multiplier = _withdrawals[i].divu(1e18)
                 .div(totalSuppliesTicket.claims[_assim.ix].divu(1e18));
 
-            totalSuppliesTicket.claims[_assim.ix] = burn_sub(
-                totalSuppliesTicket.claims[_assim.ix],
-                _withdrawals[i]
-            );
+            totalSuppliesTicket.claims[_assim.ix] = totalSuppliesTicket.claims[_assim.ix] - _withdrawals[i];
 
-            ticket.claims[_assim.ix] = burn_sub(
-                ticket.claims[_assim.ix],
-                _withdrawals[i]
-            );
+            ticket.claims[_assim.ix] = ticket.claims[_assim.ix] - _withdrawals[i];
 
             uint _withdrawal = Assimilators.outputNumeraire(
                 _assim.addr,
@@ -118,10 +116,6 @@ library PartitionedLiquidity {
 
         return withdrawals_;
 
-    }
-
-    function burn_sub(uint x, uint y) private pure returns (uint z) {
-        require((z = x - y) <= x, "Shell/burn-underflow");
     }
 
 }
