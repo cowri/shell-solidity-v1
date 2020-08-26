@@ -63,7 +63,7 @@ library Orchestrator {
 
         shell.lambda = (_lambda + 1).divu(1e18);
 
-        shell.omega = resetOmega(shell);
+        shell.omega = getNewOmega(shell);
 
         emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda, shell.omega.mulu(1e18));
 
@@ -71,7 +71,7 @@ library Orchestrator {
 
     }
 
-    function resetOmega (Loihi.Shell storage shell) private returns (int128 omega_) {
+    function getNewOmega (Loihi.Shell storage shell) private view returns (int128 omega_) {
 
         int128 _gLiq;
 
