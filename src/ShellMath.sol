@@ -178,7 +178,7 @@ library ShellMath {
 
         int128 _shellsPrev = _totalSupply.divu(1e18);
 
-        if (shell.totalSupply != 0) {
+        if (_totalSupply != 0) {
 
             shells_ = shells_.mul(_shellsPrev);
 
