@@ -22,12 +22,12 @@ contract PartitionedLiquidityTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        l.freeze(true);
+        l.setFrozen(true);
 
         l.partition();
 
         ( success_, ) = address(l).call(abi.encodeWithSignature(
-            "partxxitionedWithdraw(address[],uint256[])",
+            "partitionedWithdraw(address[],uint256[])",
             address(dai),
             301e18
         ));
@@ -38,7 +38,7 @@ contract PartitionedLiquidityTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        l.freeze(true);
+        l.setFrozen(true);
 
         l.partition();
 
@@ -57,7 +57,7 @@ contract PartitionedLiquidityTemplate is Setup {
             address(susd), 30e18
         );
 
-        l.freeze(true);
+        l.setFrozen(true);
 
         l.partition();
 

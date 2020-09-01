@@ -77,28 +77,32 @@ contract LoihiSetup is StorageSetup {
 
     function includeAssimilatorsSetOne (Loihi _loihi) public {
 
-        _loihi.includeAssimilator(address(dai), address(chai), address(chaiAssimilator));
-        _loihi.includeAssimilator(address(dai), address(cdai), address(cdaiAssimilator));
+        _loihi.includeAssimilator(address(chai), address(dai), address(dai), address(chaiAssimilator));
 
-        _loihi.includeAssimilator(address(usdc), address(cusdc), address(cusdcAssimilator));
+        _loihi.includeAssimilator(address(cdai), address(dai), address(dai), address(cdaiAssimilator));
 
-        _loihi.includeAssimilator(address(usdt), address(ausdt), address(ausdtAssimilator));
+        _loihi.includeAssimilator(address(cusdc), address(usdc), address(usdc), address(cusdcAssimilator));
 
-        _loihi.includeAssimilator(address(susd), address(asusd), address(asusdAssimilator));
+        _loihi.includeAssimilator(address(ausdt), address(usdt), address(usdt), address(ausdtAssimilator));
+
+        _loihi.includeAssimilator(address(asusd), address(susd), address(susd), address(asusdAssimilator));
 
     }
 
     function includeAssimilatorsSetTwo (Loihi _loihi) public {
 
-        _loihi.includeAssimilator(address(dai), address(chai), address(chaiAssimilator));
+        _loihi.includeAssimilator(address(chai), address(dai), address(cdai), address(chaiAssimilator));
 
     }
 
     function includeAssetsSetOne (Loihi _loihi) public {
 
         _loihi.includeAsset(address(dai), address(daiAssimilator), address(dai), address(daiAssimilator), .3e18);
+
         _loihi.includeAsset(address(usdc), address(usdcAssimilator), address(usdc), address(usdcAssimilator), .3e18);
+
         _loihi.includeAsset(address(usdt), address(usdtAssimilator), address(usdt), address(usdtAssimilator), .3e18);
+
         _loihi.includeAsset(address(susd), address(susdAssimilator), address(susd), address(susdAssimilator), .1e18);
 
     }
@@ -106,8 +110,11 @@ contract LoihiSetup is StorageSetup {
     function includeAssetsSetTwo (Loihi _loihi) public {
 
         _loihi.includeAsset(address(dai), address(daiAssimilator), address(cdai), address(cdaiAssimilator), .3e18);
+
         _loihi.includeAsset(address(usdc), address(usdcAssimilator), address(cusdc), address(cusdcAssimilator), .3e18);
+
         _loihi.includeAsset(address(usdt), address(usdtAssimilator), address(ausdt), address(ausdtAssimilator), .3e18);
+
         _loihi.includeAsset(address(susd), address(susdAssimilator), address(asusd), address(asusdAssimilator), .1e18);
 
     }
@@ -115,7 +122,9 @@ contract LoihiSetup is StorageSetup {
     function includeAssetsSetThree (Loihi _loihi) public {
 
         _loihi.includeAsset(address(dai), address(daiAssimilator), address(dai), address(daiAssimilator), 333333333333333333);
+
         _loihi.includeAsset(address(usdc), address(usdcAssimilator), address(usdc), address(usdcAssimilator), 333333333333333333);
+
         _loihi.includeAsset(address(usdt), address(usdtAssimilator), address(usdt), address(usdtAssimilator), 333333333333333333);
 
     }
@@ -123,7 +132,9 @@ contract LoihiSetup is StorageSetup {
     function includeAssetsSetFour (Loihi _loihi) public {
 
         _loihi.includeAsset(address(dai), address(daiAssimilator), address(cdai), address(cdaiAssimilator), 333333333333333333);
+
         _loihi.includeAsset(address(usdc), address(usdcAssimilator), address(cusdc), address(cusdcAssimilator), 333333333333333333);
+       
         _loihi.includeAsset(address(usdt), address(usdtAssimilator), address(ausdt), address(ausdtAssimilator), 333333333333333333);
 
     }
@@ -156,8 +167,6 @@ contract LoihiSetup is StorageSetup {
         targets[2] = address(susd); spenders[2] = address(asusd);
         targets[3] = address(usdc); spenders[3] = address(cusdc);
         targets[4] = address(usdt); spenders[4] = address(ausdt);
-
-        emit log("inter approve");
 
         for (uint i = 0; i < targets.length; i++) {
 

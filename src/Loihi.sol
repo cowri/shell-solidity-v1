@@ -31,6 +31,13 @@ import "./Swaps.sol";
 
 import "./ViewLiquidity.sol";
 
+import "./interfaces/IERC20.sol";
+import "./interfaces/IERC20NoBool.sol";
+import "./interfaces/IAToken.sol";
+import "./interfaces/ICToken.sol";
+import "./interfaces/IChai.sol";
+import "./interfaces/IPot.sol";
+
 contract Loihi {
 
     string  public constant name = "Shells";
@@ -538,6 +545,33 @@ contract Loihi {
     function TEST_setTestHalts (bool toTestOrNotToTest) external {
 
         shell.testHalts = toTestOrNotToTest;
+
+    }
+
+    IERC20 dai; ICToken cdai; IChai chai; IPot pot;
+    IERC20 usdc; ICToken cusdc;
+    IERC20NoBool usdt; IAToken ausdt;
+    IERC20 susd; IAToken asusd;
+
+    function TEST_includeAssimilatorState (
+        IERC20 _dai, ICToken _cdai, IChai _chai, IPot _pot, 
+        IERC20 _usdc, ICToken _cusdc, 
+        IERC20NoBool _usdt, IAToken _ausdt, 
+        IERC20 _susd, IAToken _asusd
+    ) public {
+
+        dai = _dai; cdai = _cdai; chai = _chai; pot = _pot;
+        usdc = _usdc; cusdc = _cusdc;
+        usdt = _usdt; ausdt = _ausdt;
+        susd = _susd; asusd = _asusd;
+
+    }
+
+    function TEST_safeApprove(address _token, address _spender, uint256 _value) public onlyOwner {
+
+        (bool success, bytes memory returndata) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
+
+        require(success, "SafeERC20: low-level call failed");
 
     }
 
