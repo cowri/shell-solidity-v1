@@ -20,27 +20,32 @@ import "./Assimilators.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-library Liquidity {
+library ViewLiquidity {
 
     using ABDKMath64x64 for int128;
 
-    function liquidity (Loihi.Shell storage shell) external view returns (uint, uint[] memory) {
+    function viewLiquidity (
+        Loihi.Shell storage shell
+    ) internal view returns (
+        uint total_,
+        uint[] memory individual_
+    ) {
 
         uint _length = shell.reserves.length;
 
-        uint[] memory liquidity_ = new uint[](_length);
-        uint totalLiquidity_;
+        uint[] memory individual_ = new uint[](_length);
+        uint total_;
 
         for (uint i = 0; i < _length; i++) {
 
             uint _liquidity = Assimilators.viewNumeraireBalance(shell.reserves[i].addr).mulu(1e18);
 
-            totalLiquidity_ += _liquidity;
-            liquidity_[i] = _liquidity;
+            total_ += _liquidity;
+            individual_[i] = _liquidity;
 
         }
 
-        return (totalLiquidity_, liquidity_);
+        return (total_, individual_);
 
     }
 

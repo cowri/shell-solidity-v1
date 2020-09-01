@@ -54,6 +54,8 @@ contract KovanDaiToDaiAssimilator is IAssimilator {
 
     }
 
+    event log_int(bytes32, int);
+
     // transfers numeraire amount of dai in, wraps it in cDai, returns raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
@@ -118,6 +120,9 @@ contract KovanDaiToDaiAssimilator is IAssimilator {
         amount_ = _amount.divu(1e18);
 
     }
+
+    event log_addr(bytes32, address);
+    event log_uint(bytes32, uint);
 
     // returns current balance in numeraire
     function viewNumeraireBalance (address _addr) public view returns (int128 balance_) {

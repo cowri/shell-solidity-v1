@@ -139,8 +139,6 @@ contract MainnetChaiToDaiAssimilator is IAssimilator {
 
     }
 
-    event log_uint(bytes32, uint);
-
     // pass it a numeraire amount and get the raw amount
     function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 

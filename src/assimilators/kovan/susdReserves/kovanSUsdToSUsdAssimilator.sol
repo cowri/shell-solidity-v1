@@ -55,7 +55,11 @@ contract KovanSUsdToSUsdAssimilator is IAssimilator {
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
         // truncate stray decimals caused by conversion
+<<<<<<< HEAD
         amount_ = _amount.mulu(1e6) / 1e3 * 1e3;
+=======
+        amount_ = _amount.mulu(1e6);
+>>>>>>> kovan
 
         bool _success = susd.transferFrom(msg.sender, address(this), amount_);
 

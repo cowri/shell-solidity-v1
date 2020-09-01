@@ -11,11 +11,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 pragma solidity ^0.5.0;
+
 import "./Loihi.sol";
 
+import "./Assimilators.sol";
+
+import "abdk-libraries-solidity/ABDKMath64x64.sol";
+
 library Shells {
+
+    using ABDKMath64x64 for int128;
 
     event Approval(address indexed _owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);

@@ -11,6 +11,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+pragma solidity ^0.5.0;
+
 import "./Assimilators.sol";
 
 import "./UnsafeMath64x64.sol";
@@ -19,11 +21,11 @@ import "./Loihi.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-pragma solidity ^0.5.0;
 library ShellMath {
 
     int128 constant ONE = 0x10000000000000000;
     int128 constant MAX = 0x4000000000000000; // .25 in laments terms
+    int128 constant ONE_WEI = 0x12;
 
     using ABDKMath64x64 for int128;
     using UnsafeMath64x64 for int128;
@@ -49,7 +51,7 @@ library ShellMath {
         int128 _ideal,
         int128 _beta,
         int128 _delta
-    ) internal pure returns (int128 fee_) {
+    ) private pure returns (int128 fee_) {
 
         if (_bal < _ideal) {
 
@@ -95,11 +97,11 @@ library ShellMath {
         int128 _nGLiq,
         int128[] memory _oBals,
         int128[] memory _nBals,
-        int128 _lAmt,
-        uint _rIx
-    ) internal view returns (int128 rAmt_ , int128 psi_) {
+        int128 _inputAmt,
+        uint _outputIndex
+    ) internal view returns (int128 outputAmt_ , int128 psi_) {
 
-        rAmt_ = - _lAmt;
+        outputAmt_ = - _inputAmt;
 
         int128 _lambda = shell.lambda;
         int128 _omega = shell.omega;
@@ -111,24 +113,26 @@ library ShellMath {
 
             psi_ = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
 
-            if (( rAmt_ = _omega < psi_
-                    ? - ( _lAmt + _omega - psi_ )
-                    : - ( _lAmt + _lambda.us_mul(_omega - psi_))
-                ) / 1e13 == rAmt_ / 1e13 ) {
+            if (( outputAmt_ = _omega < psi_
+                    ? - ( _inputAmt + _omega - psi_ )
+                    : - ( _inputAmt + _lambda.us_mul(_omega - psi_))
+                ) / 1e13 == outputAmt_ / 1e13 ) {
 
-                _nGLiq = _oGLiq + _lAmt + rAmt_;
+                _nGLiq = _oGLiq + _inputAmt + outputAmt_;
 
-                _nBals[_rIx] = _oBals[_rIx] + rAmt_;
+                _nBals[_outputIndex] = _oBals[_outputIndex] + outputAmt_;
 
                 enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, _weights);
 
-                return ( rAmt_, psi_ );
+                require(ABDKMath64x64.sub(_oGLiq, _omega) <= ABDKMath64x64.sub(_nGLiq, psi_), "Shell/swap-invariant-violation");
+
+                return ( outputAmt_, psi_ );
 
             } else {
 
-                _nGLiq = _oGLiq + _lAmt + rAmt_;
+                _nGLiq = _oGLiq + _inputAmt + outputAmt_;
 
-                _nBals[_rIx] = _oBals[_rIx].add(rAmt_);
+                _nBals[_outputIndex] = _oBals[_outputIndex].add(outputAmt_);
 
             }
 
@@ -154,12 +158,43 @@ library ShellMath {
         int128 _feeDiff = psi_.sub(_omega);
         int128 _liqDiff = _nGLiq.sub(_oGLiq);
         int128 _oUtil = _oGLiq.sub(_omega);
+        uint _totalSupply = shell.totalSupply;
 
-        if (_oGLiq == 0) shells_ = _nGLiq.sub(psi_);
-        else if (_feeDiff >= 0) shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
-        else shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff)).div(_oUtil);
+        if (_totalSupply == 0) {
 
-        if ( shell.totalSupply != 0 ) shells_ = shells_.mul(shell.totalSupply.divu(1e18));
+            shells_ = _nGLiq.sub(psi_);
+
+        } else if (_feeDiff >= 0) {
+
+            shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
+
+        } else {
+            
+            shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff));
+            
+            shells_ = shells_.div(_oUtil);
+
+        }
+
+        int128 _shellsPrev = _totalSupply.divu(1e18);
+
+        if (_totalSupply != 0) {
+
+            shells_ = shells_.mul(_shellsPrev);
+
+            int128 _prevUtilPerShell = _oGLiq.sub(_omega);
+            
+            _prevUtilPerShell = _prevUtilPerShell.div(_shellsPrev);
+
+            int128 _nextUtilPerShell = _nGLiq.sub(psi_);
+            
+            _nextUtilPerShell = _nextUtilPerShell.div(_shellsPrev.add(shells_));
+
+            _nextUtilPerShell += ONE_WEI;
+
+            require(_prevUtilPerShell <= _nextUtilPerShell, "Shell/invariant-violation");
+
+        }
 
     }
 
@@ -170,7 +205,7 @@ library ShellMath {
         int128[] memory _oBals,
         int128[] memory _nBals,
         int128[] memory _weights
-    ) internal view {
+    ) private view {
 
         uint256 _length = _nBals.length;
         int128 _alpha = shell.alpha;

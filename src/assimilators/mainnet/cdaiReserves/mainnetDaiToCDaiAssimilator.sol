@@ -31,9 +31,6 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
 
     constructor () public { }
 
-    event log_uint(bytes32, uint256);
-    event log_int(bytes32, int256);
-
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
@@ -93,8 +90,6 @@ contract MainnetDaiToCDaiAssimilator is IAssimilator {
         uint256 _redeemSuccess = cdai.redeemUnderlying(_amount);
 
         require(_redeemSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
-
-        uint256 _rate = cdai.exchangeRateStored();
 
         bool _transferSuccess = dai.transfer(_dst, _amount);
 

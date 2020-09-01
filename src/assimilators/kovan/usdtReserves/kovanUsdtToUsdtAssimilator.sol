@@ -115,6 +115,9 @@ contract KovanUsdtToUsdtAssimilator is IAssimilator {
 
     }
 
+    event log_addr(bytes32, address);
+    event log_uint(bytes32, uint);
+
     // returns numeraire amount of reserve asset, in this case aUSDT
     function viewNumeraireBalance (address _addr) public view returns (int128 balance_) {
 

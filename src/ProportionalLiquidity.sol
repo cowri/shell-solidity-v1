@@ -4,8 +4,6 @@ import "./Assimilators.sol";
 
 import "./Loihi.sol";
 
-import "./ShellMath.sol";
-
 import "./UnsafeMath64x64.sol";
 
 library ProportionalLiquidity {
@@ -17,11 +15,6 @@ library ProportionalLiquidity {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     int128 constant ONE = 0x10000000000000000;
-
-    event log_int(bytes32, int128);
-    event log_ints(bytes32, int128[]);
-    event log_uint(bytes32, uint);
-    event log_uints(bytes32, uint[]);
 
     // / @author james foley http://github.com/realisation
     // / @notice deposit into the pool with no slippage from the numeraire assets the pool supports
@@ -147,7 +140,7 @@ library ProportionalLiquidity {
         Loihi.Shell storage shell,
         uint256 _withdrawal
     ) internal returns (
-        uint[] memory withdrawals_
+        uint[] memory
     ) {
 
         uint _length = shell.reserves.length;
@@ -191,7 +184,7 @@ library ProportionalLiquidity {
         Loihi.Shell storage shell,
         uint256 _withdrawal
     ) internal view returns (
-        uint[] memory withdrawals_
+        uint[] memory
     ) {
 
         uint _length = shell.reserves.length;

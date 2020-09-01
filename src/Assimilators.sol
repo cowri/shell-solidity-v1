@@ -11,10 +11,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+pragma solidity ^0.5.0;
+
 import "./interfaces/IAssimilator.sol";
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-pragma solidity ^0.5.0;
 library Assimilators {
 
     using ABDKMath64x64 for int128;
@@ -32,41 +33,25 @@ library Assimilators {
 
     function viewRawAmount (address _assim, int128 _amt) internal view returns (uint256 amount_) {
 
-        amount_ = IAssimilator(_assim).viewRawAmount(_amt); // for production
-
-        // bytes memory data = abi.encodeWithSelector(iAsmltr.viewRawAmount.selector, _amt.abs()); // for development
-
-        // amount_ = abi.decode(delegate(_assim, data), (uint256)); // for development
+        amount_ = IAssimilator(_assim).viewRawAmount(_amt);
 
     }
 
     function viewNumeraireAmount (address _assim, uint256 _amt) internal view returns (int128 amt_) {
 
-        amt_ = IAssimilator(_assim).viewNumeraireAmount(_amt); // for production
-
-        // bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireAmount.selector, _amt); // for development
-
-        // amt_ = abi.decode(delegate(_assim, data), (int128)); // for development
+        amt_ = IAssimilator(_assim).viewNumeraireAmount(_amt);
 
     }
 
     function viewNumeraireAmountAndBalance (address _assim, uint256 _amt) internal view returns (int128 amt_, int128 bal_) {
 
-        ( amt_, bal_ ) = IAssimilator(_assim).viewNumeraireAmountAndBalance(address(this), _amt); // for production
-
-        // bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireAmountAndBalance.selector, _amt);
-
-        // ( amt_, bal_ ) = abi.decode(delegate(_assim, data), (int128,int128));
+        ( amt_, bal_ ) = IAssimilator(_assim).viewNumeraireAmountAndBalance(address(this), _amt);
 
     }
 
     function viewNumeraireBalance (address _assim) internal view returns (int128 bal_) {
 
-        bal_ = IAssimilator(_assim).viewNumeraireBalance(address(this)); // for production
-
-        // bytes memory data = abi.encodeWithSelector(iAsmltr.viewNumeraireBalance.selector, address(this));
-
-        // bal_ = abi.decode(delegate(_assim, data), (int128));
+        bal_ = IAssimilator(_assim).viewNumeraireBalance(address(this));
 
     }
 
