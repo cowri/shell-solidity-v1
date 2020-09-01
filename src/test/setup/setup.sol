@@ -2,11 +2,19 @@ pragma solidity ^0.5.0;
 
 import "../../Loihi.sol";
 
+import "../../LoihiFactory.sol";
+
 import "./stablecoins.sol";
 import "./assimilators.sol";
 import "./loihi.sol";
 
 contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
+
+    function getLoihiFactorySuiteOne () public returns (LoihiFactory loihiFactory_) {
+
+        loihiFactory_ = getLoihiFactorySuiteOneLocal();
+
+    }
 
     function getLoihiSuiteOne () public returns (Loihi loihi_) {
 
@@ -43,6 +51,16 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
     function getLoihiSuiteSixClone () public returns (Loihi loihi_) {
 
         loihi_ = getLoihiSuiteSixLocalClone();
+
+    }
+
+    function getLoihiFactorySuiteOneLocal () public returns (LoihiFactory loihiFactory_) {
+
+        setupStablecoinsLocal();
+
+        setupAssimilatorsSetOneLocal();
+
+        loihiFactory_ = new LoihiFactory();
 
     }
 
