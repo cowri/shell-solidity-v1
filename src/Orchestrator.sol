@@ -51,7 +51,7 @@ library Orchestrator {
 
         require(_epsilon < 1e16 && _epsilon >= 0, "Shell/parameter-invalid-epsilon");
 
-        require(shell.lambda <= 1e18 && _lambda >= 0, "Shell/parameter-invalid-lambda");
+        require(_lambda <= 1e18 && _lambda >= 0, "Shell/parameter-invalid-lambda");
 
         shell.alpha = (_alpha + 1).divu(1e18);
 
