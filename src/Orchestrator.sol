@@ -41,7 +41,9 @@ library Orchestrator {
         uint256 _feeAtHalt,
         uint256 _epsilon,
         uint256 _lambda
-    ) external returns (uint256 max_) {
+    ) external returns (
+        uint256 max_
+    ) {
 
         require(_alpha < 1e18 && _alpha > 0, "Shell/parameter-invalid-alpha");
 
@@ -71,7 +73,11 @@ library Orchestrator {
 
     }
 
-    function getNewOmega (Loihi.Shell storage shell) private view returns (int128 omega_) {
+    function getNewOmega (
+        Loihi.Shell storage shell
+    ) private view returns (
+        int128 omega_
+    ) {
 
         int128 _gLiq;
 
@@ -169,9 +175,7 @@ library Orchestrator {
 
     }
 
-    function prime (
-        Loihi.Shell storage shell
-    ) external {
+    function prime ( Loihi.Shell storage shell) external {
 
         uint _length = shell.reserves.length;
 
@@ -193,7 +197,9 @@ library Orchestrator {
 
     }
 
-    function viewShell (Loihi.Shell storage shell) external view returns (
+    function viewShell (
+        Loihi.Shell storage shell
+    ) external view returns (
         uint alpha_,
         uint beta_,
         uint delta_,
