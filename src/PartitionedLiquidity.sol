@@ -27,7 +27,7 @@ library PartitionedLiquidity {
 
         Loihi.PartitionTicket storage totalSupplyTicket = partitionTickets[address(this)];
 
-        totalSupplyTicket.active = true;
+        totalSupplyTicket.initialized = true;
 
         for (uint i = 0; i < _length; i++) totalSupplyTicket.claims.push(shell.totalSupply);
 
@@ -45,7 +45,7 @@ library PartitionedLiquidity {
 
         Loihi.PartitionTicket storage ticket = partitionTickets[_addr];
 
-        if (ticket.active) return ticket.claims;
+        if (ticket.initialized) return ticket.claims;
 
         uint _length = shell.reserves.length;
         uint[] memory claims_ = new uint[](_length);
@@ -72,10 +72,10 @@ library PartitionedLiquidity {
         Loihi.PartitionTicket storage totalSuppliesTicket = partitionTickets[address(this)];
         Loihi.PartitionTicket storage ticket = partitionTickets[msg.sender];
 
-        if (!ticket.active) {
+        if (!ticket.initialized) {
 
             for (uint i = 0; i < _length; i++) ticket.claims.push(_balance);
-            ticket.active = true;
+            ticket.initialized = true;
 
         }
 
@@ -87,6 +87,10 @@ library PartitionedLiquidity {
 
             Loihi.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
+            require(totalSuppliesTicket.claims[_assim.ix] >= _withdrawals[i], "Shell/burn-exceeds-total-supply");
+            
+            require(ticket.claims[_assim.ix] >= _withdrawals[i], "Shell/insufficient-balance");
+
             require(_assim.addr != address(0), "Shell/unsupported-asset");
 
             int128 _reserveBalance = Assimilators.viewNumeraireBalance(_assim.addr);
@@ -94,15 +98,9 @@ library PartitionedLiquidity {
             int128 _multiplier = _withdrawals[i].divu(1e18)
                 .div(totalSuppliesTicket.claims[_assim.ix].divu(1e18));
 
-            totalSuppliesTicket.claims[_assim.ix] = burn_sub(
-                totalSuppliesTicket.claims[_assim.ix],
-                _withdrawals[i]
-            );
+            totalSuppliesTicket.claims[_assim.ix] = totalSuppliesTicket.claims[_assim.ix] - _withdrawals[i];
 
-            ticket.claims[_assim.ix] = burn_sub(
-                ticket.claims[_assim.ix],
-                _withdrawals[i]
-            );
+            ticket.claims[_assim.ix] = ticket.claims[_assim.ix] - _withdrawals[i];
 
             uint _withdrawal = Assimilators.outputNumeraire(
                 _assim.addr,
@@ -118,10 +116,6 @@ library PartitionedLiquidity {
 
         return withdrawals_;
 
-    }
-
-    function burn_sub(uint x, uint y) private pure returns (uint z) {
-        require((z = x - y) <= x, "Shell/burn-underflow");
     }
 
 }

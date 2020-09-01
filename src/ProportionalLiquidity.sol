@@ -16,11 +16,6 @@ library ProportionalLiquidity {
 
     int128 constant ONE = 0x10000000000000000;
 
-    event log_int(bytes32, int128);
-    event log_ints(bytes32, int128[]);
-    event log_uint(bytes32, uint);
-    event log_uints(bytes32, uint[]);
-
     // / @author james foley http://github.com/realisation
     // / @notice deposit into the pool with no slippage from the numeraire assets the pool supports
     // / @param  _deposit the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool

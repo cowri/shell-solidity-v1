@@ -58,7 +58,7 @@ library Swaps {
             int128 _oGLiq,
             int128 _nGLiq,
             int128[] memory _oBals,
-            int128[] memory _nBals ) = getOriginSwapData(shell, _o.ix, _t.ix, _o.addr, address(0), _originAmount);
+            int128[] memory _nBals ) = getOriginSwapData(shell, _o.ix, _t.ix, _o.addr, _originAmount);
 
         ( _amt, shell.omega ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
@@ -69,8 +69,6 @@ library Swaps {
         emit Trade(msg.sender, _origin, _target, _originAmount, tAmt_);
 
     }
-
-    event log_uint(bytes32, uint);
 
     // / @author james foley http://github.com/realisation
     // / @notice view how much of the target currency the origin currency will provide
@@ -185,7 +183,6 @@ library Swaps {
         uint _inputIx,
         uint _outputIndex,
         address _assim,
-        address _recipient,
         uint _amt
     ) private returns (
         int128 amt_,

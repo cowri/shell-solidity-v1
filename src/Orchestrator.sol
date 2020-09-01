@@ -42,8 +42,7 @@ library Orchestrator {
         uint256 _beta,
         uint256 _feeAtHalt,
         uint256 _epsilon,
-        uint256 _lambda,
-        uint256[] memory _weights
+        uint256 _lambda
     ) internal returns (uint256 max_) {
 
         require(_alpha < 1e18 && _alpha > 0, "Shell/parameter-invalid-alpha");
@@ -54,7 +53,7 @@ library Orchestrator {
 
         require(_epsilon < 1e16 && _epsilon >= 0, "Shell/parameter-invalid-epsilon");
 
-        require(shell.lambda <= 1e18 && _lambda >= 0, "Shell/parameter-invalid-lambda");
+        require(_lambda <= 1e18 && _lambda >= 0, "Shell/parameter-invalid-lambda");
 
         shell.alpha = (_alpha + 1).divu(1e18);
 
@@ -66,7 +65,7 @@ library Orchestrator {
 
         shell.lambda = (_lambda + 1).divu(1e18);
 
-        shell.omega = resetOmega(shell);
+        shell.omega = getNewOmega(shell);
 
         emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda, shell.omega.mulu(1e18));
 
@@ -74,7 +73,7 @@ library Orchestrator {
 
     }
 
-    function resetOmega (Loihi.Shell storage shell) private returns (int128 omega_) {
+    function getNewOmega (Loihi.Shell storage shell) private view returns (int128 omega_) {
 
         int128 _gLiq;
 
@@ -91,33 +90,6 @@ library Orchestrator {
         }
 
         omega_ = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
-
-        require(shell.omega >= omega_, "Shell/paramter-invalid-psi");
-
-    }
-
-    function setWeights (
-        Loihi.Shell storage shell,
-        uint[] memory _weights
-    ) internal {
-
-        if (_weights.length == 0) return;
-
-        require(_weights.length == shell.weights.length, "Shell/parameters-invalid-number-of-weights");
-
-        uint sum;
-
-        for (uint i = 0; i < _weights.length; i++) {
-
-            require(_weights[i] > 0 && _weights[i] <= 1e18, "Shell/parameters-invalid-weight");
-
-            shell.weights[i] = _weights[i].divu(1e18);
-
-            sum += _weights[i];
-
-        }
-
-        require(sum == 1e18, "Shell/parameters-invalid-weights");
 
     }
 

@@ -19,8 +19,6 @@ import "./Assimilators.sol";
 
 import "./Orchestrator.sol";
 
-import "./Liquidity.sol";
-
 import "./PartitionedLiquidity.sol";
 
 import "./ProportionalLiquidity.sol";
@@ -30,6 +28,8 @@ import "./SelectiveLiquidity.sol";
 import "./Shells.sol";
 
 import "./Swaps.sol";
+
+import "./ViewLiquidity.sol";
 
 contract Loihi {
 
@@ -63,7 +63,7 @@ contract Loihi {
 
     struct PartitionTicket {
         uint[] claims;
-        bool active;
+        bool initialized;
     }
 
     mapping (address => PartitionTicket) public partitionTickets;
@@ -80,7 +80,7 @@ contract Loihi {
 
     event Approval(address indexed _owner, address indexed spender, uint256 value);
 
-    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda, uint omega);
+    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda, uint256 omega);
 
     event AssetIncluded(address indexed numeraire, address indexed reserve, uint weight);
 
@@ -151,9 +151,9 @@ contract Loihi {
 
     }
 
-    function setParams (uint _alpha, uint _beta, uint _deltaDerivative, uint _epsilon, uint _lambda, uint[] calldata _weights) external onlyOwner {
+    function setParams (uint _alpha, uint _beta, uint _deltaDerivative, uint _epsilon, uint _lambda) external onlyOwner {
 
-        maxFee = Orchestrator.setParams(shell, _alpha, _beta, _deltaDerivative, _epsilon, _lambda, _weights);
+        maxFee = Orchestrator.setParams(shell, _alpha, _beta, _deltaDerivative, _epsilon, _lambda);
 
     }
 
@@ -448,6 +448,8 @@ contract Loihi {
 
     function partition () external onlyOwner {
 
+        require(frozen, "Shell/must-be-frozen");
+
         PartitionedLiquidity.partition(shell, partitionTickets);
 
         partitioned = true;
@@ -528,14 +530,16 @@ contract Loihi {
         uint[] memory individual_
     ) {
 
-        return Liquidity.liquidity(shell);
+        return ViewLiquidity.viewLiquidity(shell);
 
     }
+
 
     function TEST_setTestHalts (bool toTestOrNotToTest) external {
 
         shell.testHalts = toTestOrNotToTest;
 
     }
+
 
 }
