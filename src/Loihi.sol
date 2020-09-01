@@ -51,7 +51,6 @@ contract Loihi {
         Assimilator[] reserves;
         Assimilator[] numeraires;
         mapping (address => Assimilator) assimilators;
-        bool testHalts;
     }
 
     struct Assimilator {
@@ -147,7 +146,6 @@ contract Loihi {
 
         owner = msg.sender;
         emit OwnershipTransfered(address(0), msg.sender);
-        shell.testHalts = true;
 
     }
 
