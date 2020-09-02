@@ -107,7 +107,7 @@ library Orchestrator {
         address _reserve,
         address _reserveAssim,
         uint256 _weight
-    ) internal {
+    ) external {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
 
@@ -159,7 +159,7 @@ library Orchestrator {
         address _numeraire,
         address _reserve,
         address _assimilator
-    ) internal {
+    ) external {
 
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
 
