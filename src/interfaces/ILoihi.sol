@@ -118,6 +118,13 @@ interface ILoihi {
         uint[] memory withdrawalsToMake_
     );
 
+    function viewSelectiveDeposit (
+        address[] calldata _flavors,
+        uint[] calldata _amounts,
+        uint _minShells,
+        uint _deadline
+    ) external view returns (uint);
+
     function selectiveWithdraw (
         address[] calldata _derivatives,
         uint[] calldata _amounts,
@@ -146,6 +153,11 @@ interface ILoihi {
     ) external view returns (
         uint[] memory claims_
     );
+
+    function viewProportionalWithdraw (
+        uint shellTokens,
+        uint deadline
+    ) external view returns (uint[] memory);
 
     function owner () external view returns (address);
 
@@ -202,6 +214,16 @@ interface ILoihi {
 
     function name () external view returns (string memory);
     function symbol () external view returns (string memory);
+
+    function shell () external view returns (
+        int128 alpha,
+        int128 beta,
+        int128 delta,
+        int128 epsilon,
+        int128 lambda,
+        int128 omega,
+        uint totalSupply
+    );
 
     function decimals() external view returns (uint);
 

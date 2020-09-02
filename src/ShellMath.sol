@@ -205,7 +205,7 @@ library ShellMath {
         int128[] memory _oBals,
         int128[] memory _nBals,
         int128[] memory _weights
-    ) internal view {
+    ) private view {
 
         uint256 _length = _nBals.length;
         int128 _alpha = shell.alpha;

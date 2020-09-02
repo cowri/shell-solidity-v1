@@ -26,7 +26,7 @@ library ViewLiquidity {
 
     function viewLiquidity (
         Loihi.Shell storage shell
-    ) external view returns (
+    ) internal view returns (
         uint total_,
         uint[] memory individual_
     ) {

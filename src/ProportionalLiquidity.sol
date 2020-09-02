@@ -24,7 +24,7 @@ library ProportionalLiquidity {
     function proportionalDeposit (
         Loihi.Shell storage shell,
         uint256 _deposit
-    ) external returns (
+    ) internal returns (
         uint256 shells_,
         uint[] memory
     ) {
@@ -81,7 +81,7 @@ library ProportionalLiquidity {
     function viewProportionalDeposit (
         Loihi.Shell storage shell,
         uint256 _deposit
-    ) external view returns (
+    ) internal view returns (
         uint shells_,
         uint[] memory
     ) {
@@ -139,7 +139,7 @@ library ProportionalLiquidity {
     function proportionalWithdraw (
         Loihi.Shell storage shell,
         uint256 _withdrawal
-    ) external returns (
+    ) internal returns (
         uint[] memory
     ) {
 
@@ -183,7 +183,7 @@ library ProportionalLiquidity {
     function viewProportionalWithdraw (
         Loihi.Shell storage shell,
         uint256 _withdrawal
-    ) external view returns (
+    ) internal view returns (
         uint[] memory
     ) {
 

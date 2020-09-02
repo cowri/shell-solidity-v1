@@ -34,6 +34,8 @@ library Orchestrator {
 
     event AssimilatorIncluded(address indexed derivative, address indexed numeraire, address indexed reserve, address assimilator);
 
+    event log_int(bytes32, int);
+
     function setParams (
         Loihi.Shell storage shell,
         uint256 _alpha,
@@ -105,7 +107,7 @@ library Orchestrator {
         address _reserve,
         address _reserveAssim,
         uint256 _weight
-    ) external {
+    ) internal {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
 
@@ -157,7 +159,7 @@ library Orchestrator {
         address _numeraire,
         address _reserve,
         address _assimilator
-    ) external {
+    ) internal {
 
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
 
@@ -175,7 +177,7 @@ library Orchestrator {
 
     }
 
-    function prime ( Loihi.Shell storage shell) external {
+    function prime (Loihi.Shell storage shell) external {
 
         uint _length = shell.reserves.length;
 
@@ -197,9 +199,7 @@ library Orchestrator {
 
     }
 
-    function viewShell (
-        Loihi.Shell storage shell
-    ) external view returns (
+    function viewShell (Loihi.Shell storage shell) external view returns (
         uint alpha_,
         uint beta_,
         uint delta_,
