@@ -19,7 +19,7 @@ import "./Loihi.sol";
 
 contract LoihiFactory {
 
-    event NewShell(address indexed caller, address indexed pool);
+    event NewShell(address indexed caller, address indexed shell);
 
     event CowriLabsSet(address indexed caller, address indexed clabs);
 
