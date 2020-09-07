@@ -40,51 +40,6 @@ import "./LoihiStorage.sol";
 
 contract Loihi is LoihiStorage {
 
-    // string  public constant name = "Shells";
-    // string  public constant symbol = "SHL";
-    // uint8   public constant decimals = 18;
-
-    // struct Shell {
-    //     int128 alpha;
-    //     int128 beta;
-    //     int128 delta;
-    //     int128 epsilon;
-    //     int128 lambda;
-    //     int128 omega;
-    //     int128[] weights;
-    //     uint totalSupply;
-    //     mapping (address => uint) balances;
-    //     mapping (address => mapping (address => uint)) allowances;
-    //     Assimilator[] reserves;
-    //     Assimilator[] numeraires;
-    //     mapping (address => Assimilator) assimilators;
-    //     bool TEST_HALTS;
-    // }
-
-    // struct Assimilator {
-    //     address addr;
-    //     uint8 ix;
-    // }
-
-    // Shell public shell;
-
-    // struct PartitionTicket {
-    //     uint[] claims;
-    //     bool initialized;
-    // }
-
-    // mapping (address => PartitionTicket) public partitionTickets;
-
-    // address[] public numeraires;
-
-    // bool public partitioned = false;
-    // bool public frozen = false;
-
-    // address public owner;
-    // bool internal notEntered = true;
-
-    // uint public maxFee;
-
     event Approval(address indexed _owner, address indexed spender, uint256 value);
 
     event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda, uint256 omega);
@@ -149,23 +104,32 @@ contract Loihi is LoihiStorage {
 
     }
 
+    event log_uint(bytes32, uint);
+    event log_addrs(bytes32, address[]);
+    event log_uints(bytes32, uint[]);
 
     constructor (
         address[] memory _assets,
         uint[] memory _assetWeights,
         address[] memory _derivativeAssimilators
     ) public {
+        
+        emit log_addrs("assets", _assets);
+        emit log_uints("weights", _assetWeights);
+        emit log_addrs("derivatives", _derivativeAssimilators);
 
         owner = msg.sender;
         emit OwnershipTransfered(address(0), msg.sender);
         
-        for (uint i = 0; i < _assets.length; i += 4) {
+        for (uint i = 0; i < _assetWeights.length; i++) {
+            emit log_uint("i", i);
+            emit log_uint("1 + i * 4", 1+i*4);
 
             includeAsset(
-                _assets[i],   // numeraire
-                _assets[i+1], // numeraire assimilator
-                _assets[i+2], // reserve
-                _assets[i+3], // reserve assimilator
+                _assets[i*4],   // numeraire
+                _assets[1+i*4], // numeraire assimilator
+                _assets[2+i*4], // reserve
+                _assets[3+i*4], // reserve assimilator
                 _assetWeights[i]
             );
             

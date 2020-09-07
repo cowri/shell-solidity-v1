@@ -38,6 +38,8 @@ contract LocalDaiToDaiAssimilator is IAssimilator, LoihiStorage {
 
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
+        
+        emit log_addr("dai addr", address(dai));
 
         dai.transferFrom(msg.sender, address(this), _amount);
 

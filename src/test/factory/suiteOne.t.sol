@@ -8,7 +8,9 @@ import "../setup/setup.sol";
 
 import "../setup/methods.sol";
 
-contract LoihiFactorySuiteOne is Setup, DSTest {
+import "../deposits/depositsTemplate.sol";
+
+contract LoihiFactorySuiteOne is SelectiveDepositTemplate, DSTest {
 
     using ABDKMath64x64 for uint;
     using ABDKMath64x64 for int128;
@@ -60,22 +62,73 @@ contract LoihiFactorySuiteOne is Setup, DSTest {
 
     function test_s1_loihiFactory () public {
         
-        Loihi l1 = newShell();
+        Loihi s1 = newShell();
 
-        setupSuiteOneParameters(l1);
+        setupSuiteOneParameters(s1);
 
-        Loihi l2 = newShell();
+        Loihi s2 = newShell();
 
-        setupSuiteOneParameters(l2);
+        setupSuiteOneParameters(s2);
 
-        bool l1IsShell = lf.isShell(address(l1));
+        bool s1IsShell = lf.isShell(address(s2));
 
-        bool l2IsShell = lf.isShell(address(l2));
+        bool s2IsShell = lf.isShell(address(s2));
 
-        assertTrue(l1IsShell);
+        assertTrue(s1IsShell);
 
-        assertTrue(l2IsShell);
+        assertTrue(s2IsShell);
 
+    }
+    
+    function getShellSuiteOneFromFactory () public {
+        
+        address[] memory _assets = new address[](16);
+        uint[] memory _assetWeights = new uint[](4);
+        address[] memory _derivativeAssimilators = new address[](0);
+
+        _assets[0] = address(dai);
+        _assets[1] = address(daiAssimilator);
+        _assets[2] = address(dai);
+        _assets[3] = address(daiAssimilator);
+        _assetWeights[0] = .3e18;
+
+        _assets[4] = address(usdc);
+        _assets[5] = address(usdcAssimilator);
+        _assets[6] = address(usdc);
+        _assets[7] = address(usdcAssimilator);
+        _assetWeights[1] = .3e18;
+
+        _assets[8] = address(usdt);
+        _assets[9] = address(usdtAssimilator);
+        _assets[10] = address(usdt);
+        _assets[11] = address(usdtAssimilator);
+        _assetWeights[2] = .3e18;
+
+        _assets[12] = address(susd);
+        _assets[13] = address(susdAssimilator);
+        _assets[14] = address(susd);
+        _assets[15] = address(susdAssimilator);
+        _assetWeights[3] = .1e18;
+        
+        l = lf.newShell(_assets, _assetWeights, _derivativeAssimilators);
+                
+        l.TEST_includeAssimilatorState(
+            dai, cdai, chai, pot,
+            usdc, cusdc,
+            usdt, ausdt,
+            susd, asusd
+        );
+        
+        setParamsSetOne(l);
+
+        approveStablecoins(address(l));
+
+        interApproveStablecoinsLocal(address(l));
+
+        uint256 newShells = super.balanced_5DAI_1USDC_3USDT_1SUSD();
+
+        assertEq(newShells, 9999999999999999991);
+        
     }
 
 }
