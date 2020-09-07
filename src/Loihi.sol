@@ -15,8 +15,6 @@ pragma solidity ^0.5.0;
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-import "./Assimilators.sol";
-
 import "./Orchestrator.sol";
 
 import "./PartitionedLiquidity.sol";
@@ -690,6 +688,18 @@ contract Loihi {
     ) {
 
         return ViewLiquidity.viewLiquidity(shell);
+
+    }
+
+    function viewNumeraires () public view returns (uint[] memory numeraires_) {
+
+        numeraires_ = shell.numeraires;
+
+    }
+
+    function viewReservers () public view returns (uint[] memory reserves_) {
+
+        reserves_ = shell.reserves;
 
     }
 
