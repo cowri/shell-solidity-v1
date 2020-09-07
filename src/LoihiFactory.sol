@@ -33,9 +33,17 @@ contract LoihiFactory {
 
     event log(bytes32);
 
-    function newShell() public returns (Loihi) {
+    function newShell(
+        address[] memory _assets,
+        uint[] memory _assetWeights,
+        address[] memory _derivativeAssimilators
+    ) public returns (Loihi) {
 
-        Loihi loihiShell = new Loihi();
+        Loihi loihiShell = new Loihi(
+            _assets,
+            _assetWeights,
+            _derivativeAssimilators
+        );
 
         loihiShell.transferOwnership(msg.sender);
 

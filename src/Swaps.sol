@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./Assimilators.sol";
 
-import "./Loihi.sol";
+import "./LoihiStorage.sol";
 
 import "./ShellMath.sol";
 
@@ -20,16 +20,16 @@ library Swaps {
     int128 constant ONE = 0x10000000000000000;
 
     function getOriginAndTarget (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address _o,
         address _t
     ) private view returns (
-        Loihi.Assimilator memory,
-        Loihi.Assimilator memory
+        LoihiStorage.Assimilator memory,
+        LoihiStorage.Assimilator memory
     ) {
 
-        Loihi.Assimilator memory o_ = shell.assimilators[_o];
-        Loihi.Assimilator memory t_ = shell.assimilators[_t];
+        LoihiStorage.Assimilator memory o_ = shell.assimilators[_o];
+        LoihiStorage.Assimilator memory t_ = shell.assimilators[_t];
 
         require(o_.addr != address(0), "Shell/origin-not-supported");
         require(t_.addr != address(0), "Shell/target-not-supported");
@@ -40,17 +40,17 @@ library Swaps {
 
 
     function originSwap (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _originAmount,
         address _recipient
-    ) external returns (
+    ) internal returns (
         uint256 tAmt_
     ) {
 
-        (   Loihi.Assimilator memory _o,
-            Loihi.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
+        (   LoihiStorage.Assimilator memory _o,
+            LoihiStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
         if (_o.ix == _t.ix) return Assimilators.outputNumeraire(_t.addr, _recipient, Assimilators.intakeRaw(_o.addr, _originAmount));
 
@@ -77,16 +77,16 @@ library Swaps {
     // / @param _originAmount the origin amount
     // / @return tAmt_ the amount of target that has been swapped for the origin
     function viewOriginSwap (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _originAmount
-    ) external view returns (
+    ) internal view returns (
         uint256 tAmt_
     ) {
 
-        (   Loihi.Assimilator memory _o,
-            Loihi.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
+        (   LoihiStorage.Assimilator memory _o,
+            LoihiStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
         if (_o.ix == _t.ix) return Assimilators.viewRawAmount(_t.addr, Assimilators.viewNumeraireAmount(_o.addr, _originAmount));
 
@@ -114,17 +114,17 @@ library Swaps {
     // / @param _recipient the address of the recipient of the target
     // / @return oAmt_ the amount of origin that has been swapped for the target
     function targetSwap (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _targetAmount,
         address _recipient
-    ) external returns (
+    ) internal returns (
         uint256 oAmt_
     ) {
 
-        (   Loihi.Assimilator memory _o,
-            Loihi.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
+        (   LoihiStorage.Assimilator memory _o,
+            LoihiStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
         if (_o.ix == _t.ix) return Assimilators.intakeNumeraire(_o.addr, Assimilators.outputRaw(_t.addr, _recipient, _targetAmount));
 
@@ -151,16 +151,16 @@ library Swaps {
     // / @param _targetAmount the target amount
     // / @return oAmt_ the amount of target that has been swapped for the origin
     function viewTargetSwap (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _targetAmount
-    ) external view returns (
+    ) internal view returns (
         uint256 oAmt_
     ) {
 
-        (   Loihi.Assimilator memory _o,
-            Loihi.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
+        (   LoihiStorage.Assimilator memory _o,
+            LoihiStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
         if (_o.ix == _t.ix) return Assimilators.viewRawAmount(_o.addr, Assimilators.viewNumeraireAmount(_t.addr, _targetAmount));
 
@@ -179,7 +179,7 @@ library Swaps {
     }
 
     function getOriginSwapData (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         uint _inputIx,
         uint _outputIndex,
         address _assim,
@@ -196,7 +196,7 @@ library Swaps {
 
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
-        Loihi.Assimilator[] memory _reserves = shell.reserves;
+        LoihiStorage.Assimilator[] memory _reserves = shell.reserves;
 
         for (uint i = 0; i < _length; i++) {
 
@@ -224,7 +224,7 @@ library Swaps {
     }
 
     function getTargetSwapData (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         uint _inputIx,
         uint _outputIndex,
         address _assim,
@@ -242,7 +242,7 @@ library Swaps {
 
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
-        Loihi.Assimilator[] memory _reserves = shell.reserves;
+        LoihiStorage.Assimilator[] memory _reserves = shell.reserves;
 
         for (uint i = 0; i < _length; i++) {
 
@@ -270,7 +270,7 @@ library Swaps {
     }
 
     function viewOriginSwapData (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         uint _inputIx,
         uint _outputIndex,
         uint _amt,
@@ -314,7 +314,7 @@ library Swaps {
     }
 
     function viewTargetSwapData (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         uint _inputIx,
         uint _outputIndex,
         uint _amt,

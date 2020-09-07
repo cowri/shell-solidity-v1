@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./Assimilators.sol";
 
-import "./Loihi.sol";
+import "./LoihiStorage.sol";
 
 import "./ShellMath.sol";
 
@@ -28,11 +28,11 @@ library SelectiveLiquidity {
     // / @param _dline deadline for tx
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (
-        Loihi.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts,
+        LoihiStorage.Shell storage shell,
+        address[] memory _derivatives,
+        uint[] memory _amounts,
         uint _minShells
-    ) external returns (
+    ) internal returns (
         uint shells_
     ) {
 
@@ -58,10 +58,10 @@ library SelectiveLiquidity {
     // / @param _amounts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function viewSelectiveDeposit (
-        Loihi.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts
-    ) external view returns (
+        LoihiStorage.Shell storage shell,
+        address[] memory _derivatives,
+        uint[] memory _amounts
+    ) internal view returns (
         uint shells_
     ) {
 
@@ -83,11 +83,11 @@ library SelectiveLiquidity {
     // / @param _amounts an array of amounts to withdraw that maps to _flavors
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (
-        Loihi.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts,
+        LoihiStorage.Shell storage shell,
+        address[] memory _derivatives,
+        uint[] memory _amounts,
         uint _maxShells
-    ) external returns (
+    ) internal returns (
         uint256 shells_
     ) {
 
@@ -116,10 +116,10 @@ library SelectiveLiquidity {
     // / @param _amounts an array of amounts to withdraw that maps to _flavors
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function viewSelectiveWithdraw (
-        Loihi.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts
-    ) external view returns (
+        LoihiStorage.Shell storage shell,
+        address[] memory _derivatives,
+        uint[] memory _amounts
+    ) internal view returns (
         uint shells_
     ) {
 
@@ -137,7 +137,7 @@ library SelectiveLiquidity {
     }
 
     function getLiquidityDepositData (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address[] memory _derivatives,
         uint[] memory _amounts
     ) private returns (
@@ -153,7 +153,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _derivatives.length; i++) {
 
-            Loihi.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
+            LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
@@ -180,7 +180,7 @@ library SelectiveLiquidity {
     }
 
     function getLiquidityWithdrawData (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address[] memory _derivatives,
         address _rcpnt,
         uint[] memory _amounts
@@ -197,7 +197,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _derivatives.length; i++) {
 
-            Loihi.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
+            LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
@@ -223,7 +223,7 @@ library SelectiveLiquidity {
     }
 
     function viewLiquidityDepositData (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address[] memory _derivatives,
         uint[] memory _amounts
     ) private view returns (
@@ -239,7 +239,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _derivatives.length; i++) {
 
-            Loihi.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
+            LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
@@ -266,7 +266,7 @@ library SelectiveLiquidity {
     }
 
     function viewLiquidityWithdrawData (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address[] memory _derivatives,
         uint[] memory _amounts
     ) private view returns (
@@ -282,7 +282,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _derivatives.length; i++) {
 
-            Loihi.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
+            LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
@@ -309,7 +309,7 @@ library SelectiveLiquidity {
     }
 
     function completeLiquidityData (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         int128[] memory oBals_,
         int128[] memory nBals_
     ) private view returns (
@@ -334,7 +334,7 @@ library SelectiveLiquidity {
 
     }
 
-    function burn (Loihi.Shell storage shell, address account, uint256 amount) private {
+    function burn (LoihiStorage.Shell storage shell, address account, uint256 amount) private {
 
         shell.balances[account] = burn_sub(shell.balances[account], amount);
 
@@ -344,7 +344,7 @@ library SelectiveLiquidity {
 
     }
 
-    function mint (Loihi.Shell storage shell, address account, uint256 amount) private {
+    function mint (LoihiStorage.Shell storage shell, address account, uint256 amount) private {
 
         shell.totalSupply = mint_add(shell.totalSupply, amount);
 

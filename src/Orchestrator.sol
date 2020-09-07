@@ -17,7 +17,7 @@ import "./Assimilators.sol";
 
 import "./ShellMath.sol";
 
-import "./Loihi.sol";
+import "./LoihiStorage.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
@@ -37,13 +37,13 @@ library Orchestrator {
     event log_int(bytes32, int);
 
     function setParams (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         uint256 _alpha,
         uint256 _beta,
         uint256 _feeAtHalt,
         uint256 _epsilon,
         uint256 _lambda
-    ) external returns (
+    ) internal returns (
         uint256 max_
     ) {
 
@@ -76,7 +76,7 @@ library Orchestrator {
     }
 
     function getNewOmega (
-        Loihi.Shell storage shell
+        LoihiStorage.Shell storage shell
     ) private view returns (
         int128 omega_
     ) {
@@ -100,14 +100,14 @@ library Orchestrator {
     }
 
     function includeAsset (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address[] storage numeraires,
         address _numeraire,
         address _numeraireAssim,
         address _reserve,
         address _reserveAssim,
         uint256 _weight
-    ) external {
+    ) internal {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
 
@@ -121,7 +121,7 @@ library Orchestrator {
 
         numeraires.push(_numeraire);
 
-        Loihi.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
+        LoihiStorage.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
         _numeraireAssimilator.addr = _numeraireAssim;
 
@@ -129,7 +129,7 @@ library Orchestrator {
 
         shell.numeraires.push(_numeraireAssimilator);
 
-        Loihi.Assimilator storage _reserveAssimilator = shell.assimilators[_reserve];
+        LoihiStorage.Assimilator storage _reserveAssimilator = shell.assimilators[_reserve];
 
         _reserveAssimilator.addr = _reserveAssim;
 
@@ -154,12 +154,12 @@ library Orchestrator {
     }
 
     function includeAssimilator (
-        Loihi.Shell storage shell,
+        LoihiStorage.Shell storage shell,
         address _derivative,
         address _numeraire,
         address _reserve,
         address _assimilator
-    ) external {
+    ) internal {
 
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
 
@@ -169,15 +169,15 @@ library Orchestrator {
 
         require(_assimilator != address(0), "Shell/assimilator-cannot-be-zeroth-address");
 
-        Loihi.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
+        LoihiStorage.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
-        shell.assimilators[_derivative] = Loihi.Assimilator(_assimilator, _numeraireAssim.ix);
+        shell.assimilators[_derivative] = LoihiStorage.Assimilator(_assimilator, _numeraireAssim.ix);
 
         emit AssimilatorIncluded(_derivative, _numeraire, _reserve, _assimilator);
 
     }
 
-    function prime (Loihi.Shell storage shell) external {
+    function prime (LoihiStorage.Shell storage shell) internal {
 
         uint _length = shell.reserves.length;
 
@@ -199,7 +199,7 @@ library Orchestrator {
 
     }
 
-    function viewShell (Loihi.Shell storage shell) external view returns (
+    function viewShell (LoihiStorage.Shell storage shell) internal view returns (
         uint alpha_,
         uint beta_,
         uint delta_,

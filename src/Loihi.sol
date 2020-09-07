@@ -36,51 +36,54 @@ import "./interfaces/ICToken.sol";
 import "./interfaces/IChai.sol";
 import "./interfaces/IPot.sol";
 
-contract Loihi {
+import "./LoihiStorage.sol";
 
-    string  public constant name = "Shells";
-    string  public constant symbol = "SHL";
-    uint8   public constant decimals = 18;
+contract Loihi is LoihiStorage {
 
-    struct Shell {
-        int128 alpha;
-        int128 beta;
-        int128 delta;
-        int128 epsilon;
-        int128 lambda;
-        int128 omega;
-        int128[] weights;
-        uint totalSupply;
-        mapping (address => uint) balances;
-        mapping (address => mapping (address => uint)) allowances;
-        Assimilator[] reserves;
-        Assimilator[] numeraires;
-        mapping (address => Assimilator) assimilators;
-    }
+    // string  public constant name = "Shells";
+    // string  public constant symbol = "SHL";
+    // uint8   public constant decimals = 18;
 
-    struct Assimilator {
-        address addr;
-        uint8 ix;
-    }
+    // struct Shell {
+    //     int128 alpha;
+    //     int128 beta;
+    //     int128 delta;
+    //     int128 epsilon;
+    //     int128 lambda;
+    //     int128 omega;
+    //     int128[] weights;
+    //     uint totalSupply;
+    //     mapping (address => uint) balances;
+    //     mapping (address => mapping (address => uint)) allowances;
+    //     Assimilator[] reserves;
+    //     Assimilator[] numeraires;
+    //     mapping (address => Assimilator) assimilators;
+    //     bool TEST_HALTS;
+    // }
 
-    Shell public shell;
+    // struct Assimilator {
+    //     address addr;
+    //     uint8 ix;
+    // }
 
-    struct PartitionTicket {
-        uint[] claims;
-        bool initialized;
-    }
+    // Shell public shell;
 
-    mapping (address => PartitionTicket) public partitionTickets;
+    // struct PartitionTicket {
+    //     uint[] claims;
+    //     bool initialized;
+    // }
 
-    address[] public numeraires;
+    // mapping (address => PartitionTicket) public partitionTickets;
 
-    bool public partitioned = false;
-    bool public frozen = false;
+    // address[] public numeraires;
 
-    address public owner;
-    bool internal notEntered = true;
+    // bool public partitioned = false;
+    // bool public frozen = false;
 
-    uint public maxFee;
+    // address public owner;
+    // bool internal notEntered = true;
+
+    // uint public maxFee;
 
     event Approval(address indexed _owner, address indexed spender, uint256 value);
 
@@ -147,10 +150,39 @@ contract Loihi {
     }
 
 
-    constructor () public {
+    constructor (
+        address[] memory _assets,
+        uint[] memory _assetWeights,
+        address[] memory _derivativeAssimilators
+    ) public {
 
         owner = msg.sender;
         emit OwnershipTransfered(address(0), msg.sender);
+        
+        for (uint i = 0; i < _assets.length; i += 4) {
+
+            includeAsset(
+                _assets[i],   // numeraire
+                _assets[i+1], // numeraire assimilator
+                _assets[i+2], // reserve
+                _assets[i+3], // reserve assimilator
+                _assetWeights[i]
+            );
+            
+        }
+        
+        for (uint i = 0; i < _derivativeAssimilators.length; i += 4) {
+
+            includeAssimilator(
+                _derivativeAssimilators[i],   // derivative
+                _derivativeAssimilators[i+1], // numeraire
+                _derivativeAssimilators[i+2], // reserve
+                _derivativeAssimilators[i+3]  // assimilator
+            );
+
+        }
+
+        shell.TEST_HALTS = true;
 
     }
 
@@ -185,7 +217,7 @@ contract Loihi {
         address _reserve,
         address _rAssim,
         uint _weight
-    ) external onlyOwner {
+    ) public onlyOwner {
 
         Orchestrator.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
 
@@ -202,7 +234,7 @@ contract Loihi {
         address _numeraire, 
         address _reserve, 
         address _assimilator
-    ) external onlyOwner {
+    ) public onlyOwner {
 
         Orchestrator.includeAssimilator(shell, _derivative, _numeraire, _reserve, _assimilator);
 
@@ -688,18 +720,6 @@ contract Loihi {
     ) {
 
         return ViewLiquidity.viewLiquidity(shell);
-
-    }
-
-    function viewNumeraires () public view returns (uint[] memory numeraires_) {
-
-        numeraires_ = shell.numeraires;
-
-    }
-
-    function viewReservers () public view returns (uint[] memory reserves_) {
-
-        reserves_ = shell.reserves;
 
     }
 

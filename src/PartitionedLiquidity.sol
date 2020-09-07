@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./Assimilators.sol";
 
-import "./Loihi.sol";
+import "./LoihiStorage.sol";
 
 import "./UnsafeMath64x64.sol";
 
@@ -19,13 +19,13 @@ library PartitionedLiquidity {
     int128 constant ONE = 0x10000000000000000;
 
     function partition (
-        Loihi.Shell storage shell,
-        mapping (address => Loihi.PartitionTicket) storage partitionTickets
-    ) external {
+        LoihiStorage.Shell storage shell,
+        mapping (address => LoihiStorage.PartitionTicket) storage partitionTickets
+    ) internal {
 
         uint _length = shell.reserves.length;
 
-        Loihi.PartitionTicket storage totalSupplyTicket = partitionTickets[address(this)];
+        LoihiStorage.PartitionTicket storage totalSupplyTicket = partitionTickets[address(this)];
 
         totalSupplyTicket.initialized = true;
 
@@ -36,14 +36,14 @@ library PartitionedLiquidity {
     }
 
     function viewPartitionClaims (
-        Loihi.Shell storage shell,
-        mapping (address => Loihi.PartitionTicket) storage partitionTickets,
+        LoihiStorage.Shell storage shell,
+        mapping (address => LoihiStorage.PartitionTicket) storage partitionTickets,
         address _addr
-    ) external view returns (
+    ) internal view returns (
         uint[] memory claims_
     ) {
 
-        Loihi.PartitionTicket storage ticket = partitionTickets[_addr];
+        LoihiStorage.PartitionTicket storage ticket = partitionTickets[_addr];
 
         if (ticket.initialized) return ticket.claims;
 
@@ -58,19 +58,19 @@ library PartitionedLiquidity {
     }
 
     function partitionedWithdraw (
-        Loihi.Shell storage shell,
-        mapping (address => Loihi.PartitionTicket) storage partitionTickets,
-        address[] calldata _derivatives,
-        uint[] calldata _withdrawals
-    ) external returns (
+        LoihiStorage.Shell storage shell,
+        mapping (address => LoihiStorage.PartitionTicket) storage partitionTickets,
+        address[] memory _derivatives,
+        uint[] memory _withdrawals
+    ) internal returns (
         uint[] memory
     ) {
 
         uint _length = shell.reserves.length;
         uint _balance = shell.balances[msg.sender];
 
-        Loihi.PartitionTicket storage totalSuppliesTicket = partitionTickets[address(this)];
-        Loihi.PartitionTicket storage ticket = partitionTickets[msg.sender];
+        LoihiStorage.PartitionTicket storage totalSuppliesTicket = partitionTickets[address(this)];
+        LoihiStorage.PartitionTicket storage ticket = partitionTickets[msg.sender];
 
         if (!ticket.initialized) {
 
@@ -85,7 +85,7 @@ library PartitionedLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            Loihi.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
+            LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
             require(totalSuppliesTicket.claims[_assim.ix] >= _withdrawals[i], "Shell/burn-exceeds-total-supply");
             
