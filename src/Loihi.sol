@@ -179,9 +179,9 @@ contract Loihi is LoihiStorage {
 
         derivatives.push(_numeraire);
         
-        if (_numeraire != _reserve) derivtiaves.push(_reserve);
+        if (_numeraire != _reserve) derivatives.push(_reserve);
 
-        Orchestrator.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
+        Orchestrator.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _weight);
 
     }
 

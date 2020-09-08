@@ -101,7 +101,6 @@ library Orchestrator {
 
     function includeAsset (
         LoihiStorage.Shell storage shell,
-        address[] storage numeraires,
         address _numeraire,
         address _numeraireAssim,
         address _reserve,
@@ -119,9 +118,7 @@ library Orchestrator {
 
         require(_weight < 1e18, "Shell/weight-must-be-less-than-one");
         
-        if (_numeraire != _reserve) safeApprove(_numeraire, _reserve, uint(-1));)
-
-        numeraires.push(_numeraire);
+        if (_numeraire != _reserve) safeApprove(_numeraire, _reserve, uint(-1));
 
         LoihiStorage.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
@@ -184,7 +181,7 @@ library Orchestrator {
 
         require(_assimilator != address(0), "Shell/assimilator-cannot-be-zeroth-address");
 
-        safeApprove(_derivative, _reserve, uint(-1));)
+        safeApprove(_derivative, _reserve, uint(-1));
 
         LoihiStorage.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
