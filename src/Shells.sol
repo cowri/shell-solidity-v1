@@ -42,7 +42,7 @@ library Shells {
      * - `recipient` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer(LoihiStorage.Shell storage shell, address recipient, uint256 amount) internal returns (bool) {
+    function transfer(LoihiStorage.Shell storage shell, address recipient, uint256 amount) external returns (bool) {
         _transfer(shell, msg.sender, recipient, amount);
         return true;
     }
@@ -54,7 +54,7 @@ library Shells {
      *
      * - `spender` cannot be the zero address.
      */
-    function approve(LoihiStorage.Shell storage shell, address spender, uint256 amount) internal returns (bool) {
+    function approve(LoihiStorage.Shell storage shell, address spender, uint256 amount) external returns (bool) {
         _approve(shell, msg.sender, spender, amount);
         return true;
     }
@@ -71,7 +71,7 @@ library Shells {
      * - the caller must have allowance for `sender`'s tokens of at least
      * `amount`
      */
-    function transferFrom(LoihiStorage.Shell storage shell, address sender, address recipient, uint256 amount) internal returns (bool) {
+    function transferFrom(LoihiStorage.Shell storage shell, address sender, address recipient, uint256 amount) external returns (bool) {
         _transfer(shell, msg.sender, recipient, amount);
         _approve(shell, sender, msg.sender, sub(shell.allowances[sender][msg.sender], amount, "Shell/insufficient-allowance"));
         return true;
@@ -89,7 +89,7 @@ library Shells {
      *
      * - `spender` cannot be the zero address.
      */
-    function increaseAllowance(LoihiStorage.Shell storage shell, address spender, uint256 addedValue) internal returns (bool) {
+    function increaseAllowance(LoihiStorage.Shell storage shell, address spender, uint256 addedValue) external returns (bool) {
         _approve(shell, msg.sender, spender, add(shell.allowances[msg.sender][spender], addedValue, "Shell/approval-overflow"));
         return true;
     }
@@ -108,7 +108,7 @@ library Shells {
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
      */
-    function decreaseAllowance(LoihiStorage.Shell storage shell, address spender, uint256 subtractedValue) internal returns (bool) {
+    function decreaseAllowance(LoihiStorage.Shell storage shell, address spender, uint256 subtractedValue) external returns (bool) {
         _approve(shell, msg.sender, spender, sub(shell.allowances[msg.sender][spender], subtractedValue, "Shell/allowance-decrease-underflow"));
         return true;
     }

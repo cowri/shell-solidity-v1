@@ -43,7 +43,7 @@ library Orchestrator {
         uint256 _feeAtHalt,
         uint256 _epsilon,
         uint256 _lambda
-    ) internal returns (
+    ) external returns (
         uint256 max_
     ) {
 
@@ -83,11 +83,11 @@ library Orchestrator {
 
         int128 _gLiq;
 
-        int128[] memory _bals = new int128[](shell.assetAssimilators.length);
+        int128[] memory _bals = new int128[](shell.assets.length);
 
         for (uint i = 0; i < _bals.length; i++) {
 
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
 
             _bals[i] = _bal;
 
@@ -105,8 +105,9 @@ library Orchestrator {
         address _numeraireAssim,
         address _reserve,
         address _reserveAssim,
+        address _reserveApproveTo,
         uint256 _weight
-    ) internal {
+    ) external {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
 
@@ -118,25 +119,25 @@ library Orchestrator {
 
         require(_weight < 1e18, "Shell/weight-must-be-less-than-one");
         
-        if (_numeraire != _reserve) safeApprove(_numeraire, _reserve, uint(-1));
+        if (_numeraire != _reserve) safeApprove(_numeraire, _reserveApproveTo, uint(-1));
 
         LoihiStorage.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
         _numeraireAssimilator.addr = _numeraireAssim;
 
-        _numeraireAssimilator.ix = uint8(shell.assetAssimilators.length);
+        _numeraireAssimilator.ix = uint8(shell.assets.length);
 
         LoihiStorage.Assimilator storage _reserveAssimilator = shell.assimilators[_reserve];
 
         _reserveAssimilator.addr = _reserveAssim;
 
-        _reserveAssimilator.ix = uint8(shell.assetAssimilators.length);
+        _reserveAssimilator.ix = uint8(shell.assets.length);
 
         int128 __weight = _weight.divu(1e18).add(uint256(1).divu(1e18));
 
         shell.weights.push(__weight);
 
-        shell.assetAssimilators.push(_numeraireAssimilator);
+        shell.assets.push(_numeraireAssimilator);
 
         emit AssetIncluded(_numeraire, _reserve, _weight);
 
@@ -162,14 +163,14 @@ library Orchestrator {
 
     }
 
-
     function includeAssimilator (
         LoihiStorage.Shell storage shell,
         address _derivative,
         address _numeraire,
         address _reserve,
-        address _assimilator
-    ) internal {
+        address _assimilator,
+        address _derivativeApproveTo
+    ) external {
 
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
 
@@ -179,7 +180,7 @@ library Orchestrator {
 
         require(_assimilator != address(0), "Shell/assimilator-cannot-be-zeroth-address");
 
-        safeApprove(_derivative, _reserve, uint(-1));
+        safeApprove(_numeraire, _derivativeApproveTo, uint(-1));
 
         LoihiStorage.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
@@ -189,9 +190,9 @@ library Orchestrator {
 
     }
 
-    function prime (LoihiStorage.Shell storage shell) internal {
+    function prime (LoihiStorage.Shell storage shell) external {
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
 
         int128[] memory _oBals = new int128[](_length);
 
@@ -199,7 +200,7 @@ library Orchestrator {
 
         for (uint i = 0; i < _length; i++) {
 
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
 
             _oGLiq += _bal;
 
@@ -211,7 +212,7 @@ library Orchestrator {
 
     }
 
-    function viewShell (LoihiStorage.Shell storage shell) internal view returns (
+    function viewShell (LoihiStorage.Shell storage shell) external view returns (
         uint alpha_,
         uint beta_,
         uint delta_,

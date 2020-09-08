@@ -21,9 +21,9 @@ library PartitionedLiquidity {
     function partition (
         LoihiStorage.Shell storage shell,
         mapping (address => LoihiStorage.PartitionTicket) storage partitionTickets
-    ) internal {
+    ) external {
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
 
         LoihiStorage.PartitionTicket storage totalSupplyTicket = partitionTickets[address(this)];
 
@@ -39,7 +39,7 @@ library PartitionedLiquidity {
         LoihiStorage.Shell storage shell,
         mapping (address => LoihiStorage.PartitionTicket) storage partitionTickets,
         address _addr
-    ) internal view returns (
+    ) external view returns (
         uint[] memory claims_
     ) {
 
@@ -47,7 +47,7 @@ library PartitionedLiquidity {
 
         if (ticket.initialized) return ticket.claims;
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
         uint[] memory claims_ = new uint[](_length);
         uint _balance = shell.balances[msg.sender];
 
@@ -60,13 +60,13 @@ library PartitionedLiquidity {
     function partitionedWithdraw (
         LoihiStorage.Shell storage shell,
         mapping (address => LoihiStorage.PartitionTicket) storage partitionTickets,
-        address[] memory _derivatives,
-        uint[] memory _withdrawals
-    ) internal returns (
+        address[] calldata _derivatives,
+        uint[] calldata _withdrawals
+    ) external returns (
         uint[] memory
     ) {
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
         uint _balance = shell.balances[msg.sender];
 
         LoihiStorage.PartitionTicket storage totalSuppliesTicket = partitionTickets[address(this)];

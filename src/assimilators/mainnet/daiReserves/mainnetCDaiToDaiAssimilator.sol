@@ -135,6 +135,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
     // takes a numeraire value of CDai, figures out the raw amount, transfers raw amount out, and returns raw amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
+
         amount_ = _amount.mulu(1e18);
 
         uint _mintSuccess = cdai.mint(amount_);

@@ -90,26 +90,26 @@ contract AssimilatorSetOneTests is Setup, DSTest {
 
     function setUp() public {
 
-        setupStablecoinsLocal();
-        setupAssimilatorsSetOneLocal();
+        // setupStablecoinsLocal();
+        // setupAssimilatorsSetOneLocal();
 
         assimBouncer = new AssimilatorBouncer();
 
-        assimBouncer.TEST_includeAssimilatorState(
-            IERC20(dai),
-            ICToken(cdai),
-            IChai(chai),
-            IPot(pot),
-            IERC20(usdc),
-            ICToken(cusdc),
-            IERC20NoBool(usdt),
-            IAToken(ausdt),
-            IERC20(susd),
-            IAToken(asusd)
-        );
+        // assimBouncer.TEST_includeAssimilatorState(
+        //     IERC20(dai),
+        //     ICToken(cdai),
+        //     IChai(chai),
+        //     IPot(pot),
+        //     IERC20(usdc),
+        //     ICToken(cusdc),
+        //     IERC20NoBool(usdt),
+        //     IAToken(ausdt),
+        //     IERC20(susd),
+        //     IAToken(asusd)
+        // );
 
         approveStablecoins(address(assimBouncer));
-        interApproveStablecoinsLocal(address(assimBouncer));
+        // interApproveStablecoinsLocal(address(assimBouncer));
 
     }
 
@@ -416,11 +416,11 @@ contract AssimilatorSetTwoTests is Setup, DSTest {
 
     function setUp() public {
 
-        setupAssimilatorsSetTwoLocal();
-        setupStablecoinsLocal();
+        // setupAssimilatorsSetTwoLocal();
+        // setupStablecoinsLocal();
         assimBouncer = new AssimilatorBouncer();
         approveStablecoins(address(assimBouncer));
-        interApproveStablecoinsLocal(address(assimBouncer));
+        // interApproveStablecoinsLocal(address(assimBouncer));
 
     }
 

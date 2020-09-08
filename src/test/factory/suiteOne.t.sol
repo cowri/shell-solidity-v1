@@ -21,7 +21,7 @@ contract LoihiFactorySuiteOne is SelectiveDepositTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteOneLocalFromFactory();
+        // l = getLoihiSuiteOneLocalFromFactory();
 
     }
 

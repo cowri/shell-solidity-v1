@@ -561,7 +561,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         l.prime();
 
-        l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(usdt), 9910e6);
 
@@ -574,7 +574,7 @@ contract SelectiveWithdrawTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
 
-        l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(usdt), 9910e6);
 
@@ -613,7 +613,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         l.prime();
 
-        l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(susd), 1e18);
 
@@ -626,7 +626,7 @@ contract SelectiveWithdrawTemplate is Setup {
         susd.transfer(address(l), 9970e18);
         asusd.transfer(address(l), 9970e18);
 
-        l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(susd), 1e18);
 
@@ -668,7 +668,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         l.proportionalDeposit(30000e18, 1e50);
 
-        l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(dai), 8910e18);
 
@@ -731,7 +731,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         l.prime();
 
-        l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(usdc), 1e6);
 
@@ -752,7 +752,7 @@ contract SelectiveWithdrawTemplate is Setup {
         susd.transfer(address(l), 2970e18);
         asusd.transfer(address(l), 2970e18);
 
-        l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(usdc), 1e6);
 
@@ -775,7 +775,7 @@ contract SelectiveWithdrawTemplate is Setup {
         uint256 _usdtBal = usdt.balanceOf(address(this));
         uint256 _susdBal = susd.balanceOf(address(this));
 
-        l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         l.proportionalWithdraw(1e18, 1e50);
 

@@ -45,7 +45,7 @@ library Swaps {
         address _target,
         uint256 _originAmount,
         address _recipient
-    ) internal returns (
+    ) external returns (
         uint256 tAmt_
     ) {
 
@@ -70,18 +70,12 @@ library Swaps {
 
     }
 
-    // / @author james foley http://github.com/realisation
-    // / @notice view how much of the target currency the origin currency will provide
-    // / @param _origin the address of the origin
-    // / @param _target the address of the target
-    // / @param _originAmount the origin amount
-    // / @return tAmt_ the amount of target that has been swapped for the origin
     function viewOriginSwap (
         LoihiStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _originAmount
-    ) internal view returns (
+    ) external view returns (
         uint256 tAmt_
     ) {
 
@@ -104,22 +98,13 @@ library Swaps {
 
     }
 
-    // / @author james foley http://github.com/realisation
-    // / @notice transfer a dynamic origin amount into a fixed target amount at the recipients address
-    // / @param _origin the address of the origin
-    // / @param _target the address of the target
-    // / @param _mOAmt the maximum origin amount
-    // / @param _targetAmount the target amount
-    // / @param _dline deadline in block number after which the trade will not execute
-    // / @param _recipient the address of the recipient of the target
-    // / @return oAmt_ the amount of origin that has been swapped for the target
     function targetSwap (
         LoihiStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _targetAmount,
         address _recipient
-    ) internal returns (
+    ) external returns (
         uint256 oAmt_
     ) {
 
@@ -144,18 +129,12 @@ library Swaps {
 
     }
 
-    // / @author james foley http://github.com/realisation
-    // / @notice view how much of the origin currency the target currency will take
-    // / @param _origin the address of the origin
-    // / @param _target the address of the target
-    // / @param _targetAmount the target amount
-    // / @return oAmt_ the amount of target that has been swapped for the origin
     function viewTargetSwap (
         LoihiStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _targetAmount
-    ) internal view returns (
+    ) external view returns (
         uint256 oAmt_
     ) {
 
@@ -192,11 +171,11 @@ library Swaps {
         int128[] memory
     ) {
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
 
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
-        LoihiStorage.Assimilator[] memory _reserves = shell.assetAssimilators;
+        LoihiStorage.Assimilator[] memory _reserves = shell.assets;
 
         for (uint i = 0; i < _length; i++) {
 
@@ -238,11 +217,11 @@ library Swaps {
         int128[] memory
     ) {
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
 
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
-        LoihiStorage.Assimilator[] memory _reserves = shell.assetAssimilators;
+        LoihiStorage.Assimilator[] memory _reserves = shell.assets;
 
         for (uint i = 0; i < _length; i++) {
 
@@ -283,13 +262,13 @@ library Swaps {
         int128[] memory
     ) {
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
         int128[] memory nBals_ = new int128[](_length);
         int128[] memory oBals_ = new int128[](_length);
 
         for (uint i = 0; i < _length; i++) {
 
-            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
+            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
             else {
 
                 int128 _bal;
@@ -327,13 +306,13 @@ library Swaps {
         int128[] memory
     ) {
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
         int128[] memory nBals_ = new int128[](_length);
         int128[] memory oBals_ = new int128[](_length);
 
         for (uint i = 0; i < _length; i++) {
 
-            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
+            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
             else {
 
                 int128 _bal;

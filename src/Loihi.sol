@@ -116,27 +116,27 @@ contract Loihi is LoihiStorage {
         for (uint i = 0; i < _assetWeights.length; i++) {
 
             includeAsset(
-                _assets[i*4],   // numeraire
-                _assets[1+i*4], // numeraire assimilator
-                _assets[2+i*4], // reserve
-                _assets[3+i*4], // reserve assimilator
+                _assets[i*5],   // numeraire
+                _assets[1+i*5], // numeraire assimilator
+                _assets[2+i*5], // reserve
+                _assets[3+i*5], // reserve assimilator
+                _assets[4+i*5], // reserve approve to
                 _assetWeights[i]
             );
             
         }
         
-        for (uint i = 0; i < _derivativeAssimilators.length / 4; i++) {
+        for (uint i = 0; i < _derivativeAssimilators.length / 5; i++) {
 
             includeAssimilator(
-                _derivativeAssimilators[i*4],   // derivative
-                _derivativeAssimilators[1+i*4], // numeraire
-                _derivativeAssimilators[2+i*4], // reserve
-                _derivativeAssimilators[3+i*4]  // assimilator
+                _derivativeAssimilators[i*5],   // derivative
+                _derivativeAssimilators[1+i*5], // numeraire
+                _derivativeAssimilators[2+i*5], // reserve
+                _derivativeAssimilators[3+i*5], // assimilator
+                _derivativeAssimilators[4+i*5]  // derivative approve to
             );
 
         }
-
-        shell.TEST_HALTS = true;
 
     }
 
@@ -170,6 +170,7 @@ contract Loihi is LoihiStorage {
         address _nAssim,
         address _reserve,
         address _rAssim,
+        address _rApproveTo,
         uint _weight
     ) private {
         
@@ -181,7 +182,7 @@ contract Loihi is LoihiStorage {
         
         if (_numeraire != _reserve) derivatives.push(_reserve);
 
-        Orchestrator.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _weight);
+        Orchestrator.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _rApproveTo, _weight);
 
     }
 
@@ -195,12 +196,13 @@ contract Loihi is LoihiStorage {
         address _derivative, 
         address _numeraire, 
         address _reserve, 
-        address _assimilator
+        address _assimilator,
+        address _derivativeApproveTo
     ) private {
         
         derivatives.push(_derivative);
 
-        Orchestrator.includeAssimilator(shell, _derivative, _numeraire, _reserve, _assimilator);
+        Orchestrator.includeAssimilator(shell, _derivative, _numeraire, _reserve, _assimilator, _derivativeApproveTo);
 
     }
     
