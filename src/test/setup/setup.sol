@@ -25,7 +25,11 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         
         setupAssimilatorsSetOneKovan();
 
-        loihi_ = Loihi(0x32FA3bC6f7A4AF8F41D7096c292E9310F923915D);
+        loihi_ = Loihi(0xBAf7e2545C0Cee669c73AeC3B0884823a1B7E950);
+
+        approveStablecoins(address(loihi_));
+        
+        // loihi_ = getLoihiSuiteOneKovanFromFactory();
 
         // loihi_ = getLoihiSuiteOneMainnet();
 
@@ -78,7 +82,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         
         setupAssimilatorsSetOneKovan();
         
-        LoihiFactory lf = LoihiFactory(0x6d6d82bca905DC79f3e09fE1E5637cdC395050c3);
+        LoihiFactory lf = LoihiFactory(0x785396FE84b79562dB02b540322340028441A1Cc);
 
         address[] memory _assets = new address[](16);
         uint[] memory _assetWeights = new uint[](4);
