@@ -151,18 +151,6 @@ library Orchestrator {
 
     }
     
-    function safeApprove (
-        address _token,
-        address _spender,
-        uint256 _value
-    ) private {
-
-        ( bool success, bytes memory returndata ) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
-
-        require(success, "SafeERC20: low-level call failed");
-
-    }
-
     function includeAssimilator (
         LoihiStorage.Shell storage shell,
         address _derivative,
@@ -187,6 +175,18 @@ library Orchestrator {
         shell.assimilators[_derivative] = LoihiStorage.Assimilator(_assimilator, _numeraireAssim.ix);
 
         emit AssimilatorIncluded(_derivative, _numeraire, _reserve, _assimilator);
+
+    }
+
+    function safeApprove (
+        address _token,
+        address _spender,
+        uint256 _value
+    ) private {
+
+        ( bool success, bytes memory returndata ) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
+
+        require(success, "SafeERC20: low-level call failed");
 
     }
 
