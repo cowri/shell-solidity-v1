@@ -143,200 +143,200 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
     function getLoihiSuiteOneLocal () public returns (Loihi loihi_) {
 
-        setupStablecoinsLocal();
-        setupAssimilatorsSetOneLocal();
+        // setupStablecoinsLocal();
+        // setupAssimilatorsSetOneLocal();
 
-        loihi_ = newLoihi();
+        // loihi_ = newLoihi();
         
-        loihi_.TEST_includeAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
+        // loihi_.TEST_includeAssimilatorState(
+        //     dai, cdai, chai, pot,
+        //     usdc, cusdc,
+        //     usdt, ausdt,
+        //     susd, asusd
+        // );
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
+        // includeAssetsSetOne(loihi_);
+        // includeAssimilatorsSetOne(loihi_);
 
-        setParamsSetOne(loihi_);
+        // setParamsSetOne(loihi_);
 
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
+        // approveStablecoins(address(loihi_));
+        // interApproveStablecoinsLocal(address(loihi_));
 
 
     }
 
     function getLoihiSuiteOneMainnet () public returns (Loihi loihi_) {
 
-        setupStablecoinsMainnet();
-        setupAssimilatorsSetOneMainnet();
+        // setupStablecoinsMainnet();
+        // setupAssimilatorsSetOneMainnet();
 
-        loihi_ = newLoihi();
+        // loihi_ = newLoihi();
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
-        setParamsSetOne(loihi_);
+        // includeAssetsSetOne(loihi_);
+        // includeAssimilatorsSetOne(loihi_);
+        // setParamsSetOne(loihi_);
 
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsRPC(address(loihi_));
+        // approveStablecoins(address(loihi_));
+        // interApproveStablecoinsRPC(address(loihi_));
 
     }
 
     function getLoihiSuiteTwoLocal () public returns (Loihi loihi_) {
 
-        setupStablecoinsLocal();
-        setupAssimilatorsSetOneLocal();
+        // setupStablecoinsLocal();
+        // setupAssimilatorsSetOneLocal();
 
-        loihi_ = newLoihi();
+        // loihi_ = newLoihi();
 
-        loihi_.TEST_includeAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
+        // loihi_.TEST_includeAssimilatorState(
+        //     dai, cdai, chai, pot,
+        //     usdc, cusdc,
+        //     usdt, ausdt,
+        //     susd, asusd
+        // );
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
-        setParamsSetTwo(loihi_);
+        // includeAssetsSetOne(loihi_);
+        // includeAssimilatorsSetOne(loihi_);
+        // setParamsSetTwo(loihi_);
 
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
+        // approveStablecoins(address(loihi_));
+        // interApproveStablecoinsLocal(address(loihi_));
 
     }
 
     function getLoihiSuiteThreeLocal () public returns (Loihi loihi_) {
 
-        setupStablecoinsLocal();
-        setupAssimilatorsSetTwoLocal();
+        // setupStablecoinsLocal();
+        // setupAssimilatorsSetTwoLocal();
 
-        loihi_ = newLoihi();
+        // loihi_ = newLoihi();
         
-        loihi_.TEST_includeAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
+        // loihi_.TEST_includeAssimilatorState(
+        //     dai, cdai, chai, pot,
+        //     usdc, cusdc,
+        //     usdt, ausdt,
+        //     susd, asusd
+        // );
 
-        includeAssetsSetTwo(loihi_);
-        includeAssimilatorsSetTwo(loihi_);
-        setParamsSetOne(loihi_);
+        // includeAssetsSetTwo(loihi_);
+        // includeAssimilatorsSetTwo(loihi_);
+        // setParamsSetOne(loihi_);
 
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
+        // approveStablecoins(address(loihi_));
+        // interApproveStablecoinsLocal(address(loihi_));
 
     }
 
     function getLoihiSuiteFourLocal () public returns (Loihi loihi_) {
 
-        setupStablecoinsLocal();
-        setupAssimilatorsSetTwoLocal();
+        // setupStablecoinsLocal();
+        // setupAssimilatorsSetTwoLocal();
 
-        loihi_ = newLoihi();
+        // loihi_ = newLoihi();
 
-        loihi_.TEST_includeAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
+        // loihi_.TEST_includeAssimilatorState(
+        //     dai, cdai, chai, pot,
+        //     usdc, cusdc,
+        //     usdt, ausdt,
+        //     susd, asusd
+        // );
 
-        includeAssetsSetTwo(loihi_);
-        includeAssimilatorsSetTwo(loihi_);
-        setParamsSetTwo(loihi_);
+        // includeAssetsSetTwo(loihi_);
+        // includeAssimilatorsSetTwo(loihi_);
+        // setParamsSetTwo(loihi_);
 
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
+        // approveStablecoins(address(loihi_));
+        // interApproveStablecoinsLocal(address(loihi_));
 
     }
 
     function getLoihiSuiteFiveLocal () public returns (Loihi loihi_) {
 
-        setupStablecoinsLocal();
-        setupAssimilatorsSetOneLocal();
+        // setupStablecoinsLocal();
+        // setupAssimilatorsSetOneLocal();
 
-        loihi_ = newLoihi();
+        // loihi_ = newLoihi();
         
-        loihi_.TEST_includeAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
+        // loihi_.TEST_includeAssimilatorState(
+        //     dai, cdai, chai, pot,
+        //     usdc, cusdc,
+        //     usdt, ausdt,
+        //     susd, asusd
+        // );
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
-        setParamsSetFour(loihi_);
+        // includeAssetsSetOne(loihi_);
+        // includeAssimilatorsSetOne(loihi_);
+        // setParamsSetFour(loihi_);
 
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
+        // approveStablecoins(address(loihi_));
+        // interApproveStablecoinsLocal(address(loihi_));
 
     }
 
     function getLoihiSuiteSixLocal () public returns (Loihi loihi_) {
 
-        setupStablecoinsLocal();
-        setupAssimilatorsSetOneLocal();
+        // setupStablecoinsLocal();
+        // setupAssimilatorsSetOneLocal();
 
-        loihi_ = newLoihi();
+        // loihi_ = newLoihi();
 
-        loihi_.TEST_includeAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
+        // loihi_.TEST_includeAssimilatorState(
+        //     dai, cdai, chai, pot,
+        //     usdc, cusdc,
+        //     usdt, ausdt,
+        //     susd, asusd
+        // );
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
-        setParamsSetThree(loihi_);
+        // includeAssetsSetOne(loihi_);
+        // includeAssimilatorsSetOne(loihi_);
+        // setParamsSetThree(loihi_);
 
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
+        // approveStablecoins(address(loihi_));
+        // interApproveStablecoinsLocal(address(loihi_));
 
     }
 
     function getLoihiSuiteSixLocalClone () public returns (Loihi loihi_) {
 
-        loihi_ = newLoihi();
+        // loihi_ = newLoihi();
 
-        loihi_.TEST_includeAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
+        // loihi_.TEST_includeAssimilatorState(
+        //     dai, cdai, chai, pot,
+        //     usdc, cusdc,
+        //     usdt, ausdt,
+        //     susd, asusd
+        // );
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
-        setParamsSetThree(loihi_);
+        // includeAssetsSetOne(loihi_);
+        // includeAssimilatorsSetOne(loihi_);
+        // setParamsSetThree(loihi_);
 
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
+        // approveStablecoins(address(loihi_));
+        // interApproveStablecoinsLocal(address(loihi_));
 
     }
 
     function getLoihiSuiteSeven () public returns (Loihi loihi_) {
 
-        setupStablecoinsLocal();
-        setupAssimilatorsSetOneLocal();
+        // setupStablecoinsLocal();
+        // setupAssimilatorsSetOneLocal();
 
-        loihi_ = newLoihi();
+        // loihi_ = newLoihi();
 
-        loihi_.TEST_includeAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
+        // loihi_.TEST_includeAssimilatorState(
+        //     dai, cdai, chai, pot,
+        //     usdc, cusdc,
+        //     usdt, ausdt,
+        //     susd, asusd
+        // );
 
-        includeAssetsSetOne(loihi_);
-        includeAssimilatorsSetOne(loihi_);
-        setParamsSetFive(loihi_);
+        // includeAssetsSetOne(loihi_);
+        // includeAssimilatorsSetOne(loihi_);
+        // setParamsSetFive(loihi_);
 
-        approveStablecoins(address(loihi_));
-        interApproveStablecoinsLocal(address(loihi_));
+        // approveStablecoins(address(loihi_));
+        // interApproveStablecoinsLocal(address(loihi_));
 
     }
 

@@ -192,11 +192,11 @@ library Swaps {
         int128[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
 
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
-        LoihiStorage.Assimilator[] memory _reserves = shell.reserves;
+        LoihiStorage.Assimilator[] memory _reserves = shell.assetAssimilators;
 
         for (uint i = 0; i < _length; i++) {
 
@@ -238,11 +238,11 @@ library Swaps {
         int128[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
 
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
-        LoihiStorage.Assimilator[] memory _reserves = shell.reserves;
+        LoihiStorage.Assimilator[] memory _reserves = shell.assetAssimilators;
 
         for (uint i = 0; i < _length; i++) {
 
@@ -283,13 +283,13 @@ library Swaps {
         int128[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
         int128[] memory nBals_ = new int128[](_length);
         int128[] memory oBals_ = new int128[](_length);
 
         for (uint i = 0; i < _length; i++) {
 
-            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
             else {
 
                 int128 _bal;
@@ -327,13 +327,13 @@ library Swaps {
         int128[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
         int128[] memory nBals_ = new int128[](_length);
         int128[] memory oBals_ = new int128[](_length);
 
         for (uint i = 0; i < _length; i++) {
 
-            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            if (i != _inputIx) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
             else {
 
                 int128 _bal;

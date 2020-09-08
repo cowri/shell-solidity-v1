@@ -83,11 +83,11 @@ library Orchestrator {
 
         int128 _gLiq;
 
-        int128[] memory _bals = new int128[](shell.reserves.length);
+        int128[] memory _bals = new int128[](shell.assetAssimilators.length);
 
         for (uint i = 0; i < _bals.length; i++) {
 
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
 
             _bals[i] = _bal;
 
@@ -124,21 +124,19 @@ library Orchestrator {
 
         _numeraireAssimilator.addr = _numeraireAssim;
 
-        _numeraireAssimilator.ix = uint8(shell.numeraires.length);
-
-        shell.numeraires.push(_numeraireAssimilator);
+        _numeraireAssimilator.ix = uint8(shell.assetAssimilators.length);
 
         LoihiStorage.Assimilator storage _reserveAssimilator = shell.assimilators[_reserve];
 
         _reserveAssimilator.addr = _reserveAssim;
 
-        _reserveAssimilator.ix = uint8(shell.reserves.length);
-
-        shell.reserves.push(_reserveAssimilator);
+        _reserveAssimilator.ix = uint8(shell.assetAssimilators.length);
 
         int128 __weight = _weight.divu(1e18).add(uint256(1).divu(1e18));
 
         shell.weights.push(__weight);
+
+        shell.assetAssimilators.push(_numeraireAssimilator);
 
         emit AssetIncluded(_numeraire, _reserve, _weight);
 
@@ -193,7 +191,7 @@ library Orchestrator {
 
     function prime (LoihiStorage.Shell storage shell) internal {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
 
         int128[] memory _oBals = new int128[](_length);
 
@@ -201,7 +199,7 @@ library Orchestrator {
 
         for (uint i = 0; i < _length; i++) {
 
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
 
             _oGLiq += _bal;
 
