@@ -285,32 +285,6 @@ contract Loihi is LoihiStorage {
     }
 
     /// @author james foley http://github.com/realisation
-    /// @notice swap a dynamic origin amount for a fixed target amount
-    /// @param _origin the address of the origin
-    /// @param _target the address of the target
-    /// @param _originAmount the origin amount
-    /// @param _minTargetAmount the minimum target amount
-    /// @param _deadline deadline in block number after which the trade will not execute
-    /// @param _recipient the address to send the target amount
-    /// @return targetAmount_ the amount of target that has been swapped for the origin amount
-    function originSwapTo (
-        address _origin,
-        address _target,
-        uint _originAmount,
-        uint _minTargetAmount,
-        uint _deadline,
-        address _recipient
-    ) external deadline(_deadline) transactable nonReentrant returns (
-        uint targetAmount_
-    ) {
-
-        targetAmount_ = Swaps.originSwap(shell, _origin, _target, _originAmount, _recipient);
-
-        require(targetAmount_ > _minTargetAmount, "Shell/below-min-target-amount");
-
-    }
-
-    /// @author james foley http://github.com/realisation
     /// @notice view how much target amount a fixed origin amount will swap for
     /// @param _origin the address of the origin
     /// @param _target the address of the target
@@ -348,32 +322,6 @@ contract Loihi is LoihiStorage {
     ) {
 
         originAmount_ = Swaps.targetSwap(shell, _origin, _target, _targetAmount, msg.sender);
-
-        require(originAmount_ < _maxOriginAmount, "Shell/above-max-origin-amount");
-
-    }
-
-    /// @author james foley http://github.com/realisation
-    /// @notice transfer a dynamic origin amount into a fixed target amount at the recipients address
-    /// @param _origin the address of the origin
-    /// @param _target the address of the target
-    /// @param _maxOriginAmount the maximum origin amount
-    /// @param _targetAmount the target amount
-    /// @param _deadline deadline in block number after which the trade will not execute
-    /// @param _recipient the address of the recipient of the target
-    /// @return originAmount_ the amount of origin that has been swapped for the target
-    function targetSwapTo (
-        address _origin,
-        address _target,
-        uint _maxOriginAmount,
-        uint _targetAmount,
-        uint _deadline,
-        address _recipient
-    ) external deadline(_deadline) transactable nonReentrant returns (
-        uint originAmount_
-    ) {
-
-        originAmount_ = Swaps.targetSwap(shell, _origin, _target, _targetAmount, _recipient);
 
         require(originAmount_ < _maxOriginAmount, "Shell/above-max-origin-amount");
 
