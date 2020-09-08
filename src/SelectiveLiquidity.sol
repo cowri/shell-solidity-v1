@@ -29,10 +29,10 @@ library SelectiveLiquidity {
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (
         LoihiStorage.Shell storage shell,
-        address[] memory _derivatives,
-        uint[] memory _amounts,
+        address[] calldata _derivatives,
+        uint[] calldata _amounts,
         uint _minShells
-    ) internal returns (
+    ) external returns (
         uint shells_
     ) {
 
@@ -59,9 +59,9 @@ library SelectiveLiquidity {
     // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function viewSelectiveDeposit (
         LoihiStorage.Shell storage shell,
-        address[] memory _derivatives,
-        uint[] memory _amounts
-    ) internal view returns (
+        address[] calldata _derivatives,
+        uint[] calldata _amounts
+    ) external view returns (
         uint shells_
     ) {
 
@@ -76,7 +76,6 @@ library SelectiveLiquidity {
 
     }
 
-
     // / @author james foley http://github.com/realisation
     // / @notice selectively withdrawal any supported stablecoin flavor from the contract by burning a corresponding amount of shell tokens
     // / @param _derivatives an array of flavors to withdraw from the reserves
@@ -84,10 +83,10 @@ library SelectiveLiquidity {
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (
         LoihiStorage.Shell storage shell,
-        address[] memory _derivatives,
-        uint[] memory _amounts,
+        address[] calldata _derivatives,
+        uint[] calldata _amounts,
         uint _maxShells
-    ) internal returns (
+    ) external returns (
         uint256 shells_
     ) {
 
@@ -117,9 +116,9 @@ library SelectiveLiquidity {
     // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function viewSelectiveWithdraw (
         LoihiStorage.Shell storage shell,
-        address[] memory _derivatives,
-        uint[] memory _amounts
-    ) internal view returns (
+        address[] calldata _derivatives,
+        uint[] calldata _amounts
+    ) external view returns (
         uint shells_
     ) {
 
@@ -135,7 +134,7 @@ library SelectiveLiquidity {
         shells_ = _shells.mulu(1e18);
 
     }
-
+    
     function getLiquidityDepositData (
         LoihiStorage.Shell storage shell,
         address[] memory _derivatives,
@@ -154,7 +153,7 @@ library SelectiveLiquidity {
         for (uint i = 0; i < _derivatives.length; i++) {
 
             LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
-
+            
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
             if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {

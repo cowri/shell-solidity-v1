@@ -34,8 +34,6 @@ library Orchestrator {
 
     event AssimilatorIncluded(address indexed derivative, address indexed numeraire, address indexed reserve, address assimilator);
 
-    event log_int(bytes32, int);
-
     function setParams (
         LoihiStorage.Shell storage shell,
         uint256 _alpha,
@@ -43,7 +41,7 @@ library Orchestrator {
         uint256 _feeAtHalt,
         uint256 _epsilon,
         uint256 _lambda
-    ) internal returns (
+    ) external returns (
         uint256 max_
     ) {
 
@@ -98,16 +96,15 @@ library Orchestrator {
         omega_ = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
 
     }
-
+    
     function includeAsset (
         LoihiStorage.Shell storage shell,
-        address[] storage numeraires,
         address _numeraire,
         address _numeraireAssim,
         address _reserve,
         address _reserveAssim,
         uint256 _weight
-    ) internal {
+    ) external {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
 
@@ -119,14 +116,12 @@ library Orchestrator {
 
         require(_weight < 1e18, "Shell/weight-must-be-less-than-one");
         
-        if (_numeraire != _reserve) safeApprove(_numeraire, _reserve, uint(-1));)
-
-        numeraires.push(_numeraire);
+        if (_numeraire != _reserve) safeApprove(_numeraire, _reserve, uint(-1));
 
         LoihiStorage.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
         _numeraireAssimilator.addr = _numeraireAssim;
-
+        
         _numeraireAssimilator.ix = uint8(shell.numeraires.length);
 
         shell.numeraires.push(_numeraireAssimilator);
@@ -174,7 +169,7 @@ library Orchestrator {
         address _numeraire,
         address _reserve,
         address _assimilator
-    ) internal {
+    ) external {
 
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
 
@@ -184,7 +179,7 @@ library Orchestrator {
 
         require(_assimilator != address(0), "Shell/assimilator-cannot-be-zeroth-address");
 
-        safeApprove(_derivative, _reserve, uint(-1));)
+        safeApprove(_derivative, _reserve, uint(-1));
 
         LoihiStorage.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
@@ -194,7 +189,9 @@ library Orchestrator {
 
     }
 
-    function prime (LoihiStorage.Shell storage shell) internal {
+    function prime (
+        LoihiStorage.Shell storage shell
+    ) external {
 
         uint _length = shell.reserves.length;
 
@@ -216,7 +213,9 @@ library Orchestrator {
 
     }
 
-    function viewShell (LoihiStorage.Shell storage shell) internal view returns (
+    function viewShell (
+        LoihiStorage.Shell storage shell
+    ) external view returns (
         uint alpha_,
         uint beta_,
         uint delta_,

@@ -35,66 +35,10 @@ import "../../assimilators/mainnet/asusdReserves/mainnetASUsdToASUsdAssimilator.
 import "../../assimilators/mainnet/ausdtReserves/mainnetUsdtToAUsdtAssimilator.sol";
 import "../../assimilators/mainnet/ausdtReserves/mainnetAUsdtToAUsdtAssimilator.sol";
 
-/* Assimilator set one - staking to dai, usdc, usdt and susd */
-import "../../assimilators/local/daiReserves/localDaiToDaiAssimilator.sol";
-import "../../assimilators/local/daiReserves/localCDaiToDaiAssimilator.sol";
-import "../../assimilators/local/daiReserves/localChaiToDaiAssimilator.sol";
-import "../../assimilators/local/usdcReserves/localUsdcToUsdcAssimilator.sol";
-import "../../assimilators/local/usdcReserves/localCUsdcToUsdcAssimilator.sol";
-import "../../assimilators/local/usdtReserves/localUsdtToUsdtAssimilator.sol";
-import "../../assimilators/local/usdtReserves/localAUsdtToUsdtAssimilator.sol";
-import "../../assimilators/local/susdReserves/localSUsdToSUsdAssimilator.sol";
-import "../../assimilators/local/susdReserves/localASUsdToSUsdAssimilator.sol";
-
-/* Local Assimilators set two - holding reserves in cDai, cUsdc, aUsdt and aSusd */
-import "../../assimilators/local/cdaiReserves/localDaiToCDaiAssimilator.sol";
-import "../../assimilators/local/cdaiReserves/localCDaiToCDaiAssimilator.sol";
-import "../../assimilators/local/cdaiReserves/localChaiToCDaiAssimilator.sol";
-import "../../assimilators/local/cusdcReserves/localUsdcToCUsdcAssimilator.sol";
-import "../../assimilators/local/cusdcReserves/localCUsdcToCUsdcAssimilator.sol";
-import "../../assimilators/local/ausdtReserves/localUsdtToAUsdtAssimilator.sol";
-import "../../assimilators/local/ausdtReserves/localAUsdtToAUsdtAssimilator.sol";
-import "../../assimilators/local/asusdReserves/localSUsdToASUsdAssimilator.sol";
-import "../../assimilators/local/asusdReserves/localASUsdToASUsdAssimilator.sol";
-
 contract AssimilatorSetup is StorageSetup {
 
     event log_bytes(bytes32, bytes4);
     
-    function setupAssimilatorsSetOneLocal () public {
-
-        daiAssimilator = IAssimilator(address(new LocalDaiToDaiAssimilator(address(dai))));
-        cdaiAssimilator = IAssimilator(address(new LocalCDaiToDaiAssimilator(address(dai), address(cdai))));
-        chaiAssimilator = IAssimilator(address(new LocalChaiToDaiAssimilator(address(dai), address(chai), address(pot))));
-
-        usdcAssimilator = IAssimilator(address(new LocalUsdcToUsdcAssimilator(address(usdc))));
-        cusdcAssimilator = IAssimilator(address(new LocalCUsdcToUsdcAssimilator(address(usdc), address(cusdc))));
-
-        usdtAssimilator = IAssimilator(address(new LocalUsdtToUsdtAssimilator(address(usdt))));
-        ausdtAssimilator = IAssimilator(address(new LocalAUsdtToUsdtAssimilator(address(usdt), address(ausdt))));
-
-        susdAssimilator = IAssimilator(address(new LocalSUsdToSUsdAssimilator(address(susd))));
-        asusdAssimilator = IAssimilator(address(new LocalASUsdToSUsdAssimilator(address(susd), address(asusd))));
-
-    }
-
-    function setupAssimilatorsSetTwoLocal () public {
-
-        daiAssimilator = IAssimilator(address(new LocalDaiToCDaiAssimilator(address(dai), address(cdai))));
-        cdaiAssimilator = IAssimilator(address(new LocalCDaiToCDaiAssimilator(address(cdai))));
-        chaiAssimilator = IAssimilator(address(new LocalChaiToCDaiAssimilator(address(dai), address(cdai), address(chai), address(pot))));
-
-        usdcAssimilator = IAssimilator(address(new LocalUsdcToCUsdcAssimilator(address(usdc), address(cusdc))));
-        cusdcAssimilator = IAssimilator(address(new LocalCUsdcToCUsdcAssimilator(address(cusdc))));
-
-        usdtAssimilator = IAssimilator(address(new LocalUsdtToAUsdtAssimilator(address(usdt), address(ausdt))));
-        ausdtAssimilator = IAssimilator(address(new LocalAUsdtToAUsdtAssimilator(address(ausdt))));
-
-        susdAssimilator = IAssimilator(address(new LocalSUsdToASUsdAssimilator(address(susd), address(asusd))));
-        asusdAssimilator = IAssimilator(address(new LocalASUsdToASUsdAssimilator(address(asusd))));
-
-    }
-
     function setupAssimilatorsSetOneKovan () public {
 
         usdcAssimilator = IAssimilator(address(new KovanUsdcToUsdcAssimilator()));

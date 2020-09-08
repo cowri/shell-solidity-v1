@@ -45,7 +45,7 @@ library Swaps {
         address _target,
         uint256 _originAmount,
         address _recipient
-    ) internal returns (
+    ) external returns (
         uint256 tAmt_
     ) {
 
@@ -81,7 +81,7 @@ library Swaps {
         address _origin,
         address _target,
         uint256 _originAmount
-    ) internal view returns (
+    ) external view returns (
         uint256 tAmt_
     ) {
 
@@ -119,7 +119,7 @@ library Swaps {
         address _target,
         uint256 _targetAmount,
         address _recipient
-    ) internal returns (
+    ) external returns (
         uint256 oAmt_
     ) {
 
@@ -155,7 +155,7 @@ library Swaps {
         address _origin,
         address _target,
         uint256 _targetAmount
-    ) internal view returns (
+    ) external view returns (
         uint256 oAmt_
     ) {
 

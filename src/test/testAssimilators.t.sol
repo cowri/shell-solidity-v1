@@ -90,40 +90,40 @@ contract AssimilatorSetOneTests is Setup, DSTest {
 
     function setUp() public {
 
-        setupStablecoinsLocal();
-        setupAssimilatorsSetOneLocal();
+        // setupStablecoinsLocal();
+        // setupAssimilatorsSetOneLocal();
 
-        assimBouncer = new AssimilatorBouncer();
+        // assimBouncer = new AssimilatorBouncer();
 
-        assimBouncer.TEST_includeAssimilatorState(
-            IERC20(dai),
-            ICToken(cdai),
-            IChai(chai),
-            IPot(pot),
-            IERC20(usdc),
-            ICToken(cusdc),
-            IERC20NoBool(usdt),
-            IAToken(ausdt),
-            IERC20(susd),
-            IAToken(asusd)
-        );
+        // assimBouncer.TEST_includeAssimilatorState(
+        //     IERC20(dai),
+        //     ICToken(cdai),
+        //     IChai(chai),
+        //     IPot(pot),
+        //     IERC20(usdc),
+        //     ICToken(cusdc),
+        //     IERC20NoBool(usdt),
+        //     IAToken(ausdt),
+        //     IERC20(susd),
+        //     IAToken(asusd)
+        // );
 
-        approveStablecoins(address(assimBouncer));
-        interApproveStablecoinsLocal(address(assimBouncer));
+        // approveStablecoins(address(assimBouncer));
+        // interApproveStablecoinsLocal(address(assimBouncer));
 
     }
 
     function testAssimilator_DAI_to_CDAI_views () public {
 
-        uint256 daiOf5Numeraire = daiAssimilator.viewRawAmount(
-            uint256(5e18).divu(1e18)
-        );
+        // uint256 daiOf5Numeraire = daiAssimilator.viewRawAmount(
+        //     uint256(5e18).divu(1e18)
+        // );
 
-        uint256 fiveNumeraireOfDai = daiAssimilator.viewNumeraireAmount(
-            daiOf5Numeraire
-        ).mulu(1e18);
+        // uint256 fiveNumeraireOfDai = daiAssimilator.viewNumeraireAmount(
+        //     daiOf5Numeraire
+        // ).mulu(1e18);
 
-        assertTrue(daiOf5Numeraire == fiveNumeraireOfDai);
+        // assertTrue(daiOf5Numeraire == fiveNumeraireOfDai);
 
     }
 
@@ -416,11 +416,11 @@ contract AssimilatorSetTwoTests is Setup, DSTest {
 
     function setUp() public {
 
-        setupAssimilatorsSetTwoLocal();
-        setupStablecoinsLocal();
-        assimBouncer = new AssimilatorBouncer();
-        approveStablecoins(address(assimBouncer));
-        interApproveStablecoinsLocal(address(assimBouncer));
+        // setupAssimilatorsSetTwoLocal();
+        // setupStablecoinsLocal();
+        // assimBouncer = new AssimilatorBouncer();
+        // approveStablecoins(address(assimBouncer));
+        // interApproveStablecoinsLocal(address(assimBouncer));
 
     }
 

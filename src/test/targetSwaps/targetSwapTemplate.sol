@@ -37,13 +37,13 @@ contract TargetSwapTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         originAmount_ = l.targetSwap(
             address(usdc),
             address(susd),
-            3e18
+            3e6
         );
 
     }
@@ -55,18 +55,6 @@ contract TargetSwapTemplate is Setup {
         originAmount_ = l.targetSwap(
             address(susd),
             address(usdt),
-            4e6
-        );
-
-    }
-
-    function noSlippage_Balanced_10PctWeight_to_30PctWeight_AUSDT () public returns (uint256 originAmount_) {
-
-        l.proportionalDeposit(300e18, 1e50);
-
-        originAmount_ = l.targetSwap(
-            address(susd),
-            address(ausdt),
             4e6
         );
 
@@ -91,19 +79,7 @@ contract TargetSwapTemplate is Setup {
         originAmount_ = l.targetSwap(
             address(usdc),
             address(susd),
-            12e18
-        );
-
-    }
-
-    function partialUpperAndLowerSLippage_balanced_30PctWeight_to_10PctWeight_ASUSD () public returns (uint256 originAmount_) {
-
-        l.proportionalDeposit(300e18, 1e50);
-
-        originAmount_ = l.targetSwap(
-            address(usdc),
-            address(asusd),
-            12e18
+            12e6
         );
 
     }
@@ -114,7 +90,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 65e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         originAmount_ = l.targetSwap(
@@ -131,34 +107,14 @@ contract TargetSwapTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         originAmount_ = l.targetSwap(
             address(usdc),
             address(susd),
-            3e18
+            3e6
         );
-
-    }
-
-    function noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight_CUSDC () public returns (uint256 originAmount_) {
-
-        l.deposit(
-            address(dai), 80e18,
-            address(usdc), 100e6,
-            address(usdt), 85e6,
-            address(susd), 35e18
-        );
-
-        uint256 originAmount = l.targetSwap(
-            address(cusdc),
-            address(susd),
-            3e18
-        );
-
-        originAmount_ = cusdcAssimilator.viewNumeraireAmount(originAmount).mulu(1e18);
-
 
     }
 
@@ -168,7 +124,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 90e6,
             address(usdt), 65e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         originAmount_ = l.targetSwap(
@@ -185,13 +141,13 @@ contract TargetSwapTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 90e6,
             address(usdt), 65e6,
-            address(susd), 25e18
+            address(susd), 25e6
         );
 
         originAmount_ = l.targetSwap(
             address(dai),
             address(susd),
-            3e18
+            3e6
         );
 
     }
@@ -202,7 +158,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 55e6,
             address(usdt), 90e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         originAmount_ = l.targetSwap(
@@ -219,7 +175,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 60e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         originAmount_ = l.targetSwap(
@@ -230,32 +186,13 @@ contract TargetSwapTemplate is Setup {
 
     }
 
-    function partialUpperAndLowerAntiSlippage_unbalanced_CHAI_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
-
-        l.deposit(
-            address(dai), 135e18,
-            address(usdc), 90e6,
-            address(usdt), 90e6,
-            address(susd), 25e18
-        );
-
-        uint256 chaiOf10Numeraire = chaiAssimilator.viewRawAmount(uint(10e18).divu(1e18));
-
-        originAmount_ = l.targetSwap(
-            address(susd),
-            address(chai),
-            chaiOf10Numeraire
-        );
-
-    }
-
     function partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 135e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 25e18
+            address(susd), 25e6
         );
 
         originAmount_ = l.targetSwap(
@@ -272,13 +209,13 @@ contract TargetSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 58e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
         originAmount_ = l.targetSwap(
             address(usdt),
             address(susd),
-            10e18
+            10e6
         );
 
     }
@@ -289,7 +226,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 135e6,
             address(usdt), 60e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         originAmount_ = l.targetSwap(
@@ -306,7 +243,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 135e6,
-            address(susd), 25e18
+            address(susd), 25e6
         );
 
         originAmount_ = l.targetSwap(
@@ -317,38 +254,19 @@ contract TargetSwapTemplate is Setup {
 
     }
 
-    function fullUpperAndLowerAntiSlippage_CDAI_30pct_to_10Pct () public returns (uint256 originAmount_) {
-
-        l.deposit(
-            address(dai), 58e18,
-            address(usdc), 90e6,
-            address(usdt), 90e6,
-            address(susd), 40e18
-        );
-
-        uint256 originAmount = l.targetSwap(
-            address(cdai),
-            address(susd),
-            2.349e18
-        );
-
-        originAmount_ = cdaiAssimilator.viewNumeraireAmount(originAmount).mulu(1e18);
-
-    }
-
     function fullUpperAndLowerAntiSlippage_30Pct_To10Pct () public returns (uint256 originAmount_) {
 
         l.deposit(
             address(dai), 58e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
         originAmount_ = l.targetSwap(
             address(dai),
             address(susd),
-            2.349e18
+            2.349e6
         );
 
     }
@@ -359,7 +277,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 90e6,
             address(usdt), 125e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         originAmount_ = l.targetSwap(
@@ -376,7 +294,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 100e6,
-            address(susd), 20e18
+            address(susd), 20e6
         );
 
         originAmount_ = l.targetSwap(
@@ -393,13 +311,13 @@ contract TargetSwapTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 80e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
         originAmount_ = l.targetSwap(
             address(dai),
             address(susd),
-            20e18
+            20e6
         );
 
     }
@@ -410,7 +328,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 135e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         ( success_, ) = address(l).call(abi.encodeWithSignature(
@@ -430,7 +348,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 60e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         ( success_, ) = address(l).call(abi.encodeWithSignature(
@@ -447,7 +365,6 @@ contract TargetSwapTemplate is Setup {
     function upperHaltCheck_10PctWeight () public returns (bool success_) {
 
         l.proportionalDeposit(300e18, 1e50);
-
 
         ( success_, ) = address(l).call(abi.encodeWithSignature(
             "targetSwap(address,address,uint256,uint256,uint256)",
@@ -469,7 +386,7 @@ contract TargetSwapTemplate is Setup {
             address(dai),
             address(susd),
             21e18,
-            20e18,
+            20e6,
             1e50
         ));
 
@@ -481,14 +398,10 @@ contract TargetSwapTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
-        originAmount_ = l.targetSwap(
-            address(dai),
-            address(susd),
-            3e18
-        );
+        originAmount_ = l.targetSwap( address(dai), address(susd), 3e18);
 
     }
 
@@ -498,7 +411,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 46e18,
             address(usdc), 134e6,
             address(usdt), 75e6,
-            address(susd), 45e18
+            address(susd), 45e6
         );
 
         l.targetSwap(
@@ -516,7 +429,7 @@ contract TargetSwapTemplate is Setup {
         l.targetSwap(
             address(usdc),
             address(susd),
-            31e18
+            31e6
         );
 
     }
@@ -525,9 +438,6 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
-
-        cusdc.transfer(address(l), _rawCUsdc);
         usdc.transfer(address(l), 110e6);
 
         success_ = l.targetSwapSuccess(
@@ -542,9 +452,6 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
-
-        cusdc.transfer(address(l), _rawCUsdc);
         usdc.transfer(address(l), 110e6);
 
         success_ = l.targetSwapSuccess(
@@ -559,9 +466,6 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
-
-        cusdc.transfer(address(l), _rawCUsdc);
         usdc.transfer(address(l), 110e6);
 
         success_ = l.targetSwapSuccess(
@@ -576,16 +480,9 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(67e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
-
-        cdai.transfer(address(l), _rawCDai);
         dai.transfer(address(l), 70e18);
-
         usdt.transfer(address(l), 70e6);
-        ausdt.transfer(address(l), 70e6);
-
-        susd.transfer(address(l), 23e18);
-        asusd.transfer(address(l), 23e18);
+        susd.transfer(address(l), 23e6);
 
         success_ = l.targetSwapSuccess(
             address(dai),
@@ -599,16 +496,9 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(67e18, 1e50);
 
-        uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
-
-        cdai.transfer(address(l), _rawCDai);
         dai.transfer(address(l), 70e18);
-
         usdt.transfer(address(l), 70e6);
-        ausdt.transfer(address(l), 70e6);
-
-        susd.transfer(address(l), 23e18);
-        asusd.transfer(address(l), 23e18);
+        susd.transfer(address(l), 23e6);
 
         success_ = l.targetSwapSuccess(
             address(usdt),
@@ -624,10 +514,10 @@ contract TargetSwapTemplate is Setup {
             address(dai), 2000e18,
             address(usdc), 5000e6,
             address(usdt), 5000e6,
-            address(susd), 800e18
+            address(susd), 800e6
         );
 
-        l.TEST_setTestHalts(false);
+        // l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(usdc),
@@ -643,7 +533,7 @@ contract TargetSwapTemplate is Setup {
             address(dai), 2000e18,
             address(usdc), 5000e6,
             address(usdt), 5000e6,
-            address(susd), 800e18
+            address(susd), 800e6
         );
 
         originAmount_ = l.targetSwap(
@@ -659,11 +549,10 @@ contract TargetSwapTemplate is Setup {
         l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 4910e6);
-        ausdt.transfer(address(l), 4910e6);
 
         l.prime();
 
-        l.TEST_setTestHalts(false);
+        // l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(usdt),
@@ -678,9 +567,8 @@ contract TargetSwapTemplate is Setup {
         l.proportionalDeposit(300e18, 1e50);
 
         usdt.transfer(address(l), 4910e6);
-        ausdt.transfer(address(l), 4910e6);
 
-        l.TEST_setTestHalts(false);
+        // l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(usdt),
@@ -694,18 +582,11 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(4910e18).divu(1e18));
-
         usdc.transfer(address(l), 4910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
-
         usdt.transfer(address(l), 9910e6);
-        ausdt.transfer(address(l), 9910e6);
+        susd.transfer(address(l), 1970e6);
 
-        susd.transfer(address(l), 1970e18);
-        asusd.transfer(address(l), 1970e18);
-
-        l.TEST_setTestHalts(false);
+        // l.TEST_setTestHalts(false);
 
         l.prime();
 
@@ -721,18 +602,11 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(4910e18).divu(1e18));
-
         usdc.transfer(address(l), 4910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
-
         usdt.transfer(address(l), 9910e6);
-        ausdt.transfer(address(l), 9910e6);
+        susd.transfer(address(l), 1970e6);
 
-        susd.transfer(address(l), 1970e18);
-        asusd.transfer(address(l), 1970e18);
-
-        l.TEST_setTestHalts(false);
+        // l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(dai),
@@ -746,17 +620,16 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        susd.transfer(address(l), 4970e18);
-        asusd.transfer(address(l), 4970e18);
+        susd.transfer(address(l), 4970e6);
 
         l.prime();
 
-        l.TEST_setTestHalts(false);
+        // l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(usdt),
             address(susd),
-            1e18
+            1e6
         );
 
     }
@@ -765,12 +638,11 @@ contract TargetSwapTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        susd.transfer(address(l), 4970e18);
-        asusd.transfer(address(l), 4970e18);
+        susd.transfer(address(l), 4970e6);
 
         l.prime();
 
-        l.TEST_setTestHalts(false);
+        // l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(usdt),

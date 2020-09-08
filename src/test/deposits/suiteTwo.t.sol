@@ -84,22 +84,6 @@ contract SelectiveDepositSuiteTwo is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s2_selectiveDeposit_noSlippage_36CHAI_into_300Proportional () public {
-
-        uint256 shellsMinted = super.noSlippage_36CHAI_into_300Proportional();
-
-        assertEq(shellsMinted, 35991000233367100000);
-
-    }
-
-    function test_s2_selectiveDeposit_partialLowerAntiSlippage_36CUSDC_18ASUSD_into_95DAI_55USDC_95USDT_15SUSD () public {
-
-        uint256 newShells = super.partialLowerAntiSlippage_36CUSDC_18ASUSD_into_95DAI_55USDC_95USDT_15SUSD();
-
-        assertEq(newShells,  53991711756245652892);
-
-    }
-
     function test_s2_selectiveDeposit_partialLowerAntiSlippage_36USDC_18SUSD_into_95DAI_55USDC_95USDT_15SUSD () public {
 
         uint256 newShells = super.partialLowerAntiSlippage_36USDC_18SUSD_into_95DAI_55USDC_95USDT_15SUSD();
@@ -132,13 +116,6 @@ contract SelectiveDepositSuiteTwo is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s2_selectiveDeposit_fullUpperAntiSlippage_5CHAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD () public {
-
-        uint256 newShells = super.fullUpperAntiSlippage_5CHAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD();
-
-        assertEq(newShells, 10001714411049177790);
-
-    }
 
     function test_s2_selectiveDeposit_fullUpperAntiSlippage_5DAI_5USDC_into_90DAI_90USDC_145USDT_50SUSD () public {
 
@@ -161,14 +138,6 @@ contract SelectiveDepositSuiteTwo is SelectiveDepositTemplate, DSTest {
         uint256 newShells = super.fullLowerAntiSlippage_5DAI_5USDC_5USDT_2SUSD_into_55DAI_95USDC_95USDT_15SUSD();
 
         assertEq(newShells, 17007126629845201617);
-
-    }
-
-    function test_s2_selectiveDeposit_noSlippage_36CDAI_into_300Proportional () public {
-
-        uint256 shellsMinted = super.noSlippage_36CDAI_into_300Proportional();
-
-        assertEq(shellsMinted, 35991000239800010000);
 
     }
 
@@ -201,14 +170,6 @@ contract SelectiveDepositSuiteTwo is SelectiveDepositTemplate, DSTest {
         uint256 newShells = super.megaDepositIndirectUpperToLower_165DAI_165USDT_into_90DAI_145USDC_90USDT_50SUSD();
 
         assertEq(newShells, 329943557873174181881);
-
-    }
-
-    function test_s2_selectiveDeposit_megaDepositIndirectUpperLower_165CDAI_0p0001CUSDC_165USDT_0p5SUSD_into_90DAI_145USDC_90USDT_50SUSD () public {
-
-        uint256 newShells = super.megaDepositIndirectUpperLower_165CDAI_0p0001CUSDC_165USDT_0p5SUSD_into_90DAI_145USDC_90USDT_50SUSD();
-
-        assertEq(newShells, 33028053905716828894);
 
     }
 
