@@ -23,7 +23,7 @@ library PartitionedLiquidity {
         mapping (address => LoihiStorage.PartitionTicket) storage partitionTickets
     ) external {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
 
         LoihiStorage.PartitionTicket storage totalSupplyTicket = partitionTickets[address(this)];
 
@@ -47,7 +47,7 @@ library PartitionedLiquidity {
 
         if (ticket.initialized) return ticket.claims;
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
         uint[] memory claims_ = new uint[](_length);
         uint _balance = shell.balances[msg.sender];
 
@@ -66,7 +66,7 @@ library PartitionedLiquidity {
         uint[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
         uint _balance = shell.balances[msg.sender];
 
         LoihiStorage.PartitionTicket storage totalSuppliesTicket = partitionTickets[address(this)];

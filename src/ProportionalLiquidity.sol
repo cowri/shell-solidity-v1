@@ -28,7 +28,7 @@ library ProportionalLiquidity {
 
         int128 _oGLiq;
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
 
         int128[] memory _oBals = new int128[](_length);
 
@@ -36,7 +36,7 @@ library ProportionalLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
 
             _oBals[i] = _bal;
             _oGLiq += _bal;
@@ -47,7 +47,7 @@ library ProportionalLiquidity {
 
             for (uint8 i = 0; i < _length; i++) {
 
-                deposits_[i] = Assimilators.intakeNumeraire(shell.numeraires[i].addr, _shells.mul(shell.weights[i]));
+                deposits_[i] = Assimilators.intakeNumeraire(shell.assetAssimilators[i].addr, _shells.mul(shell.weights[i]));
 
             }
 
@@ -57,7 +57,7 @@ library ProportionalLiquidity {
 
             for (uint8 i = 0; i < _length; i++) {
 
-                deposits_[i] = Assimilators.intakeNumeraire(shell.numeraires[i].addr, _oBals[i].mul(_multiplier));
+                deposits_[i] = Assimilators.intakeNumeraire(shell.assetAssimilators[i].addr, _oBals[i].mul(_multiplier));
 
             }
 
@@ -85,7 +85,7 @@ library ProportionalLiquidity {
 
         int128 _oGLiq;
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
 
         int128[] memory _oBals = new int128[](_length);
 
@@ -93,7 +93,7 @@ library ProportionalLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
 
             _oBals[i] = _bal;
             _oGLiq += _bal;
@@ -104,7 +104,7 @@ library ProportionalLiquidity {
 
             for (uint8 i = 0; i < _length; i++) {
 
-                deposits_[i] = Assimilators.viewRawAmount(shell.numeraires[i].addr, _shells.mul(shell.weights[i]));
+                deposits_[i] = Assimilators.viewRawAmount(shell.assetAssimilators[i].addr, _shells.mul(shell.weights[i]));
 
             }
 
@@ -114,7 +114,7 @@ library ProportionalLiquidity {
 
             for (uint8 i = 0; i < _length; i++) {
 
-                deposits_[i] = Assimilators.viewRawAmount(shell.numeraires[i].addr, _oBals[i].mul(_multiplier));
+                deposits_[i] = Assimilators.viewRawAmount(shell.assetAssimilators[i].addr, _oBals[i].mul(_multiplier));
 
             }
 
@@ -133,7 +133,7 @@ library ProportionalLiquidity {
         uint[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
 
         int128 _oGLiq;
         int128[] memory _oBals = new int128[](_length);
@@ -142,7 +142,7 @@ library ProportionalLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
 
             _oGLiq += _bal;
             _oBals[i] = _bal;
@@ -155,7 +155,7 @@ library ProportionalLiquidity {
 
         for (uint8 i = 0; i < _length; i++) {
 
-            withdrawals_[i] = Assimilators.outputNumeraire(shell.reserves[i].addr, msg.sender, _oBals[i].mul(_multiplier));
+            withdrawals_[i] = Assimilators.outputNumeraire(shell.assetAssimilators[i].addr, msg.sender, _oBals[i].mul(_multiplier));
 
         }
 
@@ -174,7 +174,7 @@ library ProportionalLiquidity {
         uint[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
 
         int128 _oGLiq;
         int128[] memory _oBals = new int128[](_length);
@@ -183,7 +183,7 @@ library ProportionalLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
 
             _oGLiq += _bal;
             _oBals[i] = _bal;
@@ -196,7 +196,7 @@ library ProportionalLiquidity {
 
         for (uint8 i = 0; i < _length; i++) {
 
-            withdrawals_[i] = Assimilators.viewRawAmount(shell.reserves[i].addr, _oBals[i].mul(_multiplier));
+            withdrawals_[i] = Assimilators.viewRawAmount(shell.assetAssimilators[i].addr, _oBals[i].mul(_multiplier));
 
         }
 

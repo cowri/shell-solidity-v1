@@ -232,7 +232,7 @@ library SelectiveLiquidity {
         int128[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
 
@@ -275,7 +275,7 @@ library SelectiveLiquidity {
         int128[] memory
     ) {
 
-        uint _length = shell.reserves.length;
+        uint _length = shell.assetAssimilators.length;
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
 
@@ -322,7 +322,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.reserves[i].addr);
+            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
 
             oGLiq_ += oBals_[i];
             nGLiq_ += nBals_[i];

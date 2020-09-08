@@ -46,8 +46,7 @@ contract LoihiStorage {
         uint totalSupply;
         mapping (address => uint) balances;
         mapping (address => mapping (address => uint)) allowances;
-        Assimilator[] reserves;
-        Assimilator[] numeraires;
+        Assimilator[] assetAssimilators;
         mapping (address => Assimilator) assimilators;
     }
 
