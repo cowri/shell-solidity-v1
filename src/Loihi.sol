@@ -104,26 +104,16 @@ contract Loihi is LoihiStorage {
 
     }
 
-    event log_uint(bytes32, uint);
-    event log_addrs(bytes32, address[]);
-    event log_uints(bytes32, uint[]);
-
     constructor (
         address[] memory _assets,
         uint[] memory _assetWeights,
         address[] memory _derivativeAssimilators
     ) public {
         
-        emit log_addrs("assets", _assets);
-        emit log_uints("weights", _assetWeights);
-        emit log_addrs("derivatives", _derivativeAssimilators);
-
         owner = msg.sender;
         emit OwnershipTransfered(address(0), msg.sender);
         
         for (uint i = 0; i < _assetWeights.length; i++) {
-            emit log_uint("i", i);
-            emit log_uint("1 + i * 4", 1+i*4);
 
             includeAsset(
                 _assets[i*4],   // numeraire
@@ -135,13 +125,13 @@ contract Loihi is LoihiStorage {
             
         }
         
-        for (uint i = 0; i < _derivativeAssimilators.length; i += 4) {
+        for (uint i = 0; i < _derivativeAssimilators.length / 4; i++) {
 
             includeAssimilator(
-                _derivativeAssimilators[i],   // derivative
-                _derivativeAssimilators[i+1], // numeraire
-                _derivativeAssimilators[i+2], // reserve
-                _derivativeAssimilators[i+3]  // assimilator
+                _derivativeAssimilators[i*4],   // derivative
+                _derivativeAssimilators[1+i*4], // numeraire
+                _derivativeAssimilators[2+i*4], // reserve
+                _derivativeAssimilators[3+i*4]  // assimilator
             );
 
         }
@@ -181,7 +171,15 @@ contract Loihi is LoihiStorage {
         address _reserve,
         address _rAssim,
         uint _weight
-    ) public onlyOwner {
+    ) private {
+        
+        numeraires.push(_numeraire);
+        
+        reserves.push(_reserve);
+
+        derivatives.push(_numeraire);
+        
+        if (_numeraire != _reserve) derivtiaves.push(_reserve);
 
         Orchestrator.includeAsset(shell, numeraires, _numeraire, _nAssim, _reserve, _rAssim, _weight);
 
@@ -198,7 +196,9 @@ contract Loihi is LoihiStorage {
         address _numeraire, 
         address _reserve, 
         address _assimilator
-    ) public onlyOwner {
+    ) private {
+        
+        derivatives.push(_derivative);
 
         Orchestrator.includeAssimilator(shell, _derivative, _numeraire, _reserve, _assimilator);
 

@@ -18,7 +18,9 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
     function getLoihiSuiteOne () public returns (Loihi loihi_) {
 
-        loihi_ = getLoihiSuiteOneLocal();
+        loihi_ = getLoihiSuiteOneLocalFromFactory();
+
+        // loihi_ = getLoihiSuiteOneLocal();
         // loihi_ = getLoihiSuiteOneMainnet();
 
     }
@@ -80,6 +82,64 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
     }
 
     event log(bytes32);
+    
+    function getLoihiSuiteOneLocalFromFactory () public returns (Loihi loihi_) {
+        
+        
+        setupStablecoinsLocal();
+        
+        setupAssimilatorsSetOneLocal();
+        
+        LoihiFactory lf = new LoihiFactory();
+
+        address[] memory _assets = new address[](16);
+        uint[] memory _assetWeights = new uint[](4);
+        address[] memory _derivativeAssimilators = new address[](0);
+
+        _assets[0] = address(dai);
+        _assets[1] = address(daiAssimilator);
+        _assets[2] = address(dai);
+        _assets[3] = address(daiAssimilator);
+        _assetWeights[0] = .3e18;
+
+        _assets[4] = address(usdc);
+        _assets[5] = address(usdcAssimilator);
+        _assets[6] = address(usdc);
+        _assets[7] = address(usdcAssimilator);
+        _assetWeights[1] = .3e18;
+
+        _assets[8] = address(usdt);
+        _assets[9] = address(usdtAssimilator);
+        _assets[10] = address(usdt);
+        _assets[11] = address(usdtAssimilator);
+        _assetWeights[2] = .3e18;
+
+        _assets[12] = address(susd);
+        _assets[13] = address(susdAssimilator);
+        _assets[14] = address(susd);
+        _assets[15] = address(susdAssimilator);
+        _assetWeights[3] = .1e18;
+        
+        loihi_ = lf.newShell(
+            _assets,
+            _assetWeights,
+            _derivativeAssimilators
+        );
+        
+        loihi_.TEST_includeAssimilatorState(
+            dai, cdai, chai, pot,
+            usdc, cusdc,
+            usdt, ausdt,
+            susd, asusd
+        );
+        
+        setParamsSetOne(loihi_);
+
+        approveStablecoins(address(loihi_));
+
+        interApproveStablecoinsLocal(address(loihi_));
+
+    }
 
     function getLoihiSuiteOneLocal () public returns (Loihi loihi_) {
 

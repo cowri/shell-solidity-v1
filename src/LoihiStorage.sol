@@ -73,7 +73,9 @@ contract LoihiStorage {
 
     mapping (address => PartitionTicket) public partitionTickets;
 
+    address[] public derivatives;
     address[] public numeraires;
+    address[] public reserves;
 
     bool public partitioned = false;
     bool public frozen = false;

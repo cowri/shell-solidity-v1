@@ -21,7 +21,7 @@ contract LoihiFactorySuiteOne is SelectiveDepositTemplate, DSTest {
 
     function setUp() public {
 
-        lf = getLoihiFactorySuiteOne();
+        l = getLoihiSuiteOneLocalFromFactory();
 
     }
 
@@ -112,19 +112,6 @@ contract LoihiFactorySuiteOne is SelectiveDepositTemplate, DSTest {
         
         l = lf.newShell(_assets, _assetWeights, _derivativeAssimilators);
                 
-        l.TEST_includeAssimilatorState(
-            dai, cdai, chai, pot,
-            usdc, cusdc,
-            usdt, ausdt,
-            susd, asusd
-        );
-        
-        setParamsSetOne(l);
-
-        approveStablecoins(address(l));
-
-        interApproveStablecoinsLocal(address(l));
-
         uint256 newShells = super.balanced_5DAI_1USDC_3USDT_1SUSD();
 
         assertEq(newShells, 9999999999999999991);

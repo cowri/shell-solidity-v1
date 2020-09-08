@@ -118,6 +118,8 @@ library Orchestrator {
         require(_reserveAssim != address(0), "Shell/reserve-assimilator-cannot-be-zeroth-adress");
 
         require(_weight < 1e18, "Shell/weight-must-be-less-than-one");
+        
+        if (_numeraire != _reserve) safeApprove(_numeraire, _reserve, uint(-1));)
 
         numeraires.push(_numeraire);
 
@@ -152,6 +154,19 @@ library Orchestrator {
         }
 
     }
+    
+    function safeApprove (
+        address _token,
+        address _spender,
+        uint256 _value
+    ) private {
+
+        ( bool success, bytes memory returndata ) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
+
+        require(success, "SafeERC20: low-level call failed");
+
+    }
+
 
     function includeAssimilator (
         LoihiStorage.Shell storage shell,
@@ -168,6 +183,8 @@ library Orchestrator {
         require(_reserve != address(0), "Shell/numeraire-cannot-be-zeroth-address");
 
         require(_assimilator != address(0), "Shell/assimilator-cannot-be-zeroth-address");
+
+        safeApprove(_derivative, _reserve, uint(-1));)
 
         LoihiStorage.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 

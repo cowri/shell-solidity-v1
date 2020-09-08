@@ -26,10 +26,6 @@ contract LocalDaiToDaiAssimilator is IAssimilator, LoihiStorage {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    event log_int(bytes32, int256);
-    event log_uint(bytes32, uint256);
-    event log_addr(bytes32, address);
-
     constructor (address _dai) public {
 
         dai = IERC20(_dai);
@@ -39,8 +35,6 @@ contract LocalDaiToDaiAssimilator is IAssimilator, LoihiStorage {
     // transfers raw amonut of dai in, wraps it in cDai, returns numeraire amount
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
         
-        emit log_addr("dai addr", address(dai));
-
         dai.transferFrom(msg.sender, address(this), _amount);
 
         uint256 _balance = dai.balanceOf(address(this));
@@ -65,8 +59,6 @@ contract LocalDaiToDaiAssimilator is IAssimilator, LoihiStorage {
 
         // truncate stray decimals caused by conversion
         amount_ = _amount.mulu(1e18) / 1e3 * 1e3;
-
-        emit log_uint("amount_", amount_);
 
         dai.transferFrom(msg.sender, address(this), amount_);
 

@@ -19,9 +19,11 @@ import "./Loihi.sol";
 
 contract LoihiFactory {
 
+    address private cowri;
+
     event NewShell(address indexed caller, address indexed shell);
 
-    event CowriLabsSet(address indexed caller, address indexed clabs);
+    event CowriSet(address indexed caller, address indexed cowri);
 
     mapping(address => bool) private _isShell;
 
@@ -38,6 +40,8 @@ contract LoihiFactory {
         uint[] memory _assetWeights,
         address[] memory _derivativeAssimilators
     ) public returns (Loihi) {
+        
+        if (msg.sender != cowri) revert("Shell/must-be-cowri");
 
         Loihi loihiShell = new Loihi(
             _assets,
@@ -55,27 +59,28 @@ contract LoihiFactory {
 
     }
 
-    address private cowriLabs;
 
     constructor() public {
 
-        cowriLabs = msg.sender;
+        cowri = msg.sender;
+
+        emit CowriSet(msg.sender, msg.sender);
 
     }
 
-    function getCowriLabs() external view returns (address) {
+    function getCowri () external view returns (address) {
 
-        return cowriLabs;
+        return cowri;
 
     }
 
-    function setCowriLabs (address _c) external {
+    function setCowri (address _c) external {
 
-        require(msg.sender == cowriLabs, "ERR_NOT_BLABS");
+        require(msg.sender == cowri, "Shell/must-be-cowri");
 
-        emit CowriLabsSet(msg.sender, _c);
+        emit CowriSet(msg.sender, _c);
 
-        cowriLabs = _c;
+        cowri = _c;
 
     }
 
