@@ -93,7 +93,7 @@ contract AssimilatorSetOneTests is Setup, DSTest {
         // setupStablecoinsLocal();
         // setupAssimilatorsSetOneLocal();
 
-        // assimBouncer = new AssimilatorBouncer();
+        assimBouncer = new AssimilatorBouncer();
 
         // assimBouncer.TEST_includeAssimilatorState(
         //     IERC20(dai),
@@ -108,7 +108,7 @@ contract AssimilatorSetOneTests is Setup, DSTest {
         //     IAToken(asusd)
         // );
 
-        // approveStablecoins(address(assimBouncer));
+        approveStablecoins(address(assimBouncer));
         // interApproveStablecoinsLocal(address(assimBouncer));
 
     }
