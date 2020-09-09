@@ -93,9 +93,11 @@ contract KovanASUsdToSUsdAssimilator is IAssimilator {
     // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        IAToken _asusd = getASUsd();
+        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
-        _asusd.deposit(_amount);
+        pool.deposit(address(susd), _amount, 0);
+
+        IAToken _asusd = getASUsd();
 
         bool _success = _asusd.transfer(_dst, _amount);
 
@@ -112,9 +114,11 @@ contract KovanASUsdToSUsdAssimilator is IAssimilator {
     // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        IAToken _asusd = getASUsd();
+        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
-        _asusd.deposit(_amount);
+        pool.deposit(address(susd), _amount, 0);
+
+        IAToken _asusd = getASUsd();
 
         bool _success = _asusd.transfer(_dst, _amount);
 
@@ -129,9 +133,11 @@ contract KovanASUsdToSUsdAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e6);
 
-        IAToken _asusd = getASUsd();
+        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
-        _asusd.deposit(amount_);
+        pool.deposit(address(susd), amount_, 0);
+
+        IAToken _asusd = getASUsd();
 
         bool _success = _asusd.transfer(_dst, amount_);
 
