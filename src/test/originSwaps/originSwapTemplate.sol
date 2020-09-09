@@ -150,15 +150,30 @@ contract OriginSwapTemplate is Setup {
             address(susd), 30e6
         );
 
-        uint256 gas = gasleft();
-
         targetAmount_ = l.originSwap(
             address(dai),
             address(usdt),
             5e18
         );
 
-        emit log_uint("gas for swap", gas - gasleft());
+    }
+
+    function fullUpperAndLowerSlippage_unbalanced_30PctWeight_CDAI_to_AUSDT () public returns (uint256 targetAmount_) {
+
+        l.deposit(
+            address(dai), 135e18,
+            address(usdc), 90e6,
+            address(usdt), 60e6,
+            address(susd), 30e6
+        );
+
+        uint cdaiOf5Numeraire = IAssimilator(cdaiAssimilator).viewRawAmount(uint(5e18).divu(1e18));
+
+        targetAmount_ = l.originSwap(
+            address(cdai),
+            address(ausdt),
+            cdaiOf5Numeraire
+        );
 
     }
 
@@ -171,15 +186,30 @@ contract OriginSwapTemplate is Setup {
             address(susd), 25e6
         );
 
-        uint256 gas = gasleft();
-
         targetAmount_ = l.originSwap(
             address(dai),
             address(susd),
             3e18
         );
 
-        emit log_uint("gas used for swap", gas - gasleft());
+    }
+
+    function fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight_CDAI_to_ASUSD () public returns (uint256 targetAmount_) {
+
+        l.deposit(
+            address(dai), 135e18,
+            address(usdc), 90e6,
+            address(usdt), 65e6,
+            address(susd), 25e6
+        );
+
+        uint cdaiOf3Numeraire = IAssimilator(cdaiAssimilator).viewRawAmount(uint(3e18).divu(1e18));
+
+        targetAmount_ = l.originSwap(
+            address(cdai),
+            address(asusd),
+            cdaiOf3Numeraire
+        );
 
     }
 
@@ -273,6 +303,23 @@ contract OriginSwapTemplate is Setup {
         );
 
         emit log_uint("gas used", gas - gasleft());
+
+    }
+
+    function fullUpperAndLowerAntiSlippage_10PctWeight_to30PctWeight_ASUSD_to_AUSDT () public returns (uint256 targetAmount_) {
+
+        l.deposit(
+            address(dai), 90e18,
+            address(usdc), 90e6,
+            address(usdt), 135e6,
+            address(susd), 25e6
+        );
+
+        targetAmount_ = l.originSwap(
+            address(asusd),
+            address(ausdt),
+            3.6537e6
+        );
 
     }
 
@@ -556,7 +603,7 @@ contract OriginSwapTemplate is Setup {
             address(susd), 800e6 / 100
         );
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         targetAmount_ = l.originSwap(
             address(usdc),
@@ -591,7 +638,7 @@ contract OriginSwapTemplate is Setup {
 
         l.prime();
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         targetAmount_ = l.originSwap(
             address(usdt),
@@ -607,7 +654,7 @@ contract OriginSwapTemplate is Setup {
 
         usdt.transfer(address(l), 4910e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         targetAmount_ = l.originSwap(
             address(usdt),
@@ -625,7 +672,10 @@ contract OriginSwapTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         susd.transfer(address(l), 1970e6);
 
-        // l.TEST_setTestHalts(false);
+        susd.transfer(address(l), 1970e18);
+        asusd.transfer(address(l), 1970e18);
+
+        //l.TEST_setTestHalts(false);
 
         l.prime();
 
@@ -645,7 +695,7 @@ contract OriginSwapTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         susd.transfer(address(l), 1970e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         targetAmount_ = l.originSwap(
             address(dai),
@@ -663,7 +713,7 @@ contract OriginSwapTemplate is Setup {
 
         l.prime();
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         targetAmount_ = l.originSwap(
             address(usdt),
@@ -681,7 +731,7 @@ contract OriginSwapTemplate is Setup {
 
         l.prime();
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         targetAmount_ = l.originSwap(
             address(usdt),

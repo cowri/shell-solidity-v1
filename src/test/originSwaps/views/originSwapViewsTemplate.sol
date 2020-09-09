@@ -43,7 +43,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         targetAmount_ = l.viewOriginSwap(
@@ -72,7 +72,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 65e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         uint256 gas = gasleft();
@@ -105,7 +105,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 80e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         targetAmount_ = l.viewOriginSwap(
@@ -162,7 +162,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 90e6,
             address(usdt), 60e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         uint256 gas = gasleft();
@@ -183,7 +183,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 90e6,
             address(usdt), 65e6,
-            address(susd), 25e18
+            address(susd), 25e6
         );
 
         uint256 gas = gasleft();
@@ -204,7 +204,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 55e6,
             address(usdt), 90e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         uint256 asusdOf2Point8Numeraire = IAssimilator(asusdAssimilator).viewRawAmount(2.8e18);
@@ -225,7 +225,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 55e6,
             address(usdt), 90e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         uint gas = gasleft();
@@ -246,7 +246,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 60e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         targetAmount_ = l.viewOriginSwap(
@@ -263,7 +263,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 135e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 25e18
+            address(susd), 25e6
         );
 
         targetAmount_ = l.viewOriginSwap(
@@ -280,7 +280,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 58e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
         targetAmount_ = l.viewOriginSwap(
@@ -297,7 +297,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 135e6,
             address(usdt), 60e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         uint256 gas = gasleft();
@@ -318,7 +318,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 135e6,
-            address(susd), 25e18
+            address(susd), 25e6
         );
 
         uint256 gas = gasleft();
@@ -339,7 +339,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 58e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
         targetAmount_ = l.viewOriginSwap(
@@ -356,7 +356,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 58e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
         uint256 chaiOf2p349Numeraire = IAssimilator(chaiAssimilator).viewRawAmount(2.349e18);
@@ -375,7 +375,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 135e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         ( success_, ) = address(l).call(abi.encodeWithSignature(
@@ -395,7 +395,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 60e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         ( success_, ) = address(l).call(abi.encodeWithSignature(
@@ -445,7 +445,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 90e6,
             address(usdt), 125e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         targetAmount_ = l.viewOriginSwap(
@@ -462,7 +462,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 90e6,
             address(usdt), 125e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         uint256 cdaiOf70Numeraire = IAssimilator(cdaiAssimilator).viewRawAmount(uint(70e18).divu(1e18));
@@ -481,7 +481,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 100e6,
-            address(susd), 20e18
+            address(susd), 20e6
         );
 
         targetAmount_ = l.viewOriginSwap(
@@ -498,7 +498,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 80e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
         targetAmount_ = l.viewOriginSwap(
@@ -515,7 +515,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 46e18,
             address(usdc), 134e6,
             address(usdt), 75e6,
-            address(susd), 45e18
+            address(susd), 45e6
         );
 
         l.viewOriginSwap(
@@ -648,7 +648,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 2000e18 / 100,
             address(usdc), 5000e6 / 100,
             address(usdt), 5000e6 / 100,
-            address(susd), 800e18 / 100
+            address(susd), 800e6 / 100
         );
 
         //l.TEST_setTestHalts(false);
@@ -667,7 +667,7 @@ contract OriginSwapViewsTemplate is Setup {
             address(dai), 2000e18,
             address(usdc), 5000e6,
             address(usdt), 5000e6,
-            address(susd), 800e18
+            address(susd), 800e6
         );
 
         targetAmount_ = l.viewOriginSwap(

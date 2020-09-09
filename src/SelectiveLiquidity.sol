@@ -20,19 +20,12 @@ library SelectiveLiquidity {
 
     int128 constant ONE = 0x10000000000000000;
 
-    // / @author james foley http://github.com/realisation
-    // / @notice selectively deposit any supported stablecoin flavor into the contract in return for corresponding amount of shell tokens
-    // / @param _derivatives an array containing the addresses of the flavors being deposited into
-    // / @param _amounts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
-    // / @param _minShells minimum acceptable amount of shells
-    // / @param _dline deadline for tx
-    // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function selectiveDeposit (
         LoihiStorage.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts,
+        address[] memory _derivatives,
+        uint[] memory _amounts,
         uint _minShells
-    ) external returns (
+    ) internal returns (
         uint shells_
     ) {
 
@@ -52,16 +45,11 @@ library SelectiveLiquidity {
 
     }
 
-    // / @author james folew http://github.com/realisation
-    // / @notice view how many shell tokens a deposit will mint
-    // / @param _derivatives an array containing the addresses of the flavors being deposited into
-    // / @param _amounts an array containing the values of the flavors you wish to deposit into the contract. each amount should have the same index as the flavor it is meant to deposit
-    // / @return shellsToMint_ the amount of shells to mint for the deposited stablecoin flavors
     function viewSelectiveDeposit (
         LoihiStorage.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts
-    ) external view returns (
+        address[] memory _derivatives,
+        uint[] memory _amounts
+    ) internal view returns (
         uint shells_
     ) {
 
@@ -76,17 +64,12 @@ library SelectiveLiquidity {
 
     }
 
-    // / @author james foley http://github.com/realisation
-    // / @notice selectively withdrawal any supported stablecoin flavor from the contract by burning a corresponding amount of shell tokens
-    // / @param _derivatives an array of flavors to withdraw from the reserves
-    // / @param _amounts an array of amounts to withdraw that maps to _flavors
-    // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function selectiveWithdraw (
         LoihiStorage.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts,
+        address[] memory _derivatives,
+        uint[] memory _amounts,
         uint _maxShells
-    ) external returns (
+    ) internal returns (
         uint256 shells_
     ) {
 
@@ -109,16 +92,11 @@ library SelectiveLiquidity {
 
     }
 
-    // / @author james foley http://github.com/realisation
-    // / @notice view how many shell tokens a withdraw will consume
-    // / @param _derivatives an array of flavors to withdraw from the reserves
-    // / @param _amounts an array of amounts to withdraw that maps to _flavors
-    // / @return shellsBurned_ the corresponding amount of shell tokens to withdraw the specified amount of specified flavors
     function viewSelectiveWithdraw (
         LoihiStorage.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts
-    ) external view returns (
+        address[] memory _derivatives,
+        uint[] memory _amounts
+    ) internal view returns (
         uint shells_
     ) {
 
@@ -232,7 +210,7 @@ library SelectiveLiquidity {
         int128[] memory
     ) {
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
 
@@ -275,7 +253,7 @@ library SelectiveLiquidity {
         int128[] memory
     ) {
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
 
@@ -322,7 +300,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
+            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
 
             oGLiq_ += oBals_[i];
             nGLiq_ += nBals_[i];

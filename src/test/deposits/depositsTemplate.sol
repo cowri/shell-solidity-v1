@@ -90,6 +90,24 @@ contract SelectiveDepositTemplate is Setup {
 
     }
 
+    function partialUpperSlippage_5_CDAI_5_CUSDC_70_AUSDT_28_ASUSD_300Proportional () public returns (uint256 shellsMinted_) {
+
+        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
+
+        uint _cdaiOf5Numeraire = IAssimilator(cdaiAssimilator).viewRawAmount(uint(5e18).divu(1e18));
+
+        uint _cusdcOf5Numeraire = IAssimilator(cusdcAssimilator).viewRawAmount(uint(5e6).divu(1e18));
+
+        shellsMinted_ = l.deposit(
+            address(cdai), _cdaiOf5Numeraire,
+            address(cusdc), _cusdcOf5Numeraire,
+            address(ausdt), 70e6,
+            address(asusd), 28e6
+        );
+
+    }
+
+
     function partialLowerSlippage_moderatelyUnbalanced_1DAI_51USDC_51USDT_1SUSD () public returns (uint256 shellsMinted_) {
 
         uint256 startingShells = l.deposit(
@@ -560,7 +578,7 @@ contract SelectiveDepositTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         mintedShells_ = l.deposit(address(usdt), 10000e6);
 
@@ -580,7 +598,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdt.transfer(address(l), 9910e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         l.prime();
 
@@ -594,7 +612,7 @@ contract SelectiveDepositTemplate is Setup {
 
         usdt.transfer(address(l), 9910e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         mintedShells_ = l.deposit(address(usdt), 1e6);
 
@@ -662,7 +680,7 @@ contract SelectiveDepositTemplate is Setup {
 
         susd.transfer(address(l), 2970e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         l.prime();
 
@@ -680,7 +698,7 @@ contract SelectiveDepositTemplate is Setup {
 
         susd.transfer(address(l), 2970e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         mintedShells_ = l.deposit(address(usdt), 8910e6);
 
@@ -726,7 +744,7 @@ contract SelectiveDepositTemplate is Setup {
 
         susd.transfer(address(l), 2970e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         l.prime();
 
@@ -744,7 +762,7 @@ contract SelectiveDepositTemplate is Setup {
 
         susd.transfer(address(l), 2970e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         mintedShells_ = l.deposit(address(usdt), 1e6);
 

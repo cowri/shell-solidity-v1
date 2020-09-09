@@ -179,7 +179,7 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
         l.deposit(
             address(dai), 300e18,
             address(usdt), 300e6,
-            address(susd), 100e18
+            address(susd), 100e6
         );
 
     }
@@ -188,7 +188,7 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
 
         l.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(address(susd), 500e18);
+        l.deposit(address(susd), 500e6);
 
     }
 

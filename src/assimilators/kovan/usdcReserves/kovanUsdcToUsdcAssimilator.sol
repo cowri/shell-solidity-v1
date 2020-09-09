@@ -24,7 +24,7 @@ contract KovanUsdcToUsdcAssimilator is IAssimilator {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    IERC20 constant usdc = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF);
+    IERC20 constant usdc = IERC20(0xb7a4F3E9097C08dA09517b5aB877F7a917224ede);
 
     constructor () public { }
 

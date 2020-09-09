@@ -25,8 +25,8 @@ contract KovanCUsdcToUsdcAssimilator is IAssimilator {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    IERC20 constant usdc = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF);
-    ICToken constant cusdc = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35);
+    IERC20 constant usdc = IERC20(0xb7a4F3E9097C08dA09517b5aB877F7a917224ede);
+    ICToken constant cusdc = ICToken(0x4a92E71227D294F041BD82dd8f78591B75140d63);
 
     constructor () public { }
 
@@ -117,7 +117,7 @@ contract KovanCUsdcToUsdcAssimilator is IAssimilator {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
-        uint256 _usdcAmount = ( _amount * _rate ) / 1e18;
+        uint256 _usdcAmount = ( _amount * _rate ) / 1e18 + 1;
 
         uint _mintSuccess = cusdc.mint(_usdcAmount);
 
@@ -141,7 +141,7 @@ contract KovanCUsdcToUsdcAssimilator is IAssimilator {
 
         uint256 _rate = cusdc.exchangeRateStored();
 
-        uint256 _usdcAmount = ( _amount * _rate ) / 1e18;
+        uint256 _usdcAmount = ( _amount * _rate ) / 1e18 + 1;
 
         uint _mintSuccess = cusdc.mint(_usdcAmount);
 

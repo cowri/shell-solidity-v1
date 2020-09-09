@@ -113,6 +113,24 @@ contract SelectiveWithdrawTemplate is Setup {
 
     }
 
+    function partialLowerIndirectAntiSlippage_40_CDAI_40_AUSDT_from_95DAI_55USDC_95USDT_15SUSD () public returns (uint256 shellsBurned_) {
+
+        uint256 _startingShells = l.deposit(
+            address(dai), 95e18,
+            address(usdc), 55e6,
+            address(usdt), 95e6,
+            address(susd), 15e6
+        );
+
+        uint cdaiOf40Numeraire = IAssimilator(cdaiAssimilator).viewRawAmount(uint(40e18).divu(1e18));
+
+        shellsBurned_ = l.withdraw(
+            address(cdai), cdaiOf40Numeraire,
+            address(ausdt), 40e6
+        );
+
+    }
+
     function partialLowerAntiSlippage_0p0001DAI_41USDC_41USDT_1SUSD_from_55DAI_95USDC_95USDT_15SUSD () public returns (uint256 shellsBurned_) {
 
         uint256 _startingShells = l.deposit(
@@ -127,6 +145,24 @@ contract SelectiveWithdrawTemplate is Setup {
             address(usdc), 41e6,
             address(usdt), 41e6,
             address(susd), 1e6
+        );
+
+    }
+
+    function partialUpperAntiSlippage_50_CUSDC_18_ASUSD_from_90DAI_145USDC_90USDT_50SUSD () public returns (uint256 shellsBurned_) {
+
+        uint256 _startingShells = l.deposit(
+            address(dai), 90e18,
+            address(usdc), 145e6,
+            address(usdt), 90e6,
+            address(susd), 50e6
+        );
+
+        uint256 cusdcOf50Numeraire = IAssimilator(cusdcAssimilator).viewRawAmount(uint(50e6).divu(1e6));
+
+        shellsBurned_ = l.withdraw(
+            address(cusdc), cusdcOf50Numeraire,
+            address(asusd), 18e6
         );
 
     }
@@ -481,7 +517,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         l.prime();
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(usdt), 9910e6);
 
@@ -493,7 +529,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         usdt.transfer(address(l), 9910e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(usdt), 9910e6);
 
@@ -529,7 +565,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         l.prime();
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(susd), 1e6);
 
@@ -541,7 +577,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         susd.transfer(address(l), 9970e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(susd), 1e6);
 
@@ -581,7 +617,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         l.proportionalDeposit(30000e18, 1e50);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(dai), 8910e18);
 
@@ -629,7 +665,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         l.prime();
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(usdc), 1e6);
 
@@ -645,7 +681,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         susd.transfer(address(l), 2970e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         shellsBurned_ = l.withdraw(address(usdc), 1e6);
 
@@ -667,7 +703,7 @@ contract SelectiveWithdrawTemplate is Setup {
         uint256 _usdtBal = usdt.balanceOf(address(this));
         uint256 _susdBal = susd.balanceOf(address(this));
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         l.proportionalWithdraw(1e18, 1e50);
 

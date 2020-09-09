@@ -401,7 +401,7 @@ contract TargetSwapTemplate is Setup {
             address(susd), 35e6
         );
 
-        originAmount_ = l.targetSwap( address(dai), address(susd), 3e18);
+        originAmount_ = l.targetSwap( address(dai), address(susd), 3e6);
 
     }
 
@@ -517,7 +517,7 @@ contract TargetSwapTemplate is Setup {
             address(susd), 800e6
         );
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(usdc),
@@ -552,7 +552,7 @@ contract TargetSwapTemplate is Setup {
 
         l.prime();
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(usdt),
@@ -568,7 +568,7 @@ contract TargetSwapTemplate is Setup {
 
         usdt.transfer(address(l), 4910e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(usdt),
@@ -586,7 +586,7 @@ contract TargetSwapTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         susd.transfer(address(l), 1970e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         l.prime();
 
@@ -606,7 +606,7 @@ contract TargetSwapTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         susd.transfer(address(l), 1970e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(dai),
@@ -624,7 +624,7 @@ contract TargetSwapTemplate is Setup {
 
         l.prime();
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(usdt),
@@ -642,7 +642,7 @@ contract TargetSwapTemplate is Setup {
 
         l.prime();
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         originAmount_ = l.targetSwap(
             address(usdt),

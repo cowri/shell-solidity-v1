@@ -107,7 +107,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         uint256 _balance = dai.balanceOf(address(this));
 
-        amount_ = _daiAmount.divu(1e18).neg();
+        amount_ = _daiAmount.divu(1e18);
 
         balance_ = _balance.divu(1e18);
 

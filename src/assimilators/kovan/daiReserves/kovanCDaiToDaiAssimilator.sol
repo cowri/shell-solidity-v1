@@ -25,7 +25,7 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    ICToken constant cdai = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
+    ICToken constant cdai = ICToken(0xF0d0EB522cfa50B716B3b1604C4F0fA6f04376AD);
     IERC20 constant dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
 
     constructor () public { }
@@ -72,8 +72,6 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
 
     }
 
-    event log_uint(bytes32, uint256);
-
     // takes a numeraire amount, calculates the raw amount of cDai, transfers it in and returns the corresponding raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
@@ -96,7 +94,7 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _daiAmount = ( ( _amount ) * _rate ) / 1e18;
+        uint256 _daiAmount = ( ( _amount ) * _rate ) / 1e18 + 1;
 
         uint _mintSuccess = cdai.mint(_daiAmount);
 
@@ -108,7 +106,7 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
 
         uint256 _balance = dai.balanceOf(address(this));
 
-        amount_ = _daiAmount.divu(1e18).neg();
+        amount_ = _daiAmount.divu(1e18);
 
         balance_ = _balance.divu(1e18);
 
@@ -119,7 +117,7 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _daiAmount = ( _amount * _rate ) / 1e18;
+        uint256 _daiAmount = ( _amount * _rate ) / 1e18 + 1;
 
         uint _mintSuccess = cdai.mint(_daiAmount);
 

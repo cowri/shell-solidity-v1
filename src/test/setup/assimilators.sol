@@ -41,12 +41,12 @@ contract AssimilatorSetup is StorageSetup {
     
     function setupAssimilatorsSetOneKovan () public {
 
-        usdcAssimilator = IAssimilator(address(new KovanUsdcToUsdcAssimilator()));
-        cusdcAssimilator = IAssimilator(address(new KovanCUsdcToUsdcAssimilator()));
-
         daiAssimilator = IAssimilator(address(new KovanDaiToDaiAssimilator()));
         cdaiAssimilator = IAssimilator(address(new KovanCDaiToDaiAssimilator()));
         chaiAssimilator = IAssimilator(address(new KovanChaiToDaiAssimilator()));
+
+        usdcAssimilator = IAssimilator(address(new KovanUsdcToUsdcAssimilator()));
+        cusdcAssimilator = IAssimilator(address(new KovanCUsdcToUsdcAssimilator()));
 
         usdtAssimilator = IAssimilator(address(new KovanUsdtToUsdtAssimilator()));
         ausdtAssimilator = IAssimilator(address(new KovanAUsdtToUsdtAssimilator()));
@@ -57,6 +57,23 @@ contract AssimilatorSetup is StorageSetup {
     }
 
     function setupAssimilatorsSetOneMainnet () public {
+
+        daiAssimilator = IAssimilator(address(new MainnetDaiToDaiAssimilator()));
+        cdaiAssimilator = IAssimilator(address(new MainnetCDaiToDaiAssimilator()));
+        chaiAssimilator = IAssimilator(address(new MainnetChaiToDaiAssimilator()));
+
+        usdcAssimilator = IAssimilator(address(new MainnetUsdcToUsdcAssimilator()));
+        cusdcAssimilator = IAssimilator(address(new MainnetCUsdcToUsdcAssimilator()));
+
+        usdtAssimilator = IAssimilator(address(new MainnetUsdtToUsdtAssimilator()));
+        ausdtAssimilator = IAssimilator(address(new MainnetAUsdtToUsdtAssimilator()));
+
+        susdAssimilator = IAssimilator(address(new MainnetSUsdToSUsdAssimilator()));
+        asusdAssimilator = IAssimilator(address(new MainnetASUsdToSUsdAssimilator()));
+
+    }
+
+    function setupAssimilatorsSetTwoMainnet () public {
 
         usdcAssimilator = IAssimilator(address(new MainnetUsdcToCUsdcAssimilator()));
         cusdcAssimilator = IAssimilator(address(new MainnetCUsdcToCUsdcAssimilator()));

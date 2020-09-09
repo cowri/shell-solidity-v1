@@ -60,11 +60,27 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
+    function test_s1_selectiveWithdraw_partialLowerIndirectAntiSlippage_40_CDAI_40_CUSDT_from_95DAI_55USDC_95USDT_15SUSD () public {
+
+        uint256 shellsBurned = super.partialLowerIndirectAntiSlippage_40_CDAI_40_AUSDT_from_95DAI_55USDC_95USDT_15SUSD();
+
+        assertEq(shellsBurned, 80001277371794871867);
+
+    }
+
     function test_s1_selectiveWithdraw_partialLowerAntiSlippage_0p0001DAI_41USDC_41USDT_1SUSD_from_55DAI_95USDC_95USDT_15SUSD () public {
 
         uint256 shellsBurned = super.partialLowerAntiSlippage_0p0001DAI_41USDC_41USDT_1SUSD_from_55DAI_95USDC_95USDT_15SUSD();
 
         assertEq(shellsBurned, 83002127396794871860);
+
+    }
+
+    function test_s1_selectiveWithdraw_partialUpperAntiSlippage_50_CUSDC_18_ASUSD_from_90DAI_145USDC_90USDT_50SUSD () public {
+
+        uint256 shellsBurned = super.partialUpperAntiSlippage_50_CUSDC_18_ASUSD_from_90DAI_145USDC_90USDT_50SUSD();
+
+        assertEq(shellsBurned, 68008386736111111158);
 
     }
 
@@ -178,7 +194,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
     //         address(dai), 80e18,
     //         address(usdc), 100e6,
     //         address(usdt), 85e6,
-    //         address(susd), 35e18
+    //         address(susd), 35e6
     //     );
 
     //     l.proportionalWithdraw(150e18);
@@ -201,7 +217,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
     //         address(dai), 55e18,
     //         address(usdc), 90e6,
     //         address(usdt), 125e6,
-    //         address(susd), 30e18
+    //         address(susd), 30e6
     //     );
 
     //     l.proportionalWithdraw(150*WAD);

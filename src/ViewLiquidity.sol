@@ -26,19 +26,19 @@ library ViewLiquidity {
 
     function viewLiquidity (
         LoihiStorage.Shell storage shell
-    ) external view returns (
+    ) internal view returns (
         uint total_,
         uint[] memory individual_
     ) {
 
-        uint _length = shell.assetAssimilators.length;
+        uint _length = shell.assets.length;
 
         uint[] memory individual_ = new uint[](_length);
         uint total_;
 
         for (uint i = 0; i < _length; i++) {
 
-            uint _liquidity = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr).mulu(1e18);
+            uint _liquidity = Assimilators.viewNumeraireBalance(shell.assets[i].addr).mulu(1e18);
 
             total_ += _liquidity;
             individual_[i] = _liquidity;

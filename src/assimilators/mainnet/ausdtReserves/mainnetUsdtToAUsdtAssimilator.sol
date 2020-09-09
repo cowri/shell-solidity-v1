@@ -59,9 +59,14 @@ contract MainnetUsdtToAUsdtAssimilator is IAssimilator {
     // takes raw amount, transfers it in, wraps that in aUsdt, returns numeraire amount
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
+        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
+        emit log_uint("amount", _amount);
+        emit log_uint("allowance", usdt.allowance(msg.sender, address(this)));
+        emit log_uint("allowance", usdt.allowance(address(this), address(pool)));
+
+
         safeTransferFrom(usdt, msg.sender, address(this), _amount);
 
-        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
         pool.deposit(address(usdt), _amount, 0);
 
@@ -75,14 +80,24 @@ contract MainnetUsdtToAUsdtAssimilator is IAssimilator {
 
     }
 
+    event log_uint(bytes32, uint);
+
     // takes numeraire amount, calculates raw amount, transfers that in, wraps it in aUsdt, returns raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
 
-        safeTransferFrom(usdt, msg.sender, address(this), amount_);
+        emit log_uint("amount", amount_);
+
+        emit log_uint("allowance", usdt.allowance(msg.sender, address(this)));
+
+
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
+
+        emit log_uint("allowance of ausdt", usdt.allowance(address(this), address(pool)));
+
+        safeTransferFrom(usdt, msg.sender, address(this), amount_);
 
         pool.deposit(address(usdt), amount_, 0);
 

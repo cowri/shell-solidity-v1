@@ -30,7 +30,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 10e18,
             address(usdc), 10e6,
             address(usdt), 10e6,
-            address(susd), 2.5e18
+            address(susd), 2.5e6
         );
 
         emit log_uint("gas for deposit", gas - gasleft());
@@ -43,14 +43,14 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         shellsMinted_ = l.viewDeposit(
             address(dai), 5e18,
             address(usdc), 1e6,
             address(usdt), 3e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -61,7 +61,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
     }
@@ -72,7 +72,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 55e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
     }
@@ -85,7 +85,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 70e6,
-            address(susd), 28e18
+            address(susd), 28e6
         );
 
     }
@@ -96,14 +96,14 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 100e6,
-            address(susd), 23e18
+            address(susd), 23e6
         );
 
         shellsMinted_ = l.viewDeposit(
             address(dai), 1e18,
             address(usdc), 51e6,
             address(usdt), 51e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -126,7 +126,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.viewDeposit(
@@ -142,14 +142,14 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.viewDeposit(
             address(dai), 1e18,
             address(usdc), 46e6,
             address(usdt), 53e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -170,7 +170,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 55e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         uint256 cusdcOf36Numeraire = cusdcAssimilator.viewRawAmount(uint(36e18).divu(1e18));
@@ -189,12 +189,12 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 55e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsMinted_ = l.viewDeposit(
             address(usdc), 36e6,
-            address(susd), 18e18
+            address(susd), 18e6
         );
 
     }
@@ -205,12 +205,12 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.viewDeposit(
             address(usdc), 5e6,
-            address(susd), 3e18
+            address(susd), 3e6
         );
 
     }
@@ -221,14 +221,14 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 95e6,
             address(usdt), 55e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsMinted_ = l.viewDeposit(
             address(dai), 12e18,
             address(usdc), 12e6,
             address(usdt), 1e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -239,7 +239,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 95e6,
             address(usdt), 55e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsMinted_ = l.viewDeposit(
@@ -255,7 +255,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 145e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         uint256 chaiOf5Numeraire = chaiAssimilator.viewRawAmount(uint(5e18).divu(1e18));
@@ -276,7 +276,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 145e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         emit log_uint("gas on first deposit", gas - gasleft());
@@ -298,14 +298,14 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.viewDeposit(
             address(dai), 8e18,
             address(usdc), 12e6,
             address(usdt), 10e6,
-            address(susd), 2e18
+            address(susd), 2e6
         );
 
     }
@@ -316,14 +316,14 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 95e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsMinted_ = l.viewDeposit(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 5e6,
-            address(susd), 2e18
+            address(susd), 2e6
         );
 
     }
@@ -360,12 +360,12 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 95e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsMinted_ = l.viewDeposit(
             address(dai), 105e18,
-            address(susd), 37e18
+            address(susd), 37e6
         );
 
     }
@@ -376,7 +376,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.viewDeposit(
@@ -392,7 +392,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         uint256 cdaiOf165Numeraire = cdaiAssimilator.viewRawAmount(uint(165e18).divu(1e18));
@@ -402,7 +402,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(cdai), cdaiOf165Numeraire,
             address(cusdc), cusdcOf0Point0001Numeraire,
             address(usdt), 165e6,
-            address(susd), 5e18
+            address(susd), 5e6
         );
 
     }
@@ -413,7 +413,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsMinted_ = l.viewDeposit(
@@ -440,7 +440,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         l.deposit(
             address(dai), 300e18,
             address(usdt), 300e6,
-            address(susd), 100e18
+            address(susd), 100e6
         );
 
     }
@@ -449,7 +449,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(address(susd), 500e18);
+        l.deposit(address(susd), 500e6);
 
     }
 
@@ -471,7 +471,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 140e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         ( , uint256[] memory _before ) = l.liquidity();
@@ -495,7 +495,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 100e18,
             address(usdc), 90e6,
             address(usdt), 80e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         ( , uint256[] memory _before ) = l.liquidity();
@@ -519,7 +519,7 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 125e6,
             address(usdt), 55e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         ( , uint256[] memory _before ) = l.liquidity();
@@ -564,7 +564,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         success_ = l.depositSuccess(
             address(dai), 1e18,
             address(usdt), 1e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -581,7 +581,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         success_ = l.depositSuccess(
             address(dai), 110e18,
             address(usdt), 110e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
     }
@@ -604,7 +604,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         success_ = l.depositSuccess(
             address(dai), 1e18,
             address(usdt), 1e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -657,7 +657,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         mintedShells_ = l.deposit(address(usdt), 10000e6);
 
@@ -678,7 +678,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         l.prime();
 
@@ -693,7 +693,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         mintedShells_ = l.deposit(address(usdt), 1e6);
 
@@ -781,7 +781,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         susd.transfer(address(l), 2970e18);
         asusd.transfer(address(l), 2970e18);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         l.prime();
 
@@ -805,7 +805,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         susd.transfer(address(l), 2970e18);
         asusd.transfer(address(l), 2970e18);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         mintedShells_ = l.deposit(address(usdt), 8910e6);
 
@@ -869,7 +869,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         susd.transfer(address(l), 2970e18);
         asusd.transfer(address(l), 2970e18);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         l.prime();
 
@@ -893,7 +893,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         susd.transfer(address(l), 2970e18);
         asusd.transfer(address(l), 2970e18);
 
-        // l.TEST_setTestHalts(false);
+        //l.TEST_setTestHalts(false);
 
         mintedShells_ = l.deposit(address(usdt), 1e6);
 
