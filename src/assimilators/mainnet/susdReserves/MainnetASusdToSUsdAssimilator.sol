@@ -96,7 +96,7 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
-        pool.deposit(address(susd), _amount, 0)
+        pool.deposit(address(susd), _amount, 0);
 
         IAToken _asusd = getASUsd();
 
@@ -117,7 +117,7 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
-        pool.deposit(address(susd), _amount, 0)
+        pool.deposit(address(susd), _amount, 0);
 
         IAToken _asusd = getASUsd();
 
