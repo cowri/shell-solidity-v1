@@ -517,11 +517,7 @@ contract TargetSwapTemplate is Setup {
             address(susd), 800e6
         );
 
-<<<<<<< HEAD
-        // l.TEST_setTestHalts(false);
-=======
         //l.TEST_setTestHalts(false);
->>>>>>> factory-mainnet
 
         originAmount_ = l.targetSwap(
             address(usdc),
@@ -556,11 +552,7 @@ contract TargetSwapTemplate is Setup {
 
         l.prime();
 
-<<<<<<< HEAD
-        // l.TEST_setTestHalts(false);
-=======
         //l.TEST_setTestHalts(false);
->>>>>>> factory-mainnet
 
         originAmount_ = l.targetSwap(
             address(usdt),
@@ -576,11 +568,7 @@ contract TargetSwapTemplate is Setup {
 
         usdt.transfer(address(l), 4910e6);
 
-<<<<<<< HEAD
-        // l.TEST_setTestHalts(false);
-=======
         //l.TEST_setTestHalts(false);
->>>>>>> factory-mainnet
 
         originAmount_ = l.targetSwap(
             address(usdt),
@@ -598,11 +586,7 @@ contract TargetSwapTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         susd.transfer(address(l), 1970e6);
 
-<<<<<<< HEAD
-        // l.TEST_setTestHalts(false);
-=======
         //l.TEST_setTestHalts(false);
->>>>>>> factory-mainnet
 
         l.prime();
 
@@ -622,11 +606,7 @@ contract TargetSwapTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         susd.transfer(address(l), 1970e6);
 
-<<<<<<< HEAD
-        // l.TEST_setTestHalts(false);
-=======
         //l.TEST_setTestHalts(false);
->>>>>>> factory-mainnet
 
         originAmount_ = l.targetSwap(
             address(dai),
@@ -644,11 +624,7 @@ contract TargetSwapTemplate is Setup {
 
         l.prime();
 
-<<<<<<< HEAD
-        // l.TEST_setTestHalts(false);
-=======
         //l.TEST_setTestHalts(false);
->>>>>>> factory-mainnet
 
         originAmount_ = l.targetSwap(
             address(usdt),
@@ -666,11 +642,7 @@ contract TargetSwapTemplate is Setup {
 
         l.prime();
 
-<<<<<<< HEAD
-        // l.TEST_setTestHalts(false);
-=======
         //l.TEST_setTestHalts(false);
->>>>>>> factory-mainnet
 
         originAmount_ = l.targetSwap(
             address(usdt),

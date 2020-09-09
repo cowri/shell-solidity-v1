@@ -21,7 +21,7 @@ library PartitionedLiquidity {
     function partition (
         LoihiStorage.Shell storage shell,
         mapping (address => LoihiStorage.PartitionTicket) storage partitionTickets
-    ) external {
+    ) internal {
 
         uint _length = shell.assets.length;
 
@@ -39,7 +39,7 @@ library PartitionedLiquidity {
         LoihiStorage.Shell storage shell,
         mapping (address => LoihiStorage.PartitionTicket) storage partitionTickets,
         address _addr
-    ) external view returns (
+    ) internal view returns (
         uint[] memory claims_
     ) {
 
@@ -60,9 +60,9 @@ library PartitionedLiquidity {
     function partitionedWithdraw (
         LoihiStorage.Shell storage shell,
         mapping (address => LoihiStorage.PartitionTicket) storage partitionTickets,
-        address[] calldata _derivatives,
-        uint[] calldata _withdrawals
-    ) external returns (
+        address[] memory _derivatives,
+        uint[] memory _withdrawals
+    ) internal returns (
         uint[] memory
     ) {
 

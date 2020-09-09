@@ -22,10 +22,10 @@ library SelectiveLiquidity {
 
     function selectiveDeposit (
         LoihiStorage.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts,
+        address[] memory _derivatives,
+        uint[] memory _amounts,
         uint _minShells
-    ) external returns (
+    ) internal returns (
         uint shells_
     ) {
 
@@ -47,9 +47,9 @@ library SelectiveLiquidity {
 
     function viewSelectiveDeposit (
         LoihiStorage.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts
-    ) external view returns (
+        address[] memory _derivatives,
+        uint[] memory _amounts
+    ) internal view returns (
         uint shells_
     ) {
 
@@ -66,10 +66,10 @@ library SelectiveLiquidity {
 
     function selectiveWithdraw (
         LoihiStorage.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts,
+        address[] memory _derivatives,
+        uint[] memory _amounts,
         uint _maxShells
-    ) external returns (
+    ) internal returns (
         uint256 shells_
     ) {
 
@@ -94,9 +94,9 @@ library SelectiveLiquidity {
 
     function viewSelectiveWithdraw (
         LoihiStorage.Shell storage shell,
-        address[] calldata _derivatives,
-        uint[] calldata _amounts
-    ) external view returns (
+        address[] memory _derivatives,
+        uint[] memory _amounts
+    ) internal view returns (
         uint shells_
     ) {
 
