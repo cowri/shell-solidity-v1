@@ -16,72 +16,15 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
     function getLoihiSuiteOne () public returns (Loihi loihi_) {
 
-        // loihi_ = getLoihiSuiteOneLocalFromFactory();
-        // loihi_ = getLoihiSuiteOneKovanFromFactory();
+        loihi_ = getLoihiSuiteOneKovanFromFactory();
 
+    }
+
+    function getLoihiSuiteOneKovanFromFactory () public returns (Loihi loihi_) {
+        
         setupStablecoinsKovan();
         
-        setupAssimilatorsSetOneKovan();
-
-        loihi_ = Loihi(0xBAf7e2545C0Cee669c73AeC3B0884823a1B7E950);
-
-        approveStablecoins(address(loihi_));
-        
-        // loihi_ = getLoihiSuiteOneKovanFromFactory();
-
-        // loihi_ = getLoihiSuiteOneMainnet();
-
-    }
-
-    function getLoihiSuiteTwo () public returns (Loihi loihi_) {
-
-        // loihi_ = getLoihiSuiteTwoMainnet();
-
-    }
-
-    function getLoihiSuiteThree () public returns (Loihi loihi_) {
-
-
-    }
-
-    function getLoihiSuiteFive () public returns (Loihi loihi_) {
-
-
-    }
-
-    function getLoihiSuiteSix () public returns (Loihi loihi_) {
-
-
-    }
-
-    function getLoihiSuiteSixClone () public returns (Loihi loihi_) {
-
-
-    }
-
-
-    function newLoihi () public returns (Loihi loihi_) {
-        
-        address[] memory _assets = new address[](0);
-        uint[] memory _weights = new uint[](0);
-        address[] memory _derivatives = new address[](0);        
-        
-        loihi_ = new Loihi(
-            _assets,
-            _weights,
-            _derivatives
-        );
-
-    }
-
-    event log(bytes32);
-    
-    function getLoihiSuiteOneMainnetFromFactory () public returns (Loihi loihi_) {
-        
-        setupStablecoinsMainnet();
-        
-        // setupAssimilatorsSetOneMainnet();
-        setupAssimilatorsSetTwoMainnet();
+        setupAssimilatorsSetOneMainnet();
         
         LoihiFactory lf = new LoihiFactory();
 
@@ -152,22 +95,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         setParamsSetOne(loihi_);
 
         approveStablecoins(address(loihi_));
-
-    }
-
-    function getLoihiSuiteOneMainnet () public returns (Loihi loihi_) {
-
-        // setupStablecoinsMainnet();
-        // setupAssimilatorsSetOneMainnet();
-
-        // loihi_ = newLoihi();
-
-        // includeAssetsSetOne(loihi_);
-        // includeAssimilatorsSetOne(loihi_);
-        // setParamsSetOne(loihi_);
-
-        // approveStablecoins(address(loihi_));
-        // interApproveStablecoinsRPC(address(loihi_));
 
     }
 
