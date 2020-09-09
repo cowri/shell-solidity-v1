@@ -107,7 +107,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
         uint256 _balance = dai.balanceOf(address(this));
 
-        amount_ = _daiAmount.divu(1e18).neg();
+        amount_ = _daiAmount.divu(1e18);
 
         balance_ = _balance.divu(1e18);
 
@@ -134,7 +134,6 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
 
     // takes a numeraire value of CDai, figures out the raw amount, transfers raw amount out, and returns raw amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
-
 
         amount_ = _amount.mulu(1e18);
 

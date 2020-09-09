@@ -94,9 +94,11 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
     // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        IAToken _asusd = getASUsd();
+        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
-        _asusd.deposit(_amount);
+        pool.deposit(address(susd), _amount, 0)
+
+        IAToken _asusd = getASUsd();
 
         bool _success = _asusd.transfer(_dst, _amount);
 
@@ -113,9 +115,11 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
     // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        IAToken _asusd = getASUsd();
+        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
-        _asusd.deposit(_amount);
+        pool.deposit(address(susd), _amount, 0)
+
+        IAToken _asusd = getASUsd();
 
         bool _success = _asusd.transfer(_dst, _amount);
 
