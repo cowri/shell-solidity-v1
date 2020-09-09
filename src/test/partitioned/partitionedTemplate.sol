@@ -54,7 +54,7 @@ contract PartitionedLiquidityTemplate is Setup {
             address(dai), 100e18,
             address(usdc), 80e6,
             address(usdt), 90e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         l.setFrozen(true);

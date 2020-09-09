@@ -41,12 +41,12 @@ contract AssimilatorSetup is StorageSetup {
     
     function setupAssimilatorsSetOneKovan () public {
 
-        usdcAssimilator = IAssimilator(address(new KovanUsdcToUsdcAssimilator()));
-        cusdcAssimilator = IAssimilator(address(new KovanCUsdcToUsdcAssimilator()));
-
         daiAssimilator = IAssimilator(address(new KovanDaiToDaiAssimilator()));
         cdaiAssimilator = IAssimilator(address(new KovanCDaiToDaiAssimilator()));
         chaiAssimilator = IAssimilator(address(new KovanChaiToDaiAssimilator()));
+
+        usdcAssimilator = IAssimilator(address(new KovanUsdcToUsdcAssimilator()));
+        cusdcAssimilator = IAssimilator(address(new KovanCUsdcToUsdcAssimilator()));
 
         usdtAssimilator = IAssimilator(address(new KovanUsdtToUsdtAssimilator()));
         ausdtAssimilator = IAssimilator(address(new KovanAUsdtToUsdtAssimilator()));

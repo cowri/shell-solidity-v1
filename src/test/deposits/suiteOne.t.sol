@@ -44,6 +44,14 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
+    function test_s1_selectiveDeposit_partialUpperSlippage_5_CDAI_5_CUSDC_70_AUSDT_28SUSD_300Proportional () public {
+
+        uint256 newShells = super.partialUpperSlippage_5_CDAI_5_CUSDC_70_AUSDT_28_ASUSD_300Proportional();
+
+        assertEq(newShells, 107839869281045751654);
+
+    }
+
     function test_s1_selectiveDeposit_partialLowerSlippage_moderatelyUnbalanced_1DAI_51USDC_51USDT_1SUSD () public {
 
         uint256 newShells = super.partialLowerSlippage_moderatelyUnbalanced_1DAI_51USDC_51USDT_1SUSD();
@@ -179,7 +187,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
         l.deposit(
             address(dai), 300e18,
             address(usdt), 300e6,
-            address(susd), 100e18
+            address(susd), 100e6
         );
 
     }
@@ -188,7 +196,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
         l.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(address(susd), 500e18);
+        l.deposit(address(susd), 500e6);
 
     }
 

@@ -30,7 +30,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 10e18,
             address(usdc), 10e6,
             address(usdt), 10e6,
-            address(susd), 2.5e18
+            address(susd), 2.5e6
         );
 
     }
@@ -41,14 +41,14 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         shellsBurned_ = l.viewWithdraw(
             address(dai), 5e18,
             address(usdc), 1e6,
             address(usdt), 3e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -61,7 +61,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 47e6,
-            address(susd), 16e18
+            address(susd), 16e6
         );
 
     }
@@ -72,14 +72,14 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 100e6,
-            address(susd), 23e18
+            address(susd), 23e6
         );
 
         shellsBurned_ = l.viewWithdraw(
             address(dai), 3e18,
             address(usdc), 60e6,
             address(usdt), 30e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -92,7 +92,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 0.001e18,
             address(usdc), 40e6,
             address(usdt), 40e6,
-            address(susd), 10e18
+            address(susd), 10e6
         );
 
     }
@@ -103,7 +103,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 55e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsBurned_ = l.viewWithdraw(
@@ -119,14 +119,14 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 95e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsBurned_ = l.viewWithdraw(
             address(dai), 0.0001e18,
             address(usdc), 41e6,
             address(usdt), 41e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -137,12 +137,12 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsBurned_ = l.viewWithdraw(
             address(usdc), 50e6,
-            address(susd), 18e18
+            address(susd), 18e6
         );
 
     }
@@ -153,14 +153,14 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         uint256 cusdcOf50Numeraires = cusdcAssimilator.viewRawAmount(uint(50e18).divu(1e18));
 
         shellsBurned_ = l.viewWithdraw(
             address(cusdc), cusdcOf50Numeraires,
-            address(susd), 18e18
+            address(susd), 18e6
         );
 
     }
@@ -171,7 +171,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsBurned_ = l.viewWithdraw(
@@ -187,14 +187,14 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsBurned_ = l.viewWithdraw(
             address(dai), 8e18,
             address(usdc), 2e6,
             address(usdt), 8e6,
-            address(susd), 2e18
+            address(susd), 2e6
         );
 
     }
@@ -205,13 +205,13 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 95e6,
             address(usdt), 55e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsBurned_ = l.viewWithdraw(
             address(usdc), 1e6,
             address(usdt), 7e6,
-            address(susd), 2e18
+            address(susd), 2e6
         );
 
     }
@@ -222,7 +222,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 95e6,
             address(usdt), 55e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         uint256 chaiOf5Numeraire = chaiAssimilator.viewRawAmount(uint(5e18).divu(1e18));
@@ -241,7 +241,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 95e6,
             address(usdt), 55e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsBurned_ = l.viewWithdraw(
@@ -257,7 +257,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 95e18,
             address(usdc), 95e6,
             address(usdt), 55e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsBurned_ = l.viewWithdraw(
@@ -275,7 +275,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         uint256 cdaiOf5Numeraires = IAssimilator(cdaiAssimilator).viewRawAmount(uint(5e18).divu(1e18));
@@ -293,12 +293,12 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsBurned_ = l.viewWithdraw(
             address(dai), 5e18,
-            address(susd), 2e18
+            address(susd), 2e6
         );
 
     }
@@ -309,12 +309,12 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 145e6,
-            address(susd), 50e18
+            address(susd), 50e6
         );
 
         shellsBurned_ = l.viewWithdraw(
             address(usdt), 95e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
     }
@@ -325,7 +325,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 95e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsBurned_ = l.viewWithdraw(
@@ -342,7 +342,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 95e6,
             address(usdt), 95e6,
-            address(susd), 15e18
+            address(susd), 15e6
         );
 
         shellsBurned_ = l.viewWithdraw(
@@ -360,13 +360,13 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 100e18,
             address(usdc), 90e6,
             address(usdt), 80e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         l.withdraw(
             address(dai), 95e18,
             address(usdt), 75e6,
-            address(susd), 27e18
+            address(susd), 27e6
         );
 
     }
@@ -377,7 +377,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 65e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         l.withdraw(address(usdt), 50e6);
@@ -390,7 +390,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 110e6,
             address(usdt), 80e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         l.withdraw(
@@ -407,10 +407,10 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 80e6,
-            address(susd), 40e18
+            address(susd), 40e6
         );
 
-        l.withdraw(address(susd), 30e18);
+        l.withdraw(address(susd), 30e6);
 
     }
 
@@ -420,7 +420,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         ( , uint256[] memory reserves ) = l.liquidity();
@@ -435,7 +435,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
             address(dai), 55e18,
             address(usdc), 90e6,
             address(usdt), 125e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
 
         l.proportionalWithdraw(150e18, 1e50);
@@ -524,7 +524,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
         success_ = l.withdrawSuccess(
             address(dai), 1e18,
             address(usdt), 1e6,
-            address(susd), 1e18
+            address(susd), 1e6
         );
 
     }
@@ -547,7 +547,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
         success_ = l.withdrawSuccess(
             address(dai), 80e18,
             address(usdt), 80e6,
-            address(susd), 23e18
+            address(susd), 23e6
         );
 
     }
@@ -615,7 +615,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
 
         //l.TEST_setTestHalts(false);
 
-        shellsBurned_ = l.viewWithdraw(address(susd), 1e18);
+        shellsBurned_ = l.viewWithdraw(address(susd), 1e6);
 
     }
 
@@ -628,7 +628,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
 
         //l.TEST_setTestHalts(false);
 
-        shellsBurned_ = l.viewWithdraw(address(susd), 1e18);
+        shellsBurned_ = l.viewWithdraw(address(susd), 1e6);
 
     }
 
@@ -641,7 +641,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
 
         l.prime();
 
-        shellsBurned_ = l.viewWithdraw(address(susd), 1e18);
+        shellsBurned_ = l.viewWithdraw(address(susd), 1e6);
 
     }
 
@@ -652,7 +652,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
         susd.transfer(address(l), 9970e18);
         asusd.transfer(address(l), 9970e18);
 
-        shellsBurned_ = l.viewWithdraw(address(susd), 1e18);
+        shellsBurned_ = l.viewWithdraw(address(susd), 1e6);
 
     }
 

@@ -401,7 +401,7 @@ contract TargetSwapTemplate is Setup {
             address(susd), 35e6
         );
 
-        originAmount_ = l.targetSwap( address(dai), address(susd), 3e18);
+        originAmount_ = l.targetSwap( address(dai), address(susd), 3e6);
 
     }
 

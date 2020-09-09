@@ -40,11 +40,11 @@ contract StablecoinSetup is StorageSetup {
     function setupStablecoinsKovan() public {
 
         dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
-        cdai = ICToken(0xe7bc397DBd069fC7d0109C0636d06888bb50668c);
+        cdai = ICToken(0xF0d0EB522cfa50B716B3b1604C4F0fA6f04376AD);
         chai = IChai(0xB641957b6c29310926110848dB2d464C8C3c3f38);
 
-        usdc = IERC20(0x75B0622Cec14130172EaE9Cf166B92E5C112FaFF);
-        cusdc = ICToken(0xcfC9bB230F00bFFDB560fCe2428b4E05F3442E35);
+        usdc = IERC20(0xb7a4F3E9097C08dA09517b5aB877F7a917224ede);
+        cusdc = ICToken(0x4a92E71227D294F041BD82dd8f78591B75140d63);
 
         usdt = IERC20NoBool(0x13512979ADE267AB5100878E2e0f485B568328a4);
         ausdt = IAToken(0xA01bA9fB493b851F4Ac5093A324CB081A909C34B);
@@ -53,6 +53,9 @@ contract StablecoinSetup is StorageSetup {
         asusd = IAToken(0xb9c1434aB6d5811D1D0E92E8266A37Ae8328e901);
 
         aaveLpCore = 0x95D1189Ed88B380E319dF73fF00E479fcc4CFa45;
+
+        cdai.exchangeRateCurrent();
+        cusdc.exchangeRateCurrent();
 
     }
 
