@@ -428,8 +428,8 @@ contract Loihi is LoihiStorage {
     ) { 
 
         supports_ = this.supportsInterface.selector == _interface  // erc165
-            || bytes(0x7f5828d0) == _interface                    // eip173
-            || bytes(0x36372b07) == _interface;                  // erc20
+            || bytes4(0x7f5828d0) == _interface                    // eip173
+            || bytes4(0x36372b07) == _interface;                  // erc20
         
     }
 
