@@ -41,8 +41,6 @@ library Orchestrator {
         uint256 _feeAtHalt,
         uint256 _epsilon,
         uint256 _lambda
-    // ) external returns (
-        // uint256 max_
     ) external {
 
         require(_alpha < 1e18 && _alpha > 0, "Shell/parameter-invalid-alpha");
@@ -68,8 +66,6 @@ library Orchestrator {
         shell.omega = getNewOmega(shell);
 
         emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda, shell.omega.mulu(1e18));
-
-        // max_ = _feeAtHalt;
 
     }
 
@@ -97,15 +93,16 @@ library Orchestrator {
 
     }
     
+ 
     function initialize (
         LoihiStorage.Shell storage shell,
         address[] storage numeraires,
         address[] storage reserves,
         address[] storage derivatives,
-        address[] memory _assets,
-        uint[] memory _assetWeights,
-        address[] memory _derivativeAssimilators
-    ) public {
+        address[] calldata _assets,
+        uint[] calldata _assetWeights,
+        address[] calldata _derivativeAssimilators
+    ) external {
         
         for (uint i = 0; i < _assetWeights.length; i++) {
 
@@ -261,7 +258,9 @@ library Orchestrator {
 
     }
 
-    function viewShell (LoihiStorage.Shell storage shell) external view returns (
+    function viewShell (
+        LoihiStorage.Shell storage shell
+    ) external view returns (
         uint alpha_,
         uint beta_,
         uint delta_,

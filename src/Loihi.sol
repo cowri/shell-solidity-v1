@@ -55,6 +55,15 @@ contract Loihi is LoihiStorage {
 
     event Transfer(address indexed from, address indexed to, uint256 value);
 
+    IFreeFromUpTo public constant chi = IFreeFromUpTo(0x0000000000004946c0e9F43F4Dee607b0eF1fA1c);
+
+    modifier discountCHI {
+        uint256 gasStart = gasleft();
+        _;
+        uint256 gasSpent = 21000 + gasStart - gasleft() + 16 * msg.data.length;
+        chi.freeFromUpTo(msg.sender, (gasSpent + 14154) / 41130);
+    }
+
     modifier onlyOwner() {
 
         require(msg.sender == owner, "Shell/caller-is-not-owner");
@@ -117,53 +126,6 @@ contract Loihi is LoihiStorage {
             _assetWeights,
             _derivativeAssimilators
         );
-        
-        // for (uint i = 0; i < _assetWeights.length; i++) {
-        //     uint ix = i*5;
-        
-        //     address _numeraire = _assets[ix];
-        //     address _numeraireAssim = _assets[1+ix];
-        //     address _reserve = _assets[2+ix];
-        //     address _reserveAssim = _assets[3+ix];
-        //     address _reserveApproveTo = _assets[4+ix];
-        //     uint _weight = _assetWeights[i];
-        
-        //     numeraires.push(_numeraire);
-            
-        //     reserves.push(_reserve);
-
-        //     derivatives.push(_numeraire);
-            
-        //     if (_numeraire != _reserve) derivatives.push(_reserve);
-
-        //     Orchestrator.includeAsset(
-        //         shell,
-        //         _numeraire,   // numeraire
-        //         _numeraireAssim, // numeraire assimilator
-        //         _reserve, // reserve
-        //         _reserveAssim, // reserve assimilator
-        //         _reserveApproveTo, // reserve approve to
-        //         _weight
-        //     );
-            
-        // }
-        
-        // for (uint i = 0; i < _derivativeAssimilators.length / 5; i++) {
-
-        //     address _derivative = _derivativeAssimilators[i*5];
-
-        //     derivatives.push(_derivative);
-
-        //     Orchestrator.includeAssimilator(
-        //         shell,
-        //         _derivative,   // derivative
-        //         _derivativeAssimilators[1+i*5], // numeraire
-        //         _derivativeAssimilators[2+i*5], // reserve
-        //         _derivativeAssimilators[3+i*5], // assimilator
-        //         _derivativeAssimilators[4+i*5]  // derivative approve to
-        //     );
-
-        // }
 
     }
 
@@ -181,59 +143,10 @@ contract Loihi is LoihiStorage {
         uint _lambda
     ) external onlyOwner {
 
-        // maxFee = Orchestrator.setParams(shell, _alpha, _beta, _feeAtHalt, _epsilon, _lambda);
         Orchestrator.setParams(shell, _alpha, _beta, _feeAtHalt, _epsilon, _lambda);
 
     }
 
-
-    // /// @notice includes an asset into the pool
-    // /// @param _numeraire the numeraire of the asset
-    // /// @param _nAssim the assimilator for the numeraire
-    // /// @param _reserve the reserve of the asset for instance cdai for dai
-    // /// @param _rAssim the reserve assimilator for the pool
-    // /// @param _weight the weighting of this asset in the pool
-    // function includeAsset (
-    //     address _numeraire,
-    //     address _nAssim,
-    //     address _reserve,
-    //     address _rAssim,
-    //     address _rApproveTo,
-    //     uint _weight
-    // ) private {
-        
-    //     numeraires.push(_numeraire);
-        
-    //     reserves.push(_reserve);
-
-    //     derivatives.push(_numeraire);
-        
-    //     if (_numeraire != _reserve) derivatives.push(_reserve);
-
-    //     Orchestrator.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _rApproveTo, _weight);
-
-    // }
-
-
-    // /// @notice includes an assimilator into the pool
-    // /// @param _derivative the address of the derivative the assimilator is for
-    // /// @param _numeraire the numeraire asset the assimilator is for as in dai for cdai
-    // /// @param _reserve the reserve this numeraire is held in for instance potentially adai for dai
-    // /// @param _assimilator the address of the assimilator 
-    // function includeAssimilator (
-    //     address _derivative, 
-    //     address _numeraire, 
-    //     address _reserve, 
-    //     address _assimilator,
-    //     address _derivativeApproveTo
-    // ) private {
-        
-    //     derivatives.push(_derivative);
-
-    //     Orchestrator.includeAssimilator(shell, _derivative, _numeraire, _reserve, _assimilator, _derivativeApproveTo);
-
-    // }
-    
     /// @notice excludes an assimilator from the shell
     /// @param _assimilator the address of the assimilator to exclude
     function excludeAssimilator (
@@ -288,40 +201,6 @@ contract Loihi is LoihiStorage {
 
     }
 
-    IFreeFromUpTo public constant chi = IFreeFromUpTo(0x0000000000004946c0e9F43F4Dee607b0eF1fA1c);
-
-    modifier discountCHI {
-        uint256 gasStart = gasleft();
-        _;
-        uint256 gasSpent = 21000 + gasStart - gasleft() + 16 * msg.data.length;
-        chi.freeFromUpTo(msg.sender, (gasSpent + 14154) / 41130);
-     
-    }
-    
-    /// @author james foley http://github.com/realisation
-    /// @notice swap a dynamic origin amount for a fixed target amount
-    /// @param _origin the address of the origin
-    /// @param _target the address of the target
-    /// @param _originAmount the origin amount
-    /// @param _minTargetAmount the minimum target amount
-    /// @param _deadline deadline in block number after which the trade will not execute
-    /// @return targetAmount_ the amount of target that has been swapped for the origin amount
-    function originSwapCHI (
-        address _origin,
-        address _target,
-        uint _originAmount,
-        uint _minTargetAmount,
-        uint _deadline
-    ) external deadline(_deadline) transactable nonReentrant discountCHI returns (
-        uint targetAmount_
-    ) {
-
-        targetAmount_ = Swaps.originSwap(shell, _origin, _target, _originAmount, msg.sender);
-
-        require(targetAmount_ > _minTargetAmount, "Shell/below-min-target-amount");
-
-    }
-
     /// @author james foley http://github.com/realisation
     /// @notice swap a dynamic origin amount for a fixed target amount
     /// @param _origin the address of the origin
@@ -337,6 +216,22 @@ contract Loihi is LoihiStorage {
         uint _minTargetAmount,
         uint _deadline
     ) external deadline(_deadline) transactable nonReentrant returns (
+        uint targetAmount_
+    ) {
+
+        targetAmount_ = Swaps.originSwap(shell, _origin, _target, _originAmount, msg.sender);
+
+        require(targetAmount_ > _minTargetAmount, "Shell/below-min-target-amount");
+
+    }
+
+    function originSwapDiscountCHI (
+        address _origin,
+        address _target,
+        uint _originAmount,
+        uint _minTargetAmount,
+        uint _deadline
+    ) external deadline(_deadline) transactable nonReentrant discountCHI returns (
         uint targetAmount_
     ) {
 
@@ -532,24 +427,9 @@ contract Loihi is LoihiStorage {
         bool supports_
     ) { 
 
-        supports_ = this.supportsInterface.selector == _interface // erc165
-            || this.transfer.selector == _interface 
-            || this.transferFrom.selector == _interface 
-            || this.approve.selector == _interface
-            || this.allowance.selector == _interface
-            || this.balanceOf.selector == _interface
-            || this.originSwap.selector == _interface
-            || this.targetSwap.selector == _interface
-            || this.selectiveDeposit.selector == _interface
-            || this.selectiveWithdraw.selector == _interface
-            || this.proportionalDeposit.selector == _interface       
-            || this.proportionalWithdraw.selector == _interface
-            || this.viewOriginSwap.selector == _interface
-            || this.viewTargetSwap.selector == _interface
-            || this.viewSelectiveDeposit.selector == _interface
-            || this.viewSelectiveWithdraw.selector == _interface
-            || this.viewProportionalDeposit.selector == _interface       
-            || this.viewProportionalWithdraw.selector == _interface;
+        supports_ = this.supportsInterface.selector == _interface  // erc165
+            || bytes(0x7f5828d0) == _interface                    // eip173
+            || bytes(0x36372b07) == _interface;                  // erc20
         
     }
 
