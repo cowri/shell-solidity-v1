@@ -99,6 +99,7 @@ library Orchestrator {
 
     }
     
+ 
     function initialize (
         LoihiStorage.Shell storage shell,
         address[] storage numeraires,
@@ -110,48 +111,40 @@ library Orchestrator {
     ) public {
         
         for (uint i = 0; i < _assetWeights.length; i++) {
+
             uint ix = i*5;
         
-            address _numeraire = _assets[ix];
-            address _numeraireAssim = _assets[1+ix];
-            address _reserve = _assets[2+ix];
-            address _reserveAssim = _assets[3+ix];
-            address _reserveApproveTo = _assets[4+ix];
-            uint _weight = _assetWeights[i];
-        
-            numeraires.push(_numeraire);
-            
-            reserves.push(_reserve);
+            numeraires.push(_assets[ix]);
+            derivatives.push(_assets[ix]);
 
-            derivatives.push(_numeraire);
+            reserves.push(_assets[2+ix]);
+            if (_assets[ix] != _assets[2+ix]) derivatives.push(_assets[2+ix]);
             
-            if (_numeraire != _reserve) derivatives.push(_reserve);
-
             includeAsset(
                 shell,
-                _numeraire,   // numeraire
-                _numeraireAssim, // numeraire assimilator
-                _reserve, // reserve
-                _reserveAssim, // reserve assimilator
-                _reserveApproveTo, // reserve approve to
-                _weight
+                _assets[ix], // numeraire
+                _assets[1+ix], // numeraire assimilator
+                _assets[2+ix], // reserve
+                _assets[3+ix], // reserve assimilator
+                _assets[4+ix], // reserve approve to
+                _assetWeights[i]
             );
             
         }
         
         for (uint i = 0; i < _derivativeAssimilators.length / 5; i++) {
+            
+            uint ix = i * 5;
 
-            address _derivative = _derivativeAssimilators[i*5];
-
-            derivatives.push(_derivative);
+            derivatives.push(_derivativeAssimilators[ix]);
 
             includeAssimilator(
                 shell,
-                _derivative,   // derivative
-                _derivativeAssimilators[1+i*5], // numeraire
-                _derivativeAssimilators[2+i*5], // reserve
-                _derivativeAssimilators[3+i*5], // assimilator
-                _derivativeAssimilators[4+i*5]  // derivative approve to
+                _derivativeAssimilators[ix],   // derivative
+                _derivativeAssimilators[1+ix], // numeraire
+                _derivativeAssimilators[2+ix], // reserve
+                _derivativeAssimilators[3+ix], // assimilator
+                _derivativeAssimilators[4+ix]  // derivative approve to
             );
 
         }
