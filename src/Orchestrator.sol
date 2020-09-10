@@ -41,7 +41,7 @@ library Orchestrator {
         uint256 _feeAtHalt,
         uint256 _epsilon,
         uint256 _lambda
-    ) internal returns (
+    ) external returns (
         uint256 max_
     ) {
 
@@ -105,7 +105,7 @@ library Orchestrator {
         address _reserveAssim,
         address _reserveApproveTo,
         uint256 _weight
-    ) internal {
+    ) external {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
 
@@ -156,7 +156,7 @@ library Orchestrator {
         address _reserve,
         address _assimilator,
         address _derivativeApproveTo
-    ) internal {
+    ) external {
 
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
 
@@ -188,7 +188,7 @@ library Orchestrator {
 
     }
 
-    function prime (LoihiStorage.Shell storage shell) internal {
+    function prime (LoihiStorage.Shell storage shell) external {
 
         uint _length = shell.assets.length;
 
@@ -210,7 +210,7 @@ library Orchestrator {
 
     }
 
-    function viewShell (LoihiStorage.Shell storage shell) internal view returns (
+    function viewShell (LoihiStorage.Shell storage shell) external view returns (
         uint alpha_,
         uint beta_,
         uint delta_,

@@ -627,5 +627,15 @@ contract Loihi is LoihiStorage {
         return ViewLiquidity.viewLiquidity(shell);
 
     }
+    
+    function assimilator (
+        address _derivative
+    ) public view returns (
+        address assimilator_
+    ) {
+
+        assimilator_ = shell.assimilators[_derivative].addr;
+
+    }
 
 }
