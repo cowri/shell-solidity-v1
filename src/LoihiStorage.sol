@@ -74,6 +74,6 @@ contract LoihiStorage {
     address public owner;
     bool internal notEntered = true;
 
-    uint public maxFee;
+    // uint public maxFee;
 
 }

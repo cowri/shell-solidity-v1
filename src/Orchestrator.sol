@@ -41,9 +41,9 @@ library Orchestrator {
         uint256 _feeAtHalt,
         uint256 _epsilon,
         uint256 _lambda
-    ) external returns (
-        uint256 max_
-    ) {
+    // ) external returns (
+        // uint256 max_
+    ) external {
 
         require(_alpha < 1e18 && _alpha > 0, "Shell/parameter-invalid-alpha");
 
@@ -69,7 +69,7 @@ library Orchestrator {
 
         emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda, shell.omega.mulu(1e18));
 
-        max_ = _feeAtHalt;
+        // max_ = _feeAtHalt;
 
     }
 
@@ -97,6 +97,57 @@ library Orchestrator {
 
     }
     
+    function initialize (
+        LoihiStorage.Shell storage shell,
+        address[] storage numeraires,
+        address[] storage reserves,
+        address[] storage derivatives,
+        address[] memory _assets,
+        uint[] memory _assetWeights,
+        address[] memory _derivativeAssimilators
+    ) public {
+        
+        for (uint i = 0; i < _assetWeights.length; i++) {
+
+            uint ix = i*5;
+        
+            numeraires.push(_assets[ix]);
+            derivatives.push(_assets[ix]);
+
+            reserves.push(_assets[2+ix]);
+            if (_assets[ix] != _assets[2+ix]) derivatives.push(_assets[2+ix]);
+            
+            includeAsset(
+                shell,
+                _assets[ix], // numeraire
+                _assets[1+ix], // numeraire assimilator
+                _assets[2+ix], // reserve
+                _assets[3+ix], // reserve assimilator
+                _assets[4+ix], // reserve approve to
+                _assetWeights[i]
+            );
+            
+        }
+        
+        for (uint i = 0; i < _derivativeAssimilators.length / 5; i++) {
+            
+            uint ix = i * 5;
+
+            derivatives.push(_derivativeAssimilators[ix]);
+
+            includeAssimilator(
+                shell,
+                _derivativeAssimilators[ix],   // derivative
+                _derivativeAssimilators[1+ix], // numeraire
+                _derivativeAssimilators[2+ix], // reserve
+                _derivativeAssimilators[3+ix], // assimilator
+                _derivativeAssimilators[4+ix]  // derivative approve to
+            );
+
+        }
+
+    }
+
     function includeAsset (
         LoihiStorage.Shell storage shell,
         address _numeraire,
@@ -105,7 +156,7 @@ library Orchestrator {
         address _reserveAssim,
         address _reserveApproveTo,
         uint256 _weight
-    ) external {
+    ) private {
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
 
@@ -116,7 +167,7 @@ library Orchestrator {
         require(_reserveAssim != address(0), "Shell/reserve-assimilator-cannot-be-zeroth-adress");
 
         require(_weight < 1e18, "Shell/weight-must-be-less-than-one");
-        
+
         if (_numeraire != _reserve) safeApprove(_numeraire, _reserveApproveTo, uint(-1));
 
         LoihiStorage.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
@@ -156,7 +207,7 @@ library Orchestrator {
         address _reserve,
         address _assimilator,
         address _derivativeApproveTo
-    ) external {
+    ) private {
 
         require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
 
@@ -165,7 +216,7 @@ library Orchestrator {
         require(_reserve != address(0), "Shell/numeraire-cannot-be-zeroth-address");
 
         require(_assimilator != address(0), "Shell/assimilator-cannot-be-zeroth-address");
-
+        
         safeApprove(_numeraire, _derivativeApproveTo, uint(-1));
 
         LoihiStorage.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];

@@ -134,9 +134,11 @@ contract MainnetASUsdToSUsdAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        IAToken _asusd = getASUsd();
+        ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
-        _asusd.deposit(amount_);
+        pool.deposit(address(susd), amount_, 0);
+
+        IAToken _asusd = getASUsd();
 
         bool _success = _asusd.transfer(_dst, amount_);
 

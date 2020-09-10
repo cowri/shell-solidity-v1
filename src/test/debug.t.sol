@@ -27,8 +27,20 @@ contract DebugTest is Setup, DSMath, DSTest {
         l = getLoihiSuiteOne();
 
     }
+    
+    modifier one () {
+        emit log_named_uint("one before", 1);
+        _;
+        emit log_named_uint("one after ", 1);
+    }
+    
+    modifier two () {
+        emit log_named_uint("two before", 2);
+        _;
+        emit log_named_uint("two after", 2);
+    }
 
-    function testDebug () public {
+    function testDebug () public one two {
 
         uint256 p3 = .3e18;
 
@@ -37,8 +49,6 @@ contract DebugTest is Setup, DSMath, DSTest {
         int128 onedivu = uint256(.25e18).divu(1e18);
 
         emit log_named_int("int128", onedivu);
-
-
 
     }
     
