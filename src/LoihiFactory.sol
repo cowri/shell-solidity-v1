@@ -17,6 +17,8 @@ pragma solidity ^0.5.0;
 
 import "./Loihi.sol";
 
+import "./interfaces/IFreeFromUpTo.sol";
+
 contract LoihiFactory {
 
     address private cowri;
@@ -27,19 +29,26 @@ contract LoihiFactory {
 
     mapping(address => bool) private _isShell;
 
+    IFreeFromUpTo public constant chi = IFreeFromUpTo(0x0000000000004946c0e9F43F4Dee607b0eF1fA1c);
+
+    modifier discountCHI {
+        uint256 gasStart = gasleft();
+        _;
+        uint256 gasSpent = 21000 + gasStart - gasleft() + 16 * msg.data.length;
+        chi.freeFromUpTo(msg.sender, (gasSpent + 14154) / 41130);
+    }
+
     function isShell(address _shell) external view returns (bool) {
 
         return _isShell[_shell];
 
     }
 
-    event log(bytes32);
-
     function newShell(
         address[] memory _assets,
         uint[] memory _assetWeights,
         address[] memory _derivativeAssimilators
-    ) public returns (Loihi) {
+    ) public discountCHI returns (Loihi) {
         
         if (msg.sender != cowri) revert("Shell/must-be-cowri");
 

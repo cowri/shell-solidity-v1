@@ -38,6 +38,8 @@ import "./interfaces/IPot.sol";
 
 import "./LoihiStorage.sol";
 
+import "./interfaces/IFreeFromUpTo.sol";
+
 contract Loihi is LoihiStorage {
 
     event Approval(address indexed _owner, address indexed spender, uint256 value);
@@ -113,30 +115,62 @@ contract Loihi is LoihiStorage {
         owner = msg.sender;
         emit OwnershipTransfered(address(0), msg.sender);
         
-        for (uint i = 0; i < _assetWeights.length; i++) {
-
-            includeAsset(
-                _assets[i*5],   // numeraire
-                _assets[1+i*5], // numeraire assimilator
-                _assets[2+i*5], // reserve
-                _assets[3+i*5], // reserve assimilator
-                _assets[4+i*5], // reserve approve to
-                _assetWeights[i]
-            );
-            
-        }
+        Orchestrator.initialize(
+            shell,
+            numeraires,
+            reserves,
+            derivatives,
+            _assets,
+            _assetWeights,
+            _derivativeAssimilators
+        );
         
-        for (uint i = 0; i < _derivativeAssimilators.length / 5; i++) {
+        // for (uint i = 0; i < _assetWeights.length; i++) {
+        //     uint ix = i*5;
+        
+        //     address _numeraire = _assets[ix];
+        //     address _numeraireAssim = _assets[1+ix];
+        //     address _reserve = _assets[2+ix];
+        //     address _reserveAssim = _assets[3+ix];
+        //     address _reserveApproveTo = _assets[4+ix];
+        //     uint _weight = _assetWeights[i];
+        
+        //     numeraires.push(_numeraire);
+            
+        //     reserves.push(_reserve);
 
-            includeAssimilator(
-                _derivativeAssimilators[i*5],   // derivative
-                _derivativeAssimilators[1+i*5], // numeraire
-                _derivativeAssimilators[2+i*5], // reserve
-                _derivativeAssimilators[3+i*5], // assimilator
-                _derivativeAssimilators[4+i*5]  // derivative approve to
-            );
+        //     derivatives.push(_numeraire);
+            
+        //     if (_numeraire != _reserve) derivatives.push(_reserve);
 
-        }
+        //     Orchestrator.includeAsset(
+        //         shell,
+        //         _numeraire,   // numeraire
+        //         _numeraireAssim, // numeraire assimilator
+        //         _reserve, // reserve
+        //         _reserveAssim, // reserve assimilator
+        //         _reserveApproveTo, // reserve approve to
+        //         _weight
+        //     );
+            
+        // }
+        
+        // for (uint i = 0; i < _derivativeAssimilators.length / 5; i++) {
+
+        //     address _derivative = _derivativeAssimilators[i*5];
+
+        //     derivatives.push(_derivative);
+
+        //     Orchestrator.includeAssimilator(
+        //         shell,
+        //         _derivative,   // derivative
+        //         _derivativeAssimilators[1+i*5], // numeraire
+        //         _derivativeAssimilators[2+i*5], // reserve
+        //         _derivativeAssimilators[3+i*5], // assimilator
+        //         _derivativeAssimilators[4+i*5]  // derivative approve to
+        //     );
+
+        // }
 
     }
 
@@ -154,57 +188,58 @@ contract Loihi is LoihiStorage {
         uint _lambda
     ) external onlyOwner {
 
-        maxFee = Orchestrator.setParams(shell, _alpha, _beta, _feeAtHalt, _epsilon, _lambda);
+        // maxFee = Orchestrator.setParams(shell, _alpha, _beta, _feeAtHalt, _epsilon, _lambda);
+        Orchestrator.setParams(shell, _alpha, _beta, _feeAtHalt, _epsilon, _lambda);
 
     }
 
 
-    /// @notice includes an asset into the pool
-    /// @param _numeraire the numeraire of the asset
-    /// @param _nAssim the assimilator for the numeraire
-    /// @param _reserve the reserve of the asset for instance cdai for dai
-    /// @param _rAssim the reserve assimilator for the pool
-    /// @param _weight the weighting of this asset in the pool
-    function includeAsset (
-        address _numeraire,
-        address _nAssim,
-        address _reserve,
-        address _rAssim,
-        address _rApproveTo,
-        uint _weight
-    ) private {
+    // /// @notice includes an asset into the pool
+    // /// @param _numeraire the numeraire of the asset
+    // /// @param _nAssim the assimilator for the numeraire
+    // /// @param _reserve the reserve of the asset for instance cdai for dai
+    // /// @param _rAssim the reserve assimilator for the pool
+    // /// @param _weight the weighting of this asset in the pool
+    // function includeAsset (
+    //     address _numeraire,
+    //     address _nAssim,
+    //     address _reserve,
+    //     address _rAssim,
+    //     address _rApproveTo,
+    //     uint _weight
+    // ) private {
         
-        numeraires.push(_numeraire);
+    //     numeraires.push(_numeraire);
         
-        reserves.push(_reserve);
+    //     reserves.push(_reserve);
 
-        derivatives.push(_numeraire);
+    //     derivatives.push(_numeraire);
         
-        if (_numeraire != _reserve) derivatives.push(_reserve);
+    //     if (_numeraire != _reserve) derivatives.push(_reserve);
 
-        Orchestrator.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _rApproveTo, _weight);
+    //     Orchestrator.includeAsset(shell, _numeraire, _nAssim, _reserve, _rAssim, _rApproveTo, _weight);
 
-    }
+    // }
 
 
-    /// @notice includes an assimilator into the pool
-    /// @param _derivative the address of the derivative the assimilator is for
-    /// @param _numeraire the numeraire asset the assimilator is for as in dai for cdai
-    /// @param _reserve the reserve this numeraire is held in for instance potentially adai for dai
-    /// @param _assimilator the address of the assimilator 
-    function includeAssimilator (
-        address _derivative, 
-        address _numeraire, 
-        address _reserve, 
-        address _assimilator,
-        address _derivativeApproveTo
-    ) private {
+    // /// @notice includes an assimilator into the pool
+    // /// @param _derivative the address of the derivative the assimilator is for
+    // /// @param _numeraire the numeraire asset the assimilator is for as in dai for cdai
+    // /// @param _reserve the reserve this numeraire is held in for instance potentially adai for dai
+    // /// @param _assimilator the address of the assimilator 
+    // function includeAssimilator (
+    //     address _derivative, 
+    //     address _numeraire, 
+    //     address _reserve, 
+    //     address _assimilator,
+    //     address _derivativeApproveTo
+    // ) private {
         
-        derivatives.push(_derivative);
+    //     derivatives.push(_derivative);
 
-        Orchestrator.includeAssimilator(shell, _derivative, _numeraire, _reserve, _assimilator, _derivativeApproveTo);
+    //     Orchestrator.includeAssimilator(shell, _derivative, _numeraire, _reserve, _assimilator, _derivativeApproveTo);
 
-    }
+    // }
     
     /// @notice excludes an assimilator from the shell
     /// @param _assimilator the address of the assimilator to exclude
@@ -259,7 +294,41 @@ contract Loihi is LoihiStorage {
         Orchestrator.prime(shell);
 
     }
+
+    IFreeFromUpTo public constant chi = IFreeFromUpTo(0x0000000000004946c0e9F43F4Dee607b0eF1fA1c);
+
+    modifier discountCHI {
+        uint256 gasStart = gasleft();
+        _;
+        uint256 gasSpent = 21000 + gasStart - gasleft() + 16 * msg.data.length;
+        chi.freeFromUpTo(msg.sender, (gasSpent + 14154) / 41130);
+     
+    }
     
+    /// @author james foley http://github.com/realisation
+    /// @notice swap a dynamic origin amount for a fixed target amount
+    /// @param _origin the address of the origin
+    /// @param _target the address of the target
+    /// @param _originAmount the origin amount
+    /// @param _minTargetAmount the minimum target amount
+    /// @param _deadline deadline in block number after which the trade will not execute
+    /// @return targetAmount_ the amount of target that has been swapped for the origin amount
+    function originSwapCHI (
+        address _origin,
+        address _target,
+        uint _originAmount,
+        uint _minTargetAmount,
+        uint _deadline
+    ) external deadline(_deadline) transactable nonReentrant discountCHI returns (
+        uint targetAmount_
+    ) {
+
+        targetAmount_ = Swaps.originSwap(shell, _origin, _target, _originAmount, msg.sender);
+
+        require(targetAmount_ > _minTargetAmount, "Shell/below-min-target-amount");
+
+    }
+
     /// @author james foley http://github.com/realisation
     /// @notice swap a dynamic origin amount for a fixed target amount
     /// @param _origin the address of the origin
@@ -465,6 +534,33 @@ contract Loihi is LoihiStorage {
 
     }
 
+    function supportsInterface (
+        bytes4 _interface
+    ) public view returns (
+        bool supports_
+    ) { 
+
+        supports_ = this.supportsInterface.selector == _interface // erc165
+            || this.transfer.selector == _interface 
+            || this.transferFrom.selector == _interface 
+            || this.approve.selector == _interface
+            || this.allowance.selector == _interface
+            || this.balanceOf.selector == _interface
+            || this.originSwap.selector == _interface
+            || this.targetSwap.selector == _interface
+            || this.selectiveDeposit.selector == _interface
+            || this.selectiveWithdraw.selector == _interface
+            || this.proportionalDeposit.selector == _interface       
+            || this.proportionalWithdraw.selector == _interface
+            || this.viewOriginSwap.selector == _interface
+            || this.viewTargetSwap.selector == _interface
+            || this.viewSelectiveDeposit.selector == _interface
+            || this.viewSelectiveWithdraw.selector == _interface
+            || this.viewProportionalDeposit.selector == _interface       
+            || this.viewProportionalWithdraw.selector == _interface;
+        
+    }
+
     /// @author  james foley http://github.com/realisation
     /// @notice  withdrawals amount of shell tokens from the the pool equally from the numeraire assets of the pool with no slippage
     /// @param   _shellsToBurn the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
@@ -561,34 +657,6 @@ contract Loihi is LoihiStorage {
 
     }
 
-    /// @notice increases the allowance of a particular spender
-    /// @param _spender the account to increase the spending allowance of
-    /// @param _addedValue the amount to add to the spending allowance
-    /// @return success_ the success bool of the transaction
-    function increaseAllowance(
-        address _spender,
-        uint _addedValue
-    ) public returns (
-        bool success_
-    ) {
-
-        success_ = Shells.increaseAllowance(shell, _spender, _addedValue);
-
-    }
-
-    /// @notice decreasesthe allowance of a particular spender 
-    /// @param _spender the account to decrease the spending allowance of 
-    /// @param _subtractedValue the amonut to subtract from thespending allowance
-    /// @return success_ the success bool of the transaction
-    function decreaseAllowance(
-        address _spender,
-        uint _subtractedValue
-    ) public returns (bool success_) {
-
-        success_ = Shells.decreaseAllowance(shell, _spender, _subtractedValue);
-
-    }
-    
     /// @notice view the shell token balance of a given account
     /// @param _account the account to view the balance of  
     /// @return balance_ the shell token ballance of the given account
@@ -634,6 +702,18 @@ contract Loihi is LoihiStorage {
     ) {
 
         return ViewLiquidity.viewLiquidity(shell);
+
+    }
+
+    /// @notice view the assimilator address for a derivative
+    /// @return assimilator_ the assimilator address
+    function assimilator (
+        address _derivative
+    ) public view returns (
+        address assimilator_
+    ) {
+
+        assimilator_ = shell.assimilators[_derivative].addr;
 
     }
 
