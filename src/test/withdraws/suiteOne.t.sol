@@ -188,52 +188,50 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
-    // function testProportionalWithdraw_mediumUnbalance () public {
+    function testProportionalWithdraw_mediumUnbalance () public {
 
-    //     uint256 startingShells = l.deposit(
-    //         address(dai), 80e18,
-    //         address(usdc), 100e6,
-    //         address(usdt), 85e6,
-    //         address(susd), 35e6
-    //     );
+        uint256 startingShells = l.deposit(
+            address(dai), 80e18,
+            address(usdc), 100e6,
+            address(usdt), 85e6,
+            address(susd), 35e18
+        );
 
-    //     l.proportionalWithdraw(150e18);
+        uint[] memory withdrawals = l.proportionalWithdraw(150e18, 1e50);
 
-    //     ( uint256 totalReserves, uint256[] memory reserves ) = l.liquidity();
+        uint256 endingShells = l.balanceOf(address(this));
 
-    //     uint256 endingShells = l.balanceOf(address(this));
+        assertEq(withdrawals[0], 39989999999999999960);
+        assertEq(withdrawals[1], 49987499);
+        assertEq(withdrawals[2], 42489374);
+        assertEq(withdrawals[3], 17495624999999999982);
+        assertEq(startingShells - endingShells, 150e18);
 
-    //     assertEq(reserves[0], 39999999999959671960);
-    //     assertEq(reserves[1], 50000000);
-    //     assertEq(reserves[2], 42500000);
-    //     assertEq(reserves[3], 17500000000000000000);
-    //     assertEq(startingShells - endingShells, 150e18);
+    }
+    
+    event log_uints(bytes32, uint[]);
 
-    // }
+    function testProportionalWithdraw_unbalanced () public {
 
-    // function testProportionalWithdraw_unbalanced () public {
+        uint256 startingShells = l.deposit(
+            address(dai), 55e18,
+            address(usdc), 90e6,
+            address(usdt), 125e6,
+            address(susd), 30e18
+        );
+        
+        uint[] memory withdrawals = l.proportionalWithdraw(150e18, 1e50);
 
-    //     uint256 startingShells = l.deposit(
-    //         address(dai), 55e18,
-    //         address(usdc), 90e6,
-    //         address(usdt), 125e6,
-    //         address(susd), 30e6
-    //     );
+        uint256 endingShells = l.balanceOf(address(this));
 
-    //     l.proportionalWithdraw(150*WAD);
+        assertEq(withdrawals[0], 27524982618771726505);
+        assertEq(withdrawals[1], 45040880);
+        assertEq(withdrawals[2], 62556778);
+        assertEq(withdrawals[3], 15013626882966396275);
 
-    //     ( uint256 totalReserves, uint256[] memory reserves ) = l.liquidity();
+        assertEq(startingShells - endingShells, 150e18);
 
-    //     uint256 endingShells = l.balanceOf(address(this));
-
-    //     assertEq(reserves[0], 27531865585159300387);
-    //     assertEq(reserves[1], 45052144);
-    //     assertEq(reserves[2], 62572421);
-    //     assertEq(reserves[3], 15017381228273464650);
-
-    //     assertEq(startingShells - endingShells, 150e18);
-
-    // }
+    }
 
     function test_s1_selectiveWithdraw_smartHalt_upper_outOfBounds_to_outOfBounds () public {
 

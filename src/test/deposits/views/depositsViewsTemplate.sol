@@ -474,18 +474,9 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(susd), 50e6
         );
 
-        ( , uint256[] memory _before ) = l.liquidity();
+        ( uint shellsMinted, uint[] memory deposits ) = l.proportionalDeposit(90e18, 1e50);
 
-        l.proportionalDeposit(90e18, 1e50);
-
-        ( , uint256[] memory after_ ) = l.liquidity();
-
-        after_[0] = after_[0] - _before[0];
-        after_[1] = after_[1] - _before[1];
-        after_[2] = after_[2] - _before[2];
-        after_[3] = after_[3] - _before[3];
-
-        return after_;
+        return deposits;
 
     }
 
@@ -498,18 +489,9 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(susd), 30e6
         );
 
-        ( , uint256[] memory _before ) = l.liquidity();
+        ( uint shellsMinted, uint[] memory deposits ) = l.proportionalDeposit(90e18, 1e50);
 
-        l.proportionalDeposit(90e18, 1e50);
-
-        ( , uint256[] memory after_ ) = l.liquidity();
-
-        after_[0] = after_[0] - _before[0];
-        after_[1] = after_[1] - _before[1];
-        after_[2] = after_[2] - _before[2];
-        after_[3] = after_[3] - _before[3];
-
-        return after_;
+        return deposits;
 
     }
 
@@ -522,18 +504,9 @@ contract SelectiveDepositViewsTemplate is Setup {
             address(susd), 30e6
         );
 
-        ( , uint256[] memory _before ) = l.liquidity();
+        ( uint shellsMinted, uint[] memory deposits ) = l.proportionalDeposit(90e18, 1e50);
 
-        l.proportionalDeposit(90e18, 1e50);
-
-        ( , uint256[] memory after_ ) = l.liquidity();
-
-        after_[0] = after_[0] - _before[0];
-        after_[1] = after_[1] - _before[1];
-        after_[2] = after_[2] - _before[2];
-        after_[3] = after_[3] - _before[3];
-
-        return after_;
+        return deposits;
 
     }
 
