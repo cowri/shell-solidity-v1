@@ -194,7 +194,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
-            address(susd), 35e18
+            address(susd), 35e6
         );
 
         uint[] memory withdrawals = l.proportionalWithdraw(150e18, 1e50);
@@ -204,7 +204,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
         assertEq(withdrawals[0], 39989999999999999960);
         assertEq(withdrawals[1], 49987499);
         assertEq(withdrawals[2], 42489374);
-        assertEq(withdrawals[3], 17495624999999999982);
+        assertEq(withdrawals[3], 17495624);
         assertEq(startingShells - endingShells, 150e18);
 
     }
@@ -217,7 +217,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
             address(dai), 55e18,
             address(usdc), 90e6,
             address(usdt), 125e6,
-            address(susd), 30e18
+            address(susd), 30e6
         );
         
         uint[] memory withdrawals = l.proportionalWithdraw(150e18, 1e50);
@@ -227,7 +227,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
         assertEq(withdrawals[0], 27524982618771726505);
         assertEq(withdrawals[1], 45040880);
         assertEq(withdrawals[2], 62556778);
-        assertEq(withdrawals[3], 15013626882966396275);
+        assertEq(withdrawals[3], 15013626);
 
         assertEq(startingShells - endingShells, 150e18);
 
