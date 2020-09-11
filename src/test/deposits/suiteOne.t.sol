@@ -44,7 +44,7 @@ contract SelectiveDepositSuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_selectiveDeposit_partialUpperSlippage_5_CDAI_5_CUSDC_70_AUSDT_28SUSD_300Proportional () public {
+    function test_s1_selectiveDeposit_partialUpperSlippage_5_CDAI_5_CUSDC_70_AUSDT_28_ASUSD_300Proportional () public {
 
         uint256 newShells = super.partialUpperSlippage_5_CDAI_5_CUSDC_70_AUSDT_28_ASUSD_300Proportional();
 

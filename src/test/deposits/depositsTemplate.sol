@@ -96,7 +96,7 @@ contract SelectiveDepositTemplate is Setup {
 
         uint _cdaiOf5Numeraire = IAssimilator(cdaiAssimilator).viewRawAmount(uint(5e18).divu(1e18));
 
-        uint _cusdcOf5Numeraire = IAssimilator(cusdcAssimilator).viewRawAmount(uint(5e6).divu(1e18));
+        uint _cusdcOf5Numeraire = IAssimilator(cusdcAssimilator).viewRawAmount(uint(5e18).divu(1e18));
 
         shellsMinted_ = l.deposit(
             address(cdai), _cdaiOf5Numeraire,

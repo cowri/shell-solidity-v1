@@ -125,6 +125,14 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
 
     }
 
+    function test_s1_targetSwap_fullUpperAndLowerAntiSlippage_unbalanced_30PctWeight_AUSDT_to_CUSDC () public {
+
+        uint256 originAmount = super.fullUpperAndLowerAntiSlippage_unbalanced_30PctWeight_AUSDT_to_CUSDC();
+
+        assertEq(originAmount, 4953278);
+
+    }
+
     function test_s1_targetSwap_fullUpperAndLowerAntiSlippage_10PctOrigin_to_30PctTarget () public {
 
         uint256 originAmount = super.fullUpperAndLowerAntiSlippage_10PctOrigin_to_30PctTarget();

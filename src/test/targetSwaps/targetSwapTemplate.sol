@@ -237,6 +237,25 @@ contract TargetSwapTemplate is Setup {
 
     }
 
+    function fullUpperAndLowerAntiSlippage_unbalanced_30PctWeight_AUSDT_to_CUSDC () public returns (uint256 originAmount_) {
+
+        l.deposit(
+            address(dai), 90e18,
+            address(usdc), 135e6,
+            address(usdt), 60e6,
+            address(susd), 30e6
+        );
+        
+        uint cusdcOf5Numeraire = IAssimilator(cusdcAssimilator).viewRawAmount(uint(5e18).divu(1e18));
+
+        originAmount_ = l.targetSwap(
+            address(ausdt),
+            address(cusdc),
+            cusdcOf5Numeraire
+        );
+
+    }
+
     function fullUpperAndLowerAntiSlippage_10PctOrigin_to_30PctTarget () public returns (uint256 originAmount_) {
 
         l. deposit(
