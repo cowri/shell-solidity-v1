@@ -34,8 +34,6 @@ library Orchestrator {
 
     event AssimilatorIncluded(address indexed derivative, address indexed numeraire, address indexed reserve, address assimilator);
 
-    event log_int(bytes32, int);
-
     function setParams (
         LoihiStorage.Shell storage shell,
         uint256 _alpha,
