@@ -114,7 +114,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
     // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        uint256 _rate = cdai.exchangeRateStored();
+        uint256 _rate = cdai.exchangeRateCurrent();
 
         uint256 _daiAmount = ( _amount * _rate ) / 1e18;
 
