@@ -39,23 +39,27 @@ contract StablecoinSetup is StorageSetup {
 
     function setupStablecoinsKovan() public {
 
-        dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
+        dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa); // compound compatible
+        // dai = IERC20(0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD); // aave compatible
         cdai = ICToken(0xF0d0EB522cfa50B716B3b1604C4F0fA6f04376AD);
         chai = IChai(0xB641957b6c29310926110848dB2d464C8C3c3f38);
 
-        usdc = IERC20(0xb7a4F3E9097C08dA09517b5aB877F7a917224ede);
+        usdc = IERC20(0xb7a4F3E9097C08dA09517b5aB877F7a917224ede); // compound compatible
+        // usdc = IERC20(0xe22da380ee6B445bb8273C81944ADEB6E8450422); // aave compatible
         cusdc = ICToken(0x4a92E71227D294F041BD82dd8f78591B75140d63);
 
-        usdt = IERC20NoBool(0x13512979ADE267AB5100878E2e0f485B568328a4);
+        // usdt = IERC20NoBool(0x07de306ff27a2b630b1141956844eb1552b956b5); // compound compatible
+        usdt = IERC20NoBool(0x13512979ADE267AB5100878E2e0f485B568328a4); // aave compatible
         ausdt = IAToken(0xA01bA9fB493b851F4Ac5093A324CB081A909C34B);
 
-        susd = IERC20(0xD868790F57B39C9B2B51b12de046975f986675f9);
+        susd = IERC20(0xD868790F57B39C9B2B51b12de046975f986675f9); // aave compatible
         asusd = IAToken(0xb9c1434aB6d5811D1D0E92E8266A37Ae8328e901);
 
         aaveLpCore = 0x95D1189Ed88B380E319dF73fF00E479fcc4CFa45;
 
         cdai.exchangeRateCurrent();
         cusdc.exchangeRateCurrent();
+        // cusdt.exchangeRateCurrent();
 
     }
 
