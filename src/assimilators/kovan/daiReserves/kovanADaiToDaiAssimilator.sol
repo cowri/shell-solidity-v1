@@ -30,7 +30,7 @@ contract KovanADaiToDaiAssimilator is IAssimilator {
     using ABDKMath64x64 for uint256;
 
     IERC20 constant dai = IERC20(0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD);
-    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
+    ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x506B0B2CF20FAA8f38a4E2B524EE43e1f4458Cc5);
 
     constructor () public { }
 

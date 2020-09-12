@@ -41,15 +41,15 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
 
         uint _redeemSuccess = cdai.redeem(_amount);
         
-        require(_redeemSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
+        require(_redeemSuccess == 0, "Shell/cDAI-redeem-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
-
-        _amount = ( _amount * _rate ) / 1e18;
         
-        amount_ = _amount.divu(1e18);
+        uint256 _rate = cdai.exchangeRateStored();
 
         balance_ = _balance.divu(1e18);
+
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
 
     }
 
@@ -60,22 +60,20 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
 
         require(_transferSuccess, "Shell/cDAI-transfer-from-failed");
 
+        uint _redeemSuccess = cdai.redeem(_amount);
+
+        require(_redeemSuccess == 0, "Shell/cDAI-redeem-failed");
+
         uint256 _rate = cdai.exchangeRateStored();
 
-        _amount = ( _amount * _rate ) / 1e18;
-
-        uint _redeemSuccess = cdai.redeemUnderlying(_amount);
-
-        require(_redeemSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
-
-        amount_ = _amount.divu(1e18);
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
 
     }
 
     // takes a numeraire amount, calculates the raw amount of cDai, transfers it in and returns the corresponding raw amount
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        uint256 _rate = cdai.exchangeRateStored();
+        uint256 _rate = cdai.exchangeRateCurrent();
 
         amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
@@ -92,13 +90,15 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
     // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        uint256 _rate = cdai.exchangeRateStored();
+        uint256 _rate = cdai.exchangeRateCurrent();
 
-        uint256 _daiAmount = ( ( _amount ) * _rate ) / 1e18 + 1;
+        uint256 _daiAmount = ( ( _amount ) * _rate ) / 1e18;
 
         uint _mintSuccess = cdai.mint(_daiAmount);
 
         require(_mintSuccess == 0, "Shell/cDAI-mint-failed");
+        
+        _amount = cdai.balanceOf(address(this));
 
         bool _transferSuccess = cdai.transfer(_dst, _amount);
 
@@ -117,7 +117,7 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
 
         uint256 _rate = cdai.exchangeRateStored();
 
-        uint256 _daiAmount = ( _amount * _rate ) / 1e18 + 1;
+        uint256 _daiAmount = ( _amount * _rate ) / 1e18;
 
         uint _mintSuccess = cdai.mint(_daiAmount);
 
@@ -134,15 +134,11 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
     // takes a numeraire value of CDai, figures out the raw amount, transfers raw amount out, and returns raw amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = _amount.mulu(1e18);
-
-        uint _mintSuccess = cdai.mint(amount_);
+        uint _mintSuccess = cdai.mint( _amount.mulu(1e18) );
 
         require(_mintSuccess == 0, "Shell/cDAI-mint-failed");
 
-        uint _rate = cdai.exchangeRateStored();
-
-        amount_ = ( ( amount_ * 1e18 ) / _rate );
+        amount_ = cdai.balanceOf(address(this));
 
         bool _transferSuccess = cdai.transfer(_dst, amount_);
 
