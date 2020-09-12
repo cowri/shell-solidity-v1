@@ -38,19 +38,17 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
 
         require(_transferSuccess, "Shell/cUSDC-transfer-from-failed");
 
-        uint256 _rate = cusdc.exchangeRateStored();
+        uint _redeemSuccess = cusdc.redeem(_amount);
 
-        _amount = ( _amount * _rate ) / 1e18;
-
-        uint _redeemSuccess = cusdc.redeemUnderlying(_amount);
-
-        require(_redeemSuccess == 0, "Shell/cUSDC-redeem-underlying-failed");
+        require(_redeemSuccess == 0, "Shell/cUSDC-redeem-failed");
 
         uint256 _balance = usdc.balanceOf(address(this));
 
-        amount_ = _amount.divu(1e6);
+        uint256 _rate = cusdc.exchangeRateStored();
 
         balance_ = _balance.divu(1e6);
+
+        amount_ = ( ( _amount * _rate) / 1e18).divu(1e6);
 
     }
 
@@ -61,22 +59,20 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
 
         require(_transferSuccess, "Shell/cUSDC-transfer-from-failed");
 
+        uint _redeemSuccess = cusdc.redeem(_amount);
+
+        require(_redeemSuccess == 0, "Shell/cUSDC-redeem-failed");
+
         uint256 _rate = cusdc.exchangeRateStored();
 
-        _amount = ( _amount * _rate ) / 1e18;
-
-        uint _redeemSuccess = cusdc.redeemUnderlying(_amount);
-
-        require(_redeemSuccess == 0, "Shell/cUSDC-redeem-underlying-failed");
-
-        amount_ = _amount.divu(1e6);
+        amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
 
     }
 
     // takes numeraire amount and transfers corresponding cusdc in
     function intakeNumeraire (int128 _amount) public returns (uint256 amount_) {
 
-        uint256 _rate = cusdc.exchangeRateStored();
+        uint256 _rate = cusdc.exchangeRateCurrent();
 
         amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 
@@ -94,15 +90,11 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
     // transfers corresponding cusdc to destination
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
-        amount_ = _amount.mulu(1e6);
-
-        uint _mintSuccess = cusdc.mint(amount_);
+        uint _mintSuccess = cusdc.mint( _amount.mulu(1e6) );
 
         require(_mintSuccess == 0, "Shell/cUSDC-mint-failed");
 
-        uint256 _rate = cusdc.exchangeRateStored();
-
-        amount_ = ( amount_ * 1e18 ) / _rate;
+        amount_ = cusdc.balanceOf(address(this));
 
         bool _transferSuccess = cusdc.transfer(_dst, amount_);
 
@@ -114,13 +106,15 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
     // transfers that amount to destination
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        uint256 _rate = cusdc.exchangeRateStored();
+        uint256 _rate = cusdc.exchangeRateCurrent();
 
         uint256 _usdcAmount = ( _amount * _rate ) / 1e18;
 
         uint _mintSuccess = cusdc.mint(_usdcAmount);
-
+        
         require(_mintSuccess == 0, "Shell/cUSDC-mint-failed");
+        
+        _amount = cusdc.balanceOf(address(this));
 
         bool _transferSuccess = cusdc.transfer(_dst, _amount);
 
@@ -138,11 +132,13 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
     // transfers that amount to destination
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        uint256 _rate = cusdc.exchangeRateStored();
+        uint256 _rate = cusdc.exchangeRateCurrent();
 
         uint256 _usdcAmount = ( _amount * _rate ) / 1e18;
 
         uint _mintSuccess = cusdc.mint(_usdcAmount);
+        
+        _amount = cusdc.balanceOf(address(this));
 
         require(_mintSuccess == 0, "Shell/cUSDC-mint-failed");
 
