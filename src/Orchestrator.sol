@@ -41,7 +41,7 @@ library Orchestrator {
         uint256 _feeAtHalt,
         uint256 _epsilon,
         uint256 _lambda
-    ) external {
+    ) internal {
 
         require(_alpha < 1e18 && _alpha > 0, "Shell/parameter-invalid-alpha");
 
@@ -99,10 +99,10 @@ library Orchestrator {
         address[] storage numeraires,
         address[] storage reserves,
         address[] storage derivatives,
-        address[] calldata _assets,
-        uint[] calldata _assetWeights,
-        address[] calldata _derivativeAssimilators
-    ) external {
+        address[] memory _assets,
+        uint[] memory _assetWeights,
+        address[] memory _derivativeAssimilators
+    ) internal {
         
         for (uint i = 0; i < _assetWeights.length; i++) {
 
@@ -236,7 +236,7 @@ library Orchestrator {
 
     }
 
-    function prime (LoihiStorage.Shell storage shell) external {
+    function prime (LoihiStorage.Shell storage shell) internal {
 
         uint _length = shell.assets.length;
 
@@ -260,7 +260,7 @@ library Orchestrator {
 
     function viewShell (
         LoihiStorage.Shell storage shell
-    ) external view returns (
+    ) internal view returns (
         uint alpha_,
         uint beta_,
         uint delta_,

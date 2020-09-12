@@ -25,7 +25,7 @@ library SelectiveLiquidity {
         address[] calldata _derivatives,
         uint[] calldata _amounts,
         uint _minShells
-    ) external returns (
+    ) internal returns (
         uint shells_
     ) {
 
@@ -49,7 +49,7 @@ library SelectiveLiquidity {
         LoihiStorage.Shell storage shell,
         address[] calldata _derivatives,
         uint[] calldata _amounts
-    ) external view returns (
+    ) internal view returns (
         uint shells_
     ) {
 
@@ -70,7 +70,7 @@ library SelectiveLiquidity {
         address[] calldata _derivatives,
         uint[] calldata _amounts,
         uint _maxShells
-    ) external returns (
+    ) internal returns (
         uint256 shells_
     ) {
 
@@ -97,7 +97,7 @@ library SelectiveLiquidity {
         LoihiStorage.Shell storage shell,
         address[] calldata _derivatives,
         uint[] calldata _amounts
-    ) external view returns (
+    ) internal view returns (
         uint shells_
     ) {
 
