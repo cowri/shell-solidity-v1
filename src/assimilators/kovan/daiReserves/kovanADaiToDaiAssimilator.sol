@@ -41,11 +41,17 @@ contract KovanADaiToDaiAssimilator is IAssimilator {
         return IAToken(aTokenAddress);
 
     }
+    
+    event log_uint(bytes32, uint256);
 
     // intakes raw amount of ASUsd and returns the corresponding raw amount
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         IAToken _adai = getASUsd();
+        
+        uint balance = _adai.balanceOf(msg.sender);
+        
+        emit log_uint("balance msg sender", balance);
 
         bool _success = _adai.transferFrom(msg.sender, address(this), _amount);
 

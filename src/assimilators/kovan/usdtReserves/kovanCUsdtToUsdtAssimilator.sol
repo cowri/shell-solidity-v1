@@ -27,7 +27,7 @@ contract KovanCUsdtToUsdtAssimilator is IAssimilator {
     using ABDKMath64x64 for uint256;
 
     IERC20NoBool constant usdt = IERC20NoBool(0x07de306FF27a2B630B1141956844eB1552B956B5);
-    ICToken constant cusdt = ICToken(0x3f0a0ea2f86bae6362cf9799b523ba06647da018);
+    ICToken constant cusdt = ICToken(0x3f0A0EA2f86baE6362CF9799B523BA06647Da018);
 
     constructor () public { }
 
@@ -101,17 +101,25 @@ contract KovanCUsdtToUsdtAssimilator is IAssimilator {
         require(_transferSuccess, "Shell/cUSDT-transfer-failed");
 
     }
+    
+    event log_uint(bytes32, uint);
 
     // takes raw amount
     // transfers that amount to destination
     function outputRawAndGetBalance (address _dst, uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
         uint256 _rate = cusdt.exchangeRateCurrent();
+        
+        emit log_uint("rate", _rate);
 
         uint256 _usdcAmount = ( _amount * _rate ) / 1e18;
 
+        emit log_uint("usdc amount", _usdcAmount);
+
         uint _mintSuccess = cusdt.mint(_usdcAmount);
-        
+
+        emit log_uint("mint success", _mintSuccess); 
+
         require(_mintSuccess == 0, "Shell/cUSDT-mint-failed");
         
         _amount = cusdt.balanceOf(address(this));

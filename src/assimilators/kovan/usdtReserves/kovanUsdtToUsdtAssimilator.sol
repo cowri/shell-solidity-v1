@@ -24,7 +24,7 @@ contract KovanUsdtToUsdtAssimilator is IAssimilator {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    IERC20NoBool constant usdt = IERC20NoBool(0x13512979ADE267AB5100878E2e0f485B568328a4);
+    IERC20NoBool constant usdt = IERC20NoBool(0x07de306FF27a2B630B1141956844eB1552B956B5);
 
     constructor () public { }
 

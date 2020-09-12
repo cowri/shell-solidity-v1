@@ -13,12 +13,15 @@ contract StorageSetup {
     IERC20 dai;
     IChai chai;
     ICToken cdai;
+    IAToken adai;
 
     IERC20 usdc;
     ICToken cusdc;
+    IAToken ausdc;
 
     IERC20NoBool usdt;
     IAToken ausdt;
+    ICToken cusdt;
 
     IERC20 susd;
     IAToken asusd;
@@ -30,12 +33,15 @@ contract StorageSetup {
     IAssimilator daiAssimilator;
     IAssimilator chaiAssimilator;
     IAssimilator cdaiAssimilator;
+    IAssimilator adaiAssimilator;
 
     IAssimilator usdcAssimilator;
     IAssimilator cusdcAssimilator;
+    IAssimilator ausdcAssimilator;
 
     IAssimilator usdtAssimilator;
     IAssimilator ausdtAssimilator;
+    IAssimilator cusdtAssimilator;
 
     IAssimilator susdAssimilator;
     IAssimilator asusdAssimilator;

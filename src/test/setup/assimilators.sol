@@ -4,14 +4,17 @@ import "./storage.sol";
 
 /* Kovan Assimilators set one - holding reserves in dai, usdc, usdt and susd */
 import "../../assimilators/kovan/daiReserves/kovanDaiToDaiAssimilator.sol";
+import "../../assimilators/kovan/daiReserves/kovanADaiToDaiAssimilator.sol";
 import "../../assimilators/kovan/daiReserves/kovanCDaiToDaiAssimilator.sol";
 import "../../assimilators/kovan/daiReserves/kovanChaiToDaiAssimilator.sol";
 import "../../assimilators/kovan/usdcReserves/kovanUsdcToUsdcAssimilator.sol";
+import "../../assimilators/kovan/usdcReserves/kovanAUsdcToUsdcAssimilator.sol";
 import "../../assimilators/kovan/usdcReserves/kovanCUsdcToUsdcAssimilator.sol";
 import "../../assimilators/kovan/susdReserves/kovanSUsdToSUsdAssimilator.sol";
 import "../../assimilators/kovan/susdReserves/kovanASUsdToSUsdAssimilator.sol";
 import "../../assimilators/kovan/usdtReserves/kovanUsdtToUsdtAssimilator.sol";
 import "../../assimilators/kovan/usdtReserves/kovanAUsdtToUsdtAssimilator.sol";
+import "../../assimilators/kovan/usdtReserves/kovanCUsdtToUsdtAssimilator.sol";
 
 /* Mainnet Assimilators set one - holding reserves in cDai, cUsdc, aUsdt and aSusd */
 import "../../assimilators/mainnet/daiReserves/mainnetDaiToDaiAssimilator.sol";
@@ -42,14 +45,17 @@ contract AssimilatorSetup is StorageSetup {
     function setupAssimilatorsSetOneKovan () public {
 
         daiAssimilator = IAssimilator(address(new KovanDaiToDaiAssimilator()));
+        adaiAssimilator = IAssimilator(address(new KovanADaiToDaiAssimilator()));
         cdaiAssimilator = IAssimilator(address(new KovanCDaiToDaiAssimilator()));
         chaiAssimilator = IAssimilator(address(new KovanChaiToDaiAssimilator()));
 
         usdcAssimilator = IAssimilator(address(new KovanUsdcToUsdcAssimilator()));
         cusdcAssimilator = IAssimilator(address(new KovanCUsdcToUsdcAssimilator()));
+        ausdcAssimilator = IAssimilator(address(new KovanAUsdcToUsdcAssimilator()));
 
         usdtAssimilator = IAssimilator(address(new KovanUsdtToUsdtAssimilator()));
         ausdtAssimilator = IAssimilator(address(new KovanAUsdtToUsdtAssimilator()));
+        cusdtAssimilator = IAssimilator(address(new KovanCUsdtToUsdtAssimilator()));
 
         susdAssimilator = IAssimilator(address(new KovanSUsdToSUsdAssimilator()));
         asusdAssimilator = IAssimilator(address(new KovanASUsdToSUsdAssimilator()));

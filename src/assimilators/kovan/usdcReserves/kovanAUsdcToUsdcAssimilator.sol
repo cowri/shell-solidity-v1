@@ -128,14 +128,24 @@ contract KovanAUsdcToUsdcAssimilator is IAssimilator {
         amount_ = _amount.divu(1e6);
 
     }
+    
+    event log_uint(bytes32, uint);
+    event log_addr(bytes32, address);
 
     // outputs a numeraire amount of AUsdc and returns the corresponding numeraire amount
     function outputNumeraire (address _dst, int128 _amount) public returns (uint256 amount_) {
 
         amount_ = _amount.mulu(1e6);
-
+        
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
+        uint allowance = usdc.allowance(address(this), address(pool));
+        
+        emit log_uint("pool allowance", allowance);
+        emit log_addr("address pool", address(pool));
+        
+        usdc.approve(0x95D1189Ed88B380E319dF73fF00E479fcc4CFa45, uint(-1));
+        
         pool.deposit(address(usdc), amount_, 0);
 
         IAToken _ausdc = getAUsdc();

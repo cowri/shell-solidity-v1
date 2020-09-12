@@ -24,7 +24,7 @@ contract KovanDaiToDaiAssimilator is IAssimilator {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    IERC20 constant dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
+    IERC20 constant dai = IERC20(0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD);
 
     constructor () public { }
 

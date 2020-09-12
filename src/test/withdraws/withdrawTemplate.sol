@@ -234,6 +234,25 @@ contract SelectiveWithdrawTemplate is Setup {
 
     }
 
+    function fullLowerSlippage_1USDC_7USDT_2SUSD_from_95DAI_95USDC_55USDT_15SUSD_CUSDT () public returns (uint256 shellsBurned_) {
+
+        uint256 _startingShells = l.deposit(
+            address(dai), 95e18,
+            address(usdc), 95e6,
+            address(usdt), 55e6,
+            address(susd), 15e6
+        );
+        
+        uint cusdtOf7Numeraire = IAssimilator(cusdtAssimilator).viewRawAmount(uint(7e6).divu(1e6));
+        
+        shellsBurned_ = l.withdraw(
+            address(usdc), 1e6,
+            address(cusdt), cusdtOf7Numeraire,
+            address(susd), 2e6
+        );
+
+    }
+
     function fullIndirectLowerAntiSlippage_5DAI_5USDC_from_95DAI_95USDC_55USDT_15SUSD () public returns (uint256 shellsBurned_) {
 
         uint256 _startingShells = l.deposit(
@@ -245,6 +264,22 @@ contract SelectiveWithdrawTemplate is Setup {
 
         shellsBurned_ = l.withdraw(
             address(dai), 5e18,
+            address(usdc), 5e6
+        );
+
+    }
+
+    function fullIndirectLowerAntiSlippage_5DAI_5USDC_from_95DAI_95USDC_55USDT_15SUSD_ADAI () public returns (uint256 shellsBurned_) {
+
+        uint256 _startingShells = l.deposit(
+            address(dai), 95e18,
+            address(usdc), 95e6,
+            address(usdt), 55e6,
+            address(susd), 15e6
+        );
+
+        shellsBurned_ = l.withdraw(
+            address(adai), 5e18,
             address(usdc), 5e6
         );
 

@@ -96,7 +96,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         //     _derivativeAssimilators
         // );
         
-        loihi_ = Loihi(0x3A0524EE968dF526c8D031367Eb0feca5E2Def6B);
+        loihi_ = Loihi(0xBfb8c364a1Dd3CC4e399bBd7F8D87aF8D9092849);
 
         setParamsSetOne(loihi_);
 
