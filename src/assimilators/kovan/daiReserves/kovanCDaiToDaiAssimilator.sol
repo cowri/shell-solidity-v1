@@ -29,6 +29,8 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
     IERC20 constant dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
 
     constructor () public { }
+    
+    event log_uint(bytes32, uint);
 
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
@@ -37,19 +39,17 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
 
         require(_transferSuccess, "Shell/cDAI-transfer-from-failed");
 
-        uint256 _rate = cdai.exchangeRateStored();
-
-        _amount = ( _amount * _rate ) / 1e18;
-
-        uint _redeemSuccess = cdai.redeemUnderlying(_amount);
-
+        uint _redeemSuccess = cdai.redeem(_amount);
+        
         require(_redeemSuccess == 0, "Shell/cDAI-redeem-underlying-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
 
-        balance_ = _balance.divu(1e18);
-
+        _amount = ( _amount * _rate ) / 1e18;
+        
         amount_ = _amount.divu(1e18);
+
+        balance_ = _balance.divu(1e18);
 
     }
 
