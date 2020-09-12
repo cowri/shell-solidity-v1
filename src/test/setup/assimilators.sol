@@ -2,27 +2,19 @@ pragma solidity ^0.5.0;
 
 import "./storage.sol";
 
-/* Kovan Assimilators set one - holding reserves in dai, usdc, usdt and susd */
-import "../../assimilators/kovan/daiReserves/kovanDaiToDaiAssimilator.sol";
-import "../../assimilators/kovan/daiReserves/kovanCDaiToDaiAssimilator.sol";
-import "../../assimilators/kovan/daiReserves/kovanChaiToDaiAssimilator.sol";
-import "../../assimilators/kovan/usdcReserves/kovanUsdcToUsdcAssimilator.sol";
-import "../../assimilators/kovan/usdcReserves/kovanCUsdcToUsdcAssimilator.sol";
-import "../../assimilators/kovan/susdReserves/kovanSUsdToSUsdAssimilator.sol";
-import "../../assimilators/kovan/susdReserves/kovanASUsdToSUsdAssimilator.sol";
-import "../../assimilators/kovan/usdtReserves/kovanUsdtToUsdtAssimilator.sol";
-import "../../assimilators/kovan/usdtReserves/kovanAUsdtToUsdtAssimilator.sol";
-
 /* Mainnet Assimilators set one - holding reserves in cDai, cUsdc, aUsdt and aSusd */
 import "../../assimilators/mainnet/daiReserves/mainnetDaiToDaiAssimilator.sol";
+import "../../assimilators/mainnet/daiReserves/mainnetADaiToDaiAssimilator.sol";
 import "../../assimilators/mainnet/daiReserves/mainnetCDaiToDaiAssimilator.sol";
 import "../../assimilators/mainnet/daiReserves/mainnetChaiToDaiAssimilator.sol";
 import "../../assimilators/mainnet/usdcReserves/mainnetUsdcToUsdcAssimilator.sol";
+import "../../assimilators/mainnet/usdcReserves/mainnetAUsdcToUsdcAssimilator.sol";
 import "../../assimilators/mainnet/usdcReserves/mainnetCUsdcToUsdcAssimilator.sol";
-import "../../assimilators/mainnet/susdReserves/mainnetSUsdToSUsdAssimilator.sol";
-import "../../assimilators/mainnet/susdReserves/mainnetASUsdToSUsdAssimilator.sol";
 import "../../assimilators/mainnet/usdtReserves/mainnetUsdtToUsdtAssimilator.sol";
 import "../../assimilators/mainnet/usdtReserves/mainnetAUsdtToUsdtAssimilator.sol";
+import "../../assimilators/mainnet/usdtReserves/mainnetCUsdtToUsdtAssimilator.sol";
+import "../../assimilators/mainnet/susdReserves/mainnetSUsdToSUsdAssimilator.sol";
+import "../../assimilators/mainnet/susdReserves/mainnetASUsdToSUsdAssimilator.sol";
 
 /* Mainnet Assimilators set two - holding reserves in cDai, cUsdc, aUsdt and aSusd */
 import "../../assimilators/mainnet/cdaiReserves/mainnetDaiToCDaiAssimilator.sol";
@@ -37,36 +29,20 @@ import "../../assimilators/mainnet/ausdtReserves/mainnetAUsdtToAUsdtAssimilator.
 
 contract AssimilatorSetup is StorageSetup {
 
-    event log_bytes(bytes32, bytes4);
-    
-    function setupAssimilatorsSetOneKovan () public {
-
-        usdcAssimilator = IAssimilator(address(new KovanUsdcToUsdcAssimilator()));
-        cusdcAssimilator = IAssimilator(address(new KovanCUsdcToUsdcAssimilator()));
-
-        daiAssimilator = IAssimilator(address(new KovanDaiToDaiAssimilator()));
-        cdaiAssimilator = IAssimilator(address(new KovanCDaiToDaiAssimilator()));
-        chaiAssimilator = IAssimilator(address(new KovanChaiToDaiAssimilator()));
-
-        usdtAssimilator = IAssimilator(address(new KovanUsdtToUsdtAssimilator()));
-        ausdtAssimilator = IAssimilator(address(new KovanAUsdtToUsdtAssimilator()));
-
-        susdAssimilator = IAssimilator(address(new KovanSUsdToSUsdAssimilator()));
-        asusdAssimilator = IAssimilator(address(new KovanASUsdToSUsdAssimilator()));
-
-    }
-
     function setupAssimilatorsSetOneMainnet () public {
 
         daiAssimilator = IAssimilator(address(new MainnetDaiToDaiAssimilator()));
+        adaiAssimilator = IAssimilator(address(new MainnetADaiToDaiAssimilator()));
         cdaiAssimilator = IAssimilator(address(new MainnetCDaiToDaiAssimilator()));
         chaiAssimilator = IAssimilator(address(new MainnetChaiToDaiAssimilator()));
 
         usdcAssimilator = IAssimilator(address(new MainnetUsdcToUsdcAssimilator()));
+        ausdcAssimilator = IAssimilator(address(new MainnetAUsdcToUsdcAssimilator()));
         cusdcAssimilator = IAssimilator(address(new MainnetCUsdcToUsdcAssimilator()));
 
         usdtAssimilator = IAssimilator(address(new MainnetUsdtToUsdtAssimilator()));
         ausdtAssimilator = IAssimilator(address(new MainnetAUsdtToUsdtAssimilator()));
+        cusdtAssimilator = IAssimilator(address(new MainnetCUsdtToUsdtAssimilator()));
 
         susdAssimilator = IAssimilator(address(new MainnetSUsdToSUsdAssimilator()));
         asusdAssimilator = IAssimilator(address(new MainnetASUsdToSUsdAssimilator()));

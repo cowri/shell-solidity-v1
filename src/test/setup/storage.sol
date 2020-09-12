@@ -11,14 +11,17 @@ import "../../interfaces/IPot.sol";
 contract StorageSetup {
 
     IERC20 dai;
-    IChai chai;
+    IAToken adai;
     ICToken cdai;
+    IChai chai;
 
     IERC20 usdc;
+    IAToken ausdc;
     ICToken cusdc;
 
     IERC20NoBool usdt;
     IAToken ausdt;
+    ICToken cusdt;
 
     IERC20 susd;
     IAToken asusd;
@@ -28,14 +31,17 @@ contract StorageSetup {
     address aaveLpCore;
 
     IAssimilator daiAssimilator;
-    IAssimilator chaiAssimilator;
+    IAssimilator adaiAssimilator;
     IAssimilator cdaiAssimilator;
+    IAssimilator chaiAssimilator;
 
     IAssimilator usdcAssimilator;
+    IAssimilator ausdcAssimilator;
     IAssimilator cusdcAssimilator;
 
     IAssimilator usdtAssimilator;
     IAssimilator ausdtAssimilator;
+    IAssimilator cusdtAssimilator;
 
     IAssimilator susdAssimilator;
     IAssimilator asusdAssimilator;

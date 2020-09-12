@@ -27,7 +27,7 @@ contract MainnetCUsdtToUsdtAssimilator is IAssimilator {
     using ABDKMath64x64 for uint256;
 
     IERC20NoBool constant usdt = IERC20NoBool(0xdAC17F958D2ee523a2206206994597C13D831ec7);
-    ICToken constant cusdt = ICToken(0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9);
+    ICToken constant cusdt = ICToken(0xf650C3d88D12dB855b8bf7D11Be6C55A4e07dCC9);
 
     constructor () public { }
 
