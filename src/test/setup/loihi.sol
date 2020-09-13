@@ -142,14 +142,19 @@ contract LoihiSetup is StorageSetup {
     function approveStablecoins (address _approveTo) public {
 
         approve(address(dai), _approveTo);
-        approve(address(chai), _approveTo);
+        approve(address(adai), _approveTo);
         approve(address(cdai), _approveTo);
+        approve(address(chai), _approveTo);
 
         approve(address(usdc), _approveTo);
+        approve(address(ausdc), _approveTo);
         approve(address(cusdc), _approveTo);
+
 
         approveBad(address(usdt), _approveTo);
         approve(address(ausdt), _approveTo);
+        approve(address(cusdt), _approveTo);
+
 
         approve(address(susd), _approveTo);
         approve(address(asusd), _approveTo);

@@ -53,6 +53,14 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
     }
 
+    function test_s1_originSwap_noSlippage_balanced_30PctWeight_to_30PctWeight_ADAI_to_AUSDC () public {
+
+        uint256 targetAmount = super.noSlippage_balanced_30PctWeight_to_30PctWeight_ADAI_to_AUSDC();
+
+        assertEq(targetAmount, 9997499);
+
+    }
+
     function test_s1_originSwap_noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight () public {
 
         uint256 targetAmount = super.noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight();
@@ -66,14 +74,6 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
         uint256 targetAmount = super.partialUpperAndLowerSlippage_balanced_40USDC_to_DAI();
 
         assertEq(targetAmount, 39339756348795716299);
-
-    }
-
-    function test_s1_originSwap_partialUpperAndLowerSlippage_balanced_30PctWeight_CUSDC_to_CDAI () public {
-
-        uint256 targetAmount = super.partialUpperAndLowerSlippage_balanced_30PctWeight_CUSDC_to_CDAI();
-
-        assertEq(targetAmount, 39339755421580561359);
 
     }
 
@@ -93,6 +93,14 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
     }
 
+    function test_s1_originSwap_fullUpperAndLowerSlippage_unbalanced_30PctWeight_CDAI_to_AUSDT () public {
+
+        uint256 targetAmount = super.fullUpperAndLowerSlippage_unbalanced_30PctWeight_CDAI_to_AUSDT();
+
+        assertEq(targetAmount, 4667368);
+
+    }
+
     function test_s1_originSwap_fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight () public {
 
         uint256 targetAmount = super.fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight();
@@ -101,9 +109,9 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
     }
 
-    function test_s1_originSwap_fullUpperAndLowerSlippage_CUSDC_ASUSD_unbalanced_10PctWeight_to_30PctWeight_ASUSD_CUSDC () public {
+    function test_s1_originSwap_fullUpperAndLowerSlippage_unbalanced_10PctWeight_to_30PctWeight_ASUSD_CUSDC () public {
 
-        uint256 targetAmount = super.fullUpperAndLowerSlippage_CUSDC_ASUSD_unbalanced_10PctWeight_to_30PctWeight_ASUSD_CUSDC();
+        uint256 targetAmount = super.fullUpperAndLowerSlippage_unbalanced_10PctWeight_to_30PctWeight_ASUSD_to_CUSDC();
 
         assertEq(targetAmount, 2697033999999999999);
 
@@ -117,6 +125,14 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
     }
 
+    function test_s1_originSwap_fullUpperAndLowerSlippage_unbalanced_10PctWeight_to_30PctWeight_AUSDC_to_CUSDC () public {
+
+        uint256 targetAmount = super.fullUpperAndLowerSlippage_unbalanced_10PctWeight_to_30PctWeight_ASUSD_to_CUSDC();
+
+        assertEq(targetAmount, 2697035);
+
+    }
+
     function test_s1_originSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight__ () public {
 
         uint256 targetAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight();
@@ -125,9 +141,49 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
     }
 
+    function test_s1_originSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_USDC_to_ADAI () public {
+
+        uint256 targetAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_USDC_to_ADAI();
+
+        assertEq(targetAmount, 30077776294642857112);
+
+    }
+
+    function test_s1_originSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_CUSDC_to_CDAI () public {
+
+        uint256 targetAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight();
+
+        assertEq(targetAmount, 30077776294642857112);
+
+    }
+
+    function test_s1_originSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_AUSDC_to_CDAI () public {
+
+        uint256 targetAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_AUSDC_to_CDAI();
+
+        assertEq(targetAmount, 30077776294642857112);
+
+    }
+
     function test_s1_originSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight () public {
 
         uint256 targetAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight();
+
+        assertEq(targetAmount, 10022287566546762578);
+
+    }
+
+    function test_s1_originSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight_AUSDT_to_SUSD () public {
+
+        uint256 targetAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight_AUSDT_to_SUSD();
+
+        assertEq(targetAmount, 10022287566546762578);
+
+    }
+
+    function test_s1_originSwap_partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight_CUSDT_to_ASUSD () public {
+
+        uint256 targetAmount = super.partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight_CUSDT_to_ASUSD();
 
         assertEq(targetAmount, 10022287566546762578);
 
@@ -144,6 +200,14 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
     function test_s1_originSwap_fullUpperAndLowerAntiSlippage_10PctWeight_to30PctWeight () public {
 
         uint256 targetAmount = super.fullUpperAndLowerAntiSlippage_10PctWeight_to30PctWeight();
+
+        assertEq(targetAmount, 3661067);
+
+    }
+
+    function test_s1_originSwap_fullUpperAndLowerAntiSlippage_10PctWeight_to30PctWeight_ASUSD_to_CUSDT () public {
+
+        uint256 targetAmount = super.fullUpperAndLowerAntiSlippage_10PctWeight_to30PctWeight_ASUSD_to_CUSDT();
 
         assertEq(targetAmount, 3661067);
 
@@ -201,14 +265,6 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
     function test_s1_originSwap_megaLowerToUpperUpperToLower_30PctWeight () public {
 
         uint256 targetAmount = super.megaLowerToUpperUpperToLower_30PctWeight();
-
-        assertEq(targetAmount, 69982499);
-
-    }
-
-    function test_s1_originSwap_megaLowerToUpperUpperToLower_CDAI_30PctWeight () public {
-
-        uint256 targetAmount = super.megaLowerToUpperUpperToLower_CDAI_30PctWeight();
 
         assertEq(targetAmount, 69982499);
 

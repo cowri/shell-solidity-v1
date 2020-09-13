@@ -99,6 +99,18 @@ contract OriginSwapTemplate is Setup {
 
     }
 
+    function noSlippage_balanced_30PctWeight_to_30PctWeight_ADAI_to_AUSDC() public returns (uint256 targetAmount_) {
+
+        l.proportionalDeposit(300e18, 1e50);
+
+        targetAmount_ = l.originSwap(
+            address(adai),
+            address(ausdc),
+            10e18
+        );
+
+    }
+
     function noSlippage_lightlyUnbalanced_30PctWeight_to_10PctWeight () public returns (uint256 targetAmount_) {
 
         l.deposit(
@@ -177,6 +189,29 @@ contract OriginSwapTemplate is Setup {
 
     }
 
+    function fullUpperAndLowerSlippage_unbalanced_30PctWeight_CDAI_to_AUSDT () public returns (uint256 targetAmount_) {
+
+        l.deposit(
+            address(dai), 135e18,
+            address(usdc), 90e6,
+            address(usdt), 60e6,
+            address(susd), 30e18
+        );
+
+        uint256 gas = gasleft();
+        
+        uint cdaiOf5Numeraire = IAssimilator(cdaiAssimilator).viewRawAmount(uint(5e18).divu(1e18));
+
+        targetAmount_ = l.originSwap(
+            address(cdai),
+            address(ausdt),
+            cdaiOf5Numeraire
+        );
+
+        emit log_uint("gas for swap", gas - gasleft());
+
+    }
+
     function fullUpperAndLowerSlippage_unbalanced_30PctWeight_to_10PctWeight () public returns (uint256 targetAmount_) {
 
         l.deposit(
@@ -198,7 +233,7 @@ contract OriginSwapTemplate is Setup {
 
     }
 
-    function fullUpperAndLowerSlippage_CUSDC_ASUSD_unbalanced_10PctWeight_to_30PctWeight_ASUSD_CUSDC () public returns (uint256 targetAmount_) {
+    function fullUpperAndLowerSlippage_unbalanced_10PctWeight_to_30PctWeight_ASUSD_to_CUSDC () public returns (uint256 targetAmount_) {
 
         l.deposit(
             address(dai), 90e18,
@@ -215,7 +250,7 @@ contract OriginSwapTemplate is Setup {
             asusdOf2Point8Numeraire
         );
 
-        targetAmount_ = IAssimilator(cusdcAssimilator).viewNumeraireAmount(targetAmount).mulu(1e18);
+        targetAmount_ = IAssimilator(cusdcAssimilator).viewNumeraireAmount(targetAmount).mulu(1e6);
 
     }
 
@@ -257,6 +292,64 @@ contract OriginSwapTemplate is Setup {
 
     }
 
+    function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_CUSDC_to_CDAI () public returns (uint256 targetAmount_) {
+
+        l.deposit(
+            address(dai), 135e18,
+            address(usdc), 60e6,
+            address(usdt), 90e6,
+            address(susd), 30e18
+        );
+        
+        uint cusdcOf30Numeraire = IAssimilator(cusdcAssimilator).viewRawAmount(uint(30e6).divu(1e6));
+
+        targetAmount_ = l.originSwap(
+            address(usdc),
+            address(dai),
+            cusdcOf30Numeraire
+        );
+
+        targetAmount_ = IAssimilator(cdaiAssimilator).viewNumeraireAmount(targetAmount_).mulu(1e18);
+
+
+    }
+
+    function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_USDC_to_ADAI () public returns (uint256 targetAmount_) {
+
+        l.deposit(
+            address(dai), 135e18,
+            address(usdc), 60e6,
+            address(usdt), 90e6,
+            address(susd), 30e18
+        );
+
+        targetAmount_ = l.originSwap(
+            address(usdc),
+            address(adai),
+            30e6
+        );
+
+    }
+
+    function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_AUSDC_to_CDAI () public returns (uint256 targetAmount_) {
+
+        l.deposit(
+            address(dai), 135e18,
+            address(usdc), 60e6,
+            address(usdt), 90e6,
+            address(susd), 30e18
+        );
+
+        targetAmount_ = l.originSwap(
+            address(ausdc),
+            address(cdai),
+            30e6
+        );
+        
+        targetAmount_ = IAssimilator(cdaiAssimilator).viewNumeraireAmount(targetAmount_).mulu(1e18);
+
+    }
+
     function partialUpperAndLowerAntiSlippage_unbalanced_10PctWeight_to_30PctWeight () public returns (uint256 targetAmount_) {
 
         l.deposit(
@@ -287,6 +380,42 @@ contract OriginSwapTemplate is Setup {
             address(usdt),
             address(susd),
             10e6
+        );
+
+    }
+
+    function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight_AUSDT_to_SUSD () public returns (uint256 targetAmount_) {
+
+        l.deposit(
+            address(dai), 90e18,
+            address(usdc), 90e6,
+            address(usdt), 58e6,
+            address(susd), 40e18
+        );
+
+        targetAmount_ = l.originSwap(
+            address(ausdt),
+            address(susd),
+            10e6
+        );
+
+    }
+
+    function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight_CUSDT_to_ASUSD () public returns (uint256 targetAmount_) {
+
+        l.deposit(
+            address(dai), 90e18,
+            address(usdc), 90e6,
+            address(usdt), 58e6,
+            address(susd), 40e18
+        );
+        
+        uint cusdcOf10Numeraire = IAssimilator(cusdtAssimilator).viewRawAmount(uint(10e6).divu(1e6));
+
+        targetAmount_ = l.originSwap(
+            address(cusdt),
+            address(asusd),
+            cusdcOf10Numeraire
         );
 
     }
@@ -328,6 +457,29 @@ contract OriginSwapTemplate is Setup {
             address(usdt),
             3.6537e18
         );
+
+        emit log_uint("gas used for swap", gas - gasleft());
+
+    }
+
+    function fullUpperAndLowerAntiSlippage_10PctWeight_to30PctWeight_ASUSD_to_CUSDT () public returns (uint256 targetAmount_) {
+
+        l.deposit(
+            address(dai), 90e18,
+            address(usdc), 90e6,
+            address(usdt), 135e6,
+            address(susd), 25e18
+        );
+
+        uint256 gas = gasleft();
+
+        targetAmount_ = l.originSwap(
+            address(susd),
+            address(cusdt),
+            3.6537e18
+        );
+        
+        targetAmount_ = IAssimilator(cusdtAssimilator).viewNumeraireAmount(targetAmount_).mulu(1e6);
 
         emit log_uint("gas used for swap", gas - gasleft());
 
@@ -456,7 +608,7 @@ contract OriginSwapTemplate is Setup {
 
     }
 
-    function megaLowerToUpperUpperToLower_CDAI_30PctWeight () public returns (uint256 targetAmount_) {
+    function megaLowerToUpperUpperToLower_30PctWeight_CDAI_to_AUSDT () public returns (uint256 targetAmount_) {
 
         l.deposit(
             address(dai), 55e18,
@@ -469,7 +621,7 @@ contract OriginSwapTemplate is Setup {
 
         targetAmount_ = l.originSwap(
             address(cdai),
-            address(usdt),
+            address(ausdt),
             cdaiOf70Numeraire
         );
 
