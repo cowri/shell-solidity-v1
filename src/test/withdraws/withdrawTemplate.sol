@@ -53,6 +53,24 @@ contract SelectiveWithdrawTemplate is Setup {
 
     }
 
+    function lightlyUnbalanced_5DAI_1USDC_3USDT_1SUSD_from_80DAI_100USDC_85USDT_35SUSD_ATOKENS () public returns (uint256 shellsBurned_) {
+
+        uint256 _startingShells = l.deposit(
+            address(dai), 80e18,
+            address(usdc), 100e6,
+            address(usdt), 85e6,
+            address(susd), 35e18
+        );
+
+        shellsBurned_ = l.withdraw(
+            address(dai), 5e18,
+            address(usdc), 1e6,
+            address(usdt), 3e6,
+            address(susd), 1e18
+        );
+
+    }
+
     function partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional () public returns (uint256 shellsBurned_) {
 
         ( uint256 _startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
@@ -61,6 +79,24 @@ contract SelectiveWithdrawTemplate is Setup {
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 47e6,
+            address(susd), 16e18
+        );
+
+    }
+
+    function partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional_CTOKENS () public returns (uint256 shellsBurned_) {
+
+        ( uint256 _startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
+        
+
+        uint cdaiOf5Numeraire = cdaiAssimilator.viewRawAmount(uint(5e18).divu(1e18));
+        uint cusdcOf5Numeraire = cusdcAssimilator.viewRawAmount(uint(5e6).divu(1e6));
+        uint cusdtOf47Numeraire = cusdtAssimilator.viewRawAmount(uint(47e6).divu(1e6));
+
+        shellsBurned_ = l.withdraw(
+            address(cdai), cdaiOf5Numeraire,
+            address(cusdc), cusdcOf5Numeraire,
+            address(cusdt), cusdtOf47Numeraire,
             address(susd), 16e18
         );
 

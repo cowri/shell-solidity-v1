@@ -28,9 +28,25 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     }
 
+    function test_s1_selectiveWithdraw_lightlyUnbalanced_5DAI_1USDC_3USDT_1SUSD_from_80DAI_100USDC_85USDT_35SUSD_ATOKENS () public {
+
+        uint256 shellsBurned = super.lightlyUnbalanced_5DAI_1USDC_3USDT_1SUSD_from_80DAI_100USDC_85USDT_35SUSD_ATOKENS();
+
+        assertEq(shellsBurned, 10002500000000000000);
+
+    }
+
     function test_s1_selectiveWithdraw_partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional () public {
 
         uint256 shellsBurned = super.partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional();
+
+        assertEq(shellsBurned, 73154344955029368640);
+
+    }
+
+    function test_s1_selectiveWithdraw_partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional_CTOKENS () public {
+
+        uint256 shellsBurned = super.partialLowerSlippage_balanced_5DAI_5USDC_47USDT_16SUSD_from_300Proportional_CTOKENS();
 
         assertEq(shellsBurned, 73154344955029368640);
 
