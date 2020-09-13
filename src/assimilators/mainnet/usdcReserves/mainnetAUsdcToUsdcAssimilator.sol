@@ -29,7 +29,7 @@ contract MainnetAUsdcToUsdcAssimilator is IAssimilator {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    IERC20 constant usdc = IERC20(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
+    IERC20 constant usdc = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
     ILendingPoolAddressesProvider constant lpProvider = ILendingPoolAddressesProvider(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
 
     constructor () public { }
