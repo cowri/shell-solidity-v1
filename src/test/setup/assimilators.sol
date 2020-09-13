@@ -2,17 +2,6 @@ pragma solidity ^0.5.0;
 
 import "./storage.sol";
 
-/* Kovan Assimilators set one - holding reserves in dai, usdc, usdt and susd */
-import "../../assimilators/kovan/daiReserves/kovanDaiToDaiAssimilator.sol";
-import "../../assimilators/kovan/daiReserves/kovanCDaiToDaiAssimilator.sol";
-import "../../assimilators/kovan/daiReserves/kovanChaiToDaiAssimilator.sol";
-import "../../assimilators/kovan/usdcReserves/kovanUsdcToUsdcAssimilator.sol";
-import "../../assimilators/kovan/usdcReserves/kovanCUsdcToUsdcAssimilator.sol";
-import "../../assimilators/kovan/susdReserves/kovanSUsdToSUsdAssimilator.sol";
-import "../../assimilators/kovan/susdReserves/kovanASUsdToSUsdAssimilator.sol";
-import "../../assimilators/kovan/usdtReserves/kovanUsdtToUsdtAssimilator.sol";
-import "../../assimilators/kovan/usdtReserves/kovanAUsdtToUsdtAssimilator.sol";
-
 /* Mainnet Assimilators set one - holding reserves in cDai, cUsdc, aUsdt and aSusd */
 import "../../assimilators/mainnet/daiReserves/mainnetDaiToDaiAssimilator.sol";
 import "../../assimilators/mainnet/daiReserves/mainnetCDaiToDaiAssimilator.sol";
@@ -39,23 +28,6 @@ contract AssimilatorSetup is StorageSetup {
 
     event log_bytes(bytes32, bytes4);
     
-    function setupAssimilatorsSetOneKovan () public {
-
-        usdcAssimilator = IAssimilator(address(new KovanUsdcToUsdcAssimilator()));
-        cusdcAssimilator = IAssimilator(address(new KovanCUsdcToUsdcAssimilator()));
-
-        daiAssimilator = IAssimilator(address(new KovanDaiToDaiAssimilator()));
-        cdaiAssimilator = IAssimilator(address(new KovanCDaiToDaiAssimilator()));
-        chaiAssimilator = IAssimilator(address(new KovanChaiToDaiAssimilator()));
-
-        usdtAssimilator = IAssimilator(address(new KovanUsdtToUsdtAssimilator()));
-        ausdtAssimilator = IAssimilator(address(new KovanAUsdtToUsdtAssimilator()));
-
-        susdAssimilator = IAssimilator(address(new KovanSUsdToSUsdAssimilator()));
-        asusdAssimilator = IAssimilator(address(new KovanASUsdToSUsdAssimilator()));
-
-    }
-
     function setupAssimilatorsSetOneMainnet () public {
 
         daiAssimilator = IAssimilator(address(new MainnetDaiToDaiAssimilator()));
