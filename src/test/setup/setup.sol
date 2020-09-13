@@ -71,7 +71,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         setupStablecoinsMainnet();
         
         // setupAssimilatorsSetOneMainnet();
-        setupAssimilatorsSetTwoMainnet();
         
         LoihiFactory lf = new LoihiFactory();
 
