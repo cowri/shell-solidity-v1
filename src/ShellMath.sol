@@ -37,11 +37,11 @@ library ShellMath {
         int128 _beta,
         int128 _delta,
         int128[] memory _weights
-    ) internal pure returns (int128 psi_) {
+    ) internal pure returns (int128 _psi) {
 
         for (uint i = 0; i < _weights.length; i++) {
             int128 _ideal = _gLiq.us_mul(_weights[i]);
-            psi_ += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
+            _psi += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
         }
 
     }
@@ -114,11 +114,11 @@ library ShellMath {
 
         for (uint i = 0; i < 32; i++) {
 
-            psi_ = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
+            _psi = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
 
-            if (( outputAmt_ = _omega < psi_
-                    ? - ( _inputAmt + _omega - psi_ )
-                    : - ( _inputAmt + _lambda.us_mul(_omega - psi_))
+            if (( outputAmt_ = _omega < _psi
+                    ? - ( _inputAmt + _omega - _psi )
+                    : - ( _inputAmt + _lambda.us_mul(_omega - _psi))
                 ) / 1e13 == outputAmt_ / 1e13 ) {
 
                 _nGLiq = _oGLiq + _inputAmt + outputAmt_;
@@ -129,7 +129,7 @@ library ShellMath {
                 
                 enforceSwapInvariant(_oGLiq, _omega, _nGLiq, _psi);
 
-                require(ABDKMath64x64.sub(_oGLiq, _omega) <= ABDKMath64x64.sub(_nGLiq, psi_), "Shell/swap-invariant-violation");
+                require(ABDKMath64x64.sub(_oGLiq, _omega) <= ABDKMath64x64.sub(_nGLiq, _psi), "Shell/swap-invariant-violation");
 
                 return outputAmt_;
 
@@ -164,21 +164,32 @@ library ShellMath {
         int128 _nGLiq,
         int128[] memory _oBals,
         int128[] memory _nBals
-    ) internal view returns (int128 shells_, int128 psi_) {
+    ) internal view returns (int128 shells_) {
 
         enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, shell.weights);
+        
+        int128 _omega;
+        int128 _psi;
+        
+        {
+            
+            int128 _beta = shell.beta;
+            int128 _delta = shell.delta;
+            int128[] memory _weights = shell.weights;
 
-        psi_ = calculateFee(_nGLiq, _nBals, shell.beta, shell.delta, shell.weights);
+            _omega = calculateFee(_oGLiq, _oBals, _beta, _delta, _weights);
+            _psi = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
 
-        int128 _omega = shell.omega;
-        int128 _feeDiff = psi_.sub(_omega);
+        }
+
+        int128 _feeDiff = _psi.sub(_omega);
         int128 _liqDiff = _nGLiq.sub(_oGLiq);
         int128 _oUtil = _oGLiq.sub(_omega);
-        uint _totalShells = shell.totalSupply.divu(1e18);
+        int128 _totalShells = shell.totalSupply.divu(1e18);
 
         if (_totalShells == 0) {
 
-            shells_ = _nGLiq.sub(psi_);
+            shells_ = _nGLiq.sub(_psi);
 
         } else if (_feeDiff >= 0) {
 
@@ -196,7 +207,7 @@ library ShellMath {
 
             shells_ = shells_.mul(_totalShells);
             
-            enforceLiquidityInvariant(totalShells, shells_, _oGLiq, _nGLiq, _omega, _psi);
+            enforceLiquidityInvariant(_totalShells, shells_, _oGLiq, _nGLiq, _omega, _psi);
 
         }
 

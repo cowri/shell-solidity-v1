@@ -37,7 +37,7 @@ contract Loihi is LoihiStorage {
 
     event Approval(address indexed _owner, address indexed spender, uint256 value);
 
-    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda, uint256 omega);
+    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
 
     event AssetIncluded(address indexed numeraire, address indexed reserve, uint weight);
 
@@ -169,8 +169,7 @@ contract Loihi is LoihiStorage {
         uint beta_,
         uint delta_,
         uint epsilon_,
-        uint lambda_,
-        uint omega_
+        uint lambda_
     ) {
 
         return Orchestrator.viewShell(shell);
@@ -190,14 +189,6 @@ contract Loihi is LoihiStorage {
         emit OwnershipTransfered(owner, _newOwner);
 
         owner = _newOwner;
-
-    }
-
-    /// @author james foley https://github.com/realisation
-    /// @notice reset omega in the case someone has sent tokens directly to the pool
-    function prime () external {
-
-        Orchestrator.prime(shell);
 
     }
 
