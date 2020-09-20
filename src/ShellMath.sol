@@ -99,15 +99,18 @@ library ShellMath {
         int128[] memory _nBals,
         int128 _inputAmt,
         uint _outputIndex
-    ) internal view returns (int128 outputAmt_ , int128 psi_) {
+    ) internal view returns (int128 outputAmt_) {
 
         outputAmt_ = - _inputAmt;
 
         int128 _lambda = shell.lambda;
-        int128 _omega = shell.omega;
         int128 _beta = shell.beta;
         int128 _delta = shell.delta;
         int128[] memory _weights = shell.weights;
+
+        int128 _omega = calculateFee(_oGLiq, _oBals, _beta, _delta, _weights);
+        int128 _psi;
+
 
         for (uint i = 0; i < 32; i++) {
 
@@ -123,10 +126,12 @@ library ShellMath {
                 _nBals[_outputIndex] = _oBals[_outputIndex] + outputAmt_;
 
                 enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, _weights);
+                
+                enforceSwapInvariant(_oGLiq, _omega, _nGLiq, _psi);
 
                 require(ABDKMath64x64.sub(_oGLiq, _omega) <= ABDKMath64x64.sub(_nGLiq, psi_), "Shell/swap-invariant-violation");
 
-                return ( outputAmt_, psi_ );
+                return outputAmt_;
 
             } else {
 
@@ -140,6 +145,17 @@ library ShellMath {
 
         revert("Shell/swap-convergence-failed");
 
+    }
+    
+    function enforceSwapInvariant (
+        int128 _oGLiq,
+        int128 _omega,
+        int128 _nGLiq,
+        int128 _psi
+    ) private pure {
+        
+        require(_oGLiq.sub(_omega) / 1e10 <= _nGLiq.sub(_psi) / 1e10, "Shell/swap-invariant-violation");
+        
     }
 
     function calculateLiquidityMembrane (
@@ -158,9 +174,9 @@ library ShellMath {
         int128 _feeDiff = psi_.sub(_omega);
         int128 _liqDiff = _nGLiq.sub(_oGLiq);
         int128 _oUtil = _oGLiq.sub(_omega);
-        uint _totalSupply = shell.totalSupply;
+        uint _totalShells = shell.totalSupply.divu(1e18);
 
-        if (_totalSupply == 0) {
+        if (_totalShells == 0) {
 
             shells_ = _nGLiq.sub(psi_);
 
@@ -176,26 +192,37 @@ library ShellMath {
 
         }
 
-        int128 _shellsPrev = _totalSupply.divu(1e18);
+        if (_totalShells != 0) {
 
-        if (_totalSupply != 0) {
-
-            shells_ = shells_.mul(_shellsPrev);
-
-            int128 _prevUtilPerShell = _oGLiq.sub(_omega);
+            shells_ = shells_.mul(_totalShells);
             
-            _prevUtilPerShell = _prevUtilPerShell.div(_shellsPrev);
-
-            int128 _nextUtilPerShell = _nGLiq.sub(psi_);
-            
-            _nextUtilPerShell = _nextUtilPerShell.div(_shellsPrev.add(shells_));
-
-            _nextUtilPerShell += ONE_WEI;
-
-            require(_prevUtilPerShell <= _nextUtilPerShell, "Shell/invariant-violation");
+            enforceLiquidityInvariant(totalShells, shells_, _oGLiq, _nGLiq, _omega, _psi);
 
         }
 
+    }
+    
+    function enforceLiquidityInvariant (
+        int128 _totalShells,
+        int128 _newShells,
+        int128 _oGLiq,
+        int128 _nGLiq,
+        int128 _omega,
+        int128 _psi
+    ) internal view {
+        
+        if (_totalShells == 0) return;
+        
+        int128 _prevUtilPerShell = _oGLiq
+            .sub(_omega)
+            .div(_totalShells);
+            
+        int128 _nextUtilPerShell = _nGLiq
+            .sub(_psi)
+            .div(_totalShells.add(_newShells));
+            
+        require(_prevUtilPerShell / 1e10 <= _nextUtilPerShell / 1e10, "Shell/liquidity-invariant-violation");
+        
     }
 
     function enforceHalts (

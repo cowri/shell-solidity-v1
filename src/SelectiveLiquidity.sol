@@ -34,8 +34,7 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getLiquidityDepositData(shell, _derivatives, _amounts);
 
-        int128 _shells;
-        ( _shells, shell.omega ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         shells_ = _shells.mulu(1e18);
 
@@ -58,7 +57,7 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = viewLiquidityDepositData(shell, _derivatives, _amounts);
 
-        ( int128 _shells, ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         shells_ = _shells.mulu(1e18);
 
@@ -78,9 +77,7 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getLiquidityWithdrawData(shell, _derivatives, msg.sender, _amounts);
 
-        int128 _shells;
-
-        ( _shells, shell.omega ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         _shells = _shells.abs().us_mul(ONE + shell.epsilon);
 
@@ -105,14 +102,14 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = viewLiquidityWithdrawData(shell, _derivatives, _amounts);
 
-        ( int128 _shells, ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         _shells = _shells.abs().us_mul(ONE + shell.epsilon);
 
         shells_ = _shells.mulu(1e18);
 
     }
-    
+
     function getLiquidityDepositData (
         LoihiStorage.Shell storage shell,
         address[] memory _derivatives,
@@ -131,7 +128,7 @@ library SelectiveLiquidity {
         for (uint i = 0; i < _derivatives.length; i++) {
 
             LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
-            
+
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
             if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {

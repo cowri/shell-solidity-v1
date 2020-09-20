@@ -569,7 +569,7 @@ contract TargetSwapTemplate is Setup {
 
         usdt.transfer(address(l), 4910e6);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 
@@ -607,7 +607,7 @@ contract TargetSwapTemplate is Setup {
 
         //l.TEST_setTestHalts(false);
 
-        l.prime();
+        
 
         originAmount_ = l.targetSwap(
             address(dai),
@@ -641,7 +641,7 @@ contract TargetSwapTemplate is Setup {
 
         susd.transfer(address(l), 4970e6);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 
@@ -659,7 +659,7 @@ contract TargetSwapTemplate is Setup {
 
         susd.transfer(address(l), 4970e6);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 

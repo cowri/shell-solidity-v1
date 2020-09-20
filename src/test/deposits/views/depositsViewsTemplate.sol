@@ -597,7 +597,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         susd.transfer(address(l), 23e18);
         asusd.transfer(address(l), 23e18);
 
-        l.prime();
+        
 
         success_ = l.depositSuccess(
             address(usdc), 1e6
@@ -653,7 +653,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
         //l.TEST_setTestHalts(false);
 
-        l.prime();
+        
 
         mintedShells_ = l.deposit(address(usdt), 1e6);
 
@@ -679,7 +679,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
 
-        l.prime();
+        
 
         mintedShells_ = l.deposit(address(usdc), 1e6);
 
@@ -712,7 +712,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         susd.transfer(address(l), 2970e18);
         asusd.transfer(address(l), 2970e18);
 
-        l.prime();
+        
 
         mintedShells_ = l.deposit(address(usdt), 8910e6);
 
@@ -756,7 +756,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
         //l.TEST_setTestHalts(false);
 
-        l.prime();
+        
 
         mintedShells_ = l.deposit(address(usdt), 8910e6);
 
@@ -800,7 +800,7 @@ contract SelectiveDepositViewsTemplate is Setup {
         susd.transfer(address(l), 2970e18);
         asusd.transfer(address(l), 2970e18);
 
-        l.prime();
+        
 
         mintedShells_ = l.deposit(address(usdt), 1e6);
 
@@ -844,7 +844,7 @@ contract SelectiveDepositViewsTemplate is Setup {
 
         //l.TEST_setTestHalts(false);
 
-        l.prime();
+        
 
         mintedShells_ = l.deposit(address(usdt), 1e6);
 

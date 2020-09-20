@@ -550,7 +550,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         usdt.transfer(address(l), 9910e6);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 
@@ -576,7 +576,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         usdt.transfer(address(l), 9910e6);
 
-        l.prime();
+        
 
         shellsBurned_ = l.withdraw(address(usdt), 9910e6);
 
@@ -598,7 +598,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         susd.transfer(address(l), 9970e6);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 
@@ -624,7 +624,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         susd.transfer(address(l), 9970e6);
 
-        l.prime();
+        
 
         shellsBurned_ = l.withdraw(address(susd), 1e6);
 
@@ -668,7 +668,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         susd.transfer(address(l), 2970e6);
 
-        l.prime();
+        
 
         shellsBurned_ = l.withdraw(address(usdc), 1e6);
 
@@ -698,7 +698,7 @@ contract SelectiveWithdrawTemplate is Setup {
 
         susd.transfer(address(l), 2970e6);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 

@@ -41,7 +41,6 @@ contract LoihiStorage {
         int128 delta;
         int128 epsilon;
         int128 lambda;
-        int128 omega;
         int128[] weights;
         uint totalSupply;
         mapping (address => uint) balances;
@@ -73,7 +72,5 @@ contract LoihiStorage {
 
     address public owner;
     bool internal notEntered = true;
-
-    // uint public maxFee;
 
 }
