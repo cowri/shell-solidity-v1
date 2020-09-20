@@ -6,6 +6,9 @@ import "./LoihiStorage.sol";
 
 import "./UnsafeMath64x64.sol";
 
+import "./ShellMath.sol";
+
+
 library ProportionalLiquidity {
 
     using ABDKMath64x64 for uint;
@@ -15,6 +18,7 @@ library ProportionalLiquidity {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     int128 constant ONE = 0x10000000000000000;
+    int128 constant ONE_WEI = 0x12;
 
     // / @author james foley http://github.com/realisation
     // / @notice deposit into the pool with no slippage from the numeraire assets the pool supports
@@ -29,7 +33,7 @@ library ProportionalLiquidity {
         uint[] memory
     ) {
 
-        int128 _shells = _deposit.divu(1e18);
+        int128 _newShells = _deposit.divu(1e18);
 
         int128 _oGLiq;
 
@@ -52,13 +56,13 @@ library ProportionalLiquidity {
 
             for (uint8 i = 0; i < _length; i++) {
 
-                deposits_[i] = Assimilators.intakeNumeraire(shell.assetAssimilators[i].addr, _shells.mul(shell.weights[i]));
+                deposits_[i] = Assimilators.intakeNumeraire(shell.assetAssimilators[i].addr, _newShells.mul(shell.weights[i]));
 
             }
 
         } else {
 
-            int128 _multiplier = _shells.div(_oGLiq);
+            int128 _multiplier = _newShells.div(_oGLiq);
 
             for (uint8 i = 0; i < _length; i++) {
 
@@ -66,18 +70,60 @@ library ProportionalLiquidity {
 
             }
 
-            shell.omega = shell.omega.mul(ONE.add(_multiplier));
-
         }
+        
+        int128 _totalShells = shell.totalSupply.divu(1e18);
 
-        if (shell.totalSupply > 0) _shells = _shells.div(_oGLiq).mul(shell.totalSupply.divu(1e18));
+        if (_totalShells> 0) _newShells = _newShells.div(_oGLiq).mul(_totalShells);
+         
+        requireLiquidityInvariant(
+            shell, 
+            _totalShells, 
+            _newShells, 
+            _oGLiq, 
+            _oBals
+        );        
 
-        mint(shell, msg.sender, shells_ = _shells.mulu(1e18));
+        mint(shell, msg.sender, shells_ = _newShells.mulu(1e18));
 
         return (shells_, deposits_);
 
     }
+    
+    event log(bytes32);
+    
+    function requireLiquidityInvariant (
+        LoihiStorage.Shell storage shell,
+        int128 _shells,
+        int128 _newShells,
+        int128 _oGLiq,
+        int128[] memory _oBals
+    ) internal {
+    
+        int128 _nGLiq; 
+        int128[] memory _nBals = new int128[](_oBals.length);
+        
+        for (uint i = 0; i < _nBals.length; i++) {
 
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
+            
+            _nBals[i] = _bal;
+            _nGLiq += _bal;
+
+        }
+        
+        int128 _beta = shell.beta;
+        int128 _delta = shell.delta;
+        int128[] memory _weights = shell.weights;
+        
+        int128 _omega = ShellMath.calculateFee(_oGLiq, _oBals, _beta, _delta, _weights);
+
+        int128 _psi = ShellMath.calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
+
+        ShellMath.enforceLiquidityInvariant(_shells, _newShells, _oGLiq, _nGLiq, _omega, _psi);
+        
+    }
+    
     function viewProportionalDeposit (
         LoihiStorage.Shell storage shell,
         uint256 _deposit
@@ -131,8 +177,6 @@ library ProportionalLiquidity {
 
     }
 
-
-
     // / @author  james foley http://github.com/realisation
     // / @notice  withdrawas amount of shell tokens from the the pool equally from the numeraire assets of the pool with no slippage
     // / @param   _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
@@ -169,14 +213,20 @@ library ProportionalLiquidity {
 
         }
 
-        shell.omega = shell.omega.mul(ONE.sub(_multiplier));
-
+        requireLiquidityInvariant(
+            shell, 
+            shell.totalSupply.divu(1e18), 
+            _withdrawal.divu(1e18).neg(), 
+            _oGLiq, 
+            _oBals
+        );
+        
         burn(shell, msg.sender, _withdrawal);
 
         return withdrawals_;
 
     }
-
+    
     // / @author  james foley http://github.com/realisation
     // / @notice  withdrawas amount of shell tokens from the the pool equally from the numeraire assets of the pool with no slippage
     // / @param   _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
