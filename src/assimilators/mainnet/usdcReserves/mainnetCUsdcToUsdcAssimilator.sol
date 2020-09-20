@@ -154,6 +154,12 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
     function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
         uint256 _rate = cusdc.exchangeRateStored();
+        
+        uint256 _supplyRate = cdai.supplyRatePerBlock();
+
+        uint256 _prevBlock = cdai.accrualBlockNumber();
+
+        _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
         amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 
@@ -163,6 +169,12 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
     function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
         uint256 _rate = cusdc.exchangeRateStored();
+        
+        uint256 _supplyRate = cdai.supplyRatePerBlock();
+
+        uint256 _prevBlock = cdai.accrualBlockNumber();
+
+        _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
 
@@ -181,6 +193,12 @@ contract MainnetCUsdcToUsdcAssimilator is IAssimilator {
     function viewNumeraireAmountAndBalance (address _addr, uint256 _amount) public view returns (int128 amount_, int128 balance_) {
 
         uint256 _rate = cusdc.exchangeRateStored();
+        
+        uint256 _supplyRate = cdai.supplyRatePerBlock();
+
+        uint256 _prevBlock = cdai.accrualBlockNumber();
+
+        _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
 

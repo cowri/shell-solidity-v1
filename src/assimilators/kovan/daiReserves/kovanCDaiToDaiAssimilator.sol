@@ -16,20 +16,21 @@ pragma solidity ^0.5.0;
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
 import "../../../interfaces/ICToken.sol";
-
 import "../../../interfaces/IERC20.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
-contract MainnetCDaiToDaiAssimilator is IAssimilator {
+contract KovanCDaiToDaiAssimilator is IAssimilator {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    ICToken constant cdai = ICToken(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
-    IERC20 constant dai = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    ICToken constant cdai = ICToken(0xF0d0EB522cfa50B716B3b1604C4F0fA6f04376AD);
+    IERC20 constant dai = IERC20(0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa);
 
     constructor () public { }
+    
+    event log_uint(bytes32, uint);
 
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
@@ -39,11 +40,11 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
         require(_transferSuccess, "Shell/cDAI-transfer-from-failed");
 
         uint _redeemSuccess = cdai.redeem(_amount);
-
+        
         require(_redeemSuccess == 0, "Shell/cDAI-redeem-failed");
 
         uint256 _balance = dai.balanceOf(address(this));
-
+        
         uint256 _rate = cdai.exchangeRateStored();
 
         balance_ = _balance.divu(1e18);
@@ -94,9 +95,9 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
         uint256 _daiAmount = ( ( _amount ) * _rate ) / 1e18;
 
         uint _mintSuccess = cdai.mint(_daiAmount);
-        
-        require(_mintSuccess == 0, "Shell/cDAI-mint-failed");
 
+        require(_mintSuccess == 0, "Shell/cDAI-mint-failed");
+        
         _amount = cdai.balanceOf(address(this));
 
         bool _transferSuccess = cdai.transfer(_dst, _amount);
@@ -121,8 +122,6 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
         uint _mintSuccess = cdai.mint(_daiAmount);
 
         require(_mintSuccess == 0, "Shell/cDAI-mint-failed");
-
-        _amount = cdai.balanceOf(address(this));
 
         bool _transferSuccess = cdai.transfer(_dst, _amount);
 
@@ -157,7 +156,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
         uint256 _prevBlock = cdai.accrualBlockNumber();
 
         _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
-
+        
         amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
 
     }
@@ -192,7 +191,7 @@ contract MainnetCDaiToDaiAssimilator is IAssimilator {
     function viewNumeraireAmountAndBalance (address _addr, uint256 _amount) public view returns (int128 amount_, int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
-        
+
         uint256 _supplyRate = cdai.supplyRatePerBlock();
 
         uint256 _prevBlock = cdai.accrualBlockNumber();
