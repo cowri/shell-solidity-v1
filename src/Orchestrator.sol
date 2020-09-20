@@ -34,8 +34,6 @@ library Orchestrator {
 
     event AssimilatorIncluded(address indexed derivative, address indexed numeraire, address indexed reserve, address assimilator);
 
-    event log_int(bytes32, int);
-
     function setParams (
         LoihiStorage.Shell storage shell,
         uint256 _alpha,
@@ -43,9 +41,7 @@ library Orchestrator {
         uint256 _feeAtHalt,
         uint256 _epsilon,
         uint256 _lambda
-    ) internal returns (
-        uint256 max_
-    ) {
+    ) internal {
 
         require(_alpha < 1e18 && _alpha > 0, "Shell/parameter-invalid-alpha");
 
@@ -53,9 +49,11 @@ library Orchestrator {
 
         require(_feeAtHalt <= .5e18, "Shell/parameter-invalid-max");
 
-        require(_epsilon < 1e16 && _epsilon >= 0, "Shell/parameter-invalid-epsilon");
+        require(_epsilon <= 1e16 && _epsilon >= 0, "Shell/parameter-invalid-epsilon");
 
         require(_lambda <= 1e18 && _lambda >= 0, "Shell/parameter-invalid-lambda");
+        
+        int128 _omega = getFee(shell);
 
         shell.alpha = (_alpha + 1).divu(1e18);
 
@@ -66,19 +64,19 @@ library Orchestrator {
         shell.epsilon = (_epsilon + 1).divu(1e18);
 
         shell.lambda = (_lambda + 1).divu(1e18);
-
-        shell.omega = getNewOmega(shell);
+        
+        int128 _psi = getFee(shell);
+        
+        require(_omega <= _psi, "Shell/parameters-increase-fee");
 
         emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda, shell.omega.mulu(1e18));
 
-        max_ = _feeAtHalt;
-
     }
-
-    function getNewOmega (
+    
+    function getFee (
         LoihiStorage.Shell storage shell
     ) private view returns (
-        int128 omega_
+        int128 fee_
     ) {
 
         int128 _gLiq;
@@ -95,7 +93,7 @@ library Orchestrator {
 
         }
 
-        omega_ = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
+        fee_ = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
 
     }
 
