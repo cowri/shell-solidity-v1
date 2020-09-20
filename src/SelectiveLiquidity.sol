@@ -34,8 +34,7 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getLiquidityDepositData(shell, _derivatives, _amounts);
 
-        int128 _shells;
-        ( _shells, shell.omega ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         shells_ = _shells.mulu(1e18);
 
@@ -58,12 +57,11 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = viewLiquidityDepositData(shell, _derivatives, _amounts);
 
-        ( int128 _shells, ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         shells_ = _shells.mulu(1e18);
 
     }
-
 
     function selectiveWithdraw (
         LoihiStorage.Shell storage shell,
@@ -79,9 +77,7 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getLiquidityWithdrawData(shell, _derivatives, msg.sender, _amounts);
 
-        int128 _shells;
-
-        ( _shells, shell.omega ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         _shells = _shells.abs().us_mul(ONE + shell.epsilon);
 
@@ -106,7 +102,7 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = viewLiquidityWithdrawData(shell, _derivatives, _amounts);
 
-        ( int128 _shells, ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         _shells = _shells.abs().us_mul(ONE + shell.epsilon);
 
