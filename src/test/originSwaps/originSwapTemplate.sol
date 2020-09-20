@@ -685,7 +685,7 @@ contract OriginSwapTemplate is Setup {
         usdt.transfer(address(l), 4910e6);
         ausdt.transfer(address(l), 4910e6);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 
@@ -731,7 +731,7 @@ contract OriginSwapTemplate is Setup {
 
         //l.TEST_setTestHalts(false);
 
-        l.prime();
+        
 
         targetAmount_ = l.originSwap(
             address(dai),
@@ -773,7 +773,7 @@ contract OriginSwapTemplate is Setup {
         susd.transfer(address(l), 4970e18);
         asusd.transfer(address(l), 4970e18);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 
@@ -792,7 +792,7 @@ contract OriginSwapTemplate is Setup {
         susd.transfer(address(l), 4970e18);
         asusd.transfer(address(l), 4970e18);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 

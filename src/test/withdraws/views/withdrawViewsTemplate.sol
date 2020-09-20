@@ -559,7 +559,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 
@@ -587,7 +587,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
         usdt.transfer(address(l), 9910e6);
         ausdt.transfer(address(l), 9910e6);
 
-        l.prime();
+        
 
         shellsBurned_ = l.viewWithdraw(address(usdt), 9910e6);
 
@@ -611,7 +611,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
         susd.transfer(address(l), 9970e18);
         asusd.transfer(address(l), 9970e18);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 
@@ -639,7 +639,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
         susd.transfer(address(l), 9970e18);
         asusd.transfer(address(l), 9970e18);
 
-        l.prime();
+        
 
         shellsBurned_ = l.viewWithdraw(address(susd), 1e18);
 
@@ -689,7 +689,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
         susd.transfer(address(l), 2970e18);
         asusd.transfer(address(l), 2970e18);
 
-        l.prime();
+        
 
         shellsBurned_ = l.viewWithdraw(address(usdc), 1e6);
 
@@ -729,7 +729,7 @@ contract SelectiveWithdrawViewsTemplate is Setup {
         susd.transfer(address(l), 2970e18);
         asusd.transfer(address(l), 2970e18);
 
-        l.prime();
+        
 
         //l.TEST_setTestHalts(false);
 
