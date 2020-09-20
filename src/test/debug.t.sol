@@ -21,42 +21,82 @@ contract DebugTest is Setup, DSMath, DSTest {
 
     event log_bytes(bytes32, bytes4);
     event log_uints(bytes32, uint256[]);
+    
+    AssimilatorBouncer bouncer;
 
     function setUp() public {
 
-        l = getLoihiSuiteOne();
+        setupStablecoinsKovan();
+        setupAssimilatorsSetOneKovan();
+        
+        bouncer = new AssimilatorBouncer();
+
+        approveStablecoins(address(bouncer));
+    }
+
+    
+    function testDebug () public  {
+        
+        
+        int128 _cdaiViewBalBefore = cdaiAssimilator.viewNumeraireAmount(500e8);
+        
+        cdai.exchangeRateCurrent();
+        int128 _cdaiViewBalAfter = cdaiAssimilator.viewNumeraireAmount(500e8);
+        emit log_named_uint("dai view bal before", _cdaiViewBalBefore.mulu(1e18));
+        emit log_named_uint("dai view bal after", _cdaiViewBalAfter.mulu(1e18));
 
     }
     
-    modifier one () {
-        emit log_named_uint("one before", 1);
-        _;
-        emit log_named_uint("one after ", 1);
-    }
+}
     
-    modifier two () {
-        emit log_named_uint("two before", 2);
-        _;
-        emit log_named_uint("two after", 2);
-    }
 
-    function testDebug () public one two {
+contract AssimilatorBouncer {
 
-        uint256 p3 = .3e18;
+    using ABDKMath64x64 for uint256;
+    using ABDKMath64x64 for int128;
 
-        int128 p3divu = p3.divu(1e18);
-
-        int128 onedivu = uint256(.25e18).divu(1e18);
-
-        emit log_named_int("int128", onedivu);
+    constructor () public { 
 
     }
     
-    function testMath () public {
+    function safeApprove (address _token, address _spender, uint256 _value) public {
+        ( bool success, bytes memory returndata ) = _token.call(abi.encodeWithSignature("approve(address,uint256)", _spender, _value));
+        require(success, "SafeERC20: low-level call failed");
+    }
 
-        uint256 a = 1;
+    function depositRaw (address _assim, uint256 _amt) public returns (int256 amt_, int256 bal_) {
 
-        int128 a64 = a.fromUInt();
+        ( int128 _amt64x64, int128 _bal64x64 ) = Assimilators.intakeRawAndGetBalance(_assim, _amt);
+
+        amt_ = _amt64x64.muli(1e18);
+
+        bal_ = _bal64x64.muli(1e18);
+
+    }
+
+    function depositNumeraire (address _assim, uint256 _amt) public returns (uint256 amt_) {
+
+        int128 _amt64x64 = _amt.divu(1e18);
+
+        amt_ = Assimilators.intakeNumeraire(_assim, _amt64x64);
+
+    }
+
+    function withdrawRaw (address _assim, uint256 _amt) public returns (int256 amt_, int256 bal_) {
+
+        ( int128 _amt64x64, int128 _bal64x64 ) = Assimilators.outputRawAndGetBalance(_assim, msg.sender, _amt);
+
+        amt_ = _amt64x64.muli(1e18);
+
+        bal_ = _bal64x64.muli(1e18);
+
+    }
+
+    function withdrawNumeraire (address _assim, uint256 _amt) public returns (uint256 amt_) {
+
+        int128 _amt64x64 = _amt.divu(1e18);
+
+        amt_ = Assimilators.outputNumeraire(_assim, msg.sender, _amt64x64);
 
     }
 

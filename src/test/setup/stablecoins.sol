@@ -60,9 +60,9 @@ contract StablecoinSetup is StorageSetup {
 
         aaveLpCore = 0x95D1189Ed88B380E319dF73fF00E479fcc4CFa45;
 
-        cdai.exchangeRateCurrent();
-        cusdc.exchangeRateCurrent();
-        cusdt.exchangeRateCurrent();
+        // cdai.exchangeRateCurrent();
+        // cusdc.exchangeRateCurrent();
+        // cusdt.exchangeRateCurrent();
 
     }
 
