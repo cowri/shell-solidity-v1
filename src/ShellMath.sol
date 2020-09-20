@@ -278,12 +278,10 @@ library ShellMath {
                     int128 _oHalt = _oGLiq.us_mul(_weights[i]).us_mul(_lowerAlpha);
 
                     if (_oBals[i] > _oHalt) revert("Shell/lower-halt");
-                    if (_nHalt - _nBals[i] > _oHalt - _oBals[i]) revert("Shel/lower-halt");
+                    if (_nHalt - _nBals[i] > _oHalt - _oBals[i]) revert("Shell/lower-halt");
 
                 }
             }
         }
-
     }
-
 }
