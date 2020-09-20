@@ -20,7 +20,7 @@ import "../../../interfaces/IERC20.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
-contract KovanCDaiToDaiAssimilator is IAssimilator {
+contract KovanCDaiToDaiAssimilatorNoView {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
@@ -30,8 +30,6 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
 
     constructor () public { }
     
-    event log_uint(bytes32, uint);
-
     // takes raw cdai amount, transfers it in, calculates corresponding numeraire amount and returns it
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
@@ -115,7 +113,7 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
     // takes a raw amount of cDai and transfers it out, returns numeraire value of the raw amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        uint256 _rate = cdai.exchangeRateCurrent();
+        uint256 _rate = cdai.exchangeRateStored();
 
         uint256 _daiAmount = ( _amount * _rate ) / 1e18;
 
@@ -146,18 +144,21 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
 
     }
 
+    event log_uint(bytes32, uint);
+
     // takes a numeraire amount and returns the raw amount
-    function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
+    function viewRawAmount (int128 _amount) public returns (uint256 amount_) {
 
         uint256 _rate = cdai.exchangeRateStored();
         
         uint256 _supplyRate = cdai.supplyRatePerBlock();
-
         uint256 _prevBlock = cdai.accrualBlockNumber();
-
-        _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
+        uint256 _newRate = _rate * _supplyRate * (block.number - _prevBlock);
         
-        amount_ = ( _amount.mulu(1e18) * 1e18 ) / _rate;
+        emit log_uint("rate", _rate);
+        emit log_uint("new rate", _newRate);
+        
+        amount_ = ( _amount.mulu(1e18) * 1e18 ) / _newRate;
 
     }
 
@@ -165,12 +166,6 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
     function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
         uint256 _rate = cdai.exchangeRateStored();
-
-        uint256 _supplyRate = cdai.supplyRatePerBlock();
-
-        uint256 _prevBlock = cdai.accrualBlockNumber();
-
-        _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
 
@@ -191,12 +186,6 @@ contract KovanCDaiToDaiAssimilator is IAssimilator {
     function viewNumeraireAmountAndBalance (address _addr, uint256 _amount) public view returns (int128 amount_, int128 balance_) {
 
         uint256 _rate = cdai.exchangeRateStored();
-
-        uint256 _supplyRate = cdai.supplyRatePerBlock();
-
-        uint256 _prevBlock = cdai.accrualBlockNumber();
-
-        _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e18);
 

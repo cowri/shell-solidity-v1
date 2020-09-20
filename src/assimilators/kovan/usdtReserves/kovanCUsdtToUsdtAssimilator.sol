@@ -162,6 +162,12 @@ contract KovanCUsdtToUsdtAssimilator is IAssimilator {
     function viewRawAmount (int128 _amount) public view returns (uint256 amount_) {
 
         uint256 _rate = cusdt.exchangeRateStored();
+        
+        uint256 _supplyRate = cdai.supplyRatePerBlock();
+
+        uint256 _prevBlock = cdai.accrualBlockNumber();
+
+        _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
         amount_ = ( _amount.mulu(1e6) * 1e18 ) / _rate;
 

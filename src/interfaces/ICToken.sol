@@ -10,6 +10,8 @@ interface ICToken {
     function getCash() external view returns (uint);
     function exchangeRateCurrent() external returns (uint);
     function exchangeRateStored() external view returns (uint);
+    function supplyRatePerBlock() external view returns (uint);
+    function accrualBlockNumber() external view returns (uint);
     function transfer(address recipient, uint256 amount) external returns (bool);
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
     function totalSupply() external view returns (uint256);
