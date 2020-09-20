@@ -155,9 +155,9 @@ contract MainnetCUsdtToUsdtAssimilator is IAssimilator {
 
         uint256 _rate = cusdt.exchangeRateStored();
         
-        uint256 _supplyRate = cdai.supplyRatePerBlock();
+        uint256 _supplyRate = cusdt.supplyRatePerBlock();
 
-        uint256 _prevBlock = cdai.accrualBlockNumber();
+        uint256 _prevBlock = cusdt.accrualBlockNumber();
 
         _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
@@ -170,9 +170,9 @@ contract MainnetCUsdtToUsdtAssimilator is IAssimilator {
 
         uint256 _rate = cusdt.exchangeRateStored();
         
-        uint256 _supplyRate = cdai.supplyRatePerBlock();
+        uint256 _supplyRate = cusdt.supplyRatePerBlock();
 
-        uint256 _prevBlock = cdai.accrualBlockNumber();
+        uint256 _prevBlock = cusdt.accrualBlockNumber();
 
         _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
@@ -194,9 +194,9 @@ contract MainnetCUsdtToUsdtAssimilator is IAssimilator {
 
         uint256 _rate = cusdt.exchangeRateStored();
         
-        uint256 _supplyRate = cdai.supplyRatePerBlock();
+        uint256 _supplyRate = cusdt.supplyRatePerBlock();
 
-        uint256 _prevBlock = cdai.accrualBlockNumber();
+        uint256 _prevBlock = cusdt.accrualBlockNumber();
 
         _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
