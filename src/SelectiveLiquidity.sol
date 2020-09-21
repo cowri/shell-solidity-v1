@@ -143,7 +143,7 @@ library SelectiveLiquidity {
 
                 int128 _amount = Assimilators.intakeRaw(_assim.addr, _amounts[i]);
 
-                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount);
+                nBals_[_assim.ix] = nBals_[_assim.ix].add(_amount);
 
             }
 
@@ -186,7 +186,7 @@ library SelectiveLiquidity {
 
                 int128 _amount = Assimilators.outputRaw(_assim.addr, _rcpnt, _amounts[i]);
 
-                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount);
+                nBals_[_assim.ix] = nBals_[_assim.ix].add(_amount);
 
             }
 
@@ -229,7 +229,7 @@ library SelectiveLiquidity {
 
                 int128 _amount = Assimilators.viewNumeraireAmount(_assim.addr, _amounts[i]);
 
-                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount);
+                nBals_[_assim.ix] = nBals_[_assim.ix].add(_amount);
 
             }
 
@@ -264,7 +264,7 @@ library SelectiveLiquidity {
 
                 ( int128 _amount, int128 _balance ) = Assimilators.viewNumeraireAmountAndBalance(_assim.addr, _amounts[i]);
 
-                nBals_[_assim.ix] = _balance.add(_amount.neg());
+                nBals_[_assim.ix] = _balance.sub(_amount);
 
                 oBals_[_assim.ix] = _balance;
 
@@ -272,7 +272,7 @@ library SelectiveLiquidity {
 
                 int128 _amount = Assimilators.viewNumeraireAmount(_assim.addr, _amounts[i]);
 
-                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount.neg());
+                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount);
 
             }
 
@@ -297,7 +297,11 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
+            if (oBals_[i] == 0 && nBals_[i] == 0) {
+
+                nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
+                
+            }
 
             oGLiq_ += oBals_[i];
             nGLiq_ += nBals_[i];

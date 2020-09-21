@@ -26,6 +26,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         
         setupAssimilatorsSetOneKovan();
         
+<<<<<<< HEAD
         // LoihiFactory lf = new LoihiFactory();
 
         // address[] memory _assets = new address[](20);
@@ -60,6 +61,9 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         // _assets[18] = address(susdAssimilator);
         // _assets[19] = address(susd);
         // _assetWeights[3] = .1e18;
+=======
+        // setupAssimilatorsSetOneMainnet();
+>>>>>>> factory-mainnet
         
         // _derivativeAssimilators[0] = address(chai);
         // _derivativeAssimilators[1] = address(dai);

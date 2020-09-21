@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./storage.sol";
 
+<<<<<<< HEAD
 /* Kovan Assimilators set one - holding reserves in dai, usdc, usdt and susd */
 import "../../assimilators/kovan/daiReserves/kovanDaiToDaiAssimilator.sol";
 import "../../assimilators/kovan/daiReserves/kovanADaiToDaiAssimilator.sol";
@@ -16,6 +17,8 @@ import "../../assimilators/kovan/usdtReserves/kovanUsdtToUsdtAssimilator.sol";
 import "../../assimilators/kovan/usdtReserves/kovanAUsdtToUsdtAssimilator.sol";
 import "../../assimilators/kovan/usdtReserves/kovanCUsdtToUsdtAssimilator.sol";
 
+=======
+>>>>>>> factory-mainnet
 /* Mainnet Assimilators set one - holding reserves in cDai, cUsdc, aUsdt and aSusd */
 import "../../assimilators/mainnet/daiReserves/mainnetDaiToDaiAssimilator.sol";
 import "../../assimilators/mainnet/daiReserves/mainnetCDaiToDaiAssimilator.sol";
@@ -27,19 +30,9 @@ import "../../assimilators/mainnet/susdReserves/mainnetASUsdToSUsdAssimilator.so
 import "../../assimilators/mainnet/usdtReserves/mainnetUsdtToUsdtAssimilator.sol";
 import "../../assimilators/mainnet/usdtReserves/mainnetAUsdtToUsdtAssimilator.sol";
 
-/* Mainnet Assimilators set two - holding reserves in cDai, cUsdc, aUsdt and aSusd */
-import "../../assimilators/mainnet/cdaiReserves/mainnetDaiToCDaiAssimilator.sol";
-import "../../assimilators/mainnet/cdaiReserves/mainnetCDaiToCDaiAssimilator.sol";
-import "../../assimilators/mainnet/cdaiReserves/mainnetChaiToCDaiAssimilator.sol";
-import "../../assimilators/mainnet/cusdcReserves/mainnetUsdcToCUsdcAssimilator.sol";
-import "../../assimilators/mainnet/cusdcReserves/mainnetCUsdcToCUsdcAssimilator.sol";
-import "../../assimilators/mainnet/asusdReserves/mainnetSUsdToASUsdAssimilator.sol";
-import "../../assimilators/mainnet/asusdReserves/mainnetASUsdToASUsdAssimilator.sol";
-import "../../assimilators/mainnet/ausdtReserves/mainnetUsdtToAUsdtAssimilator.sol";
-import "../../assimilators/mainnet/ausdtReserves/mainnetAUsdtToAUsdtAssimilator.sol";
-
 contract AssimilatorSetup is StorageSetup {
 
+<<<<<<< HEAD
     event log_bytes(bytes32, bytes4);
     
     function setupAssimilatorsSetOneKovan () public {
@@ -62,6 +55,8 @@ contract AssimilatorSetup is StorageSetup {
 
     }
 
+=======
+>>>>>>> factory-mainnet
     function setupAssimilatorsSetOneMainnet () public {
 
         daiAssimilator = IAssimilator(address(new MainnetDaiToDaiAssimilator()));
@@ -76,23 +71,6 @@ contract AssimilatorSetup is StorageSetup {
 
         susdAssimilator = IAssimilator(address(new MainnetSUsdToSUsdAssimilator()));
         asusdAssimilator = IAssimilator(address(new MainnetASUsdToSUsdAssimilator()));
-
-    }
-
-    function setupAssimilatorsSetTwoMainnet () public {
-
-        usdcAssimilator = IAssimilator(address(new MainnetUsdcToCUsdcAssimilator()));
-        cusdcAssimilator = IAssimilator(address(new MainnetCUsdcToCUsdcAssimilator()));
-
-        daiAssimilator = IAssimilator(address(new MainnetDaiToCDaiAssimilator()));
-        cdaiAssimilator = IAssimilator(address(new MainnetCDaiToCDaiAssimilator()));
-        chaiAssimilator = IAssimilator(address(new MainnetChaiToCDaiAssimilator()));
-
-        usdtAssimilator = IAssimilator(address(new MainnetUsdtToAUsdtAssimilator()));
-        ausdtAssimilator = IAssimilator(address(new MainnetAUsdtToAUsdtAssimilator()));
-
-        susdAssimilator = IAssimilator(address(new MainnetSUsdToASUsdAssimilator()));
-        asusdAssimilator = IAssimilator(address(new MainnetASUsdToASUsdAssimilator()));
 
     }
 
