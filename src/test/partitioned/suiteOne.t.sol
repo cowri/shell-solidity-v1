@@ -29,7 +29,7 @@ contract PartitionedWithdrawSuiteOne is PartitionedLiquidityTemplate, DSTest {
         assertEq(_claims[2], 300e18);
         assertEq(_claims[3], 300e18);
 
-        uint daiBalance = dai.balanceOf(address(l));
+        uint daiBalance = dai.balanceOf(address(s));
 
         assertEq(daiBalance, 60000000000000000002);
 

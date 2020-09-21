@@ -17,7 +17,7 @@ contract DebugTest is Setup, DSMath, DSTest {
 
     using ShellMethods for Shell;
 
-    Shell l;
+    Shell s;
 
     event log_bytes(bytes32, bytes4);
     event log_uints(bytes32, uint256[]);

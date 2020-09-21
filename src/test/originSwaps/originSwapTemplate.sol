@@ -16,7 +16,7 @@ contract OriginSwapTemplate is Setup {
 
     using ShellMethods for Shell;
 
-    Shell l;
+    Shell s;
     Shell s2;
 
     event log_int(bytes32, int);
@@ -378,7 +378,7 @@ contract OriginSwapTemplate is Setup {
             address(susd), 30e18
         );
 
-        ( success_, ) = address(l).call(abi.encodeWithSignature(
+        ( success_, ) = address(s).call(abi.encodeWithSignature(
             "originSwap(address,address,uint256,uint256,uint256)",
             address(usdc),
             address(usdt),
@@ -398,7 +398,7 @@ contract OriginSwapTemplate is Setup {
             address(susd), 30e18
         );
 
-        ( success_, ) = address(l).call(abi.encodeWithSignature(
+        ( success_, ) = address(s).call(abi.encodeWithSignature(
             "originSwap(address,address,uint256,uint256,uint256)",
             address(usdc),
             address(dai),
@@ -413,7 +413,7 @@ contract OriginSwapTemplate is Setup {
 
         s.proportionalDeposit(300e18, 1e50);
 
-        ( success_, ) = address(l).call(abi.encodeWithSignature(
+        ( success_, ) = address(s).call(abi.encodeWithSignature(
             "originSwap(address,address,uint256,uint256,uint256)",
             address(susd),
             address(usdt),
@@ -428,7 +428,7 @@ contract OriginSwapTemplate is Setup {
 
         s.proportionalDeposit(300e18, 1e50);
 
-        ( success_, ) = address(l).call(abi.encodeWithSignature(
+        ( success_, ) = address(s).call(abi.encodeWithSignature(
             "originSwap(address,address,uint256,uint256,uint256)",
             address(dai),
             address(susd),
@@ -544,8 +544,8 @@ contract OriginSwapTemplate is Setup {
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
-        cusdc.transfer(address(l), _rawCUsdc);
-        usdc.transfer(address(l), 110e6);
+        cusdc.transfer(address(s), _rawCUsdc);
+        usdc.transfer(address(s), 110e6);
 
         success_ = s.originSwapSuccess(
             address(usdc),
@@ -561,8 +561,8 @@ contract OriginSwapTemplate is Setup {
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(110e18).divu(1e18));
 
-        cusdc.transfer(address(l), _rawCUsdc);
-        usdc.transfer(address(l), 110e6);
+        cusdc.transfer(address(s), _rawCUsdc);
+        usdc.transfer(address(s), 110e6);
 
         success_ = s.originSwapSuccess(
             address(usdt),
@@ -578,14 +578,14 @@ contract OriginSwapTemplate is Setup {
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
-        cdai.transfer(address(l), _rawCDai);
-        dai.transfer(address(l), 70e18);
+        cdai.transfer(address(s), _rawCDai);
+        dai.transfer(address(s), 70e18);
 
-        usdt.transfer(address(l), 70e6);
-        ausdt.transfer(address(l), 70e6);
+        usdt.transfer(address(s), 70e6);
+        ausdt.transfer(address(s), 70e6);
 
-        susd.transfer(address(l), 23e18);
-        asusd.transfer(address(l), 23e18);
+        susd.transfer(address(s), 23e18);
+        asusd.transfer(address(s), 23e18);
 
         success_ = s.originSwapSuccess(
             address(usdc),
@@ -601,14 +601,14 @@ contract OriginSwapTemplate is Setup {
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
-        cdai.transfer(address(l), _rawCDai);
-        dai.transfer(address(l), 70e18);
+        cdai.transfer(address(s), _rawCDai);
+        dai.transfer(address(s), 70e18);
 
-        usdt.transfer(address(l), 70e6);
-        ausdt.transfer(address(l), 70e6);
+        usdt.transfer(address(s), 70e6);
+        ausdt.transfer(address(s), 70e6);
 
-        susd.transfer(address(l), 23e18);
-        asusd.transfer(address(l), 23e18);
+        susd.transfer(address(s), 23e18);
+        asusd.transfer(address(s), 23e18);
 
         success_ = s.originSwapSuccess(
             address(usdc),
@@ -624,14 +624,14 @@ contract OriginSwapTemplate is Setup {
 
         uint256 _rawCDai = cdaiAssimilator.viewRawAmount(uint256(70e18).divu(1e18));
 
-        cdai.transfer(address(l), _rawCDai);
-        dai.transfer(address(l), 70e18);
+        cdai.transfer(address(s), _rawCDai);
+        dai.transfer(address(s), 70e18);
 
-        usdt.transfer(address(l), 70e6);
-        ausdt.transfer(address(l), 70e6);
+        usdt.transfer(address(s), 70e6);
+        ausdt.transfer(address(s), 70e6);
 
-        susd.transfer(address(l), 23e18);
-        asusd.transfer(address(l), 23e18);
+        susd.transfer(address(s), 23e18);
+        asusd.transfer(address(s), 23e18);
 
         success_ = s.originSwapSuccess(
             address(usdt),
@@ -682,8 +682,8 @@ contract OriginSwapTemplate is Setup {
 
         s.proportionalDeposit(300e18, 1e50);
 
-        usdt.transfer(address(l), 4910e6);
-        ausdt.transfer(address(l), 4910e6);
+        usdt.transfer(address(s), 4910e6);
+        ausdt.transfer(address(s), 4910e6);
 
         
 
@@ -701,8 +701,8 @@ contract OriginSwapTemplate is Setup {
 
         s.proportionalDeposit(300e18, 1e50);
 
-        usdt.transfer(address(l), 4910e6);
-        ausdt.transfer(address(l), 4910e6);
+        usdt.transfer(address(s), 4910e6);
+        ausdt.transfer(address(s), 4910e6);
 
         //l.TEST_setTestHalts(false);
 
@@ -720,14 +720,14 @@ contract OriginSwapTemplate is Setup {
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(4910e18).divu(1e18));
 
-        usdc.transfer(address(l), 4910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
+        usdc.transfer(address(s), 4910e6);
+        cusdc.transfer(address(s), _rawCUsdc);
 
-        usdt.transfer(address(l), 9910e6);
-        ausdt.transfer(address(l), 9910e6);
+        usdt.transfer(address(s), 9910e6);
+        ausdt.transfer(address(s), 9910e6);
 
-        susd.transfer(address(l), 1970e18);
-        asusd.transfer(address(l), 1970e18);
+        susd.transfer(address(s), 1970e18);
+        asusd.transfer(address(s), 1970e18);
 
         //l.TEST_setTestHalts(false);
 
@@ -747,14 +747,14 @@ contract OriginSwapTemplate is Setup {
 
         uint256 _rawCUsdc = cusdcAssimilator.viewRawAmount(uint256(4910e18).divu(1e18));
 
-        usdc.transfer(address(l), 4910e6);
-        cusdc.transfer(address(l), _rawCUsdc);
+        usdc.transfer(address(s), 4910e6);
+        cusdc.transfer(address(s), _rawCUsdc);
 
-        usdt.transfer(address(l), 9910e6);
-        ausdt.transfer(address(l), 9910e6);
+        usdt.transfer(address(s), 9910e6);
+        ausdt.transfer(address(s), 9910e6);
 
-        susd.transfer(address(l), 1970e18);
-        asusd.transfer(address(l), 1970e18);
+        susd.transfer(address(s), 1970e18);
+        asusd.transfer(address(s), 1970e18);
 
         //l.TEST_setTestHalts(false);
 
@@ -770,8 +770,8 @@ contract OriginSwapTemplate is Setup {
 
         s.proportionalDeposit(300e18, 1e50);
 
-        susd.transfer(address(l), 4970e18);
-        asusd.transfer(address(l), 4970e18);
+        susd.transfer(address(s), 4970e18);
+        asusd.transfer(address(s), 4970e18);
 
         
 
@@ -789,8 +789,8 @@ contract OriginSwapTemplate is Setup {
 
         s.proportionalDeposit(300e18, 1e50);
 
-        susd.transfer(address(l), 4970e18);
-        asusd.transfer(address(l), 4970e18);
+        susd.transfer(address(s), 4970e18);
+        asusd.transfer(address(s), 4970e18);
 
         
 

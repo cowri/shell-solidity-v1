@@ -58,7 +58,7 @@ contract ShellFactory {
             _derivativeAssimilators
         );
 
-        shellShell.transferOwnership(msg.sender);
+        shell.transferOwnership(msg.sender);
 
         _isShell[address(shell)] = true;
 

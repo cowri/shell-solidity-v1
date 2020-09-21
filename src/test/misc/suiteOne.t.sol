@@ -9,7 +9,7 @@ import "../setup/setup.sol";
 
 contract MiscSuiteOneTest is Setup, DSTest {
 
-    Shell l;
+    Shell s;
 
     function setUp() public {
 

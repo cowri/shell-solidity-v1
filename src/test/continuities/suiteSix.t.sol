@@ -10,7 +10,7 @@ contract ContinuitySuiteSix is Setup, DSTest {
 
     using ShellMethods for Shell;
 
-    Shell l;
+    Shell s;
     Shell s2;
 
     function setUp() public {

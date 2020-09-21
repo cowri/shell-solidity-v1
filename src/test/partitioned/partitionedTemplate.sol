@@ -16,7 +16,7 @@ contract PartitionedLiquidityTemplate is Setup {
 
     using ShellMethods for Shell;
 
-    Shell l;
+    Shell s;
 
     function from_proprotional_state_underflow () public returns (bool success_) {
 
@@ -26,7 +26,7 @@ contract PartitionedLiquidityTemplate is Setup {
 
         s.partition();
 
-        ( success_, ) = address(l).call(abi.encodeWithSignature(
+        ( success_, ) = address(s).call(abi.encodeWithSignature(
             "partitionedWithdraw(address[],uint256[])",
             address(dai),
             301e18
