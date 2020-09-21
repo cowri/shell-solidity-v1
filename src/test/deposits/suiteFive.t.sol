@@ -8,7 +8,7 @@ contract SelectiveDepositSuiteFive is SelectiveDepositTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteFive();
+        s = getShellSuiteFive();
 
     }
 

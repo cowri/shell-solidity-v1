@@ -18,9 +18,9 @@ import "../interfaces/IAssimilator.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-import "../LoihiStorage.sol";
+import "../ShellStorage.sol";
 
-contract AssimilatorBouncer is LoihiStorage {
+contract AssimilatorBouncer is ShellStorage {
 
     using ABDKMath64x64 for uint256;
     using ABDKMath64x64 for int128;
@@ -30,7 +30,7 @@ contract AssimilatorBouncer is LoihiStorage {
     event log_addr(bytes32, address);
     event log(bytes32);
 
-    constructor () public LoihiStorage () { 
+    constructor () public ShellStorage () { 
 
     }
 

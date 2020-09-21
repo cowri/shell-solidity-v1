@@ -8,8 +8,8 @@ contract SelectiveWithdrawSuiteSix is SelectiveWithdrawTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteSix();
-        l2 = getLoihiSuiteSixClone();
+        s = getShellSuiteSix();
+        s2 = getShellSuiteSixClone();
 
     }
 
@@ -20,15 +20,15 @@ contract SelectiveWithdrawSuiteSix is SelectiveWithdrawTemplate, DSTest {
         address z, uint256 zAmt
     ) public {
 
-        l.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
-        l2.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
+        s.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
+        s2.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
 
     }
 
     function doubleDeposit (uint256 shells) public {
 
-        l.proportionalDeposit(shells, 1e50);
-        l2.proportionalDeposit(shells, 1e50);
+        s.proportionalDeposit(shells, 1e50);
+        s2.proportionalDeposit(shells, 1e50);
 
     }
 
@@ -36,21 +36,21 @@ contract SelectiveWithdrawSuiteSix is SelectiveWithdrawTemplate, DSTest {
 
         doubleDeposit(300e18);
 
-        uint256 burntShellsOf10 = l.withdraw(
+        uint256 burntShellsOf10 = s.withdraw(
             address(dai), 10e18,
             address(usdc), 10e6,
             address(usdt), 10e6,
             address(susd), 2.5e18
         );
 
-        uint256 burntShellsOf5And5 = l2.withdraw(
+        uint256 burntShellsOf5And5 = s2.withdraw(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 5e6,
             address(susd), 1.25e18
         );
 
-        burntShellsOf5And5 += l2.withdraw(
+        burntShellsOf5And5 += s2.withdraw(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 5e6,
@@ -69,21 +69,21 @@ contract SelectiveWithdrawSuiteSix is SelectiveWithdrawTemplate, DSTest {
         doubleDeposit(300e18);
 
 
-        uint256 shellsBurnedFiveFiveFortysevenSixteen = l.withdraw(
+        uint256 shellsBurnedFiveFiveFortysevenSixteen = s.withdraw(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 47e6,
             address(susd), 16e18
         );
 
-        uint256 shellsBurnedTwoPFiveTwoPFiveTwentythreePFiveEightTwice = l2.withdraw(
+        uint256 shellsBurnedTwoPFiveTwoPFiveTwentythreePFiveEightTwice = s2.withdraw(
             address(dai), 2.5e18,
             address(usdc), 2.5e6,
             address(usdt), 23.5e6,
             address(susd), 8e18
         );
 
-        shellsBurnedTwoPFiveTwoPFiveTwentythreePFiveEightTwice += l2.withdraw(
+        shellsBurnedTwoPFiveTwoPFiveTwentythreePFiveEightTwice += s2.withdraw(
             address(dai), 2.5e18,
             address(usdc), 2.5e6,
             address(usdt), 23.5e6,
@@ -108,17 +108,17 @@ contract SelectiveWithdrawSuiteSix is SelectiveWithdrawTemplate, DSTest {
             address(susd), 50e18
         );
 
-        uint256 shellsBurntOf50And18 = l.withdraw(
+        uint256 shellsBurntOf50And18 = s.withdraw(
             address(usdc), 50e6,
             address(susd), 18e18
         );
 
-        uint256 shellsBurntOf25And9Twice = l2.withdraw(
+        uint256 shellsBurntOf25And9Twice = s2.withdraw(
             address(usdc), 25e6,
             address(susd), 9e18
         );
 
-        shellsBurntOf25And9Twice += l2.withdraw(
+        shellsBurntOf25And9Twice += s2.withdraw(
             address(usdc), 25e6,
             address(susd), 9e18
         );

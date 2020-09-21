@@ -29,11 +29,11 @@ import "./Swaps.sol";
 
 import "./ViewLiquidity.sol";
 
-import "./LoihiStorage.sol";
+import "./ShellStorage.sol";
 
 import "./interfaces/IFreeFromUpTo.sol";
 
-contract Loihi is LoihiStorage {
+contract Shell is ShellStorage {
 
     event Approval(address indexed _owner, address indexed spender, uint256 value);
 

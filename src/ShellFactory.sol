@@ -15,11 +15,11 @@ pragma solidity ^0.5.0;
 
 // Builds new BPools, logging their addresses and providing `isBPool(address) -> (bool)`
 
-import "./Loihi.sol";
+import "./Shell.sol";
 
 import "./interfaces/IFreeFromUpTo.sol";
 
-contract LoihiFactory {
+contract ShellFactory {
 
     address private cowri;
 
@@ -48,23 +48,23 @@ contract LoihiFactory {
         address[] memory _assets,
         uint[] memory _assetWeights,
         address[] memory _derivativeAssimilators
-    ) public returns (Loihi) {
+    ) public returns (Shell) {
         
         if (msg.sender != cowri) revert("Shell/must-be-cowri");
 
-        Loihi loihiShell = new Loihi(
+        Shell shellShell = new Shell(
             _assets,
             _assetWeights,
             _derivativeAssimilators
         );
 
-        loihiShell.transferOwnership(msg.sender);
+        shellShell.transferOwnership(msg.sender);
 
-        _isShell[address(loihiShell)] = true;
+        _isShell[address(shellShell)] = true;
 
-        emit NewShell(msg.sender, address(loihiShell));
+        emit NewShell(msg.sender, address(shellShell));
 
-        return loihiShell;
+        return shellShell;
 
     }
 

@@ -15,47 +15,47 @@ contract ChopSueyTests is Setup, DSTest {
     using ABDKMath64x64 for uint;
     using ABDKMath64x64 for int128;
 
-    using LoihiMethods for Loihi;
+    using ShellMethods for Shell;
 
-    Loihi l;
-    Loihi l2;
+    Shell s;
+    Shell s2;
 
     function setUp () public {
 
-      l = getLoihiSuiteOne();
+      s = getShellSuiteOne();
       
-      l.setParams(.5e18, .25e18, .05e18, 3.5e14, .5e18);
+      s.setParams(.5e18, .25e18, .05e18, 3.5e14, .5e18);
       
     }
     
     function chopSueyOne () public {
       
-      l.deposit(
+      s.deposit(
         address(dai), 3000000000e18,
         address(usdc), 3000000000e6, 
         address(usdt), 3000000000e6,
         address(susd), 1000000000e18
       );
       
-      uint bigOne = l.originSwap(
+      uint bigOne = s.originSwap(
         address(dai),
         address(usdc),
         800000000e18
       );
       
-      uint bigTwo = l.originSwap(
+      uint bigTwo = s.originSwap(
         address(usdc),
         address(usdt),
         800000000e6
       );
       
-      uint smallOne = l.originSwap(
+      uint smallOne = s.originSwap(
         address(usdc),
         address(dai),
         10000e6
       );
       
-      uint smallTwo = l.originSwap(
+      uint smallTwo = s.originSwap(
         address(usdt),
         address(dai),
         10000e6

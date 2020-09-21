@@ -8,8 +8,8 @@ contract SelectiveDepositSuiteSix is SelectiveDepositTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteSix();
-        l2 = getLoihiSuiteSixClone();
+        s = getShellSuiteSix();
+        s2 = getShellSuiteSixClone();
 
     }
 
@@ -20,28 +20,28 @@ contract SelectiveDepositSuiteSix is SelectiveDepositTemplate, DSTest {
         address z, uint256 zAmt
     ) public {
 
-        l.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
-        l2.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
+        s.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
+        s2.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
 
     }
 
     function test_s6_selectiveDeposit_continuity_noSlippage_noAntiSlippage () public {
 
-        uint256 shellsOfTenTenTenAndTwoPFive = l.deposit(
+        uint256 shellsOfTenTenTenAndTwoPFive = s.deposit(
             address(dai), 10e18,
             address(usdc), 10e6,
             address(usdt), 10e6,
             address(susd), 2.5e18
         );
 
-        uint256 shellsOfFiveFiveFiveAndOnePTwoFiveTwice = l.deposit(
+        uint256 shellsOfFiveFiveFiveAndOnePTwoFiveTwice = s.deposit(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 5e6,
             address(susd), 1.25e18
         );
 
-        shellsOfFiveFiveFiveAndOnePTwoFiveTwice += l.deposit(
+        shellsOfFiveFiveFiveAndOnePTwoFiveTwice += s.deposit(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 5e6,
@@ -64,11 +64,11 @@ contract SelectiveDepositSuiteSix is SelectiveDepositTemplate, DSTest {
             address(susd), 50e18
         );
 
-        uint256 shellsOfTen = l.deposit(address(dai), 10e18);
+        uint256 shellsOfTen = s.deposit(address(dai), 10e18);
 
-        uint256 shellsOfFiveAndFive = l2.deposit(address(dai), 5e18);
+        uint256 shellsOfFiveAndFive = s2.deposit(address(dai), 5e18);
 
-        shellsOfFiveAndFive += l2.deposit(address(dai), 5e18);
+        shellsOfFiveAndFive += s2.deposit(address(dai), 5e18);
 
         assertEq(
             shellsOfTen / 1e12,
@@ -86,10 +86,10 @@ contract SelectiveDepositSuiteSix is SelectiveDepositTemplate, DSTest {
             address(susd), 30e18
         );
 
-        uint256 shellsOfTen = l.deposit(address(dai), 10e18);
+        uint256 shellsOfTen = s.deposit(address(dai), 10e18);
 
-        uint256 shellsOfFiveAndFive = l2.deposit(address(dai), 5e18);
-        shellsOfFiveAndFive += l2.deposit(address(dai), 5e18);
+        uint256 shellsOfFiveAndFive = s2.deposit(address(dai), 5e18);
+        shellsOfFiveAndFive += s2.deposit(address(dai), 5e18);
 
         assertEq(
             shellsOfTen / 1e12,

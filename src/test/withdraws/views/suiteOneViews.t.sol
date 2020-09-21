@@ -8,7 +8,7 @@ contract SelectiveWithdrawSuiteOneViews is SelectiveWithdrawViewsTemplate, DSTes
 
     function setUp() public {
 
-        l = getLoihiSuiteOne();
+        s = getShellSuiteOne();
 
     }
 
@@ -174,18 +174,18 @@ contract SelectiveWithdrawSuiteOneViews is SelectiveWithdrawViewsTemplate, DSTes
 
     // function testProportionalWithdraw_mediumUnbalance () public {
 
-    //     uint256 startingShells = l.deposit(
+    //     uint256 startingShells = s.deposit(
     //         address(dai), 80e18,
     //         address(usdc), 100e6,
     //         address(usdt), 85e6,
     //         address(susd), 35e18
     //     );
 
-    //     l.proportionalWithdraw(150e18);
+    //     s.proportionalWithdraw(150e18);
 
-    //     ( uint256 totalReserves, uint256[] memory reserves ) = l.liquidity();
+    //     ( uint256 totalReserves, uint256[] memory reserves ) = s.liquidity();
 
-    //     uint256 endingShells = l.balanceOf(address(this));
+    //     uint256 endingShells = s.balanceOf(address(this));
 
     //     assertEq(reserves[0], 39999999999959671960);
     //     assertEq(reserves[1], 50000000);
@@ -197,18 +197,18 @@ contract SelectiveWithdrawSuiteOneViews is SelectiveWithdrawViewsTemplate, DSTes
 
     // function testProportionalWithdraw_unbalanced () public {
 
-    //     uint256 startingShells = l.deposit(
+    //     uint256 startingShells = s.deposit(
     //         address(dai), 55e18,
     //         address(usdc), 90e6,
     //         address(usdt), 125e6,
     //         address(susd), 30e18
     //     );
 
-    //     l.proportionalWithdraw(150*WAD);
+    //     s.proportionalWithdraw(150*WAD);
 
-    //     ( uint256 totalReserves, uint256[] memory reserves ) = l.liquidity();
+    //     ( uint256 totalReserves, uint256[] memory reserves ) = s.liquidity();
 
-    //     uint256 endingShells = l.balanceOf(address(this));
+    //     uint256 endingShells = s.balanceOf(address(this));
 
     //     assertEq(reserves[0], 27531865585159300387);
     //     assertEq(reserves[1], 45052144);

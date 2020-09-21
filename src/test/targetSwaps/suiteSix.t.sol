@@ -9,8 +9,8 @@ contract TargetSwapSuiteSixTest is TargetSwapTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteSix();
-        l2 = getLoihiSuiteSixClone();
+        s = getShellSuiteSix();
+        s2 = getShellSuiteSixClone();
 
     }
 
@@ -21,15 +21,15 @@ contract TargetSwapSuiteSixTest is TargetSwapTemplate, DSTest {
         address z, uint256 zAmt
     ) public {
 
-        l.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
-        l2.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
+        s.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
+        s2.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
 
     }
 
     function doubleDeposit (uint256 shells) public {
 
-        l.proportionalDeposit(shells, 1e50);
-        l2.proportionalDeposit(shells, 1e50);
+        s.proportionalDeposit(shells, 1e50);
+        s2.proportionalDeposit(shells, 1e50);
 
     }
 
@@ -37,19 +37,19 @@ contract TargetSwapSuiteSixTest is TargetSwapTemplate, DSTest {
 
         doubleDeposit(300e18);
 
-        uint256 originOf10 = l.targetSwap(
+        uint256 originOf10 = s.targetSwap(
             address(dai),
             address(usdc),
             10e6
         );
 
-        uint256 originOf5And5 = l2.targetSwap(
+        uint256 originOf5And5 = s2.targetSwap(
             address(dai),
             address(usdc),
             5e6
         );
 
-        originOf5And5 += l2.targetSwap(
+        originOf5And5 += s2.targetSwap(
             address(dai),
             address(usdc),
             5e6
@@ -66,19 +66,19 @@ contract TargetSwapSuiteSixTest is TargetSwapTemplate, DSTest {
 
         doubleDeposit(300e18);
 
-        uint256 originOf40 = l.targetSwap(
+        uint256 originOf40 = s.targetSwap(
             address(usdc),
             address(dai),
             40e18
         );
 
-        uint256 originOf20And20 = l2.targetSwap(
+        uint256 originOf20And20 = s2.targetSwap(
             address(usdc),
             address(dai),
             20e18
         );
 
-        originOf20And20 += l2.targetSwap(
+        originOf20And20 += s2.targetSwap(
             address(usdc),
             address(dai),
             20e18
@@ -100,19 +100,19 @@ contract TargetSwapSuiteSixTest is TargetSwapTemplate, DSTest {
             address(susd), 30e18
         );
 
-        uint256 originOf30 = l.targetSwap(
+        uint256 originOf30 = s.targetSwap(
             address(usdc),
             address(dai),
             30e18
         );
 
-        uint256 originOf15And15 = l2.targetSwap(
+        uint256 originOf15And15 = s2.targetSwap(
             address(usdc),
             address(dai),
             15e18
         );
 
-        originOf15And15 += l2.targetSwap(
+        originOf15And15 += s2.targetSwap(
             address(usdc),
             address(dai),
             15e18

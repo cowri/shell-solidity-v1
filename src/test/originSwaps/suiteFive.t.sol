@@ -9,7 +9,7 @@ contract OriginSwapSuiteFiveTest is OriginSwapTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteFive();
+        s = getShellSuiteFive();
 
     }
 

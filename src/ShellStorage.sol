@@ -36,7 +36,7 @@ import "./interfaces/ICToken.sol";
 import "./interfaces/IChai.sol";
 import "./interfaces/IPot.sol";
 
-contract LoihiStorage {
+contract ShellStorage {
 
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";

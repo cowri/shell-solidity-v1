@@ -9,8 +9,8 @@ contract OriginSwapSuiteSixTest is OriginSwapTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteSix();
-        l2 = getLoihiSuiteSixClone();
+        s = getShellSuiteSix();
+        s2 = getShellSuiteSixClone();
 
     }
 
@@ -21,15 +21,15 @@ contract OriginSwapSuiteSixTest is OriginSwapTemplate, DSTest {
         address z, uint256 zAmt
     ) public {
 
-        l.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
-        l2.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
+        s.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
+        s2.deposit(w, wAmt, x, xAmt, y, yAmt, z, zAmt);
 
     }
 
     function doubleDeposit (uint256 shells) public {
 
-        l.proportionalDeposit(shells, 1e50);
-        l2.proportionalDeposit(shells, 1e50);
+        s.proportionalDeposit(shells, 1e50);
+        s2.proportionalDeposit(shells, 1e50);
 
     }
 
@@ -42,19 +42,19 @@ contract OriginSwapSuiteSixTest is OriginSwapTemplate, DSTest {
             address(susd), 50e18
         );
 
-        uint256 _targetOfTen = l.originSwap(
+        uint256 _targetOfTen = s.originSwap(
             address(dai),
             address(usdt),
             10e18
         );
 
-        uint256 _targetOfFiveAndFive = l2.originSwap(
+        uint256 _targetOfFiveAndFive = s2.originSwap(
             address(dai),
             address(usdt),
             5e18
         );
 
-        _targetOfFiveAndFive += l2.originSwap(
+        _targetOfFiveAndFive += s2.originSwap(
             address(dai),
             address(usdt),
             5e18
@@ -71,19 +71,19 @@ contract OriginSwapSuiteSixTest is OriginSwapTemplate, DSTest {
 
         doubleDeposit(300e18);
 
-        uint256 _targetOfForty = l.originSwap(
+        uint256 _targetOfForty = s.originSwap(
             address(usdc),
             address(dai),
             40e6
         );
 
-        uint256 _targetOfTwentyAndTwenty = l2.originSwap(
+        uint256 _targetOfTwentyAndTwenty = s2.originSwap(
             address(usdc),
             address(dai),
             20e6
         );
 
-        _targetOfTwentyAndTwenty += l2.originSwap(
+        _targetOfTwentyAndTwenty += s2.originSwap(
             address(usdc),
             address(dai),
             20e6
@@ -106,19 +106,19 @@ contract OriginSwapSuiteSixTest is OriginSwapTemplate, DSTest {
             address(susd), 25e18
         );
 
-        uint256 _targetOfThree = l.originSwap(
+        uint256 _targetOfThree = s.originSwap(
             address(dai),
             address(susd),
             3e18
         );
 
-        uint256 _targetOf1p5And1p5 = l2.originSwap(
+        uint256 _targetOf1p5And1p5 = s2.originSwap(
             address(dai),
             address(susd),
             1.5e18
         );
 
-        _targetOf1p5And1p5 += l2.originSwap(
+        _targetOf1p5And1p5 += s2.originSwap(
             address(dai),
             address(susd),
             1.5e18
@@ -140,19 +140,19 @@ contract OriginSwapSuiteSixTest is OriginSwapTemplate, DSTest {
             address(susd), 35e18
         );
 
-        uint256 _targetOf30 = l.originSwap(
+        uint256 _targetOf30 = s.originSwap(
             address(usdc),
             address(dai),
             30e6
         );
 
-        uint256 _targetOf15And15 = l2.originSwap(
+        uint256 _targetOf15And15 = s2.originSwap(
             address(usdc),
             address(dai),
             15e6
         );
 
-        _targetOf15And15 += l2.originSwap(
+        _targetOf15And15 += s2.originSwap(
             address(usdc),
             address(dai),
             15e6
@@ -174,19 +174,19 @@ contract OriginSwapSuiteSixTest is OriginSwapTemplate, DSTest {
             address(susd), 25e18
         );
 
-        uint256 _targetOf10 = l.originSwap(
+        uint256 _targetOf10 = s.originSwap(
             address(susd),
             address(dai),
             10e18
         );
 
-        uint256 _targetOf5And5 = l2.originSwap(
+        uint256 _targetOf5And5 = s2.originSwap(
             address(susd),
             address(dai),
             5e18
         );
 
-        _targetOf5And5 += l2.originSwap(
+        _targetOf5And5 += s2.originSwap(
             address(susd),
             address(dai),
             5e18
@@ -208,19 +208,19 @@ contract OriginSwapSuiteSixTest is OriginSwapTemplate, DSTest {
             address(susd), 40e18
         );
 
-        uint256 _targetOf7 = l.originSwap(
+        uint256 _targetOf7 = s.originSwap(
             address(usdt),
             address(susd),
             7e6
         );
 
-        uint256 _targetOf3p5And3p5 = l2.originSwap(
+        uint256 _targetOf3p5And3p5 = s2.originSwap(
             address(usdt),
             address(susd),
             3.5e6
         );
 
-        _targetOf3p5And3p5 += l2.originSwap(
+        _targetOf3p5And3p5 += s2.originSwap(
             address(usdt),
             address(susd),
             3.5e6
@@ -242,19 +242,19 @@ contract OriginSwapSuiteSixTest is OriginSwapTemplate, DSTest {
             address(susd), 30e18
         );
 
-        uint256 _targetOf5 = l.originSwap(
+        uint256 _targetOf5 = s.originSwap(
             address(usdt),
             address(usdc),
             5e6
         );
 
-        uint256 _targetOf2p5And2p5 = l2.originSwap(
+        uint256 _targetOf2p5And2p5 = s2.originSwap(
             address(usdt),
             address(usdc),
             2.5e6
         );
 
-        _targetOf2p5And2p5 += l2.originSwap(
+        _targetOf2p5And2p5 += s2.originSwap(
             address(usdt),
             address(usdc),
             2.5e6
@@ -276,19 +276,19 @@ contract OriginSwapSuiteSixTest is OriginSwapTemplate, DSTest {
             address(susd), 30e18
         );
 
-        uint256 _targetOf2p349 = l.originSwap(
+        uint256 _targetOf2p349 = s.originSwap(
             address(dai),
             address(susd),
             2.349e18
         );
 
-        uint256 _targetOf1p1745And1p1745 = l2.originSwap(
+        uint256 _targetOf1p1745And1p1745 = s2.originSwap(
             address(dai),
             address(susd),
             1.1745e18
         );
 
-        _targetOf1p1745And1p1745 += l2.originSwap(
+        _targetOf1p1745And1p1745 += s2.originSwap(
             address(dai),
             address(susd),
             1.1745e18

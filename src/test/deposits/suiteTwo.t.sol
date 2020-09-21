@@ -8,7 +8,7 @@ contract SelectiveDepositSuiteTwo is SelectiveDepositTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteTwo();
+        s = getShellSuiteTwo();
 
     }
 
@@ -222,17 +222,17 @@ contract SelectiveDepositSuiteTwo is SelectiveDepositTemplate, DSTest {
 
     function testFailSelectiveDepositUpperHaltCheck30Pct () public {
 
-        l.proportionalDeposit(300e18, 1e50);
+        s.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(address(dai), 100e18);
+        s.deposit(address(dai), 100e18);
 
     }
 
     function testFailSelectiveDepositLowerHaltCheck30Pct () public {
 
-        l.proportionalDeposit(300e18, 1e50);
+        s.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(
+        s.deposit(
             address(dai), 300e18,
             address(usdt), 300e6,
             address(susd), 100e18
@@ -242,17 +242,17 @@ contract SelectiveDepositSuiteTwo is SelectiveDepositTemplate, DSTest {
 
     function testFailSelectiveDepositDepostUpperHaltCheck10Pct () public {
 
-        l.proportionalDeposit(300e18, 1e50);
+        s.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(address(susd), 500e18);
+        s.deposit(address(susd), 500e18);
 
     }
 
     function testFailSelectiveDepositLowerHaltCheck10Pct () public {
 
-        l.proportionalDeposit(300e18, 1e50);
+        s.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(
+        s.deposit(
             address(dai), 200e18,
             address(usdc), 200e6,
             address(usdt), 200e6

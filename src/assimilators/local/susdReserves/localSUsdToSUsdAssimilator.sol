@@ -13,13 +13,13 @@
 
 pragma solidity ^0.5.0;
 
-import "../../../LoihiStorage.sol";
+import "../../../ShellStorage.sol";
 
 import "../../../interfaces/IAssimilator.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-contract LocalSUsdToSUsdAssimilator is IAssimilator, LoihiStorage {
+contract LocalSUsdToSUsdAssimilator is IAssimilator, ShellStorage {
 
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;

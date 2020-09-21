@@ -8,7 +8,7 @@ contract SelectiveWithdrawSuiteFive is SelectiveWithdrawTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteFive();
+        s = getShellSuiteFive();
 
     }
 

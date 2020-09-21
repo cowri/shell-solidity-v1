@@ -9,7 +9,7 @@ contract TargetSwapSuiteFiveTest is TargetSwapTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteFive();
+        s = getShellSuiteFive();
 
     }
 

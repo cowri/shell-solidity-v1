@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./Assimilators.sol";
 
-import "./LoihiStorage.sol";
+import "./ShellStorage.sol";
 
 import "./UnsafeMath64x64.sol";
 
@@ -26,7 +26,7 @@ library ProportionalLiquidity {
     // / @return shells_ the amount of shells you receive in return for your deposit
     // / @return deposits_ the amount deposited per stablecoin according to the current balances in the pool
     function proportionalDeposit (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         uint256 _deposit
     ) internal returns (
         uint256 shells_,
@@ -83,7 +83,7 @@ library ProportionalLiquidity {
     
     
     function viewProportionalDeposit (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         uint256 _deposit
     ) internal view returns (
         uint shells_,
@@ -134,7 +134,7 @@ library ProportionalLiquidity {
     // / @notice  withdrawas amount of shell tokens from the the pool equally from the numeraire assets of the pool with no slippage
     // / @param   _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     function proportionalWithdraw (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         uint256 _withdrawal
     ) internal returns (
         uint[] memory
@@ -174,7 +174,7 @@ library ProportionalLiquidity {
     }
     
     function viewProportionalWithdraw (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         uint256 _withdrawal
     ) internal view returns (
         uint[] memory
@@ -201,7 +201,7 @@ library ProportionalLiquidity {
     }
 
     function getGrossLiquidityAndBalances (
-        LoihiStorage.Shell storage shell
+        ShellStorage.Shell storage shell
     ) internal view returns (
         int128 grossLiquidity_,
         int128[] memory
@@ -225,7 +225,7 @@ library ProportionalLiquidity {
     }
     
     function requireLiquidityInvariant (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         int128 _shells,
         int128 _newShells,
         int128 _oGLiq,
@@ -255,7 +255,7 @@ library ProportionalLiquidity {
         
     }
 
-    function burn (LoihiStorage.Shell storage shell, address account, uint256 amount) private {
+    function burn (ShellStorage.Shell storage shell, address account, uint256 amount) private {
 
         shell.balances[account] = burn_sub(shell.balances[account], amount);
 
@@ -265,7 +265,7 @@ library ProportionalLiquidity {
 
 }
 
-    function mint (LoihiStorage.Shell storage shell, address account, uint256 amount) private {
+    function mint (ShellStorage.Shell storage shell, address account, uint256 amount) private {
 
         shell.totalSupply = mint_add(shell.totalSupply, amount);
 
