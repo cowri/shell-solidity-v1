@@ -185,7 +185,7 @@ library Swaps {
                 int128 _bal;
                 ( amt_, _bal ) = Assimilators.intakeRawAndGetBalance(_assim, _amt);
 
-                oBals_[i] = _bal - amt_;
+                oBals_[i] = _bal.sub(amt_);
                 nBals_[i] = _bal;
 
             }
@@ -231,7 +231,7 @@ library Swaps {
                 int128 _bal;
                 ( amt_, _bal ) = Assimilators.outputRawAndGetBalance(_assim, _recipient, _amt);
 
-                oBals_[i] = _bal - amt_;
+                oBals_[i] = _bal.sub(amt_);
                 nBals_[i] = _bal;
 
             }
