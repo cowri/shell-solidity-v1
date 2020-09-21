@@ -222,7 +222,7 @@ library ShellMath {
         int128 _psi
     ) internal view {
         
-        if (_totalShells == 0) return;
+        if (_totalShells == 0 || 0 == _totalShells + _newShells) return;
         
         int128 _prevUtilPerShell = _oGLiq
             .sub(_omega)

@@ -35,6 +35,8 @@ contract ShellStorage {
     string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
 
+    Shell public shell;
+
     struct Shell {
         int128 alpha;
         int128 beta;
@@ -53,8 +55,6 @@ contract ShellStorage {
         address addr;
         uint8 ix;
     }
-
-    Shell public shell;
 
     struct PartitionTicket {
         uint[] claims;
