@@ -20,11 +20,6 @@ library ProportionalLiquidity {
     int128 constant ONE = 0x10000000000000000;
     int128 constant ONE_WEI = 0x12;
 
-    // / @author james foley http://github.com/realisation
-    // / @notice deposit into the pool with no slippage from the numeraire assets the pool supports
-    // / @param  _deposit the full amount you want to deposit into the pool which will be divided up evenly amongst the numeraire assets of the pool
-    // / @return shells_ the amount of shells you receive in return for your deposit
-    // / @return deposits_ the amount deposited per stablecoin according to the current balances in the pool
     function proportionalDeposit (
         LoihiStorage.Shell storage shell,
         uint256 _deposit
@@ -130,9 +125,6 @@ library ProportionalLiquidity {
 
     }
 
-    // / @author  james foley http://github.com/realisation
-    // / @notice  withdrawas amount of shell tokens from the the pool equally from the numeraire assets of the pool with no slippage
-    // / @param   _withdrawal the full amount you want to withdraw from the pool which will be withdrawn from evenly amongst the numeraire assets of the pool
     function proportionalWithdraw (
         LoihiStorage.Shell storage shell,
         uint256 _withdrawal
@@ -162,7 +154,7 @@ library ProportionalLiquidity {
         requireLiquidityInvariant(
             shell, 
             _totalShells, 
-            __withdrawal, 
+            __withdrawal.neg(), 
             _oGLiq, 
             _oBals
         );
