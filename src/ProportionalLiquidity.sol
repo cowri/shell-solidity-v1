@@ -154,7 +154,7 @@ library ProportionalLiquidity {
         requireLiquidityInvariant(
             shell, 
             _totalShells, 
-            __withdrawal, 
+            __withdrawal.neg(), 
             _oGLiq, 
             _oBals
         );
