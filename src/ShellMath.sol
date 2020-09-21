@@ -17,7 +17,7 @@ import "./Assimilators.sol";
 
 import "./UnsafeMath64x64.sol";
 
-import "./LoihiStorage.sol";
+import "./ShellStorage.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
@@ -92,7 +92,7 @@ library ShellMath {
     }
 
     function calculateTrade (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         int128 _oGLiq,
         int128 _nGLiq,
         int128[] memory _oBals,
@@ -159,7 +159,7 @@ library ShellMath {
     }
 
     function calculateLiquidityMembrane (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         int128 _oGLiq,
         int128 _nGLiq,
         int128[] memory _oBals,
@@ -237,7 +237,7 @@ library ShellMath {
     }
 
     function enforceHalts (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         int128 _oGLiq,
         int128 _nGLiq,
         int128[] memory _oBals,

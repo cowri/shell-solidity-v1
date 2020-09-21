@@ -17,7 +17,7 @@ import "./Assimilators.sol";
 
 import "./ShellMath.sol";
 
-import "./LoihiStorage.sol";
+import "./ShellStorage.sol";
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
@@ -35,7 +35,7 @@ library Orchestrator {
     event AssimilatorIncluded(address indexed derivative, address indexed numeraire, address indexed reserve, address assimilator);
 
     function setParams (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         uint256 _alpha,
         uint256 _beta,
         uint256 _feeAtHalt,
@@ -74,7 +74,7 @@ library Orchestrator {
     }
 
     function getFee (
-        LoihiStorage.Shell storage shell
+        ShellStorage.Shell storage shell
     ) private view returns (
         int128 fee_
     ) {
@@ -99,7 +99,7 @@ library Orchestrator {
     
  
     function initialize (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address[] storage numeraires,
         address[] storage reserves,
         address[] storage derivatives,
@@ -150,7 +150,7 @@ library Orchestrator {
     }
 
     function includeAsset (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address _numeraire,
         address _numeraireAssim,
         address _reserve,
@@ -171,13 +171,13 @@ library Orchestrator {
 
         if (_numeraire != _reserve) safeApprove(_numeraire, _reserveApproveTo, uint(-1));
 
-        LoihiStorage.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
+        ShellStorage.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
         _numeraireAssimilator.addr = _numeraireAssim;
 
         _numeraireAssimilator.ix = uint8(shell.assets.length);
 
-        LoihiStorage.Assimilator storage _reserveAssimilator = shell.assimilators[_reserve];
+        ShellStorage.Assimilator storage _reserveAssimilator = shell.assimilators[_reserve];
 
         _reserveAssimilator.addr = _reserveAssim;
 
@@ -202,7 +202,7 @@ library Orchestrator {
     }
     
     function includeAssimilator (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address _derivative,
         address _numeraire,
         address _reserve,
@@ -220,9 +220,9 @@ library Orchestrator {
         
         safeApprove(_numeraire, _derivativeApproveTo, uint(-1));
 
-        LoihiStorage.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
+        ShellStorage.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
 
-        shell.assimilators[_derivative] = LoihiStorage.Assimilator(_assimilator, _numeraireAssim.ix);
+        shell.assimilators[_derivative] = ShellStorage.Assimilator(_assimilator, _numeraireAssim.ix);
 
         emit AssimilatorIncluded(_derivative, _numeraire, _reserve, _assimilator);
 
@@ -241,7 +241,7 @@ library Orchestrator {
     }
 
     function viewShell (
-        LoihiStorage.Shell storage shell
+        ShellStorage.Shell storage shell
     ) external view returns (
         uint alpha_,
         uint beta_,

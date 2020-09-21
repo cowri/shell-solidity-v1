@@ -3,25 +3,25 @@ pragma solidity ^0.5.0;
 
 import "ds-test/test.sol";
 
-import "../../Loihi.sol";
+import "../../Shell.sol";
 
 import "../setup/setup.sol";
 
 contract MiscSuiteOneTest is Setup, DSTest {
 
-    Loihi l;
+    Shell l;
 
     function setUp() public {
 
-        l = getLoihiSuiteOne();
+        s = getShellSuiteOne();
 
     }
 
     function testLiquidity () public {
 
-        l.proportionalDeposit(300e18, 1e50);
+        s.proportionalDeposit(300e18, 1e50);
 
-        ( uint liquidity, uint[] memory liquidities ) = l.liquidity();
+        ( uint liquidity, uint[] memory liquidities ) = s.liquidity();
 
     }
 

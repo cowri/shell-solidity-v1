@@ -1,62 +1,62 @@
 pragma solidity ^0.5.0;
 
-import "../../Loihi.sol";
+import "../../Shell.sol";
 
-import "../../LoihiFactory.sol";
+import "../../ShellFactory.sol";
 
 import "./stablecoins.sol";
 import "./assimilators.sol";
-import "./loihi.sol";
+import "./shell.sol";
 
-contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
+contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
-    function getLoihiFactorySuiteOne () public returns (LoihiFactory loihiFactory_) {
-
-    }
-
-    function getLoihiSuiteOne () public returns (Loihi loihi_) {
-
-        loihi_ = getLoihiSuiteOneMainnetFromFactory();
-
-        // loihi_ = getLoihiSuiteOneLocal();
-        // loihi_ = getLoihiSuiteOneMainnet();
+    function getShellFactorySuiteOne () public returns (ShellFactory shellFactory_) {
 
     }
 
-    function getLoihiSuiteTwo () public returns (Loihi loihi_) {
+    function getShellSuiteOne () public returns (Shell shell_) {
 
-        // loihi_ = getLoihiSuiteTwoMainnet();
+        shell_ = getShellSuiteOneMainnetFromFactory();
 
-    }
-
-    function getLoihiSuiteThree () public returns (Loihi loihi_) {
-
+        // shell_ = getShellSuiteOneLocal();
+        // shell_ = getShellSuiteOneMainnet();
 
     }
 
-    function getLoihiSuiteFive () public returns (Loihi loihi_) {
+    function getShellSuiteTwo () public returns (Shell shell_) {
+
+        // shell_ = getShellSuiteTwoMainnet();
+
+    }
+
+    function getShellSuiteThree () public returns (Shell shell_) {
 
 
     }
 
-    function getLoihiSuiteSix () public returns (Loihi loihi_) {
+    function getShellSuiteFive () public returns (Shell shell_) {
 
 
     }
 
-    function getLoihiSuiteSixClone () public returns (Loihi loihi_) {
+    function getShellSuiteSix () public returns (Shell shell_) {
+
+
+    }
+
+    function getShellSuiteSixClone () public returns (Shell shell_) {
 
 
     }
 
 
-    function newLoihi () public returns (Loihi loihi_) {
+    function newShell () public returns (Shell shell_) {
         
         address[] memory _assets = new address[](0);
         uint[] memory _weights = new uint[](0);
         address[] memory _derivatives = new address[](0);        
         
-        loihi_ = new Loihi(
+        shell_ = new Shell(
             _assets,
             _weights,
             _derivatives
@@ -66,13 +66,13 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
 
     event log(bytes32);
     
-    function getLoihiSuiteOneMainnetFromFactory () public returns (Loihi loihi_) {
+    function getShellSuiteOneMainnetFromFactory () public returns (Shell shell_) {
         
         setupStablecoinsMainnet();
         
         // setupAssimilatorsSetOneMainnet();
         
-        LoihiFactory lf = new LoihiFactory();
+        ShellFactory lf = new ShellFactory();
 
         address[] memory _assets = new address[](20);
         uint[] memory _assetWeights = new uint[](4);
@@ -111,7 +111,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         _derivativeAssimilators[2] = address(cdai);
         _derivativeAssimilators[3] = address(chaiAssimilator);
         _derivativeAssimilators[4] = address(chai);
-
+        // _derivativeAssimilators[4] = address(cdai);
         // _derivativeAssimilators[4] = address(cdai);
         // _derivativeAssimilators[5] = address(dai);
         // _derivativeAssimilators[6] = address(dai);
@@ -132,31 +132,31 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         // _derivativeAssimilators[18] = address(susd);
         // _derivativeAssimilators[19] = address(asusdAssimilator);
 
-        loihi_ = lf.newShell(
+        shell_ = lf.newShell(
             _assets,
             _assetWeights,
             _derivativeAssimilators
         );
         
-        setParamsSetOne(loihi_);
+        setParamsSetOne(shell_);
 
-        approveStablecoins(address(loihi_));
+        approveStablecoins(address(shell_));
 
     }
 
-    function getLoihiSuiteOneMainnet () public returns (Loihi loihi_) {
+    function getShellSuiteOneMainnet () public returns (Shell shell_) {
 
         // setupStablecoinsMainnet();
         // setupAssimilatorsSetOneMainnet();
 
-        // loihi_ = newLoihi();
+        // shell_ = newShell();
 
-        // includeAssetsSetOne(loihi_);
-        // includeAssimilatorsSetOne(loihi_);
-        // setParamsSetOne(loihi_);
+        // includeAssetsSetOne(shell_);
+        // includeAssimilatorsSetOne(shell_);
+        // setParamsSetOne(shell_);
 
-        // approveStablecoins(address(loihi_));
-        // interApproveStablecoinsRPC(address(loihi_));
+        // approveStablecoins(address(shell_));
+        // interApproveStablecoinsRPC(address(shell_));
 
     }
 

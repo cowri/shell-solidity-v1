@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "abdk-libraries-solidity/ABDKMath64x64.sol";
 
-import "../../Loihi.sol";
+import "../../Shell.sol";
 
 library AssimilatorMethods {
 
@@ -79,22 +79,22 @@ library AssimilatorMethods {
 
 }
 
-library LoihiMethods {
+library ShellMethods {
 
-    using LoihiMethods for Loihi;
+    using ShellMethods for Shell;
 
     function deposit (
-        Loihi loihi,
+        Shell shell,
         address[] memory _flvrs,
         uint256[] memory _amts
     ) internal returns (uint256 shells_) {
 
-        shells_ = loihi.selectiveDeposit(_flvrs, _amts, 0, 1e50);
+        shells_ = shell.selectiveDeposit(_flvrs, _amts, 0, 1e50);
 
     }
 
     function deposit (
-        Loihi loihi,
+        Shell shell,
         address _token,
         uint256 _amt
     ) internal returns (uint256 shells_) {
@@ -103,12 +103,12 @@ library LoihiMethods {
         _stblcns[0] = _token;
         _amts[0] = _amt;
 
-        shells_ = loihi.selectiveDeposit(_stblcns, _amts, 0, 1e50);
+        shells_ = shell.selectiveDeposit(_stblcns, _amts, 0, 1e50);
 
     }
 
     function deposit (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -122,12 +122,12 @@ library LoihiMethods {
         _stblcns[1] = _token2;
         _amts[1] = _amt2;
 
-        shells_ = loihi.selectiveDeposit(_stblcns, _amts, 0, 1e50);
+        shells_ = shell.selectiveDeposit(_stblcns, _amts, 0, 1e50);
 
     }
 
     function deposit (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -145,12 +145,12 @@ library LoihiMethods {
         _stblcns[2] = _token3;
         _amts[2] = _amt3;
 
-        shells_ = loihi.selectiveDeposit(_stblcns, _amts, 0, 1e50);
+        shells_ = shell.selectiveDeposit(_stblcns, _amts, 0, 1e50);
 
     }
 
     function deposit (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -172,22 +172,22 @@ library LoihiMethods {
         _stblcns[3] = _token4;
         _amts[3] = _amt4;
 
-        shells_ = loihi.selectiveDeposit(_stblcns, _amts, 0, 1e50);
+        shells_ = shell.selectiveDeposit(_stblcns, _amts, 0, 1e50);
 
     }
 
     function viewDeposit (
-        Loihi loihi,
+        Shell shell,
         address[] memory _flvrs,
         uint256[] memory _amts
     ) internal returns (uint256 shells_) {
 
-        shells_ = loihi.viewSelectiveDeposit(_flvrs, _amts);
+        shells_ = shell.viewSelectiveDeposit(_flvrs, _amts);
 
     }
 
     function viewDeposit (
-        Loihi loihi,
+        Shell shell,
         address _token,
         uint256 _amt
     ) internal returns (uint256 shells_) {
@@ -196,12 +196,12 @@ library LoihiMethods {
         _stblcns[0] = _token;
         _amts[0] = _amt;
 
-        shells_ = loihi.viewSelectiveDeposit(_stblcns, _amts);
+        shells_ = shell.viewSelectiveDeposit(_stblcns, _amts);
 
     }
 
     function viewDeposit (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -215,12 +215,12 @@ library LoihiMethods {
         _stblcns[1] = _token2;
         _amts[1] = _amt2;
 
-        shells_ = loihi.viewSelectiveDeposit(_stblcns, _amts);
+        shells_ = shell.viewSelectiveDeposit(_stblcns, _amts);
 
     }
 
     function viewDeposit (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -238,12 +238,12 @@ library LoihiMethods {
         _stblcns[2] = _token3;
         _amts[2] = _amt3;
 
-        shells_ = loihi.viewSelectiveDeposit(_stblcns, _amts);
+        shells_ = shell.viewSelectiveDeposit(_stblcns, _amts);
 
     }
 
     function viewDeposit (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -265,12 +265,12 @@ library LoihiMethods {
         _stblcns[3] = _token4;
         _amts[3] = _amt4;
 
-        shells_ = loihi.viewSelectiveDeposit(_stblcns, _amts);
+        shells_ = shell.viewSelectiveDeposit(_stblcns, _amts);
 
     }
 
     function depositSuccess (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -292,8 +292,8 @@ library LoihiMethods {
         _stblcns[3] = _token4;
         _amts[3] = _amt4;
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
-            loihi.selectiveDeposit.selector,
+        ( success_, ) = address(shell).call(abi.encodeWithSelector(
+            shell.selectiveDeposit.selector,
             _stblcns,
             _amts,
             0,
@@ -303,7 +303,7 @@ library LoihiMethods {
     }
 
     function depositSuccess (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -321,8 +321,8 @@ library LoihiMethods {
         _stblcns[2] = _token3;
         _amts[2] = _amt3;
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
-            loihi.selectiveDeposit.selector,
+        ( success_, ) = address(shell).call(abi.encodeWithSelector(
+            shell.selectiveDeposit.selector,
             _stblcns,
             _amts,
             0,
@@ -332,7 +332,7 @@ library LoihiMethods {
     }
 
     function depositSuccess (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -346,8 +346,8 @@ library LoihiMethods {
         _stblcns[1] = _token2;
         _amts[1] = _amt2;
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
-            loihi.selectiveDeposit.selector,
+        ( success_, ) = address(shell).call(abi.encodeWithSelector(
+            shell.selectiveDeposit.selector,
             _stblcns,
             _amts,
             0,
@@ -357,7 +357,7 @@ library LoihiMethods {
     }
 
     function depositSuccess (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1
     ) internal returns (bool success_) {
@@ -367,8 +367,8 @@ library LoihiMethods {
         _stblcns[0] = _token1;
         _amts[0] = _amt1;
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
-            loihi.selectiveDeposit.selector,
+        ( success_, ) = address(shell).call(abi.encodeWithSelector(
+            shell.selectiveDeposit.selector,
             _stblcns,
             _amts,
             0,
@@ -378,17 +378,17 @@ library LoihiMethods {
     }
 
     function withdraw (
-        Loihi loihi,
+        Shell shell,
         address[] memory _flvrs,
         uint256[] memory _amts
     ) internal returns (uint256 shells_) {
 
-        shells_ = loihi.selectiveWithdraw(_flvrs, _amts, 1e50, 1e50);
+        shells_ = shell.selectiveWithdraw(_flvrs, _amts, 1e50, 1e50);
 
     }
 
     function withdraw (
-        Loihi loihi,
+        Shell shell,
         address _token,
         uint256 _amt
     ) internal returns (uint256 shells_) {
@@ -397,12 +397,12 @@ library LoihiMethods {
         _stblcns[0] = _token;
         _amts[0] = _amt;
 
-        shells_ = loihi.selectiveWithdraw(_stblcns, _amts, 1e50, 1e50);
+        shells_ = shell.selectiveWithdraw(_stblcns, _amts, 1e50, 1e50);
 
     }
 
     function withdraw (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -416,12 +416,12 @@ library LoihiMethods {
         _stblcns[1] = _token2;
         _amts[1] = _amt2;
 
-        shells_ = loihi.selectiveWithdraw(_stblcns, _amts, 1e50, 1e50);
+        shells_ = shell.selectiveWithdraw(_stblcns, _amts, 1e50, 1e50);
 
     }
 
     function withdraw (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -439,12 +439,12 @@ library LoihiMethods {
         _stblcns[2] = _token3;
         _amts[2] = _amt3;
 
-        shells_ = loihi.selectiveWithdraw(_stblcns, _amts, 1e50, 1e50);
+        shells_ = shell.selectiveWithdraw(_stblcns, _amts, 1e50, 1e50);
 
     }
 
     function withdraw (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -466,22 +466,22 @@ library LoihiMethods {
         _stblcns[3] = _token4;
         _amts[3] = _amt4;
 
-        shells_ = loihi.selectiveWithdraw(_stblcns, _amts, 1e50, 1e50);
+        shells_ = shell.selectiveWithdraw(_stblcns, _amts, 1e50, 1e50);
 
     }
 
     function viewWithdraw (
-        Loihi loihi,
+        Shell shell,
         address[] memory _flvrs,
         uint256[] memory _amts
     ) internal returns (uint256 shells_) {
 
-        shells_ = loihi.viewSelectiveWithdraw(_flvrs, _amts);
+        shells_ = shell.viewSelectiveWithdraw(_flvrs, _amts);
 
     }
 
     function viewWithdraw (
-        Loihi loihi,
+        Shell shell,
         address _token,
         uint256 _amt
     ) internal returns (uint256 shells_) {
@@ -490,12 +490,12 @@ library LoihiMethods {
         _stblcns[0] = _token;
         _amts[0] = _amt;
 
-        shells_ = loihi.viewSelectiveWithdraw(_stblcns, _amts);
+        shells_ = shell.viewSelectiveWithdraw(_stblcns, _amts);
 
     }
 
     function viewWithdraw (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -509,12 +509,12 @@ library LoihiMethods {
         _stblcns[1] = _token2;
         _amts[1] = _amt2;
 
-        shells_ = loihi.viewSelectiveWithdraw(_stblcns, _amts);
+        shells_ = shell.viewSelectiveWithdraw(_stblcns, _amts);
 
     }
 
     function viewWithdraw (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -532,12 +532,12 @@ library LoihiMethods {
         _stblcns[2] = _token3;
         _amts[2] = _amt3;
 
-        shells_ = loihi.viewSelectiveWithdraw(_stblcns, _amts);
+        shells_ = shell.viewSelectiveWithdraw(_stblcns, _amts);
 
     }
 
     function viewWithdraw (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -559,12 +559,12 @@ library LoihiMethods {
         _stblcns[3] = _token4;
         _amts[3] = _amt4;
 
-        shells_ = loihi.viewSelectiveWithdraw(_stblcns, _amts);
+        shells_ = shell.viewSelectiveWithdraw(_stblcns, _amts);
 
     }
 
     function withdrawSuccess (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -586,8 +586,8 @@ library LoihiMethods {
         _stblcns[3] = _token4;
         _amts[3] = _amt4;
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
-            loihi.selectiveWithdraw.selector,
+        ( success_, ) = address(shell).call(abi.encodeWithSelector(
+            shell.selectiveWithdraw.selector,
             _stblcns,
             _amts,
             1e50,
@@ -597,7 +597,7 @@ library LoihiMethods {
     }
 
     function withdrawSuccess (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -615,8 +615,8 @@ library LoihiMethods {
         _stblcns[2] = _token3;
         _amts[2] = _amt3;
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
-            loihi.selectiveWithdraw.selector,
+        ( success_, ) = address(shell).call(abi.encodeWithSelector(
+            shell.selectiveWithdraw.selector,
             _stblcns,
             _amts,
             1e50,
@@ -626,7 +626,7 @@ library LoihiMethods {
     }
 
     function withdrawSuccess (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1,
         address _token2,
@@ -640,8 +640,8 @@ library LoihiMethods {
         _stblcns[1] = _token2;
         _amts[1] = _amt2;
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
-            loihi.selectiveWithdraw.selector,
+        ( success_, ) = address(shell).call(abi.encodeWithSelector(
+            shell.selectiveWithdraw.selector,
             _stblcns,
             _amts,
             1e50,
@@ -651,7 +651,7 @@ library LoihiMethods {
     }
 
     function withdrawSuccess (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint256 _amt1
     ) internal returns (bool success_) {
@@ -661,8 +661,8 @@ library LoihiMethods {
         _stblcns[0] = _token1;
         _amts[0] = _amt1;
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSelector(
-            loihi.selectiveWithdraw.selector,
+        ( success_, ) = address(shell).call(abi.encodeWithSelector(
+            shell.selectiveWithdraw.selector,
             _stblcns,
             _amts,
             1e50,
@@ -672,24 +672,24 @@ library LoihiMethods {
     }
 
     function originSwap (
-        Loihi loihi,
+        Shell shell,
         address _origin,
         address _target,
         uint256 _originAmount
     ) internal returns (uint256 targetAmount_) {
 
-        targetAmount_ = loihi.originSwap(_origin, _target, _originAmount, 0, 1e50);
+        targetAmount_ = shell.originSwap(_origin, _target, _originAmount, 0, 1e50);
 
     }
 
     function originSwapSuccess (
-        Loihi loihi,
+        Shell shell,
         address _origin,
         address _target,
         uint256 _originAmount
     ) internal returns (bool success_) {
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSignature(
+        ( success_, ) = address(shell).call(abi.encodeWithSignature(
             "originSwap(address,address,uint256,uint256,uint256)",
             _origin,
             _target,
@@ -701,24 +701,24 @@ library LoihiMethods {
     }
 
     function targetSwap (
-        Loihi loihi,
+        Shell shell,
         address _origin,
         address _target,
         uint256 _targetAmount
     ) internal returns (uint256 originAmount_) {
 
-        originAmount_ = loihi.targetSwap(_origin, _target, 1e50, _targetAmount, 1e50);
+        originAmount_ = shell.targetSwap(_origin, _target, 1e50, _targetAmount, 1e50);
 
     }
 
     function targetSwapSuccess (
-        Loihi loihi,
+        Shell shell,
         address _origin,
         address _target,
         uint256 _targetAmount
     ) internal returns (bool success_) {
 
-        ( success_, ) = address(loihi).call(abi.encodeWithSignature(
+        ( success_, ) = address(shell).call(abi.encodeWithSignature(
             "targetSwap(address,address,uint256,uint256,uint256)",
             _origin,
             _target,
@@ -730,7 +730,7 @@ library LoihiMethods {
     }
 
     function partitionedWithdraw (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint _amount1
     ) internal returns (uint[] memory) {
@@ -741,13 +741,13 @@ library LoihiMethods {
         _tokens[0] = _token1;
         _amounts[0] = _amount1;
 
-        return loihi.partitionedWithdraw(_tokens, _amounts);
+        return shell.partitionedWithdraw(_tokens, _amounts);
 
     }
 
 
     function partitionedWithdraw (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint _amount1,
         address _token2,
@@ -762,12 +762,12 @@ library LoihiMethods {
         _tokens[1] = _token2;
         _amounts[1] = _amount2;
 
-        return loihi.partitionedWithdraw(_tokens, _amounts);
+        return shell.partitionedWithdraw(_tokens, _amounts);
 
     }
 
     function partitionedWithdraw (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint _amount1,
         address _token2,
@@ -786,12 +786,12 @@ library LoihiMethods {
         _tokens[2] = _token3;
         _amounts[2] = _amount3;
 
-        return loihi.partitionedWithdraw(_tokens, _amounts);
+        return shell.partitionedWithdraw(_tokens, _amounts);
 
     }
 
     function partitionedWithdraw (
-        Loihi loihi,
+        Shell shell,
         address _token1,
         uint _amount1,
         address _token2,
@@ -814,7 +814,7 @@ library LoihiMethods {
         _tokens[0] = _token4;
         _amounts[0] = _amount4;
 
-        return loihi.partitionedWithdraw(_tokens, _amounts);
+        return shell.partitionedWithdraw(_tokens, _amounts);
 
     }
 

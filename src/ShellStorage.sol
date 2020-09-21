@@ -29,7 +29,7 @@ import "./Swaps.sol";
 
 import "./ViewLiquidity.sol";
 
-contract LoihiStorage {
+contract ShellStorage {
 
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
