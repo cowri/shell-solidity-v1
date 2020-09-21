@@ -192,6 +192,23 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
         assertEq(startingShells - endingShells, 150e18);
 
     }
+
+    function testProportionalWithdrawEntire () public {
+
+        uint256 startingShells = s.deposit(
+            address(dai), 80e18,
+            address(usdc), 100e6,
+            address(usdt), 85e6,
+            address(susd), 35e18
+        );
+
+        assertEq(withdrawals[0], 79979999999999999921);
+        assertEq(withdrawals[1], 99974999);
+        assertEq(withdrawals[2], 84978749); 
+        assertEq(withdrawals[3], 34991249999999999965);
+
+    }
+
     
     event log_uints(bytes32, uint[]);
 
