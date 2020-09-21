@@ -37,11 +37,11 @@ library ShellMath {
         int128 _beta,
         int128 _delta,
         int128[] memory _weights
-    ) internal pure returns (int128 psi_) {
+    ) internal pure returns (int128 _psi) {
 
         for (uint i = 0; i < _weights.length; i++) {
             int128 _ideal = _gLiq.us_mul(_weights[i]);
-            psi_ += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
+            _psi += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
         }
 
     }
@@ -128,6 +128,8 @@ library ShellMath {
                 
                 enforceSwapInvariant(_oGLiq, _omega, _nGLiq, _psi);
 
+                require(ABDKMath64x64.sub(_oGLiq, _omega) <= ABDKMath64x64.sub(_nGLiq, _psi), "Shell/swap-invariant-violation");
+
                 return outputAmt_;
 
             } else {
@@ -200,7 +202,6 @@ library ShellMath {
             shells_ = shells_.div(_oUtil);
 
         }
-
 
         if (_totalShells != 0) {
 

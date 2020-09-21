@@ -92,7 +92,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         
         LoihiFactory lf = new LoihiFactory();
 
-        address[] memory _assets = new address[](16);
+        address[] memory _assets = new address[](20);
         uint[] memory _assetWeights = new uint[](4);
         address[] memory _derivativeAssimilators = new address[](0);
 
@@ -100,24 +100,28 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         _assets[1] = address(daiAssimilator);
         _assets[2] = address(dai);
         _assets[3] = address(daiAssimilator);
+        _assets[4] = address(dai);
         _assetWeights[0] = .3e18;
 
-        _assets[4] = address(usdc);
-        _assets[5] = address(usdcAssimilator);
-        _assets[6] = address(usdc);
-        _assets[7] = address(usdcAssimilator);
+        _assets[5] = address(usdc);
+        _assets[6] = address(usdcAssimilator);
+        _assets[7] = address(usdc);
+        _assets[8] = address(usdcAssimilator);
+        _assets[9] = address(usdc);
         _assetWeights[1] = .3e18;
 
-        _assets[8] = address(usdt);
-        _assets[9] = address(usdtAssimilator);
         _assets[10] = address(usdt);
         _assets[11] = address(usdtAssimilator);
+        _assets[12] = address(usdt);
+        _assets[13] = address(usdtAssimilator);
+        _assets[14] = address(usdt);
         _assetWeights[2] = .3e18;
 
-        _assets[12] = address(susd);
-        _assets[13] = address(susdAssimilator);
-        _assets[14] = address(susd);
-        _assets[15] = address(susdAssimilator);
+        _assets[15] = address(susd);
+        _assets[16] = address(susdAssimilator);
+        _assets[17] = address(susd);
+        _assets[18] = address(susdAssimilator);
+        _assets[19] = address(susd);
         _assetWeights[3] = .1e18;
         
         loihi_ = lf.newShell(
@@ -126,12 +130,16 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
             _derivativeAssimilators
         );
         
+        emit log("mew shell");
+        
         loihi_.TEST_includeAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
             usdt, ausdt,
             susd, asusd
         );
+        
+        emit log("after assim state");
         
         setParamsSetOne(loihi_);
 
@@ -140,7 +148,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         interApproveStablecoinsLocal(address(loihi_));
 
     }
-
+    
     function getLoihiSuiteOneLocal () public returns (Loihi loihi_) {
 
         // setupStablecoinsLocal();

@@ -661,7 +661,7 @@ contract TargetSwapViewsTemplate is Setup {
         usdt.transfer(address(l), 4910e6);
         ausdt.transfer(address(l), 4910e6);
 
-        l.prime();
+        
 
         l.TEST_setTestHalts(false);
 
@@ -707,7 +707,7 @@ contract TargetSwapViewsTemplate is Setup {
 
         l.TEST_setTestHalts(false);
 
-        l.prime();
+        
 
         originAmount_ = l.viewTargetSwap(
             address(dai),
@@ -749,7 +749,7 @@ contract TargetSwapViewsTemplate is Setup {
         susd.transfer(address(l), 4970e18);
         asusd.transfer(address(l), 4970e18);
 
-        l.prime();
+        
 
         l.TEST_setTestHalts(false);
 
@@ -768,7 +768,7 @@ contract TargetSwapViewsTemplate is Setup {
         susd.transfer(address(l), 4970e18);
         asusd.transfer(address(l), 4970e18);
 
-        l.prime();
+        
 
         l.TEST_setTestHalts(false);
 

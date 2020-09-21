@@ -52,7 +52,7 @@ contract LoihiStorage {
         uint totalSupply;
         mapping (address => uint) balances;
         mapping (address => mapping (address => uint)) allowances;
-        Assimilator[] assetAssimilators;
+        Assimilator[] assets;
         mapping (address => Assimilator) assimilators;
         bool TEST_HALTS;
     }

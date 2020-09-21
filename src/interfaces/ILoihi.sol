@@ -259,8 +259,7 @@ interface ILoihi {
         uint256 beta,
         uint256 delta,
         uint256 epsilon,
-        uint256 lambda,
-        uint256 omega
+        uint256 lambda
     );
 
     event AssetIncluded(

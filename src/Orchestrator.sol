@@ -28,7 +28,7 @@ library Orchestrator {
 
     int128 constant ONE_WEI = 0x12;
 
-    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda, uint256 omega);
+    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
 
     event AssetIncluded(address indexed numeraire, address indexed reserve, uint weight);
 
@@ -69,10 +69,10 @@ library Orchestrator {
         
         require(_omega <= _psi, "Shell/parameters-increase-fee");
 
-        emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda, shell.omega.mulu(1e18));
+        emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda);
 
     }
-    
+
     function getFee (
         LoihiStorage.Shell storage shell
     ) private view returns (
@@ -81,11 +81,11 @@ library Orchestrator {
 
         int128 _gLiq;
 
-        int128[] memory _bals = new int128[](shell.assetAssimilators.length);
+        int128[] memory _bals = new int128[](shell.assets.length);
 
         for (uint i = 0; i < _bals.length; i++) {
 
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
+            int128 _bal = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
 
             _bals[i] = _bal;
 
@@ -96,15 +96,75 @@ library Orchestrator {
         fee_ = ShellMath.calculateFee(_gLiq, _bals, shell.beta, shell.delta, shell.weights);
 
     }
+    
+    event log_addr(bytes32, address);
 
+    function initialize (
+        LoihiStorage.Shell storage shell,
+        address[] storage numeraires,
+        address[] storage reserves,
+        address[] storage derivatives,
+        address[] memory _assets,
+        uint[] memory _assetWeights,
+        address[] memory _derivativeAssimilators
+    ) internal {
+        
+        for (uint i = 0; i < _assetWeights.length; i++) {
+
+            uint ix = i*5;
+        
+            numeraires.push(_assets[ix]);
+            derivatives.push(_assets[ix]);
+
+            reserves.push(_assets[2+ix]);
+            if (_assets[ix] != _assets[2+ix]) derivatives.push(_assets[2+ix]);
+            
+            includeAsset(
+                shell,
+                _assets[ix], // numeraire
+                _assets[1+ix], // numeraire assimilator
+                _assets[2+ix], // reserve
+                _assets[3+ix], // reserve assimilator
+                _assets[4+ix], // reserve approve to
+                _assetWeights[i]
+            );
+            
+        }
+        
+        for (uint i = 0; i < _derivativeAssimilators.length / 5; i++) {
+            
+            uint ix = i * 5;
+
+            derivatives.push(_derivativeAssimilators[ix]);
+
+            includeAssimilator(
+                shell,
+                _derivativeAssimilators[ix],   // derivative
+                _derivativeAssimilators[1+ix], // numeraire
+                _derivativeAssimilators[2+ix], // reserve
+                _derivativeAssimilators[3+ix], // assimilator
+                _derivativeAssimilators[4+ix]  // derivative approve to
+            );
+
+        }
+
+    }
+    
     function includeAsset (
         LoihiStorage.Shell storage shell,
         address _numeraire,
         address _numeraireAssim,
         address _reserve,
         address _reserveAssim,
+        address _reserveApproveTo,
         uint256 _weight
-    ) internal {
+    ) private {
+        
+        // emit log_addr("_numeraire", _numeraire);
+        // emit log_addr("_nuemraire assim", _numeraireAssim);
+        // emit log_addr("_)reserve", _reserve);
+        // emit log_addr("_reserveAssim", _reserveAssim);
+        // emit log_addr("_resertve aprove to", _reserveApproveTo);
 
         require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-adress");
 
@@ -116,25 +176,25 @@ library Orchestrator {
 
         require(_weight < 1e18, "Shell/weight-must-be-less-than-one");
         
-        if (_numeraire != _reserve) safeApprove(_numeraire, _reserve, uint(-1));
+        if (_numeraire != _reserve) safeApprove(_numeraire, _reserveApproveTo, uint(-1));
 
         LoihiStorage.Assimilator storage _numeraireAssimilator = shell.assimilators[_numeraire];
 
         _numeraireAssimilator.addr = _numeraireAssim;
 
-        _numeraireAssimilator.ix = uint8(shell.assetAssimilators.length);
+        _numeraireAssimilator.ix = uint8(shell.assets.length);
 
         LoihiStorage.Assimilator storage _reserveAssimilator = shell.assimilators[_reserve];
 
         _reserveAssimilator.addr = _reserveAssim;
 
-        _reserveAssimilator.ix = uint8(shell.assetAssimilators.length);
+        _reserveAssimilator.ix = uint8(shell.assets.length);
 
         int128 __weight = _weight.divu(1e18).add(uint256(1).divu(1e18));
 
         shell.weights.push(__weight);
 
-        shell.assetAssimilators.push(_numeraireAssimilator);
+        shell.assets.push(_numeraireAssimilator);
 
         emit AssetIncluded(_numeraire, _reserve, _weight);
 
@@ -148,6 +208,33 @@ library Orchestrator {
 
     }
     
+    function includeAssimilator (
+        LoihiStorage.Shell storage shell,
+        address _derivative,
+        address _numeraire,
+        address _reserve,
+        address _assimilator,
+        address _derivativeApproveTo
+    ) private {
+
+        require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
+
+        require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-address");
+
+        require(_reserve != address(0), "Shell/numeraire-cannot-be-zeroth-address");
+
+        require(_assimilator != address(0), "Shell/assimilator-cannot-be-zeroth-address");
+        
+        safeApprove(_numeraire, _derivativeApproveTo, uint(-1));
+
+        LoihiStorage.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
+
+        shell.assimilators[_derivative] = LoihiStorage.Assimilator(_assimilator, _numeraireAssim.ix);
+
+        emit AssimilatorIncluded(_derivative, _numeraire, _reserve, _assimilator);
+
+    }
+
     function safeApprove (
         address _token,
         address _spender,
@@ -160,62 +247,14 @@ library Orchestrator {
 
     }
 
-
-    function includeAssimilator (
-        LoihiStorage.Shell storage shell,
-        address _derivative,
-        address _numeraire,
-        address _reserve,
-        address _assimilator
-    ) internal {
-
-        require(_derivative != address(0), "Shell/derivative-cannot-be-zeroth-address");
-
-        require(_numeraire != address(0), "Shell/numeraire-cannot-be-zeroth-address");
-
-        require(_reserve != address(0), "Shell/numeraire-cannot-be-zeroth-address");
-
-        require(_assimilator != address(0), "Shell/assimilator-cannot-be-zeroth-address");
-
-        safeApprove(_derivative, _reserve, uint(-1));
-
-        LoihiStorage.Assimilator storage _numeraireAssim = shell.assimilators[_numeraire];
-
-        shell.assimilators[_derivative] = LoihiStorage.Assimilator(_assimilator, _numeraireAssim.ix);
-
-        emit AssimilatorIncluded(_derivative, _numeraire, _reserve, _assimilator);
-
-    }
-
-    function prime (LoihiStorage.Shell storage shell) internal {
-
-        uint _length = shell.assetAssimilators.length;
-
-        int128[] memory _oBals = new int128[](_length);
-
-        int128 _oGLiq;
-
-        for (uint i = 0; i < _length; i++) {
-
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.assetAssimilators[i].addr);
-
-            _oGLiq += _bal;
-
-            _oBals[i] = _bal;
-
-        }
-
-        shell.omega = ShellMath.calculateFee(_oGLiq, _oBals, shell.beta, shell.delta, shell.weights);
-
-    }
-
-    function viewShell (LoihiStorage.Shell storage shell) internal view returns (
+    function viewShell (
+        LoihiStorage.Shell storage shell
+    ) internal view returns (
         uint alpha_,
         uint beta_,
         uint delta_,
         uint epsilon_,
-        uint lambda_,
-        uint omega_
+        uint lambda_
     ) {
 
         alpha_ = shell.alpha.mulu(1e18);
@@ -227,8 +266,6 @@ library Orchestrator {
         epsilon_ = shell.epsilon.mulu(1e18);
 
         lambda_ = shell.lambda.mulu(1e18);
-
-        omega_ = shell.omega.mulu(1e18);
 
     }
 
