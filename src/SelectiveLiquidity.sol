@@ -297,7 +297,11 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
+            if (oBals_[i] == 0 && nBals_[i] == 0) {
+
+                nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
+                
+            }
 
             oGLiq_ += oBals_[i];
             nGLiq_ += nBals_[i];

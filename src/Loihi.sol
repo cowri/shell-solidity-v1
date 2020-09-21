@@ -152,12 +152,21 @@ contract Loihi is LoihiStorage {
     }
 
     /// @notice excludes an assimilator from the shell
-    /// @param _assimilator the address of the assimilator to exclude
-    function excludeAssimilator (
-        address _assimilator
+    /// @param _derivative the address of the assimilator to exclude
+    function excludeDerivative (
+        address _derivative
     ) external onlyOwner {
 
-        delete shell.assimilators[_assimilator];
+        uint _length = numeraires.length; 
+
+        for (uint i = 0; i < numeraires.length; i++) {
+            
+            if (_derivative == numeraires[i]) revert("Shell/cannot-delete-numeraire");
+            if (_derivative == reserves[i]) revert("Shell/cannot-delete-reserve");
+            
+        }
+
+        delete shell.assimilators[_derivative];
 
     }
 
@@ -423,8 +432,8 @@ contract Loihi is LoihiStorage {
     ) { 
 
         supports_ = this.supportsInterface.selector == _interface  // erc165
-            || bytes4(0x7f5828d0) == _interface                    // eip173
-            || bytes4(0x36372b07) == _interface;                  // erc20
+            || bytes4(0x7f5828d0) == _interface                   // eip173
+            || bytes4(0x36372b07) == _interface;                 // erc20
         
     }
 
