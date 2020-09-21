@@ -163,9 +163,9 @@ contract KovanCUsdtToUsdtAssimilator is IAssimilator {
 
         uint256 _rate = cusdt.exchangeRateStored();
         
-        uint256 _supplyRate = cdai.supplyRatePerBlock();
+        uint256 _supplyRate = cusdt.supplyRatePerBlock();
 
-        uint256 _prevBlock = cdai.accrualBlockNumber();
+        uint256 _prevBlock = cusdt.accrualBlockNumber();
 
         _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
@@ -177,6 +177,12 @@ contract KovanCUsdtToUsdtAssimilator is IAssimilator {
     function viewNumeraireAmount (uint256 _amount) public view returns (int128 amount_) {
 
         uint256 _rate = cusdt.exchangeRateStored();
+
+        uint256 _supplyRate = cusdt.supplyRatePerBlock();
+
+        uint256 _prevBlock = cusdt.accrualBlockNumber();
+
+        _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
 
@@ -195,6 +201,12 @@ contract KovanCUsdtToUsdtAssimilator is IAssimilator {
     function viewNumeraireAmountAndBalance (address _addr, uint256 _amount) public view returns (int128 amount_, int128 balance_) {
 
         uint256 _rate = cusdt.exchangeRateStored();
+
+        uint256 _supplyRate = cusdt.supplyRatePerBlock();
+
+        uint256 _prevBlock = cusdt.accrualBlockNumber();
+
+        _rate += _rate * _supplyRate * (block.number - _prevBlock) / 1e18;
 
         amount_ = ( ( _amount * _rate ) / 1e18 ).divu(1e6);
 

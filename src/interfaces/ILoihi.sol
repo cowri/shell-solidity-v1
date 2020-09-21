@@ -14,7 +14,7 @@
 
 pragma solidity ^0.5.0;
 
-interface ILoihi {
+interface IShell {
 
     function originSwap (
         address _origin,

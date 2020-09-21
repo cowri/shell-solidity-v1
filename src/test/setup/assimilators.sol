@@ -2,7 +2,6 @@ pragma solidity ^0.5.0;
 
 import "./storage.sol";
 
-<<<<<<< HEAD
 /* Kovan Assimilators set one - holding reserves in dai, usdc, usdt and susd */
 import "../../assimilators/kovan/daiReserves/kovanDaiToDaiAssimilator.sol";
 import "../../assimilators/kovan/daiReserves/kovanADaiToDaiAssimilator.sol";
@@ -17,8 +16,6 @@ import "../../assimilators/kovan/usdtReserves/kovanUsdtToUsdtAssimilator.sol";
 import "../../assimilators/kovan/usdtReserves/kovanAUsdtToUsdtAssimilator.sol";
 import "../../assimilators/kovan/usdtReserves/kovanCUsdtToUsdtAssimilator.sol";
 
-=======
->>>>>>> factory-mainnet
 /* Mainnet Assimilators set one - holding reserves in cDai, cUsdc, aUsdt and aSusd */
 import "../../assimilators/mainnet/daiReserves/mainnetDaiToDaiAssimilator.sol";
 import "../../assimilators/mainnet/daiReserves/mainnetCDaiToDaiAssimilator.sol";
@@ -32,7 +29,6 @@ import "../../assimilators/mainnet/usdtReserves/mainnetAUsdtToUsdtAssimilator.so
 
 contract AssimilatorSetup is StorageSetup {
 
-<<<<<<< HEAD
     event log_bytes(bytes32, bytes4);
     
     function setupAssimilatorsSetOneKovan () public {
@@ -55,8 +51,6 @@ contract AssimilatorSetup is StorageSetup {
 
     }
 
-=======
->>>>>>> factory-mainnet
     function setupAssimilatorsSetOneMainnet () public {
 
         daiAssimilator = IAssimilator(address(new MainnetDaiToDaiAssimilator()));

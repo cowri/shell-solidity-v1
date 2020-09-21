@@ -1,4 +1,4 @@
-# Loihi tests
+# Shell tests
 
 ## Suites 
 The tests are divided into suites. Suites are composed asset sets and parameter sets. Asset sets are the numeraires, reserves and weights for the tokens in the pool, which entails a set of assimilators. Parameter sets are the global variables to use in the pool.

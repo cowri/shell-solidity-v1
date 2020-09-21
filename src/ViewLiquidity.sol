@@ -14,7 +14,7 @@
 
 pragma solidity ^0.5.0;
 
-import "./LoihiStorage.sol";
+import "./ShellStorage.sol";
 
 import "./Assimilators.sol";
 
@@ -25,7 +25,7 @@ library ViewLiquidity {
     using ABDKMath64x64 for int128;
 
     function viewLiquidity (
-        LoihiStorage.Shell storage shell
+        ShellStorage.Shell storage shell
     ) external view returns (
         uint total_,
         uint[] memory individual_

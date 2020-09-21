@@ -9,7 +9,7 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteOne();
+        s = getShellSuiteOne();
 
     }
 

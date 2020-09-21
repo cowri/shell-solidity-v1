@@ -9,7 +9,7 @@ contract PartitionedWithdrawSuiteOne is PartitionedLiquidityTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteOne();
+        s = getShellSuiteOne();
 
     }
 
@@ -22,14 +22,14 @@ contract PartitionedWithdrawSuiteOne is PartitionedLiquidityTemplate, DSTest {
 
         assertEq(_withdraws[0], 29999999999999999998);
 
-        uint[] memory _claims = l.viewPartitionClaims(address(this));
+        uint[] memory _claims = s.viewPartitionClaims(address(this));
 
         assertEq(_claims[0], 200e18);
         assertEq(_claims[1], 300e18);
         assertEq(_claims[2], 300e18);
         assertEq(_claims[3], 300e18);
 
-        uint daiBalance = dai.balanceOf(address(l));
+        uint daiBalance = dai.balanceOf(address(s));
 
         assertEq(daiBalance, 60000000000000000002);
 
@@ -53,7 +53,7 @@ contract PartitionedWithdrawSuiteOne is PartitionedLiquidityTemplate, DSTest {
 
         assertEq(_withdraws[2], 1499999);
 
-        uint[] memory _claims = l.viewPartitionClaims(address(this));
+        uint[] memory _claims = s.viewPartitionClaims(address(this));
 
         assertEq(_claims[0], 290000000000000000000);
 

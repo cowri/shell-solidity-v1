@@ -14,19 +14,19 @@ contract PartitionedLiquidityTemplate is Setup {
     using ABDKMath64x64 for uint;
     using ABDKMath64x64 for int128;
 
-    using LoihiMethods for Loihi;
+    using ShellMethods for Shell;
 
-    Loihi l;
+    Shell s;
 
     function from_proprotional_state_underflow () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        l.setFrozen(true);
+       s.setFrozen(true);
 
-        l.partition();
+       s.partition();
 
-        ( success_, ) = address(l).call(abi.encodeWithSignature(
+        ( success_, ) = address(s).call(abi.encodeWithSignature(
             "partitionedWithdraw(address[],uint256[])",
             address(dai),
             301e18
@@ -36,13 +36,13 @@ contract PartitionedLiquidityTemplate is Setup {
 
     function from_proportional_state () public returns (uint[] memory) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        l.setFrozen(true);
+       s.setFrozen(true);
 
-        l.partition();
+       s.partition();
 
-        return l.partitionedWithdraw(
+        return s.partitionedWithdraw(
             address(dai), 100e18
         );
 
@@ -50,18 +50,18 @@ contract PartitionedLiquidityTemplate is Setup {
 
     function from_slightly_unbalanced_state () public returns (uint[] memory) {
 
-        uint startingShells = l.deposit(
+        uint startingShells = s.deposit(
             address(dai), 100e18,
             address(usdc), 80e6,
             address(usdt), 90e6,
             address(susd), 30e6
         );
 
-        l.setFrozen(true);
+       s.setFrozen(true);
 
-        l.partition();
+       s.partition();
 
-        return l.partitionedWithdraw(
+        return s.partitionedWithdraw(
             address(dai), 10e18,
             address(usdc), 1e18,
             address(usdt), 5e18

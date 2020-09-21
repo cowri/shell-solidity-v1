@@ -13,20 +13,20 @@ contract SelectiveDepositTemplate is Setup {
     using ABDKMath64x64 for uint;
     using ABDKMath64x64 for int128;
 
-    using LoihiMethods for Loihi;
+    using ShellMethods for Shell;
 
-    Loihi l;
-    Loihi l2;
+    Shell s;
+    Shell s2;
 
     event log_uint(bytes32, uint256);
 
     function noSlippage_balanced_10DAI_10USDC_10USDT_2p5SUSD () public returns (uint256 shellsMinted_) {
 
-        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
+        ( uint256 startingShells, uint[] memory _deposits ) = s.proportionalDeposit(300e18, 1e50);
 
         uint256 gas = gasleft();
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 10e18,
             address(usdc), 10e6,
             address(usdt), 10e6,
@@ -39,14 +39,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function balanced_5DAI_1USDC_3USDT_1SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
             address(susd), 35e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 5e18,
             address(usdc), 1e6,
             address(usdt), 3e6,
@@ -57,7 +57,7 @@ contract SelectiveDepositTemplate is Setup {
 
     function partialUpperSlippage_145DAI_90USDC_90USDT_50SUSD () public returns (uint256 shellsMinted_) {
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
@@ -68,7 +68,7 @@ contract SelectiveDepositTemplate is Setup {
 
     function partialLowerSlippage_95DAI_55USDC_95USDT_15SUSD () public returns (uint256 shellsMinted_) {
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 95e18,
             address(usdc), 55e6,
             address(usdt), 95e6,
@@ -79,9 +79,9 @@ contract SelectiveDepositTemplate is Setup {
 
     function partialUpperSlippage_5DAI_5USDC_70USDT_28SUSD_300Proportional () public returns (uint256 shellsMinted_) {
 
-        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
+        ( uint256 startingShells, uint[] memory _deposits ) = s.proportionalDeposit(300e18, 1e50);
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 70e6,
@@ -92,13 +92,13 @@ contract SelectiveDepositTemplate is Setup {
 
     function partialUpperSlippage_5_CDAI_5_CUSDC_70_AUSDT_28_ASUSD_300Proportional () public returns (uint256 shellsMinted_) {
 
-        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
+        ( uint256 startingShells, uint[] memory _deposits ) = s.proportionalDeposit(300e18, 1e50);
 
         uint _cdaiOf5Numeraire = IAssimilator(cdaiAssimilator).viewRawAmount(uint(5e18).divu(1e18));
 
         uint _cusdcOf5Numeraire = IAssimilator(cusdcAssimilator).viewRawAmount(uint(5e18).divu(1e18));
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(cdai), _cdaiOf5Numeraire,
             address(cusdc), _cusdcOf5Numeraire,
             address(ausdt), 70e6,
@@ -110,14 +110,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function partialLowerSlippage_moderatelyUnbalanced_1DAI_51USDC_51USDT_1SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 100e6,
             address(susd), 23e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 1e18,
             address(usdc), 51e6,
             address(usdt), 51e6,
@@ -128,9 +128,9 @@ contract SelectiveDepositTemplate is Setup {
 
     function partialLowerSlippage_balanced_0p001DAI_90USDC_90USDT () public returns (uint256 shellsMinted_) {
 
-        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
+        ( uint256 startingShells, uint[] memory _deposits ) = s.proportionalDeposit(300e18, 1e50);
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), .001e18,
             address(usdc), 90e6,
             address(usdt), 90e6
@@ -140,14 +140,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function partialUpperAntiSlippage_46USDC_53USDT_into_145DAI_90USDC_90USDT_50SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
             address(susd), 50e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(usdc), 46e6,
             address(usdt), 53e6
         );
@@ -160,7 +160,7 @@ contract SelectiveDepositTemplate is Setup {
 
         emit log_uint("balance", balance);
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
@@ -169,7 +169,7 @@ contract SelectiveDepositTemplate is Setup {
 
         emit log_uint("starting shells", startingShells);
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 1e18,
             address(usdc), 46e6,
             address(usdt), 53e6,
@@ -180,14 +180,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function partialLowerAntiSlippage_36USDC_18SUSD_into_95DAI_55USDC_95USDT_15SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 95e18,
             address(usdc), 55e6,
             address(usdt), 95e6,
             address(susd), 15e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(usdc), 36e6,
             address(susd), 18e6
         );
@@ -196,14 +196,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function fullUpperSlippage_5USDC_3SUSD_into_90DAI_145USDC_90USDT_50SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
             address(susd), 50e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(usdc), 5e6,
             address(susd), 3e6
         );
@@ -212,14 +212,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function fullLowerSlippage_12DAI_12USDC_1USDT_1SUSD_into_95DAI_95USDC_55USDT_15SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 95e18,
             address(usdc), 95e6,
             address(usdt), 55e6,
             address(susd), 15e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 12e18,
             address(usdc), 12e6,
             address(usdt), 1e6,
@@ -230,14 +230,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function fullLowerSlippage_9DAI_9USDC_into_95DAI_95USDC_55USDT_15SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 95e18,
             address(usdc), 95e6,
             address(usdt), 55e6,
             address(susd), 15e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 9e18,
             address(usdc), 9e6
         );
@@ -248,7 +248,7 @@ contract SelectiveDepositTemplate is Setup {
 
         uint256 gas = gasleft();
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 145e6,
@@ -259,7 +259,7 @@ contract SelectiveDepositTemplate is Setup {
 
         gas = gasleft();
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 5e18,
             address(usdc), 5e6
         );
@@ -270,14 +270,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function fullUpperAntiSlippage_8DAI_12USDC_10USDT_2SUSD_into_145DAI_90USDC_90USDT_50SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 145e18,
             address(usdc), 90e6,
             address(usdt), 90e6,
             address(susd), 50e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 8e18,
             address(usdc), 12e6,
             address(usdt), 10e6,
@@ -288,14 +288,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function fullLowerAntiSlippage_5DAI_5USDC_5USDT_2SUSD_into_55DAI_95USDC_95USDT_15SUSD  () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 55e18,
             address(usdc), 95e6,
             address(usdt), 95e6,
             address(susd), 15e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 5e18,
             address(usdc), 5e6,
             address(usdt), 5e6,
@@ -306,30 +306,30 @@ contract SelectiveDepositTemplate is Setup {
 
     function noSlippage_36DAI_from_300Proportional () public returns (uint256 shellsMinted_) {
 
-        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
+        ( uint256 startingShells, uint[] memory _deposits ) = s.proportionalDeposit(300e18, 1e50);
 
-        shellsMinted_ = l.deposit(address(dai), 36e18);
+        shellsMinted_ = s.deposit(address(dai), 36e18);
 
     }
 
     function upperSlippage_36Point001Dai_into_300Proportional () public returns (uint256 shellsMinted_) {
 
-        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
+        ( uint256 startingShells, uint[] memory _deposits ) = s.proportionalDeposit(300e18, 1e50);
 
-        shellsMinted_ = l.deposit(address(dai), 36.001e18);
+        shellsMinted_ = s.deposit(address(dai), 36.001e18);
 
     }
 
     function megaDepositDirectLowerToUpper_105DAI_37SUSD_from_55DAI_95USDC_95USDT_15SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 55e18,
             address(usdc), 95e6,
             address(usdt), 95e6,
             address(susd), 15e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 105e18,
             address(susd), 37e6
         );
@@ -338,14 +338,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function megaDepositIndirectUpperToLower_165DAI_165USDT_into_90DAI_145USDC_90USDT_50SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
             address(susd), 50e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 165e18,
             address(usdt), 165e6
         );
@@ -354,14 +354,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function megaDepositIndirectUpperToLower_165DAI_0p0001USDC_165USDT_0p5SUSD_from_90DAI_145USDC_90USDT_50SUSD () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 90e18,
             address(usdc), 145e6,
             address(usdt), 90e6,
             address(susd), 50e6
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(dai), 165e18,
             address(usdc), 0.0001e6,
             address(usdt), 165e6,
@@ -372,17 +372,17 @@ contract SelectiveDepositTemplate is Setup {
 
     function testFailSelectiveDepositUpperHaltCheck30Pct () public {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(address(dai), 100e18);
+       s.deposit(address(dai), 100e18);
 
     }
 
     function testFailSelectiveDepositLowerHaltCheck30Pct () public {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(
+       s.deposit(
             address(dai), 300e18,
             address(usdt), 300e6,
             address(susd), 100e6
@@ -392,17 +392,17 @@ contract SelectiveDepositTemplate is Setup {
 
     function testFailSelectiveDepositDepostUpperHaltCheck10Pct () public {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(address(susd), 500e6);
+       s.deposit(address(susd), 500e6);
 
     }
 
     function testFailSelectiveDepositLowerHaltCheck10Pct () public {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        l.deposit(
+       s.deposit(
             address(dai), 200e18,
             address(usdc), 200e6,
             address(usdt), 200e6
@@ -412,14 +412,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function proportionalDeposit_unbalancedShell () public returns (uint256[] memory) {
 
-        l.deposit(
+       s.deposit(
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 140e6,
             address(susd), 50e6
         );
 
-        ( uint shellsMinted, uint[] memory deposits ) = l.proportionalDeposit(90e18, 1e50);
+        ( uint shellsMinted, uint[] memory deposits ) = s.proportionalDeposit(90e18, 1e50);
 
         return deposits;
 
@@ -427,14 +427,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function proportionalDeposit_slightlyUnbalancedShell () public returns (uint256[] memory) {
 
-        l.deposit(
+       s.deposit(
             address(dai), 100e18,
             address(usdc), 90e6,
             address(usdt), 80e6,
             address(susd), 30e6
         );
 
-        ( uint shellsMinted, uint[] memory deposits ) = l.proportionalDeposit(90e18, 1e50);
+        ( uint shellsMinted, uint[] memory deposits ) = s.proportionalDeposit(90e18, 1e50);
 
         return deposits;
 
@@ -442,14 +442,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function proportionalDeposit_heavilyUnbalancedShell () public returns (uint256[] memory) {
 
-        l.deposit(
+       s.deposit(
             address(dai), 90e18,
             address(usdc), 125e6,
             address(usdt), 55e6,
             address(susd), 30e6
         );
         
-        ( uint shellsMinted, uint[] memory deposits ) = l.proportionalDeposit(90e18, 1e50);
+        ( uint shellsMinted, uint[] memory deposits ) = s.proportionalDeposit(90e18, 1e50);
 
         return deposits;
 
@@ -457,11 +457,11 @@ contract SelectiveDepositTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_exacerbated () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        usdc.transfer(address(l), 110e6);
+        usdc.transfer(address(s), 110e6);
 
-        success_ = l.depositSuccess(
+        success_ = s.depositSuccess(
             address(usdc), 1e6
         );
 
@@ -469,11 +469,11 @@ contract SelectiveDepositTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_to_outOfBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        usdc.transfer(address(l), 110e6);
+        usdc.transfer(address(s), 110e6);
 
-        success_ = l.depositSuccess(
+        success_ = s.depositSuccess(
             address(dai), 1e18,
             address(usdt), 1e6,
             address(susd), 1e6
@@ -483,11 +483,11 @@ contract SelectiveDepositTemplate is Setup {
 
     function smartHalt_upper_outOfBounds_to_inBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        usdc.transfer(address(l), 110e6);
+        usdc.transfer(address(s), 110e6);
 
-        success_ = l.depositSuccess(
+        success_ = s.depositSuccess(
             address(dai), 110e18,
             address(usdt), 110e6,
             address(susd), 35e6
@@ -497,15 +497,15 @@ contract SelectiveDepositTemplate is Setup {
 
     function smartHalt_lower_unrelated () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18, 1e50);
+       s.proportionalDeposit(67e18, 1e50);
 
-        dai.transfer(address(l), 70e18);
+        dai.transfer(address(s), 70e18);
 
-        usdt.transfer(address(l), 70e6);
+        usdt.transfer(address(s), 70e6);
 
-        susd.transfer(address(l), 23e6);
+        susd.transfer(address(s), 23e6);
 
-        success_ = l.depositSuccess(
+        success_ = s.depositSuccess(
             address(dai), 1e18,
             address(usdt), 1e6,
             address(susd), 1e6
@@ -515,17 +515,17 @@ contract SelectiveDepositTemplate is Setup {
 
     function smartHalt_lower_outOfBounds_to_outOfBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18, 1e50);
+       s.proportionalDeposit(67e18, 1e50);
 
-        dai.transfer(address(l), 70e18);
+        dai.transfer(address(s), 70e18);
 
-        usdt.transfer(address(l), 70e6);
+        usdt.transfer(address(s), 70e6);
 
-        susd.transfer(address(l), 23e6);
+        susd.transfer(address(s), 23e6);
 
         
 
-        success_ = l.depositSuccess(
+        success_ = s.depositSuccess(
             address(usdc), 1e6
         );
 
@@ -533,15 +533,15 @@ contract SelectiveDepositTemplate is Setup {
 
     function smartHalt_lower_outOfBounds_to_inBounds () public returns (bool success_) {
 
-        l.proportionalDeposit(67e18, 1e50);
+       s.proportionalDeposit(67e18, 1e50);
 
-        dai.transfer(address(l), 70e18);
+        dai.transfer(address(s), 70e18);
 
-        usdt.transfer(address(l), 70e6);
+        usdt.transfer(address(s), 70e6);
 
-        susd.transfer(address(l), 23e6);
+        susd.transfer(address(s), 23e6);
 
-        success_ = l.depositSuccess(
+        success_ = s.depositSuccess(
             address(usdc), 50e6
         );
 
@@ -549,195 +549,195 @@ contract SelectiveDepositTemplate is Setup {
 
     function monotonicity_upper_inBounds_to_outOfBounds_noHalt () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
         //l.TEST_setTestHalts(false);
 
-        mintedShells_ = l.deposit(address(usdt), 10000e6);
+        mintedShells_ = s.deposit(address(usdt), 10000e6);
 
     }
 
     function monotonicity_upper_inBounds_to_outOfBounds_halt () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        mintedShells_ = l.deposit(address(usdt), 10000e6);
+        mintedShells_ = s.deposit(address(usdt), 10000e6);
 
     }
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_noHalt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        usdt.transfer(address(l), 9910e6);
+        usdt.transfer(address(s), 9910e6);
 
         //l.TEST_setTestHalts(false);
 
         
 
-        mintedShells_ = l.deposit(address(usdt), 1e6);
+        mintedShells_ = s.deposit(address(usdt), 1e6);
 
     }
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_noHalt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        usdt.transfer(address(l), 9910e6);
+        usdt.transfer(address(s), 9910e6);
 
         //l.TEST_setTestHalts(false);
 
-        mintedShells_ = l.deposit(address(usdt), 1e6);
+        mintedShells_ = s.deposit(address(usdt), 1e6);
 
     }
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_halt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        usdt.transfer(address(l), 9910e6);
+        usdt.transfer(address(s), 9910e6);
 
         
 
-        mintedShells_ = l.deposit(address(usdc), 1e6);
+        mintedShells_ = s.deposit(address(usdc), 1e6);
 
     }
 
     function monotonicity_upper_outOfBand_outOfBounds_to_outOfBounds_halt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        usdt.transfer(address(l), 9910e6);
+        usdt.transfer(address(s), 9910e6);
 
-        mintedShells_ = l.deposit(address(usdc), 1e6);
+        mintedShells_ = s.deposit(address(usdc), 1e6);
 
     }
 
     function monotonicity_lower_outOfBand_outOfBounds_to_inBounds_halt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        dai.transfer(address(l), 8910e18);
+        dai.transfer(address(s), 8910e18);
 
-        usdc.transfer(address(l), 8910e6);
+        usdc.transfer(address(s), 8910e6);
 
-        susd.transfer(address(l), 2970e6);
+        susd.transfer(address(s), 2970e6);
 
         
 
-        mintedShells_ = l.deposit(address(usdt), 8910e6);
+        mintedShells_ = s.deposit(address(usdt), 8910e6);
 
     }
 
     function monotonicity_lower_outOfBand_outOfBounds_to_inBounds_halt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        dai.transfer(address(l), 8910e18);
+        dai.transfer(address(s), 8910e18);
 
-        usdc.transfer(address(l), 8910e6);
+        usdc.transfer(address(s), 8910e6);
 
-        susd.transfer(address(l), 2970e6);
+        susd.transfer(address(s), 2970e6);
 
-        mintedShells_ = l.deposit(address(usdt), 8910e6);
+        mintedShells_ = s.deposit(address(usdt), 8910e6);
 
     }
 
     function monotonicity_lower_outOfBand_outOfBounds_to_inBounds_noHalt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        dai.transfer(address(l), 8910e18);
+        dai.transfer(address(s), 8910e18);
 
-        usdc.transfer(address(l), 8910e6);
+        usdc.transfer(address(s), 8910e6);
 
-        susd.transfer(address(l), 2970e6);
+        susd.transfer(address(s), 2970e6);
 
         //l.TEST_setTestHalts(false);
 
         
 
-        mintedShells_ = l.deposit(address(usdt), 8910e6);
+        mintedShells_ = s.deposit(address(usdt), 8910e6);
 
     }
 
     function monotonicity_lower_outOfBand_outOfBounds_to_inBounds_noHalt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        dai.transfer(address(l), 8910e18);
+        dai.transfer(address(s), 8910e18);
 
-        usdc.transfer(address(l), 8910e6);
+        usdc.transfer(address(s), 8910e6);
 
-        susd.transfer(address(l), 2970e6);
+        susd.transfer(address(s), 2970e6);
 
         //l.TEST_setTestHalts(false);
 
-        mintedShells_ = l.deposit(address(usdt), 8910e6);
+        mintedShells_ = s.deposit(address(usdt), 8910e6);
 
     }
     
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_halt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        dai.transfer(address(l), 8910e18);
+        dai.transfer(address(s), 8910e18);
 
-        usdc.transfer(address(l), 8910e6);
+        usdc.transfer(address(s), 8910e6);
 
-        susd.transfer(address(l), 2970e6);
+        susd.transfer(address(s), 2970e6);
 
         
 
-        mintedShells_ = l.deposit(address(usdt), 1e6);
+        mintedShells_ = s.deposit(address(usdt), 1e6);
 
     }
 
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_halt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        dai.transfer(address(l), 8910e18);
+        dai.transfer(address(s), 8910e18);
 
-        usdc.transfer(address(l), 8910e6);
+        usdc.transfer(address(s), 8910e6);
 
-        susd.transfer(address(l), 2970e6);
+        susd.transfer(address(s), 2970e6);
 
-        mintedShells_ = l.deposit(address(usdt), 1e6);
+        mintedShells_ = s.deposit(address(usdt), 1e6);
 
     }
 
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_noHalt_omegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        dai.transfer(address(l), 8910e18);
+        dai.transfer(address(s), 8910e18);
 
-        usdc.transfer(address(l), 8910e6);
+        usdc.transfer(address(s), 8910e6);
 
-        susd.transfer(address(l), 2970e6);
+        susd.transfer(address(s), 2970e6);
 
         //l.TEST_setTestHalts(false);
 
         
 
-        mintedShells_ = l.deposit(address(usdt), 1e6);
+        mintedShells_ = s.deposit(address(usdt), 1e6);
 
     }
 
     function monotonicity_lower_outOfBand_outOfBounds_to_outOfBounds_noHalt_noOmegaUpdate () public returns (uint256 mintedShells_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        dai.transfer(address(l), 8910e18);
+        dai.transfer(address(s), 8910e18);
 
-        usdc.transfer(address(l), 8910e6);
+        usdc.transfer(address(s), 8910e6);
 
-        susd.transfer(address(l), 2970e6);
+        susd.transfer(address(s), 2970e6);
 
         //l.TEST_setTestHalts(false);
 
-        mintedShells_ = l.deposit(address(usdt), 1e6);
+        mintedShells_ = s.deposit(address(usdt), 1e6);
 
     }
 
@@ -748,20 +748,20 @@ contract SelectiveDepositTemplate is Setup {
         uint256 susd_
     ) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        usdc.transfer(address(l), 8910e6);
+        usdc.transfer(address(s), 8910e6);
 
-        usdt.transfer(address(l), 8910e6);
+        usdt.transfer(address(s), 8910e6);
 
-        susd.transfer(address(l), 2970e6);
+        susd.transfer(address(s), 2970e6);
 
         uint256 _daiBal = dai.balanceOf(address(this));
         uint256 _usdcBal = usdc.balanceOf(address(this));
         uint256 _usdtBal = usdt.balanceOf(address(this));
         uint256 _susdBal = susd.balanceOf(address(this));
 
-        l.proportionalDeposit(1e18, 1e50);
+       s.proportionalDeposit(1e18, 1e50);
 
         dai_ = _daiBal - dai.balanceOf(address(this));
         usdc_ = _usdcBal - usdc.balanceOf(address(this));
@@ -777,16 +777,16 @@ contract SelectiveDepositTemplate is Setup {
         uint256 susd_
     ) {
 
-        l.proportionalDeposit(300e18, 1e50);
+       s.proportionalDeposit(300e18, 1e50);
 
-        usdc.transfer(address(l), 9910e6);
+        usdc.transfer(address(s), 9910e6);
 
         uint256 _daiBal = dai.balanceOf(address(this));
         uint256 _usdcBal = usdc.balanceOf(address(this));
         uint256 _usdtBal = usdt.balanceOf(address(this));
         uint256 _susdBal = susd.balanceOf(address(this));
 
-        l.proportionalDeposit(1e18, 1e50);
+       s.proportionalDeposit(1e18, 1e50);
 
         dai_ = _daiBal - dai.balanceOf(address(this));
         usdc_ = _usdcBal - usdc.balanceOf(address(this));

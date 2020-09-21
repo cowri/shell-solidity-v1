@@ -8,7 +8,7 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     function setUp() public {
 
-        l = getLoihiSuiteOne();
+        s = getShellSuiteOne();
 
     }
 
@@ -206,16 +206,16 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     function testProportionalWithdraw_mediumUnbalance () public {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
             address(susd), 35e6
         );
 
-        uint[] memory withdrawals = l.proportionalWithdraw(150e18, 1e50);
+        uint[] memory withdrawals = s.proportionalWithdraw(150e18, 1e50);
 
-        uint256 endingShells = l.balanceOf(address(this));
+        uint256 endingShells = s.balanceOf(address(this));
 
         assertEq(withdrawals[0], 39989999999999999960);
         assertEq(withdrawals[1], 49987499);
@@ -229,16 +229,16 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
 
     function testProportionalWithdraw_unbalanced () public {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 55e18,
             address(usdc), 90e6,
             address(usdt), 125e6,
             address(susd), 30e6
         );
         
-        uint[] memory withdrawals = l.proportionalWithdraw(150e18, 1e50);
+        uint[] memory withdrawals = s.proportionalWithdraw(150e18, 1e50);
 
-        uint256 endingShells = l.balanceOf(address(this));
+        uint256 endingShells = s.balanceOf(address(this));
 
         assertEq(withdrawals[0], 27524982618771726505);
         assertEq(withdrawals[1], 45040880);

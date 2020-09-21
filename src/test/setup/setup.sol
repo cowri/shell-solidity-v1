@@ -1,33 +1,32 @@
 pragma solidity ^0.5.0;
 
-import "../../Loihi.sol";
+import "../../Shell.sol";
 
-import "../../LoihiFactory.sol";
+import "../../ShellFactory.sol";
 
 import "./stablecoins.sol";
 import "./assimilators.sol";
-import "./loihi.sol";
+import "./shell.sol";
 
-contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
+contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
-    function getLoihiFactorySuiteOne () public returns (LoihiFactory loihiFactory_) {
-
-    }
-
-    function getLoihiSuiteOne () public returns (Loihi loihi_) {
-
-        loihi_ = getLoihiSuiteOneKovanFromFactory();
+    function getShellFactorySuiteOne () public returns (ShellFactory shellFactory_) {
 
     }
 
-    function getLoihiSuiteOneKovanFromFactory () public returns (Loihi loihi_) {
+    function getShellSuiteOne () public returns (Shell shell_) {
+
+        shell_ = getShellSuiteOneKovanFromFactory();
+
+    }
+
+    function getShellSuiteOneKovanFromFactory () public returns (Shell shell_) {
         
         setupStablecoinsKovan();
         
         setupAssimilatorsSetOneKovan();
         
-<<<<<<< HEAD
-        // LoihiFactory lf = new LoihiFactory();
+        // ShellFactory lf = new ShellFactory();
 
         // address[] memory _assets = new address[](20);
         // uint[] memory _assetWeights = new uint[](4);
@@ -61,9 +60,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         // _assets[18] = address(susdAssimilator);
         // _assets[19] = address(susd);
         // _assetWeights[3] = .1e18;
-=======
-        // setupAssimilatorsSetOneMainnet();
->>>>>>> factory-mainnet
         
         // _derivativeAssimilators[0] = address(chai);
         // _derivativeAssimilators[1] = address(dai);
@@ -94,17 +90,17 @@ contract Setup is StablecoinSetup, AssimilatorSetup, LoihiSetup {
         // _derivativeAssimilators[22] = address(susd);
         // _derivativeAssimilators[23] = aerfaerwfdress(aaveLpCore);
 
-        // loihi_ = lf.newShell(
+        // shell_ = lf.newShell(
         //     _assets,
         //     _assetWeights,
         //     _derivativeAssimilators
         // );
         
-        loihi_ = Loihi(0x4B6F91a106fEd779EFE013d1e9693cB5f4943071);
+        shell_ = Shell(0x4B6F91a106fEd779EFE013d1e9693cB5f4943071);
 
-        setParamsSetOne(loihi_);
+        setParamsSetOne(shell_);
 
-        approveStablecoins(address(loihi_));
+        approveStablecoins(address(shell_));
 
     }
 
