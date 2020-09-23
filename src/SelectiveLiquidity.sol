@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./Assimilators.sol";
 
-import "./LoihiStorage.sol";
+import "./ShellStorage.sol";
 
 import "./ShellMath.sol";
 
@@ -21,7 +21,7 @@ library SelectiveLiquidity {
     int128 constant ONE = 0x10000000000000000;
 
     function selectiveDeposit (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address[] memory _derivatives,
         uint[] memory _amounts,
         uint _minShells
@@ -34,8 +34,7 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getLiquidityDepositData(shell, _derivatives, _amounts);
 
-        int128 _shells;
-        ( _shells, shell.omega ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         shells_ = _shells.mulu(1e18);
 
@@ -46,7 +45,7 @@ library SelectiveLiquidity {
     }
 
     function viewSelectiveDeposit (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address[] memory _derivatives,
         uint[] memory _amounts
     ) internal view returns (
@@ -58,15 +57,14 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = viewLiquidityDepositData(shell, _derivatives, _amounts);
 
-        ( int128 _shells, ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         shells_ = _shells.mulu(1e18);
 
     }
 
-
     function selectiveWithdraw (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address[] memory _derivatives,
         uint[] memory _amounts,
         uint _maxShells
@@ -79,9 +77,7 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getLiquidityWithdrawData(shell, _derivatives, msg.sender, _amounts);
 
-        int128 _shells;
-
-        ( _shells, shell.omega ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         _shells = _shells.abs().us_mul(ONE + shell.epsilon);
 
@@ -94,7 +90,7 @@ library SelectiveLiquidity {
     }
 
     function viewSelectiveWithdraw (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address[] memory _derivatives,
         uint[] memory _amounts
     ) internal view returns (
@@ -106,7 +102,7 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = viewLiquidityWithdrawData(shell, _derivatives, _amounts);
 
-        ( int128 _shells, ) = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         _shells = _shells.abs().us_mul(ONE + shell.epsilon);
 
@@ -115,7 +111,7 @@ library SelectiveLiquidity {
     }
 
     function getLiquidityDepositData (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address[] memory _derivatives,
         uint[] memory _amounts
     ) private returns (
@@ -131,7 +127,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _derivatives.length; i++) {
 
-            LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
+            ShellStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
@@ -147,7 +143,7 @@ library SelectiveLiquidity {
 
                 int128 _amount = Assimilators.intakeRaw(_assim.addr, _amounts[i]);
 
-                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount);
+                nBals_[_assim.ix] = nBals_[_assim.ix].add(_amount);
 
             }
 
@@ -158,7 +154,7 @@ library SelectiveLiquidity {
     }
 
     function getLiquidityWithdrawData (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address[] memory _derivatives,
         address _rcpnt,
         uint[] memory _amounts
@@ -175,7 +171,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _derivatives.length; i++) {
 
-            LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
+            ShellStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
@@ -190,7 +186,7 @@ library SelectiveLiquidity {
 
                 int128 _amount = Assimilators.outputRaw(_assim.addr, _rcpnt, _amounts[i]);
 
-                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount);
+                nBals_[_assim.ix] = nBals_[_assim.ix].add(_amount);
 
             }
 
@@ -201,7 +197,7 @@ library SelectiveLiquidity {
     }
 
     function viewLiquidityDepositData (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address[] memory _derivatives,
         uint[] memory _amounts
     ) private view returns (
@@ -217,7 +213,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _derivatives.length; i++) {
 
-            LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
+            ShellStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
@@ -233,7 +229,7 @@ library SelectiveLiquidity {
 
                 int128 _amount = Assimilators.viewNumeraireAmount(_assim.addr, _amounts[i]);
 
-                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount);
+                nBals_[_assim.ix] = nBals_[_assim.ix].add(_amount);
 
             }
 
@@ -244,7 +240,7 @@ library SelectiveLiquidity {
     }
 
     function viewLiquidityWithdrawData (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address[] memory _derivatives,
         uint[] memory _amounts
     ) private view returns (
@@ -260,7 +256,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _derivatives.length; i++) {
 
-            LoihiStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
+            ShellStorage.Assimilator memory _assim = shell.assimilators[_derivatives[i]];
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
@@ -268,7 +264,7 @@ library SelectiveLiquidity {
 
                 ( int128 _amount, int128 _balance ) = Assimilators.viewNumeraireAmountAndBalance(_assim.addr, _amounts[i]);
 
-                nBals_[_assim.ix] = _balance.add(_amount.neg());
+                nBals_[_assim.ix] = _balance.sub(_amount);
 
                 oBals_[_assim.ix] = _balance;
 
@@ -276,7 +272,7 @@ library SelectiveLiquidity {
 
                 int128 _amount = Assimilators.viewNumeraireAmount(_assim.addr, _amounts[i]);
 
-                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount.neg());
+                nBals_[_assim.ix] = nBals_[_assim.ix].sub(_amount);
 
             }
 
@@ -287,7 +283,7 @@ library SelectiveLiquidity {
     }
 
     function completeLiquidityData (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         int128[] memory oBals_,
         int128[] memory nBals_
     ) private view returns (
@@ -301,7 +297,11 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            if (oBals_[i] == 0 && nBals_[i] == 0) nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
+            if (oBals_[i] == 0 && nBals_[i] == 0) {
+
+                nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
+                
+            }
 
             oGLiq_ += oBals_[i];
             nGLiq_ += nBals_[i];
@@ -312,7 +312,7 @@ library SelectiveLiquidity {
 
     }
 
-    function burn (LoihiStorage.Shell storage shell, address account, uint256 amount) private {
+    function burn (ShellStorage.Shell storage shell, address account, uint256 amount) private {
 
         shell.balances[account] = burn_sub(shell.balances[account], amount);
 
@@ -322,7 +322,7 @@ library SelectiveLiquidity {
 
     }
 
-    function mint (LoihiStorage.Shell storage shell, address account, uint256 amount) private {
+    function mint (ShellStorage.Shell storage shell, address account, uint256 amount) private {
 
         shell.totalSupply = mint_add(shell.totalSupply, amount);
 

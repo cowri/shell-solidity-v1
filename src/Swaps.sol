@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./Assimilators.sol";
 
-import "./LoihiStorage.sol";
+import "./ShellStorage.sol";
 
 import "./ShellMath.sol";
 
@@ -20,16 +20,16 @@ library Swaps {
     int128 constant ONE = 0x10000000000000000;
 
     function getOriginAndTarget (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address _o,
         address _t
     ) private view returns (
-        LoihiStorage.Assimilator memory,
-        LoihiStorage.Assimilator memory
+        ShellStorage.Assimilator memory,
+        ShellStorage.Assimilator memory
     ) {
 
-        LoihiStorage.Assimilator memory o_ = shell.assimilators[_o];
-        LoihiStorage.Assimilator memory t_ = shell.assimilators[_t];
+        ShellStorage.Assimilator memory o_ = shell.assimilators[_o];
+        ShellStorage.Assimilator memory t_ = shell.assimilators[_t];
 
         require(o_.addr != address(0), "Shell/origin-not-supported");
         require(t_.addr != address(0), "Shell/target-not-supported");
@@ -40,7 +40,7 @@ library Swaps {
 
 
     function originSwap (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _originAmount,
@@ -49,8 +49,8 @@ library Swaps {
         uint256 tAmt_
     ) {
 
-        (   LoihiStorage.Assimilator memory _o,
-            LoihiStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
+        (   ShellStorage.Assimilator memory _o,
+            ShellStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
         if (_o.ix == _t.ix) return Assimilators.outputNumeraire(_t.addr, _recipient, Assimilators.intakeRaw(_o.addr, _originAmount));
 
@@ -60,7 +60,7 @@ library Swaps {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getOriginSwapData(shell, _o.ix, _t.ix, _o.addr, _originAmount);
 
-        ( _amt, shell.omega ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
+        _amt = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
         _amt = _amt.us_mul(ONE - shell.epsilon);
 
@@ -71,7 +71,7 @@ library Swaps {
     }
 
     function viewOriginSwap (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _originAmount
@@ -79,8 +79,8 @@ library Swaps {
         uint256 tAmt_
     ) {
 
-        (   LoihiStorage.Assimilator memory _o,
-            LoihiStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
+        (   ShellStorage.Assimilator memory _o,
+            ShellStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
         if (_o.ix == _t.ix) return Assimilators.viewRawAmount(_t.addr, Assimilators.viewNumeraireAmount(_o.addr, _originAmount));
 
@@ -90,7 +90,7 @@ library Swaps {
             int128[] memory _nBals,
             int128[] memory _oBals ) = viewOriginSwapData(shell, _o.ix, _t.ix, _originAmount, _o.addr);
 
-        ( _amt, ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
+        _amt = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _t.ix);
 
         _amt = _amt.us_mul(ONE - shell.epsilon);
 
@@ -99,7 +99,7 @@ library Swaps {
     }
 
     function targetSwap (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _targetAmount,
@@ -108,8 +108,8 @@ library Swaps {
         uint256 oAmt_
     ) {
 
-        (   LoihiStorage.Assimilator memory _o,
-            LoihiStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
+        (   ShellStorage.Assimilator memory _o,
+            ShellStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
         if (_o.ix == _t.ix) return Assimilators.intakeNumeraire(_o.addr, Assimilators.outputRaw(_t.addr, _recipient, _targetAmount));
 
@@ -119,7 +119,7 @@ library Swaps {
             int128[] memory _oBals,
             int128[] memory _nBals) = getTargetSwapData(shell, _t.ix, _o.ix, _t.addr, _recipient, _targetAmount);
 
-        ( _amt, shell.omega ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
+        _amt = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
 
         _amt = _amt.us_mul(ONE + shell.epsilon);
 
@@ -130,7 +130,7 @@ library Swaps {
     }
 
     function viewTargetSwap (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         address _origin,
         address _target,
         uint256 _targetAmount
@@ -138,8 +138,8 @@ library Swaps {
         uint256 oAmt_
     ) {
 
-        (   LoihiStorage.Assimilator memory _o,
-            LoihiStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
+        (   ShellStorage.Assimilator memory _o,
+            ShellStorage.Assimilator memory _t  ) = getOriginAndTarget(shell, _origin, _target);
 
         if (_o.ix == _t.ix) return Assimilators.viewRawAmount(_o.addr, Assimilators.viewNumeraireAmount(_t.addr, _targetAmount));
 
@@ -149,7 +149,7 @@ library Swaps {
             int128[] memory _nBals,
             int128[] memory _oBals ) = viewTargetSwapData(shell, _t.ix, _o.ix, _targetAmount, _t.addr);
 
-        ( _amt, ) = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
+        _amt = ShellMath.calculateTrade(shell, _oGLiq, _nGLiq, _oBals, _nBals, _amt, _o.ix);
 
         _amt = _amt.us_mul(ONE + shell.epsilon);
 
@@ -158,7 +158,7 @@ library Swaps {
     }
 
     function getOriginSwapData (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         uint _inputIx,
         uint _outputIndex,
         address _assim,
@@ -175,7 +175,7 @@ library Swaps {
 
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
-        LoihiStorage.Assimilator[] memory _reserves = shell.assets;
+        ShellStorage.Assimilator[] memory _reserves = shell.assets;
 
         for (uint i = 0; i < _length; i++) {
 
@@ -185,7 +185,7 @@ library Swaps {
                 int128 _bal;
                 ( amt_, _bal ) = Assimilators.intakeRawAndGetBalance(_assim, _amt);
 
-                oBals_[i] = _bal - amt_;
+                oBals_[i] = _bal.sub(amt_);
                 nBals_[i] = _bal;
 
             }
@@ -203,7 +203,7 @@ library Swaps {
     }
 
     function getTargetSwapData (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         uint _inputIx,
         uint _outputIndex,
         address _assim,
@@ -221,7 +221,7 @@ library Swaps {
 
         int128[] memory oBals_ = new int128[](_length);
         int128[] memory nBals_ = new int128[](_length);
-        LoihiStorage.Assimilator[] memory _reserves = shell.assets;
+        ShellStorage.Assimilator[] memory _reserves = shell.assets;
 
         for (uint i = 0; i < _length; i++) {
 
@@ -231,7 +231,7 @@ library Swaps {
                 int128 _bal;
                 ( amt_, _bal ) = Assimilators.outputRawAndGetBalance(_assim, _recipient, _amt);
 
-                oBals_[i] = _bal - amt_;
+                oBals_[i] = _bal.sub(amt_);
                 nBals_[i] = _bal;
 
             }
@@ -249,7 +249,7 @@ library Swaps {
     }
 
     function viewOriginSwapData (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         uint _inputIx,
         uint _outputIndex,
         uint _amt,
@@ -293,7 +293,7 @@ library Swaps {
     }
 
     function viewTargetSwapData (
-        LoihiStorage.Shell storage shell,
+        ShellStorage.Shell storage shell,
         uint _inputIx,
         uint _outputIndex,
         uint _amt,

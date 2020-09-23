@@ -10,22 +10,22 @@ import "../setup/methods.sol";
 
 import "../deposits/depositsTemplate.sol";
 
-contract LoihiFactorySuiteOne is SelectiveDepositTemplate, DSTest {
+contract ShellFactorySuiteOne is SelectiveDepositTemplate, DSTest {
 
     using ABDKMath64x64 for uint;
     using ABDKMath64x64 for int128;
 
-    using LoihiMethods for Loihi;
+    using ShellMethods for Shell;
 
-    LoihiFactory lf;
+    ShellFactory lf;
 
     function setUp() public {
 
-        // l = getLoihiSuiteOneLocalFromFactory();
+        // s = getShellSuiteOneLocalFromFactory();
 
     }
 
-    function setupSuiteOneParameters (Loihi _l) public {
+    function setupSuiteOneParameters (Shell _l) public {
 
         // _l.TEST_includeAssimilatorState(
         //     dai, cdai, chai, pot,
@@ -46,13 +46,13 @@ contract LoihiFactorySuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function newShell () public returns (Loihi loihi_) {
+    function newShell () public returns (Shell shell_) {
         
         address[] memory _assets = new address[](0);
         uint[] memory _weights = new uint[](0);
         address[] memory _derivatives = new address[](0);        
         
-        loihi_ = lf.newShell(
+        shell_ = lf.newShell(
             _assets,
             _weights,
             _derivatives
@@ -60,13 +60,13 @@ contract LoihiFactorySuiteOne is SelectiveDepositTemplate, DSTest {
 
     }
 
-    function test_s1_loihiFactory () public {
+    function test_s1_shellFactory () public {
         
-        // Loihi s1 = newShell();
+        // Shell s1 = newShell();
 
         // setupSuiteOneParameters(s1);
 
-        // Loihi s2 = newShell();
+        // Shell s2 = newShell();
 
         // setupSuiteOneParameters(s2);
 
@@ -110,7 +110,7 @@ contract LoihiFactorySuiteOne is SelectiveDepositTemplate, DSTest {
         _assets[15] = address(susdAssimilator);
         _assetWeights[3] = .1e18;
         
-        l = lf.newShell(_assets, _assetWeights, _derivativeAssimilators);
+        s = lf.newShell(_assets, _assetWeights, _derivativeAssimilators);
                 
         uint256 newShells = super.balanced_5DAI_1USDC_3USDT_1SUSD();
 

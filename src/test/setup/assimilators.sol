@@ -16,17 +16,6 @@ import "../../assimilators/mainnet/usdtReserves/mainnetCUsdtToUsdtAssimilator.so
 import "../../assimilators/mainnet/susdReserves/mainnetSUsdToSUsdAssimilator.sol";
 import "../../assimilators/mainnet/susdReserves/mainnetASUsdToSUsdAssimilator.sol";
 
-/* Mainnet Assimilators set two - holding reserves in cDai, cUsdc, aUsdt and aSusd */
-import "../../assimilators/mainnet/cdaiReserves/mainnetDaiToCDaiAssimilator.sol";
-import "../../assimilators/mainnet/cdaiReserves/mainnetCDaiToCDaiAssimilator.sol";
-import "../../assimilators/mainnet/cdaiReserves/mainnetChaiToCDaiAssimilator.sol";
-import "../../assimilators/mainnet/cusdcReserves/mainnetUsdcToCUsdcAssimilator.sol";
-import "../../assimilators/mainnet/cusdcReserves/mainnetCUsdcToCUsdcAssimilator.sol";
-import "../../assimilators/mainnet/asusdReserves/mainnetSUsdToASUsdAssimilator.sol";
-import "../../assimilators/mainnet/asusdReserves/mainnetASUsdToASUsdAssimilator.sol";
-import "../../assimilators/mainnet/ausdtReserves/mainnetUsdtToAUsdtAssimilator.sol";
-import "../../assimilators/mainnet/ausdtReserves/mainnetAUsdtToAUsdtAssimilator.sol";
-
 contract AssimilatorSetup is StorageSetup {
 
     function setupAssimilatorsSetOneMainnet () public {
@@ -46,23 +35,6 @@ contract AssimilatorSetup is StorageSetup {
 
         susdAssimilator = IAssimilator(address(new MainnetSUsdToSUsdAssimilator()));
         asusdAssimilator = IAssimilator(address(new MainnetASUsdToSUsdAssimilator()));
-
-    }
-
-    function setupAssimilatorsSetTwoMainnet () public {
-
-        usdcAssimilator = IAssimilator(address(new MainnetUsdcToCUsdcAssimilator()));
-        cusdcAssimilator = IAssimilator(address(new MainnetCUsdcToCUsdcAssimilator()));
-
-        daiAssimilator = IAssimilator(address(new MainnetDaiToCDaiAssimilator()));
-        cdaiAssimilator = IAssimilator(address(new MainnetCDaiToCDaiAssimilator()));
-        chaiAssimilator = IAssimilator(address(new MainnetChaiToCDaiAssimilator()));
-
-        usdtAssimilator = IAssimilator(address(new MainnetUsdtToAUsdtAssimilator()));
-        ausdtAssimilator = IAssimilator(address(new MainnetAUsdtToAUsdtAssimilator()));
-
-        susdAssimilator = IAssimilator(address(new MainnetSUsdToASUsdAssimilator()));
-        asusdAssimilator = IAssimilator(address(new MainnetASUsdToASUsdAssimilator()));
 
     }
 

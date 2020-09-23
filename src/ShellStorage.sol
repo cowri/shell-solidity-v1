@@ -29,18 +29,13 @@ import "./Swaps.sol";
 
 import "./ViewLiquidity.sol";
 
-import "./interfaces/IERC20.sol";
-import "./interfaces/IERC20NoBool.sol";
-import "./interfaces/IAToken.sol";
-import "./interfaces/ICToken.sol";
-import "./interfaces/IChai.sol";
-import "./interfaces/IPot.sol";
-
-contract LoihiStorage {
+contract ShellStorage {
 
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
+
+    Shell public shell;
 
     struct Shell {
         int128 alpha;
@@ -48,7 +43,6 @@ contract LoihiStorage {
         int128 delta;
         int128 epsilon;
         int128 lambda;
-        int128 omega;
         int128[] weights;
         uint totalSupply;
         mapping (address => uint) balances;
@@ -61,8 +55,6 @@ contract LoihiStorage {
         address addr;
         uint8 ix;
     }
-
-    Shell public shell;
 
     struct PartitionTicket {
         uint[] claims;
@@ -80,7 +72,5 @@ contract LoihiStorage {
 
     address public owner;
     bool internal notEntered = true;
-
-    // uint public maxFee;
 
 }

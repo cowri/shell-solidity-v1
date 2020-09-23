@@ -29,22 +29,15 @@ import "./Swaps.sol";
 
 import "./ViewLiquidity.sol";
 
-import "./interfaces/IERC20.sol";
-import "./interfaces/IERC20NoBool.sol";
-import "./interfaces/IAToken.sol";
-import "./interfaces/ICToken.sol";
-import "./interfaces/IChai.sol";
-import "./interfaces/IPot.sol";
-
-import "./LoihiStorage.sol";
+import "./ShellStorage.sol";
 
 import "./interfaces/IFreeFromUpTo.sol";
 
-contract Loihi is LoihiStorage {
+contract Shell is ShellStorage {
 
     event Approval(address indexed _owner, address indexed spender, uint256 value);
 
-    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda, uint256 omega);
+    event ParametersSet(uint256 alpha, uint256 beta, uint256 delta, uint256 epsilon, uint256 lambda);
 
     event AssetIncluded(address indexed numeraire, address indexed reserve, uint weight);
 
@@ -155,12 +148,21 @@ contract Loihi is LoihiStorage {
     }
 
     /// @notice excludes an assimilator from the shell
-    /// @param _assimilator the address of the assimilator to exclude
-    function excludeAssimilator (
-        address _assimilator
+    /// @param _derivative the address of the assimilator to exclude
+    function excludeDerivative (
+        address _derivative
     ) external onlyOwner {
 
-        delete shell.assimilators[_assimilator];
+        uint _length = numeraires.length; 
+
+        for (uint i = 0; i < numeraires.length; i++) {
+            
+            if (_derivative == numeraires[i]) revert("Shell/cannot-delete-numeraire");
+            if (_derivative == reserves[i]) revert("Shell/cannot-delete-reserve");
+            
+        }
+
+        delete shell.assimilators[_derivative];
 
     }
 
@@ -176,8 +178,7 @@ contract Loihi is LoihiStorage {
         uint beta_,
         uint delta_,
         uint epsilon_,
-        uint lambda_,
-        uint omega_
+        uint lambda_
     ) {
 
         return Orchestrator.viewShell(shell);
@@ -197,14 +198,6 @@ contract Loihi is LoihiStorage {
         emit OwnershipTransfered(owner, _newOwner);
 
         owner = _newOwner;
-
-    }
-
-    /// @author james foley https://github.com/realisation
-    /// @notice reset omega in the case someone has sent tokens directly to the pool
-    function prime () external {
-
-        Orchestrator.prime(shell);
 
     }
 
@@ -265,7 +258,6 @@ contract Loihi is LoihiStorage {
         targetAmount_ = Swaps.viewOriginSwap(shell, _origin, _target, _originAmount);
 
     }
-
 
     /// @author james foley http://github.com/realisation
     /// @notice swap a dynamic origin amount for a fixed target amount
@@ -436,8 +428,8 @@ contract Loihi is LoihiStorage {
     ) { 
 
         supports_ = this.supportsInterface.selector == _interface  // erc165
-            || bytes4(0x7f5828d0) == _interface                    // eip173
-            || bytes4(0x36372b07) == _interface;                  // erc20
+            || bytes4(0x7f5828d0) == _interface                   // eip173
+            || bytes4(0x36372b07) == _interface;                 // erc20
         
     }
 
@@ -506,6 +498,8 @@ contract Loihi is LoihiStorage {
         bool success_
     ) {
 
+        require(!partitionTickets[msg.sender].initialized, "Shell/cannot-transfer-once-partitioned");
+
         success_ = Shells.transfer(shell, _recipient, _amount);
 
     }
@@ -522,6 +516,8 @@ contract Loihi is LoihiStorage {
     ) public nonReentrant returns (
         bool success_
     ) {
+
+        require(!partitionTickets[_sender].initialized, "Shell/cannot-transfer-once-partitioned");
 
         success_ = Shells.transferFrom(shell, _sender, _recipient, _amount);
 
@@ -584,7 +580,7 @@ contract Loihi is LoihiStorage {
         return ViewLiquidity.viewLiquidity(shell);
 
     }
-
+    
     /// @notice view the assimilator address for a derivative
     /// @return assimilator_ the assimilator address
     function assimilator (
