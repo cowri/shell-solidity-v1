@@ -24,7 +24,7 @@ import "abdk-libraries-solidity/ABDKMath64x64.sol";
 library ShellMath {
 
     int128 constant ONE = 0x10000000000000000;
-    int128 constant MAX = 0x4000000000000000; // .25 in laments terms
+    int128 constant MAX = 0x4000000000000000; // .25 in layman's terms
     int128 constant ONE_WEI = 0x12;
 
     using ABDKMath64x64 for int128;
@@ -37,11 +37,16 @@ library ShellMath {
         int128 _beta,
         int128 _delta,
         int128[] memory _weights
-    ) internal pure returns (int128 _psi) {
+    ) internal pure returns (int128 psi_) {
 
-        for (uint i = 0; i < _weights.length; i++) {
+        uint _length = _bals.length;
+
+        for (uint i = 0; i < _length; i++) {
+
             int128 _ideal = _gLiq.us_mul(_weights[i]);
-            _psi += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
+
+            psi_ += calculateMicroFee(_bals[i], _ideal, _beta, _delta);
+
         }
 
     }
@@ -59,14 +64,14 @@ library ShellMath {
 
             if (_bal < _threshold) {
 
-                int128 _feeSection = _threshold - _bal;
+                int128 _feeMargin = _threshold - _bal;
 
-                fee_ = _feeSection.us_div(_ideal);
+                fee_ = _feeMargin.us_div(_ideal);
                 fee_ = fee_.us_mul(_delta);
 
                 if (fee_ > MAX) fee_ = MAX;
 
-                fee_ = fee_.us_mul(_feeSection);
+                fee_ = fee_.us_mul(_feeMargin);
 
             } else fee_ = 0;
 
@@ -76,14 +81,14 @@ library ShellMath {
 
             if (_bal > _threshold) {
 
-                int128 _feeSection = _bal - _threshold;
+                int128 _feeMargin = _bal - _threshold;
 
-                fee_ = _feeSection.us_div(_ideal);
+                fee_ = _feeMargin.us_div(_ideal);
                 fee_ = fee_.us_mul(_delta);
 
                 if (fee_ > MAX) fee_ = MAX;
 
-                fee_ = fee_.us_mul(_feeSection);
+                fee_ = fee_.us_mul(_feeMargin);
 
             } else fee_ = 0;
 
@@ -111,7 +116,6 @@ library ShellMath {
         int128 _omega = calculateFee(_oGLiq, _oBals, _beta, _delta, _weights);
         int128 _psi;
 
-
         for (uint i = 0; i < 32; i++) {
 
             _psi = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
@@ -128,8 +132,6 @@ library ShellMath {
                 enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, _weights);
                 
                 enforceSwapInvariant(_oGLiq, _omega, _nGLiq, _psi);
-
-                require(ABDKMath64x64.sub(_oGLiq, _omega) <= ABDKMath64x64.sub(_nGLiq, _psi), "Shell/swap-invariant-violation");
 
                 return outputAmt_;
 

@@ -160,7 +160,7 @@ library Swaps {
     function getOriginSwapData (
         ShellStorage.Shell storage shell,
         uint _inputIx,
-        uint _outputIndex,
+        uint _outputIx,
         address _assim,
         uint _amt
     ) private returns (
@@ -196,7 +196,7 @@ library Swaps {
         }
 
         nGLiq_ = nGLiq_.sub(amt_);
-        nBals_[_outputIndex] = ABDKMath64x64.sub(nBals_[_outputIndex], amt_);
+        nBals_[_outputIx] = ABDKMath64x64.sub(nBals_[_outputIx], amt_);
 
         return ( amt_, oGLiq_, nGLiq_, oBals_, nBals_ );
 
@@ -205,7 +205,7 @@ library Swaps {
     function getTargetSwapData (
         ShellStorage.Shell storage shell,
         uint _inputIx,
-        uint _outputIndex,
+        uint _outputIx,
         address _assim,
         address _recipient,
         uint _amt
@@ -242,7 +242,7 @@ library Swaps {
         }
 
         nGLiq_ = nGLiq_.sub(amt_);
-        nBals_[_outputIndex] = ABDKMath64x64.sub(nBals_[_outputIndex], amt_);
+        nBals_[_outputIx] = ABDKMath64x64.sub(nBals_[_outputIx], amt_);
 
         return ( amt_, oGLiq_, nGLiq_, oBals_, nBals_ );
 
@@ -251,7 +251,7 @@ library Swaps {
     function viewOriginSwapData (
         ShellStorage.Shell storage shell,
         uint _inputIx,
-        uint _outputIndex,
+        uint _outputIx,
         uint _amt,
         address _assim
     ) private view returns (
@@ -285,8 +285,7 @@ library Swaps {
         }
 
         nGLiq_ = nGLiq_.sub(amt_);
-        nBals_[_outputIndex] = ABDKMath64x64.sub(nBals_[_outputIndex], amt_);
-
+        nBals_[_outputIx] = ABDKMath64x64.sub(nBals_[_outputIx], amt_);
 
         return ( amt_, oGLiq_, nGLiq_, nBals_, oBals_ );
 
@@ -295,7 +294,7 @@ library Swaps {
     function viewTargetSwapData (
         ShellStorage.Shell storage shell,
         uint _inputIx,
-        uint _outputIndex,
+        uint _outputIx,
         uint _amt,
         address _assim
     ) private view returns (
@@ -330,7 +329,7 @@ library Swaps {
         }
 
         nGLiq_ = nGLiq_.sub(amt_);
-        nBals_[_outputIndex] = ABDKMath64x64.sub(nBals_[_outputIndex], amt_);
+        nBals_[_outputIx] = ABDKMath64x64.sub(nBals_[_outputIx], amt_);
 
 
         return ( amt_, oGLiq_, nGLiq_, nBals_, oBals_ );
