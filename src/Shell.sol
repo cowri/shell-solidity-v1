@@ -498,7 +498,7 @@ contract Shell is ShellStorage {
         bool success_
     ) {
 
-        require(!partitionTickets[msg.sender].initialized, "Shell/cannot-transfer-once-partitioned");
+        require(!partitionTickets[msg.sender].initialized, "Shell/no-transfers-once-partitioned");
 
         success_ = Shells.transfer(shell, _recipient, _amount);
 
@@ -517,7 +517,7 @@ contract Shell is ShellStorage {
         bool success_
     ) {
 
-        require(!partitionTickets[_sender].initialized, "Shell/cannot-transfer-once-partitioned");
+        require(!partitionTickets[_sender].initialized, "Shell/no-transfers-once-partitioned");
 
         success_ = Shells.transferFrom(shell, _sender, _recipient, _amount);
 
