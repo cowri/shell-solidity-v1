@@ -25,13 +25,8 @@ library ViewLiquidity {
     using ABDKMath64x64 for int128;
 
     function viewLiquidity (
-<<<<<<< HEAD
-        LoihiStorage.Shell storage shell
-    ) internal view returns (
-=======
         ShellStorage.Shell storage shell
-    ) external view returns (
->>>>>>> factory-mainnet
+    ) internal view returns (
         uint total_,
         uint[] memory individual_
     ) {

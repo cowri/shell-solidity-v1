@@ -242,7 +242,7 @@ library Orchestrator {
 
     function viewShell (
         ShellStorage.Shell storage shell
-    ) external view returns (
+    ) internal view returns (
         uint alpha_,
         uint beta_,
         uint delta_,

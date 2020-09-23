@@ -21,7 +21,7 @@ library PartitionedLiquidity {
     function partition (
         ShellStorage.Shell storage shell,
         mapping (address => ShellStorage.PartitionTicket) storage partitionTickets
-    ) external {
+    ) internal {
 
         uint _length = shell.assets.length;
 
