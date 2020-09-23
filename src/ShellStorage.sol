@@ -29,6 +29,15 @@ import "./Swaps.sol";
 
 import "./ViewLiquidity.sol";
 
+
+import "./interfaces/IERC20.sol";
+import "./interfaces/IERC20NoBool.sol";
+import "./interfaces/IAToken.sol";
+import "./interfaces/ICToken.sol";
+import "./interfaces/IChai.sol";
+import "./interfaces/IPot.sol";
+
+
 contract ShellStorage {
 
     address public owner;

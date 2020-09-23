@@ -202,6 +202,8 @@ contract SelectiveWithdrawSuiteOne is SelectiveWithdrawTemplate, DSTest {
             address(susd), 35e18
         );
 
+        uint[] memory withdrawals = s.proportionalWithdraw(150e18, 1e50);
+
         assertEq(withdrawals[0], 79979999999999999921);
         assertEq(withdrawals[1], 99974999);
         assertEq(withdrawals[2], 84978749); 
