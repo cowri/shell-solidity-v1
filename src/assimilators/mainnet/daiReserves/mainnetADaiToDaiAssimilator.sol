@@ -34,7 +34,7 @@ contract MainnetADaiToDaiAssimilator is IAssimilator {
 
     constructor () public { }
 
-    function getASUsd () public view returns (IAToken) {
+    function getADai () public view returns (IAToken) {
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
         (,,,,,,,,,,,address aTokenAddress,) = pool.getReserveData(address(dai));
@@ -45,7 +45,7 @@ contract MainnetADaiToDaiAssimilator is IAssimilator {
     // intakes raw amount of ASUsd and returns the corresponding raw amount
     function intakeRawAndGetBalance (uint256 _amount) public returns (int128 amount_, int128 balance_) {
 
-        IAToken _adai = getASUsd();
+        IAToken _adai = getADai();
 
         bool _success = _adai.transferFrom(msg.sender, address(this), _amount);
 
@@ -64,7 +64,7 @@ contract MainnetADaiToDaiAssimilator is IAssimilator {
     // intakes raw amount of ASUsd and returns the corresponding raw amount
     function intakeRaw (uint256 _amount) public returns (int128 amount_) {
 
-        IAToken _adai = getASUsd();
+        IAToken _adai = getADai();
 
         bool _success = _adai.transferFrom(msg.sender, address(this), _amount);
 
@@ -81,7 +81,7 @@ contract MainnetADaiToDaiAssimilator is IAssimilator {
 
         amount_ = _amount.mulu(1e18);
 
-        IAToken _adai = getASUsd();
+        IAToken _adai = getADai();
 
         bool _success = _adai.transferFrom(msg.sender, address(this), amount_);
 
@@ -98,7 +98,7 @@ contract MainnetADaiToDaiAssimilator is IAssimilator {
 
         pool.deposit(address(dai), _amount, 0);
 
-        IAToken _adai = getASUsd();
+        IAToken _adai = getADai();
 
         bool _success = _adai.transfer(_dst, _amount);
 
@@ -115,7 +115,7 @@ contract MainnetADaiToDaiAssimilator is IAssimilator {
     // outputs a raw amount of ASUsd and returns the corresponding numeraire amount
     function outputRaw (address _dst, uint256 _amount) public returns (int128 amount_) {
 
-        IAToken _adai = getASUsd();
+        IAToken _adai = getADai();
 
         ILendingPool pool = ILendingPool(lpProvider.getLendingPool());
 
@@ -138,7 +138,7 @@ contract MainnetADaiToDaiAssimilator is IAssimilator {
 
         pool.deposit(address(dai), amount_, 0);
 
-        IAToken _adai = getASUsd();
+        IAToken _adai = getADai();
 
         bool _success = _adai.transfer(_dst, amount_);
 
