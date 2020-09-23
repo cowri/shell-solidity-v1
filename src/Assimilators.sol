@@ -31,9 +31,9 @@ library Assimilators {
 
     }
 
-    function viewRawAmount (address _assim, int128 _amt) internal view returns (uint256 amount_) {
+    function viewRawAmount (address _assim, int128 _amt) internal view returns (uint256 amt_) {
 
-        amount_ = IAssimilator(_assim).viewRawAmount(_amt);
+        amt_ = IAssimilator(_assim).viewRawAmount(_amt);
 
     }
 
