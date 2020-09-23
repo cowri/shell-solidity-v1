@@ -234,15 +234,6 @@ library ProportionalLiquidity {
     
         ( int128 _nGLiq, int128[] memory _nBals ) = getGrossLiquidityAndBalances(shell);
         
-        for (uint i = 0; i < _nBals.length; i++) {
-
-            int128 _bal = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
-            
-            _nBals[i] = _bal;
-            _nGLiq += _bal;
-
-        }
-        
         int128 _beta = shell.beta;
         int128 _delta = shell.delta;
         int128[] memory _weights = shell.weights;

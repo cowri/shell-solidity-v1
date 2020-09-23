@@ -79,7 +79,7 @@ library SelectiveLiquidity {
 
         int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
-        _shells = _shells.abs().us_mul(ONE + shell.epsilon);
+        _shells = _shells.neg().us_mul(ONE + shell.epsilon);
 
         shells_ = _shells.mulu(1e18);
 
@@ -104,7 +104,7 @@ library SelectiveLiquidity {
 
         int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
-        _shells = _shells.abs().us_mul(ONE + shell.epsilon);
+        _shells = _shells.neg().us_mul(ONE + shell.epsilon);
 
         shells_ = _shells.mulu(1e18);
 
@@ -131,7 +131,7 @@ library SelectiveLiquidity {
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
-            if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {
+            if ( nBals_[_assim.ix] == 0 && 0 == oBals_[_assim.ix]) {
 
                 ( int128 _amount, int128 _balance ) = Assimilators.intakeRawAndGetBalance(_assim.addr, _amounts[i]);
 
@@ -175,7 +175,7 @@ library SelectiveLiquidity {
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
-            if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {
+            if ( nBals_[_assim.ix] == 0 && 0 == oBals_[_assim.ix]) {
 
                 ( int128 _amount, int128 _balance ) = Assimilators.outputRawAndGetBalance(_assim.addr, _rcpnt, _amounts[i]);
 
@@ -217,7 +217,7 @@ library SelectiveLiquidity {
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
-            if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {
+            if ( nBals_[_assim.ix] == 0 && 0 == oBals_[_assim.ix]) {
 
                 ( int128 _amount, int128 _balance ) = Assimilators.viewNumeraireAmountAndBalance(_assim.addr, _amounts[i]);
 
@@ -260,7 +260,7 @@ library SelectiveLiquidity {
 
             require(_assim.addr != address(0), "Shell/unsupported-derivative");
 
-            if ( nBals_[_assim.ix] == 0 && oBals_[_assim.ix] == 0 ) {
+            if ( nBals_[_assim.ix] == 0 && 0 == oBals_[_assim.ix]) {
 
                 ( int128 _amount, int128 _balance ) = Assimilators.viewNumeraireAmountAndBalance(_assim.addr, _amounts[i]);
 
@@ -297,7 +297,7 @@ library SelectiveLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            if (oBals_[i] == 0 && nBals_[i] == 0) {
+            if (oBals_[i] == 0 && 0 == nBals_[i]) {
 
                 nBals_[i] = oBals_[i] = Assimilators.viewNumeraireBalance(shell.assets[i].addr);
                 

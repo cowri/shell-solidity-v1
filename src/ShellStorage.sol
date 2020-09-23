@@ -29,18 +29,15 @@ import "./Swaps.sol";
 
 import "./ViewLiquidity.sol";
 
-import "./interfaces/IERC20.sol";
-import "./interfaces/IERC20NoBool.sol";
-import "./interfaces/IAToken.sol";
-import "./interfaces/ICToken.sol";
-import "./interfaces/IChai.sol";
-import "./interfaces/IPot.sol";
-
 contract ShellStorage {
+
+    address public owner;
 
     string  public constant name = "Shells";
     string  public constant symbol = "SHL";
     uint8   public constant decimals = 18;
+
+    Shell public shell;
 
     struct Shell {
         int128 alpha;
@@ -50,10 +47,10 @@ contract ShellStorage {
         int128 lambda;
         int128[] weights;
         uint totalSupply;
-        mapping (address => uint) balances;
-        mapping (address => mapping (address => uint)) allowances;
         Assimilator[] assets;
         mapping (address => Assimilator) assimilators;
+        mapping (address => uint) balances;
+        mapping (address => mapping (address => uint)) allowances;
         bool TEST_HALTS;
     }
 
@@ -62,23 +59,21 @@ contract ShellStorage {
         uint8 ix;
     }
 
-    Shell public shell;
+    mapping (address => PartitionTicket) public partitionTickets;
 
     struct PartitionTicket {
         uint[] claims;
         bool initialized;
     }
 
-    mapping (address => PartitionTicket) public partitionTickets;
-
     address[] public derivatives;
     address[] public numeraires;
     address[] public reserves;
 
     bool public partitioned = false;
+
     bool public frozen = false;
 
-    address public owner;
     bool internal notEntered = true;
 
     uint public maxFee;

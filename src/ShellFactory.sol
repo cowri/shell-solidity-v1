@@ -13,7 +13,7 @@
 
 pragma solidity ^0.5.0;
 
-// Builds new BPools, logging their addresses and providing `isBPool(address) -> (bool)`
+// Finds new Shells! logs their addresses and provides `isShell(address) -> (bool)`
 
 import "./Shell.sol";
 
@@ -52,19 +52,19 @@ contract ShellFactory {
         
         if (msg.sender != cowri) revert("Shell/must-be-cowri");
 
-        Shell shellShell = new Shell(
+        Shell shell = new Shell(
             _assets,
             _assetWeights,
             _derivativeAssimilators
         );
 
-        shellShell.transferOwnership(msg.sender);
+        shell.transferOwnership(msg.sender);
 
-        _isShell[address(shellShell)] = true;
+        _isShell[address(shell)] = true;
 
-        emit NewShell(msg.sender, address(shellShell));
+        emit NewShell(msg.sender, address(shell));
 
-        return shellShell;
+        return shell;
 
     }
 
