@@ -67,7 +67,7 @@ library Orchestrator {
         
         int128 _psi = getFee(shell);
         
-        require(_omega <= _psi, "Shell/parameters-increase-fee");
+        require(_omega >= _psi, "Shell/parameters-increase-fee");
 
         emit ParametersSet(_alpha, _beta, shell.delta.mulu(1e18), _epsilon, _lambda);
 
