@@ -25,6 +25,7 @@ library ShellMath {
 
     int128 constant ONE = 0x10000000000000000;
     int128 constant MAX = 0x4000000000000000; // .25 in layman's terms
+    int128 constant MAX_DIFF = -0x10C6F7A0B5EE;
     int128 constant ONE_WEI = 0x12;
 
     using ABDKMath64x64 for int128;
@@ -155,8 +156,14 @@ library ShellMath {
         int128 _nGLiq,
         int128 _psi
     ) private pure {
-        
-        require(_oGLiq.sub(_omega) / 1e10 <= _nGLiq.sub(_psi) / 1e10, "Shell/swap-invariant-violation");
+
+        int128 _nextUtil = _nGLiq - _psi;
+
+        int128 _prevUtil = _oGLiq - _omega;
+
+        int128 _diff = _nextUtil - _prevUtil;
+
+        require(0 < _diff || _diff >= MAX_DIFF, "Shell/swap-invariant-violation");
         
     }
 
@@ -233,8 +240,10 @@ library ShellMath {
         int128 _nextUtilPerShell = _nGLiq
             .sub(_psi)
             .div(_totalShells.add(_newShells));
-            
-        require(_prevUtilPerShell / 1e10 <= _nextUtilPerShell / 1e10, "Shell/liquidity-invariant-violation");
+
+        int128 _diff = _nextUtilPerShell - _prevUtilPerShell;
+
+        require(0 < _diff || _diff >= MAX_DIFF, "Shell/liquidity-invariant-violation");
         
     }
 
