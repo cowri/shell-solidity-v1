@@ -69,4 +69,19 @@ contract PartitionedLiquidityTemplate is Setup {
 
     }
 
+    function withdraw_two_derivatives () public returns (uint[] memory) {
+
+        s.proportionalDeposit(300e18, 1e50);
+
+        s.setFrozen(true);
+
+        s.partition();
+
+        return s.partitionedWithdraw(
+            address(dai), 150e18,
+            address(adai), 150e18
+        );
+
+    }
+
 }

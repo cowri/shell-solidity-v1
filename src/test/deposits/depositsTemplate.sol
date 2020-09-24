@@ -57,14 +57,14 @@ contract SelectiveDepositTemplate is Setup {
 
     function balanced_5DAI_1USDC_3USDT_1SUSD_ATOKENS () public returns (uint256 shellsMinted_) {
 
-        uint256 startingShells = l.deposit(
+        uint256 startingShells = s.deposit(
             address(dai), 80e18,
             address(usdc), 100e6,
             address(usdt), 85e6,
             address(susd), 35e18
         );
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(adai), 5e18,
             address(ausdc), 1e6,
             address(ausdt), 3e6,
@@ -110,13 +110,13 @@ contract SelectiveDepositTemplate is Setup {
 
     function partialUpperSlippage_5DAI_5USDC_70USDT_28SUSD_300Proportional_CTOKENS () public returns (uint256 shellsMinted_) {
 
-        ( uint256 startingShells, uint[] memory _deposits ) = l.proportionalDeposit(300e18, 1e50);
+        ( uint256 startingShells, uint[] memory _deposits ) = s.proportionalDeposit(300e18, 1e50);
         
         uint cdaiOf5Numeraire = cdaiAssimilator.viewRawAmount(uint(5e18).divu(1e18));
         uint cusdcOf5Numeraire = cusdcAssimilator.viewRawAmount(uint(5e6).divu(1e6));
         uint cusdtOf70Numeraire = cusdtAssimilator.viewRawAmount(uint(70e6).divu(1e6));
 
-        shellsMinted_ = l.deposit(
+        shellsMinted_ = s.deposit(
             address(cdai), cdaiOf5Numeraire,
             address(cusdc), cusdcOf5Numeraire,
             address(cusdt), cusdtOf70Numeraire,

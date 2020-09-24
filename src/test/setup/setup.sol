@@ -70,13 +70,13 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
         
         setupStablecoinsMainnet();
         
-        // setupAssimilatorsSetOneMainnet();
+        setupAssimilatorsSetOneMainnet();
         
         ShellFactory lf = new ShellFactory();
 
         address[] memory _assets = new address[](20);
         uint[] memory _assetWeights = new uint[](4);
-        address[] memory _derivativeAssimilators = new address[](5);
+        address[] memory _derivativeAssimilators = new address[](35);
 
         _assets[0] = address(dai);
         _assets[1] = address(daiAssimilator);
@@ -108,29 +108,45 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
         
         _derivativeAssimilators[0] = address(cdai);
         _derivativeAssimilators[1] = address(dai);
-        _derivativeAssimilators[2] = address(cdai);
-        _derivativeAssimilators[3] = address(chaiAssimilator);
-        _derivativeAssimilators[4] = address(chai);
-        // _derivativeAssimilators[4] = address(cdai);
-        // _derivativeAssimilators[4] = address(cdai);
-        // _derivativeAssimilators[5] = address(dai);
-        // _derivativeAssimilators[6] = address(dai);
-        // _derivativeAssimilators[7] = address(cdaiAssimilator);
+        _derivativeAssimilators[2] = address(dai);
+        _derivativeAssimilators[3] = address(cdaiAssimilator);
+        _derivativeAssimilators[4] = address(cdai);
 
-        // _derivativeAssimilators[8] = address(cusdc);
-        // _derivativeAssimilators[9] = address(usdc);
-        // _derivativeAssimilators[10] = address(usdc);
-        // _derivativeAssimilators[11] = address(cusdcAssimilator);
+        _derivativeAssimilators[5] = address(adai);
+        _derivativeAssimilators[6] = address(dai);
+        _derivativeAssimilators[7] = address(dai);
+        _derivativeAssimilators[8] = address(adaiAssimilator);
+        _derivativeAssimilators[9] = address(aaveLpCore);
 
-        // _derivativeAssimilators[12] = address(ausdt);
-        // _derivativeAssimilators[13] = address(usdt);
-        // _derivativeAssimilators[14] = address(usdt);
-        // _derivativeAssimilators[15] = address(ausdtAssimilator);
+        _derivativeAssimilators[10] = address(cusdc);
+        _derivativeAssimilators[11] = address(usdc);
+        _derivativeAssimilators[12] = address(usdc);
+        _derivativeAssimilators[13] = address(cusdcAssimilator);
+        _derivativeAssimilators[14] = address(cusdc);
 
-        // _derivativeAssimilators[16] = address(asusd);
-        // _derivativeAssimilators[17] = address(susd);
-        // _derivativeAssimilators[18] = address(susd);
-        // _derivativeAssimilators[19] = address(asusdAssimilator);
+        _derivativeAssimilators[15] = address(ausdc);
+        _derivativeAssimilators[16] = address(usdc);
+        _derivativeAssimilators[17] = address(usdc);
+        _derivativeAssimilators[18] = address(ausdcAssimilator);
+        _derivativeAssimilators[19] = address(aaveLpCore);
+
+        _derivativeAssimilators[20] = address(ausdt);
+        _derivativeAssimilators[21] = address(usdt);
+        _derivativeAssimilators[22] = address(usdt);
+        _derivativeAssimilators[23] = address(ausdtAssimilator);
+        _derivativeAssimilators[24] = address(aaveLpCore);
+
+        _derivativeAssimilators[25] = address(cusdt);
+        _derivativeAssimilators[26] = address(usdt);
+        _derivativeAssimilators[27] = address(usdt);
+        _derivativeAssimilators[28] = address(cusdtAssimilator);
+        _derivativeAssimilators[29] = address(cusdt);
+
+        _derivativeAssimilators[30] = address(asusd);
+        _derivativeAssimilators[31] = address(susd);
+        _derivativeAssimilators[32] = address(susd);
+        _derivativeAssimilators[33] = address(asusdAssimilator);
+        _derivativeAssimilators[34] = address(aaveLpCore);
 
         shell_ = lf.newShell(
             _assets,

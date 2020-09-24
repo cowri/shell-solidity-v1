@@ -21,6 +21,73 @@ contract OriginSwapTemplate is Setup {
 
     event log_int(bytes32, int);
 
+    
+    function direct_cdai_to_adai () public returns (uint256 targetAmount_) {
+
+        s.proportionalDeposit(300e18, 1e50);
+
+        uint cdaiOf10Numeraire = cdaiAssimilator.viewRawAmount(uint(10e18).divu(1e18));
+
+        targetAmount_ = s.originSwap(
+            address(cdai),
+            address(adai),
+            cdaiOf10Numeraire 
+        );
+
+    }
+
+    function direct_adai_to_dai () public returns (uint targetAmount_) {
+
+        s.proportionalDeposit(300e18, 1e50);
+
+        targetAmount_ = s.originSwap(
+            address(adai),
+            address(dai),
+            10e18
+        );
+
+    }
+
+    function direct_cusdt_to_ausdt () public returns (uint targetAmount_) {
+
+        s.proportionalDeposit(300e18, 1e50);
+
+        uint cusdtOf10Numeraire = cusdtAssimilator.viewRawAmount(uint(10e18).divu(1e18));
+
+        targetAmount_ = s.originSwap(
+            address(cusdt),
+            address(ausdt),
+            cusdtOf10Numeraire 
+        );
+
+    }
+
+    function direct_cusdc_to_ausdc () public returns (uint targetAmount_) {
+
+        s.proportionalDeposit(300e18, 1e50);
+
+        uint cusdcOf10Numeraire = cusdcAssimilator.viewRawAmount(uint(10e18).divu(1e18));
+
+        targetAmount_ = s.originSwap(
+            address(cusdc),
+            address(ausdc),
+            cusdcOf10Numeraire 
+        );
+
+    }
+
+    function direct_asusd_to_susd () public returns (uint targetAmount_) {
+
+        s.proportionalDeposit(300e18, 1e50);
+
+        targetAmount_ = s.originSwap(
+            address(asusd),
+            address(susd),
+            10e18
+        );
+
+    }
+
     function noSlippage_balanced_10DAI_to_USDC_300Proportional () public returns (uint256 targetAmount_) {
 
         s.proportionalDeposit(300e18, 1e50);
@@ -101,9 +168,9 @@ contract OriginSwapTemplate is Setup {
 
     function noSlippage_balanced_30PctWeight_to_30PctWeight_ADAI_to_AUSDC() public returns (uint256 targetAmount_) {
 
-        l.proportionalDeposit(300e18, 1e50);
+        s.proportionalDeposit(300e18, 1e50);
 
-        targetAmount_ = l.originSwap(
+        targetAmount_ = s.originSwap(
             address(adai),
             address(ausdc),
             10e18
@@ -191,7 +258,7 @@ contract OriginSwapTemplate is Setup {
 
     function fullUpperAndLowerSlippage_unbalanced_30PctWeight_CDAI_to_AUSDT () public returns (uint256 targetAmount_) {
 
-        l.deposit(
+        s.deposit(
             address(dai), 135e18,
             address(usdc), 90e6,
             address(usdt), 60e6,
@@ -202,7 +269,7 @@ contract OriginSwapTemplate is Setup {
         
         uint cdaiOf5Numeraire = IAssimilator(cdaiAssimilator).viewRawAmount(uint(5e18).divu(1e18));
 
-        targetAmount_ = l.originSwap(
+        targetAmount_ = s.originSwap(
             address(cdai),
             address(ausdt),
             cdaiOf5Numeraire
@@ -294,7 +361,7 @@ contract OriginSwapTemplate is Setup {
 
     function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_CUSDC_to_CDAI () public returns (uint256 targetAmount_) {
 
-        l.deposit(
+        s.deposit(
             address(dai), 135e18,
             address(usdc), 60e6,
             address(usdt), 90e6,
@@ -303,7 +370,7 @@ contract OriginSwapTemplate is Setup {
         
         uint cusdcOf30Numeraire = IAssimilator(cusdcAssimilator).viewRawAmount(uint(30e6).divu(1e6));
 
-        targetAmount_ = l.originSwap(
+        targetAmount_ = s.originSwap(
             address(usdc),
             address(dai),
             cusdcOf30Numeraire
@@ -316,14 +383,14 @@ contract OriginSwapTemplate is Setup {
 
     function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_USDC_to_ADAI () public returns (uint256 targetAmount_) {
 
-        l.deposit(
+        s.deposit(
             address(dai), 135e18,
             address(usdc), 60e6,
             address(usdt), 90e6,
             address(susd), 30e18
         );
 
-        targetAmount_ = l.originSwap(
+        targetAmount_ = s.originSwap(
             address(usdc),
             address(adai),
             30e6
@@ -333,14 +400,14 @@ contract OriginSwapTemplate is Setup {
 
     function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_AUSDC_to_CDAI () public returns (uint256 targetAmount_) {
 
-        l.deposit(
+        s.deposit(
             address(dai), 135e18,
             address(usdc), 60e6,
             address(usdt), 90e6,
             address(susd), 30e18
         );
 
-        targetAmount_ = l.originSwap(
+        targetAmount_ = s.originSwap(
             address(ausdc),
             address(cdai),
             30e6
@@ -386,14 +453,14 @@ contract OriginSwapTemplate is Setup {
 
     function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight_AUSDT_to_SUSD () public returns (uint256 targetAmount_) {
 
-        l.deposit(
+        s.deposit(
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 58e6,
             address(susd), 40e18
         );
 
-        targetAmount_ = l.originSwap(
+        targetAmount_ = s.originSwap(
             address(ausdt),
             address(susd),
             10e6
@@ -403,7 +470,7 @@ contract OriginSwapTemplate is Setup {
 
     function partialUpperAndLowerAntiSlippage_unbalanced_30PctWeight_to_10PctWeight_CUSDT_to_ASUSD () public returns (uint256 targetAmount_) {
 
-        l.deposit(
+        s.deposit(
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 58e6,
@@ -412,7 +479,7 @@ contract OriginSwapTemplate is Setup {
         
         uint cusdcOf10Numeraire = IAssimilator(cusdtAssimilator).viewRawAmount(uint(10e6).divu(1e6));
 
-        targetAmount_ = l.originSwap(
+        targetAmount_ = s.originSwap(
             address(cusdt),
             address(asusd),
             cusdcOf10Numeraire
@@ -464,7 +531,7 @@ contract OriginSwapTemplate is Setup {
 
     function fullUpperAndLowerAntiSlippage_10PctWeight_to30PctWeight_ASUSD_to_CUSDT () public returns (uint256 targetAmount_) {
 
-        l.deposit(
+        s.deposit(
             address(dai), 90e18,
             address(usdc), 90e6,
             address(usdt), 135e6,
@@ -473,7 +540,7 @@ contract OriginSwapTemplate is Setup {
 
         uint256 gas = gasleft();
 
-        targetAmount_ = l.originSwap(
+        targetAmount_ = s.originSwap(
             address(susd),
             address(cusdt),
             3.6537e18

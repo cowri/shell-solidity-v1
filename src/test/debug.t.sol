@@ -24,21 +24,16 @@ contract DebugTest is Setup, DSMath, DSTest {
 
     function setUp() public {
 
-        s = getShellSuiteOne();
+        // s = getShellSuiteOne();
+        setupAssimilatorsSetOneMainnet();
 
     }
 
     function testDebug () public {
 
-        uint256 p3 = .3e18;
+        uint daiBal = daiAssimilator.viewNumeraireBalance(address(this)).mulu(1e18);
 
-        int128 p3divu = p3.divu(1e18);
-
-        int128 onedivu = uint256(.25e18).divu(1e18);
-
-        emit log_named_int("int128", onedivu);
-
-
+        emit log_named_uint("daibal", daiBal);
 
     }
     

@@ -65,4 +65,24 @@ contract PartitionedWithdrawSuiteOne is PartitionedLiquidityTemplate, DSTest {
 
     }
 
+    function test_s1_partitioned_withdraw_two_derivatives () public {
+
+        uint[] memory _withdraws = super.withdraw_two_derivatives();
+
+        assertEq(_withdraws[0], 45e18);
+
+        assertEq(_withdraws[1], 45e18);
+
+        uint[] memory _claims = s.viewPartitionClaims(address(this));
+
+        assertEq(_claims[0], 0);
+
+        assertEq(_claims[1], 300e18);
+
+        assertEq(_claims[2], 300e18);
+
+        assertEq(_claims[3], 300e18);
+
+    }
+
 }

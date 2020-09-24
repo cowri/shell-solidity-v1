@@ -13,6 +13,46 @@ contract OriginSwapSuiteOneTest is OriginSwapTemplate, DSTest {
 
     }
 
+    function test_s1_originSwap_direct_cdai_to_adai () public {
+
+        uint targetAmount = super.direct_cdai_to_adai();
+
+        assertEq(targetAmount, 9999999999889571588);
+
+    }
+
+    function test_s1_originSwap_direct_adai_to_dai() public {
+
+        uint targetAmount = super.direct_adai_to_dai();
+
+        assertEq(targetAmount, 10e18);
+
+    }
+
+    function test_s1_originSwap_direct_cusdc_to_ausdc() public {
+
+        uint targetAmount = super.direct_cusdc_to_ausdc();
+
+        assertEq(targetAmount, 9999998);
+
+    }
+
+    function test_s1_originSwap_direct_cusdt_to_ausdt() public {
+
+        uint targetAmount = super.direct_cusdt_to_ausdt();
+
+        assertEq(targetAmount, 10e18);
+
+    }
+    function test_s1_originSwap_direct_asusd_to_susd() public {
+
+        uint targetAmount = super.direct_asusd_to_susd();
+
+        assertEq(targetAmount, 10e18);
+
+    }
+
+
     function test_s1_originSwap_noSlippage_balanced_10DAI_to_USDC_300Proportional () public {
 
         uint256 targetAmount = super.noSlippage_balanced_10DAI_to_USDC_300Proportional();
