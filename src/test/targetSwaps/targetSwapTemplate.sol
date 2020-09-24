@@ -768,8 +768,6 @@ contract TargetSwapTemplate is Setup {
         susd.transfer(address(s), 4970e18);
         asusd.transfer(address(s), 4970e18);
 
-        
-
         s.TEST_setTestHalts(false);
 
         originAmount_ = s.targetSwap(

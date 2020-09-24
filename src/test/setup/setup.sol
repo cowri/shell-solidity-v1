@@ -85,11 +85,23 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
     
     function getShellSuiteOneLocalFromFactory () public returns (Shell shell_) {
         
-        
         setupStablecoinsLocal();
         
         setupAssimilatorsSetOneLocal();
+
+        shell_ = getShellFromFactory();
         
+        setParamsSetOne(shell_);
+
+        approveStablecoins(address(shell_));
+
+        interApproveStablecoinsLocal(address(shell_));
+
+    }
+
+
+    function getShellFromFactory () public returns (Shell shell_) {
+
         ShellFactory lf = new ShellFactory();
 
         address[] memory _assets = new address[](20);
@@ -130,8 +142,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
             _derivativeAssimilators
         );
         
-        emit log("mew shell");
-        
         shell_.TEST_includeAssimilatorState(
             dai, cdai, chai, pot,
             usdc, cusdc,
@@ -139,14 +149,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
             susd, asusd
         );
         
-        emit log("after assim state");
-        
-        setParamsSetOne(shell_);
-
-        approveStablecoins(address(shell_));
-
-        interApproveStablecoinsLocal(address(shell_));
-
     }
     
     function getShellSuiteOneLocal () public returns (Shell shell_) {
@@ -261,24 +263,16 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
     function getShellSuiteFiveLocal () public returns (Shell shell_) {
 
-        // setupStablecoinsLocal();
-        // setupAssimilatorsSetOneLocal();
+        setupStablecoinsLocal();
+        setupAssimilatorsSetOneLocal();
 
-        // shell_ = newShell();
+        shell_ = getShellFromFactory();
         
-        // shell_.TEST_includeAssimilatorState(
-        //     dai, cdai, chai, pot,
-        //     usdc, cusdc,
-        //     usdt, ausdt,
-        //     susd, asusd
-        // );
+        setParamsSetFour(shell_);
 
-        // includeAssetsSetOne(shell_);
-        // includeAssimilatorsSetOne(shell_);
-        // setParamsSetFour(shell_);
+        approveStablecoins(address(shell_));
 
-        // approveStablecoins(address(shell_));
-        // interApproveStablecoinsLocal(address(shell_));
+        interApproveStablecoinsLocal(address(shell_));
 
     }
 
@@ -327,24 +321,17 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
     function getShellSuiteSeven () public returns (Shell shell_) {
 
-        // setupStablecoinsLocal();
-        // setupAssimilatorsSetOneLocal();
+        setupStablecoinsLocal();
 
-        // shell_ = newShell();
+        setupAssimilatorsSetOneLocal();
 
-        // shell_.TEST_includeAssimilatorState(
-        //     dai, cdai, chai, pot,
-        //     usdc, cusdc,
-        //     usdt, ausdt,
-        //     susd, asusd
-        // );
+        shell_ = getShellFromFactory();
+        
+        setParamsSetFive(shell_);
 
-        // includeAssetsSetOne(shell_);
-        // includeAssimilatorsSetOne(shell_);
-        // setParamsSetFive(shell_);
+        approveStablecoins(address(shell_));
 
-        // approveStablecoins(address(shell_));
-        // interApproveStablecoinsLocal(address(shell_));
+        interApproveStablecoinsLocal(address(shell_));
 
     }
 

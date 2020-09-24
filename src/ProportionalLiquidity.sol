@@ -223,6 +223,8 @@ library ProportionalLiquidity {
         return (grossLiquidity_, balances_);
 
     }
+
+    event log_int(bytes32, int);
     
     function requireLiquidityInvariant (
         ShellStorage.Shell storage shell,
@@ -242,7 +244,8 @@ library ProportionalLiquidity {
 
         int128 _psi = ShellMath.calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
 
-        ShellMath.enforceLiquidityInvariant(_shells, _newShells, _oGLiq, _nGLiq, _omega, _psi);
+
+        ShellMath.enforceLiquidityInvariant_no_view(_shells, _newShells, _oGLiq, _nGLiq, _omega, _psi);
         
     }
 

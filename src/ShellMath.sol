@@ -156,7 +156,7 @@ library ShellMath {
         int128 _psi
     ) private pure {
         
-        require(_oGLiq.sub(_omega) / 1e10 <= _nGLiq.sub(_psi) / 1e10, "Shell/swap-invariant-violation");
+        require(_oGLiq.sub(_omega) / 1e13 <= _nGLiq.sub(_psi) / 1e13, "Shell/swap-invariant-violation");
         
     }
 
@@ -239,6 +239,45 @@ library ShellMath {
         
     }
 
+    event log_int(bytes32, int);
+
+    function enforceLiquidityInvariant_no_view (
+        int128 _totalShells,
+        int128 _newShells,
+        int128 _oGLiq,
+        int128 _nGLiq,
+        int128 _omega,
+        int128 _psi
+    ) internal {
+        
+        if (_totalShells == 0 || 0 == _totalShells + _newShells) return;
+        
+        int128 _prevUtilPerShell = _oGLiq
+            .sub(_omega)
+            .div(_totalShells);
+            
+        int128 _nextUtilPerShell = _nGLiq
+            .sub(_psi)
+            .div(_totalShells.add(_newShells));
+
+        emit log_int("ogliq", _oGLiq.muli(1e18));
+        emit log_int("omega", _omega.muli(1e18));
+        emit log_int("ngliq", _nGLiq.muli(1e18));
+        emit log_int("psi", _psi.muli(1e18));
+
+        emit log_int("prev util", _prevUtilPerShell);
+        emit log_int("next util", _nextUtilPerShell);
+
+        emit log_int("prev util", _prevUtilPerShell.muli(1e18));
+        emit log_int("next util", _nextUtilPerShell.muli(1e18));
+
+        emit log_int("prev util", ( _prevUtilPerShell / 1e12 * 1e12).muli(1e18));
+        emit log_int("next util", ( _nextUtilPerShell / 1e12 * 1e12).muli(1e18));
+            
+        require(_prevUtilPerShell / 1e13 <= _nextUtilPerShell / 1e13, "Shell/liquidity-invariant-violation");
+        
+    }
+    
     function enforceHalts (
         ShellStorage.Shell storage shell,
         int128 _oGLiq,
