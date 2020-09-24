@@ -25,6 +25,7 @@ library ShellMath {
 
     int128 constant ONE = 0x10000000000000000;
     int128 constant MAX = 0x4000000000000000; // .25 in layman's terms
+    int128 constant MAX_DIFF = -0x10C6F7A0B5EE;
     int128 constant ONE_WEI = 0x12;
 
     using ABDKMath64x64 for int128;
@@ -148,6 +149,80 @@ library ShellMath {
         revert("Shell/swap-convergence-failed");
 
     }
+
+    function calculateTrade_no_view (
+        ShellStorage.Shell storage shell,
+        int128 _oGLiq,
+        int128 _nGLiq,
+        int128[] memory _oBals,
+        int128[] memory _nBals,
+        int128 _inputAmt,
+        uint _outputIndex
+    ) internal returns (int128 outputAmt_) {
+
+        outputAmt_ = - _inputAmt;
+
+        int128 _lambda = shell.lambda;
+        int128 _beta = shell.beta;
+        int128 _delta = shell.delta;
+        int128[] memory _weights = shell.weights;
+
+        int128 _omega = calculateFee(_oGLiq, _oBals, _beta, _delta, _weights);
+        int128 _psi;
+
+        for (uint i = 0; i < 32; i++) {
+
+            _psi = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
+
+            if (( outputAmt_ = _omega < _psi
+                    ? - ( _inputAmt + _omega - _psi )
+                    : - ( _inputAmt + _lambda.us_mul(_omega - _psi))
+                ) / 1e13 == outputAmt_ / 1e13 ) {
+
+                _nGLiq = _oGLiq + _inputAmt + outputAmt_;
+
+                _nBals[_outputIndex] = _oBals[_outputIndex] + outputAmt_;
+
+                enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, _weights);
+                
+                enforceSwapInvariant_no_view(_oGLiq, _omega, _nGLiq, _psi);
+
+                return outputAmt_;
+
+            } else {
+
+                _nGLiq = _oGLiq + _inputAmt + outputAmt_;
+
+                _nBals[_outputIndex] = _oBals[_outputIndex].add(outputAmt_);
+
+            }
+
+        }
+
+        revert("Shell/swap-convergence-failed");
+
+    }
+
+    function enforceSwapInvariant_no_view (
+        int128 _oGLiq,
+        int128 _omega,
+        int128 _nGLiq,
+        int128 _psi
+    ) private {
+
+        int128 _nextUtil = _nGLiq - _psi;
+
+        int128 _prevUtil = _oGLiq - _omega;
+
+        int128 _diff = _nextUtil - _prevUtil;
+
+        emit log_int("_next util", _nextUtil.muli(1e18));
+        emit log_int("_prev util", _prevUtil.muli(1e18));
+        emit log_int("_diff", _diff.muli(1e18));
+
+        require(0 < _diff || _diff >= MAX_DIFF, "Shell/swap-invariant-violation");
+
+    }
     
     function enforceSwapInvariant (
         int128 _oGLiq,
@@ -155,9 +230,16 @@ library ShellMath {
         int128 _nGLiq,
         int128 _psi
     ) private pure {
+
         
-        require(_oGLiq.sub(_omega) / 1e13 <= _nGLiq.sub(_psi) / 1e13, "Shell/swap-invariant-violation");
-        
+        int128 _nextUtil = _nGLiq - _psi;
+
+        int128 _prevUtil = _oGLiq - _omega;
+
+        int128 _diff = _nextUtil - _prevUtil;
+
+        require(0 < _diff || _diff >= MAX_DIFF, "Shell/swap-invariant-violation");
+
     }
 
     function calculateLiquidityMembrane (
@@ -215,6 +297,62 @@ library ShellMath {
         }
 
     }
+
+    function calculateLiquidityMembrane_no_view (
+        ShellStorage.Shell storage shell,
+        int128 _oGLiq,
+        int128 _nGLiq,
+        int128[] memory _oBals,
+        int128[] memory _nBals
+    ) internal returns (int128 shells_) {
+
+        int128 _psi;
+        int128 _omega;
+
+        {
+            
+            int128 _beta = shell.beta;
+            int128 _delta = shell.delta;
+            int128[] memory _weights = shell.weights;
+
+            enforceHalts(shell, _oGLiq, _nGLiq, _oBals, _nBals, _weights);
+
+            _psi = calculateFee(_nGLiq, _nBals, _beta, _delta, _weights);
+
+            _omega = calculateFee(_oGLiq, _oBals, _beta, _delta, _weights);
+            
+        }
+
+        int128 _feeDiff = _psi.sub(_omega);
+        int128 _liqDiff = _nGLiq.sub(_oGLiq);
+        int128 _oUtil = _oGLiq.sub(_omega);
+        int128 _totalShells = shell.totalSupply.divu(1e18);
+
+        if (_totalShells == 0) {
+
+            shells_ = _nGLiq.sub(_psi);
+
+        } else if (_feeDiff >= 0) {
+
+            shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
+
+        } else {
+            
+            shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff));
+            
+            shells_ = shells_.div(_oUtil);
+
+        }
+
+        if (_totalShells != 0) {
+
+            shells_ = shells_.mul(_totalShells);
+            
+            enforceLiquidityInvariant_no_view(_totalShells, shells_, _oGLiq, _nGLiq, _omega, _psi);
+
+        }
+
+    }
     
     function enforceLiquidityInvariant (
         int128 _totalShells,
@@ -235,7 +373,10 @@ library ShellMath {
             .sub(_psi)
             .div(_totalShells.add(_newShells));
             
-        require(_prevUtilPerShell / 1e10 <= _nextUtilPerShell / 1e10, "Shell/liquidity-invariant-violation");
+        int128 _diff = _nextUtilPerShell - _prevUtilPerShell;
+
+        require(0 < _diff || _diff >= MAX_DIFF, "Shell/liquidity-invariant-violation");
+        
         
     }
 
@@ -267,14 +408,20 @@ library ShellMath {
 
         emit log_int("prev util", _prevUtilPerShell);
         emit log_int("next util", _nextUtilPerShell);
+        emit log_int("minus", _prevUtilPerShell - _nextUtilPerShell);
 
         emit log_int("prev util", _prevUtilPerShell.muli(1e18));
         emit log_int("next util", _nextUtilPerShell.muli(1e18));
+        emit log_int("minus", (_prevUtilPerShell - _nextUtilPerShell).muli(1e18));
 
-        emit log_int("prev util", ( _prevUtilPerShell / 1e12 * 1e12).muli(1e18));
-        emit log_int("next util", ( _nextUtilPerShell / 1e12 * 1e12).muli(1e18));
-            
-        require(_prevUtilPerShell / 1e13 <= _nextUtilPerShell / 1e13, "Shell/liquidity-invariant-violation");
+        emit log_int("prev util", ( _prevUtilPerShell / 1e13 * 1e13).muli(1e18));
+        emit log_int("next util", ( _nextUtilPerShell / 1e13 * 1e13).muli(1e18));
+
+        int128 _diff = _nextUtilPerShell - _prevUtilPerShell;
+
+        emit log_int("max diff", MAX_DIFF.neg());
+
+        require(0 < _diff || _diff >= MAX_DIFF, "Shell/liquidity-invariant-violation");
         
     }
     

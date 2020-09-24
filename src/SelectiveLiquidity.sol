@@ -77,7 +77,7 @@ library SelectiveLiquidity {
             int128[] memory _oBals,
             int128[] memory _nBals ) = getLiquidityWithdrawData(shell, _derivatives, msg.sender, _amounts);
 
-        int128 _shells = ShellMath.calculateLiquidityMembrane(shell, _oGLiq, _nGLiq, _oBals, _nBals);
+        int128 _shells = ShellMath.calculateLiquidityMembrane_no_view(shell, _oGLiq, _nGLiq, _oBals, _nBals);
 
         _shells = _shells.neg().us_mul(ONE + shell.epsilon);
 
