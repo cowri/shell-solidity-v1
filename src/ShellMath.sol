@@ -123,7 +123,7 @@ library ShellMath {
 
             if (( outputAmt_ = _omega < _psi
                     ? - ( _inputAmt + _omega - _psi )
-                    : - ( _inputAmt + _lambda.us_mul(_omega - _psi))
+                    : - ( _inputAmt + _lambda.us_mul(_omega - _psi) )
                 ) / 1e13 == outputAmt_ / 1e13 ) {
 
                 _nGLiq = _oGLiq + _inputAmt + outputAmt_;
@@ -231,7 +231,6 @@ library ShellMath {
         int128 _psi
     ) private pure {
 
-        
         int128 _nextUtil = _nGLiq - _psi;
 
         int128 _prevUtil = _oGLiq - _omega;
@@ -239,7 +238,7 @@ library ShellMath {
         int128 _diff = _nextUtil - _prevUtil;
 
         require(0 < _diff || _diff >= MAX_DIFF, "Shell/swap-invariant-violation");
-
+        
     }
 
     function calculateLiquidityMembrane (
@@ -271,6 +270,7 @@ library ShellMath {
         int128 _liqDiff = _nGLiq.sub(_oGLiq);
         int128 _oUtil = _oGLiq.sub(_omega);
         int128 _totalShells = shell.totalSupply.divu(1e18);
+        int128 _shellMultiplier;
 
         if (_totalShells == 0) {
 
@@ -278,19 +278,19 @@ library ShellMath {
 
         } else if (_feeDiff >= 0) {
 
-            shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
+            _shellMultiplier = _liqDiff.sub(_feeDiff).div(_oUtil);
 
         } else {
             
-            shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff));
+            _shellMultiplier = _liqDiff.sub(shell.lambda.mul(_feeDiff));
             
-            shells_ = shells_.div(_oUtil);
+            _shellMultiplier = _shellMultiplier.div(_oUtil);
 
         }
 
         if (_totalShells != 0) {
 
-            shells_ = shells_.mul(_totalShells);
+            shells_ = _totalShells.us_mul(_shellMultiplier);
             
             enforceLiquidityInvariant(_totalShells, shells_, _oGLiq, _nGLiq, _omega, _psi);
 
@@ -372,11 +372,10 @@ library ShellMath {
         int128 _nextUtilPerShell = _nGLiq
             .sub(_psi)
             .div(_totalShells.add(_newShells));
-            
+
         int128 _diff = _nextUtilPerShell - _prevUtilPerShell;
 
         require(0 < _diff || _diff >= MAX_DIFF, "Shell/liquidity-invariant-violation");
-        
         
     }
 
@@ -418,8 +417,6 @@ library ShellMath {
         emit log_int("next util", ( _nextUtilPerShell / 1e13 * 1e13).muli(1e18));
 
         int128 _diff = _nextUtilPerShell - _prevUtilPerShell;
-
-        emit log_int("max diff", MAX_DIFF.neg());
 
         require(0 < _diff || _diff >= MAX_DIFF, "Shell/liquidity-invariant-violation");
         

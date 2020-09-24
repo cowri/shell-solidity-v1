@@ -21,19 +21,19 @@ contract SelectiveDepositSuiteSeven is Setup, DSTest {
   function test_s7_fuzz (uint num) public { 
 
     s.deposit(
-      address(dai), 190e18,
-      address(usdc), 190e6,
-      address(usdt), 190e6,
-      address(susd), 60e18
+      address(dai), 190000000000e18,
+      address(usdc), 190000000000e6,
+      address(usdt), 190000000000e6,
+      address(susd), 60000000000e18
     );
 
-    if (num < 20e18) {
+    if (num < 20000000000e18) {
 
-      while (num < 20e18) num *= 2;
+      while (num < 20000000000e18) num *= 2;
 
-    } else if (num > 40e18) {
+    } else if (num > 40000000000e18) {
 
-      while (num > 40e18) num /= 2;
+      while (num > 40000000000e18) num /= 2;
 
     }
 
