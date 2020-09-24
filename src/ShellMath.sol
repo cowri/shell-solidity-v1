@@ -156,7 +156,7 @@ library ShellMath {
         int128 _psi
     ) private pure {
         
-        require(_oGLiq.sub(_omega) / 1e10 <= _nGLiq.sub(_psi) / 1e10, "Shell/swap-invariant-violation");
+        require(_oGLiq.sub(_omega) / 1e13 <= _nGLiq.sub(_psi) / 1e13, "Shell/swap-invariant-violation");
         
     }
 
@@ -234,7 +234,7 @@ library ShellMath {
             .sub(_psi)
             .div(_totalShells.add(_newShells));
             
-        require(_prevUtilPerShell / 1e10 <= _nextUtilPerShell / 1e10, "Shell/liquidity-invariant-violation");
+        require(_prevUtilPerShell / 1e13 <= _nextUtilPerShell / 1e13, "Shell/liquidity-invariant-violation");
         
     }
 
