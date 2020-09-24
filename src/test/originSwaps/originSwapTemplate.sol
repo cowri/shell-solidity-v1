@@ -588,7 +588,7 @@ contract OriginSwapTemplate is Setup {
 
     }
 
-    function upperHaltCheck_30PctWeight () public returns (bool success_) {
+    function haltCheckUpper_30PctWeight () public returns (bool success_) {
 
         s.deposit(
             address(dai), 90e18,
@@ -608,7 +608,7 @@ contract OriginSwapTemplate is Setup {
 
     }
 
-    function lowerHaltCheck_30PctWeight () public returns (bool success_) {
+    function haltCheckLower_30PctWeight () public returns (bool success_) {
 
         s.deposit(
             address(dai), 60e18,
@@ -628,7 +628,7 @@ contract OriginSwapTemplate is Setup {
 
     }
 
-    function upperHaltCheck_10PctWeight () public returns (bool success_) {
+    function haltCheckUpper_10PctWeight () public returns (bool success_) {
 
         s.proportionalDeposit(300e18, 1e50);
 

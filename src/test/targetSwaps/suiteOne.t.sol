@@ -165,25 +165,25 @@ contract TargetSwapSuiteOneTests is TargetSwapTemplate, DSTest {
 
     }
 
-    function test_s1_targetSwap_upperHaltCheck_30PctWeight () public {
+    function test_s1_targetSwap_haltCheckUpper_30PctWeight () public {
 
-        bool success = super.upperHaltCheck_30PctWeight();
-
-        assertTrue(!success);
-
-    }
-
-    function test_s1_targetSwap_lowerHaltCheck_30PctWeight () public {
-
-        bool success = super.lowerHaltCheck_30PctWeight();
+        bool success = super.haltCheckUpper_30PctWeight();
 
         assertTrue(!success);
 
     }
 
-    function test_s1_targetSwap_upperHaltCheck_10PctWeight () public {
+    function test_s1_targetSwap_haltCheckLower_30PctWeight () public {
 
-        bool success = super.upperHaltCheck_10PctWeight();
+        bool success = super.haltCheckLower_30PctWeight();
+
+        assertTrue(!success);
+
+    }
+
+    function test_s1_targetSwap_haltCheckUpper_10PctWeight () public {
+
+        bool success = super.haltCheckUpper_10PctWeight();
 
         assertTrue(!success);
 
