@@ -18,16 +18,54 @@ contract SelectiveDepositSuiteSeven is Setup, DSTest {
 
   }
 
-  function test_s7_deposit () public { 
+  function test_s7_fuzz (uint num) public { 
 
     s.deposit(
-      address(dai), 90e18,
-      address(usdc), 90e6,
-      address(usdt), 90e6,
-      address(susd), 30e18
+      address(dai), 190e18,
+      address(usdc), 190e6,
+      address(usdt), 190e6,
+      address(susd), 60e18
     );
 
-    s.proportionalDeposit(18446744073709551616, 1e50);
+    if (num < 20e18) {
+
+      while (num < 20e18) num *= 2;
+
+    } else if (num > 40e18) {
+
+      while (num > 40e18) num /= 2;
+
+    }
+
+    s.targetSwap(
+      address(susd),
+      address(dai),
+      num
+    );
+
+    s.originSwap(
+      address(dai),
+      address(susd),
+      num
+    );
+
+    s.deposit(
+      address(dai), ( num * 100 / 85 ),
+      address(usdc), ( num * 100 / 110 ) / 1e12,
+      address(usdt), ( num * 100 / 115 ) / 1e12,
+      address(susd), num / 3
+    );
+
+    s.proportionalWithdraw(num, 1e50);
+
+    s.proportionalDeposit(num, 1e50);
+    
+    s.withdraw(
+      address(dai), ( num * 100 / 85 ),
+      address(usdc), ( num * 100 / 120 ) / 1e12,
+      address(usdt), ( num * 100 / 111 ) / 1e12,
+      address(susd), num / 3
+    );
 
   }
 
