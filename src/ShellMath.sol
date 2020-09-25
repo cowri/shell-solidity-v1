@@ -123,7 +123,7 @@ library ShellMath {
 
             if (( outputAmt_ = _omega < _psi
                     ? - ( _inputAmt + _omega - _psi )
-                    : - ( _inputAmt + _lambda.us_mul(_omega - _psi))
+                    : - ( _inputAmt + _lambda.us_mul(_omega - _psi) )
                 ) / 1e13 == outputAmt_ / 1e13 ) {
 
                 _nGLiq = _oGLiq + _inputAmt + outputAmt_;
@@ -195,6 +195,7 @@ library ShellMath {
         int128 _liqDiff = _nGLiq.sub(_oGLiq);
         int128 _oUtil = _oGLiq.sub(_omega);
         int128 _totalShells = shell.totalSupply.divu(1e18);
+        int128 _shellMultiplier;
 
         if (_totalShells == 0) {
 
@@ -202,19 +203,19 @@ library ShellMath {
 
         } else if (_feeDiff >= 0) {
 
-            shells_ = _liqDiff.sub(_feeDiff).div(_oUtil);
+            _shellMultiplier = _liqDiff.sub(_feeDiff).div(_oUtil);
 
         } else {
             
-            shells_ = _liqDiff.sub(shell.lambda.mul(_feeDiff));
+            _shellMultiplier = _liqDiff.sub(shell.lambda.mul(_feeDiff));
             
-            shells_ = shells_.div(_oUtil);
+            _shellMultiplier = _shellMultiplier.div(_oUtil);
 
         }
 
         if (_totalShells != 0) {
 
-            shells_ = shells_.mul(_totalShells);
+            shells_ = _totalShells.us_mul(_shellMultiplier);
             
             enforceLiquidityInvariant(_totalShells, shells_, _oGLiq, _nGLiq, _omega, _psi);
 
