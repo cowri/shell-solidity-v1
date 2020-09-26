@@ -25,8 +25,8 @@ contract RinkebyCUsdcToUsdcAssimilator is IAssimilator {
     using ABDKMath64x64 for int128;
     using ABDKMath64x64 for uint256;
 
-    IERC20 constant usdc = IERC20(0xb7a4F3E9097C08dA09517b5aB877F7a917224ede);
-    ICToken constant cusdc = ICToken(0x4a92E71227D294F041BD82dd8f78591B75140d63);
+    IERC20 constant usdc = IERC20(0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b);
+    ICToken constant cusdc = ICToken(0x5B281A6DdA0B271e91ae35DE655Ad301C976edb1);
 
     constructor () public { }
 
