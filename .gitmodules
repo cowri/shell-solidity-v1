@@ -4,9 +4,9 @@
 [submodule "lib/ds-math"]
 	path = lib/ds-math
 	url = https://github.com/dapphub/ds-math
-[submodule "lib/abdk-libraries-solidity"]
-	path = lib/abdk-libraries-solidity
-	url = https://github.com/cowri/abdk-libraries-solidity
 [submodule "lib/openzeppelin-contracts"]
 	path = lib/openzeppelin-contracts
 	url = https://github.com/cowri/openzeppelin-contracts
+[submodule "lib/abdk-libraries-solidity"]
+	path = lib/abdk-libraries-solidity
+	url = https://github.com/cowri/abdk-libraries-solidity.git

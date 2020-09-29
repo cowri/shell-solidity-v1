@@ -1,4 +1,4 @@
-pragma solidity ^0.5.12;
+pragma solidity ^0.5.0;
 
 interface IChai {
     function draw(address src, uint wad) external;

@@ -114,15 +114,15 @@ Mainnet Deployment Addresses:
 * [ASUsd adapter](https://etherscan.io/address/0xe302a5e54c9e837cd1b5891f94eb6d6df3464610#code)
 ------------------------------------------------------------------------
 
-[Loihi Exchange](https://etherscan.io/address/0xb40b60cd9687dae6fe7043e8c62bb8ec692632a3#code)
+[Shell Exchange](https://etherscan.io/address/0xb40b60cd9687dae6fe7043e8c62bb8ec692632a3#code)
 
 ------------------------------------------------------------------------
 
-[Loihi Views](https://etherscan.io/address/0x04a6cf4e770a9af7e6b6733462d72e238b8ab140#code)
+[Shell Views](https://etherscan.io/address/0x04a6cf4e770a9af7e6b6733462d72e238b8ab140#code)
 
 ------------------------------------------------------------------------
 
-[Loihi Liqudity](https://etherscan.io/address/0x7db66490d3436717f90d4681bf8297a2f2b8774a#code)
+[Shell Liqudity](https://etherscan.io/address/0x7db66490d3436717f90d4681bf8297a2f2b8774a#code)
 
 ------------------------------------------------------------------------
-[Loihi ERC20](https://etherscan.io/address/0xffa473d58c9f15e97b86ad281f876d9dbf96241c#code)
+[Shell ERC20](https://etherscan.io/address/0xffa473d58c9f15e97b86ad281f876d9dbf96241c#code)
