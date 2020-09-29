@@ -24,7 +24,7 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
 
         uint256 newShells = super.partialUpperSlippage_145DAI_90USDC_90USDT_50SUSD();
 
-        assertEq(newShells, 374956944444444444455);
+        assertEq(newShells, 374956944444444444456);
 
     }
 
@@ -112,7 +112,7 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
 
         uint256 newShells = super.fullUpperAntiSlippage_8DAI_12USDC_10USDT_2SUSD_into_145DAI_90USDC_90USDT_50SUSD();
 
-        assertEq(newShells, 32007966147966147958);
+        assertEq(newShells, 32007966147966147959);
 
     }
 
@@ -152,7 +152,7 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
 
         uint256 newShells = super.megaDepositIndirectUpperToLower_165DAI_165USDT_into_90DAI_145USDC_90USDT_50SUSD();
 
-        assertEq(newShells, 329943557919621749370);
+        assertEq(newShells, 329943557919621749371);
 
     }
 
@@ -160,7 +160,7 @@ contract SelectiveDepositSuiteOneViews is SelectiveDepositViewsTemplate, DSTest 
 
         uint256 newShells = super.megaDepositIndirectUpperToLower_165DAI_0p0001USDC_165USDT_0p5SUSD_from_90DAI_145USDC_90USDT_50SUSD();
 
-        assertEq(newShells, 330445741274888467979);
+        assertEq(newShells, 330445741274888467980);
 
     }
 

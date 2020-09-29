@@ -20,15 +20,11 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
         shell_ = getShellSuiteOneLocalFromFactory();
 
-        // shell_ = getShellSuiteOneLocal();
-        // shell_ = getShellSuiteOneMainnet();
-
     }
 
     function getShellSuiteTwo () public returns (Shell shell_) {
 
         shell_ = getShellSuiteTwoLocal();
-        // shell_ = getShellSuiteTwoMainnet();
 
     }
 
@@ -66,7 +62,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
     }
     
-
     function newShell () public returns (Shell shell_) {
         
         address[] memory _assets = new address[](0);
@@ -99,6 +94,163 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
     }
 
+    function getShellSuiteTwoLocal () public returns (Shell shell_) {
+
+        setupStablecoinsLocal();
+
+        setupAssimilatorsSetOneLocal();
+
+        shell_ = getShellFromFactory();
+
+        setParamsSetTwo(shell_);
+
+        approveStablecoins(address(shell_));
+
+        interApproveStablecoinsLocal(address(shell_));
+
+    }
+
+    
+    function getShellSuiteOneLocal () public returns (Shell shell_) {
+
+        // setupStablecoinsLocal();
+        // setupAssimilatorsSetOneLocal();
+
+        // shell_ = newShell();
+        
+        // shell_.TEST_includeAssimilatorState(
+        //     dai, cdai, chai, pot,
+        //     usdc, cusdc,
+        //     usdt, ausdt,
+        //     susd, asusd
+        // );
+
+        // includeAssetsSetOne(shell_);
+        // includeAssimilatorsSetOne(shell_);
+
+        // setParamsSetOne(shell_);
+
+        // approveStablecoins(address(shell_));
+        // interApproveStablecoinsLocal(address(shell_));
+
+
+    }
+
+    function getShellSuiteOneMainnet () public returns (Shell shell_) {
+
+        setupStablecoinsMainnet();
+
+        setupAssimilatorsSetOneMainnet();
+
+        shell_ = getShellFromFactory();
+
+        setParamsSetOne(shell_);
+
+        approveStablecoins(address(shell_));
+
+        interApproveStablecoinsRPC(address(shell_));
+
+    }
+
+
+    function getShellSuiteThreeLocal () public returns (Shell shell_) {
+
+        setupStablecoinsLocal();
+
+        setupAssimilatorsSetTwoLocal();
+
+        shell_ = getShellFromFactory();
+
+        setParamsSetOne(shell_);
+
+        approveStablecoins(address(shell_));
+
+        interApproveStablecoinsLocal(address(shell_));
+
+    }
+
+    function getShellSuiteFourLocal () public returns (Shell shell_) {
+
+        setupStablecoinsLocal();
+
+        setupAssimilatorsSetTwoLocal();
+
+        shell_ = getShellFromFactory();
+
+        setParamsSetTwo(shell_);
+
+        approveStablecoins(address(shell_));
+
+        interApproveStablecoinsLocal(address(shell_));
+
+    }
+
+    function getShellSuiteFiveLocal () public returns (Shell shell_) {
+
+        setupStablecoinsLocal();
+        setupAssimilatorsSetOneLocal();
+
+        shell_ = getShellFromFactory();
+        
+        setParamsSetFour(shell_);
+
+        approveStablecoins(address(shell_));
+
+        interApproveStablecoinsLocal(address(shell_));
+
+    }
+
+    function getShellSuiteSixLocal () public returns (Shell shell_) {
+
+        setupStablecoinsLocal();
+
+        setupAssimilatorsSetOneLocal();
+
+        shell_ = getShellFromFactory();
+ 
+        setParamsSetThree(shell_);
+
+        approveStablecoins(address(shell_));
+
+        interApproveStablecoinsLocal(address(shell_));
+
+    }
+
+    function getShellSuiteSixLocalClone () public returns (Shell shell_) {
+
+        // shell_ = newShell();
+
+        // shell_.TEST_includeAssimilatorState(
+        //     dai, cdai, chai, pot,
+        //     usdc, cusdc,
+        //     usdt, ausdt,
+        //     susd, asusd
+        // );
+
+        // includeAssetsSetOne(shell_);
+        // includeAssimilatorsSetOne(shell_);
+        // setParamsSetThree(shell_);
+
+        // approveStablecoins(address(shell_));
+        // interApproveStablecoinsLocal(address(shell_));
+
+    }
+
+    function getShellSuiteSeven () public returns (Shell shell_) {
+
+        setupStablecoinsLocal();
+
+        setupAssimilatorsSetOneLocal();
+
+        shell_ = getShellFromFactory();
+        
+        setParamsSetFive(shell_);
+
+        approveStablecoins(address(shell_));
+
+        interApproveStablecoinsLocal(address(shell_));
+
+    }
 
     function getShellFromFactory () public returns (Shell shell_) {
 
@@ -149,190 +301,6 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
             susd, asusd
         );
         
-    }
-    
-    function getShellSuiteOneLocal () public returns (Shell shell_) {
-
-        // setupStablecoinsLocal();
-        // setupAssimilatorsSetOneLocal();
-
-        // shell_ = newShell();
-        
-        // shell_.TEST_includeAssimilatorState(
-        //     dai, cdai, chai, pot,
-        //     usdc, cusdc,
-        //     usdt, ausdt,
-        //     susd, asusd
-        // );
-
-        // includeAssetsSetOne(shell_);
-        // includeAssimilatorsSetOne(shell_);
-
-        // setParamsSetOne(shell_);
-
-        // approveStablecoins(address(shell_));
-        // interApproveStablecoinsLocal(address(shell_));
-
-
-    }
-
-    function getShellSuiteOneMainnet () public returns (Shell shell_) {
-
-        // setupStablecoinsMainnet();
-        // setupAssimilatorsSetOneMainnet();
-
-        // shell_ = newShell();
-
-        // includeAssetsSetOne(shell_);
-        // includeAssimilatorsSetOne(shell_);
-        // setParamsSetOne(shell_);
-
-        // approveStablecoins(address(shell_));
-        // interApproveStablecoinsRPC(address(shell_));
-
-    }
-
-    function getShellSuiteTwoLocal () public returns (Shell shell_) {
-
-        // setupStablecoinsLocal();
-        // setupAssimilatorsSetOneLocal();
-
-        // shell_ = newShell();
-
-        // shell_.TEST_includeAssimilatorState(
-        //     dai, cdai, chai, pot,
-        //     usdc, cusdc,
-        //     usdt, ausdt,
-        //     susd, asusd
-        // );
-
-        // includeAssetsSetOne(shell_);
-        // includeAssimilatorsSetOne(shell_);
-        // setParamsSetTwo(shell_);
-
-        // approveStablecoins(address(shell_));
-        // interApproveStablecoinsLocal(address(shell_));
-
-    }
-
-    function getShellSuiteThreeLocal () public returns (Shell shell_) {
-
-        // setupStablecoinsLocal();
-        // setupAssimilatorsSetTwoLocal();
-
-        // shell_ = newShell();
-        
-        // shell_.TEST_includeAssimilatorState(
-        //     dai, cdai, chai, pot,
-        //     usdc, cusdc,
-        //     usdt, ausdt,
-        //     susd, asusd
-        // );
-
-        // includeAssetsSetTwo(shell_);
-        // includeAssimilatorsSetTwo(shell_);
-        // setParamsSetOne(shell_);
-
-        // approveStablecoins(address(shell_));
-        // interApproveStablecoinsLocal(address(shell_));
-
-    }
-
-    function getShellSuiteFourLocal () public returns (Shell shell_) {
-
-        // setupStablecoinsLocal();
-        // setupAssimilatorsSetTwoLocal();
-
-        // shell_ = newShell();
-
-        // shell_.TEST_includeAssimilatorState(
-        //     dai, cdai, chai, pot,
-        //     usdc, cusdc,
-        //     usdt, ausdt,
-        //     susd, asusd
-        // );
-
-        // includeAssetsSetTwo(shell_);
-        // includeAssimilatorsSetTwo(shell_);
-        // setParamsSetTwo(shell_);
-
-        // approveStablecoins(address(shell_));
-        // interApproveStablecoinsLocal(address(shell_));
-
-    }
-
-    function getShellSuiteFiveLocal () public returns (Shell shell_) {
-
-        setupStablecoinsLocal();
-        setupAssimilatorsSetOneLocal();
-
-        shell_ = getShellFromFactory();
-        
-        setParamsSetFour(shell_);
-
-        approveStablecoins(address(shell_));
-
-        interApproveStablecoinsLocal(address(shell_));
-
-    }
-
-    function getShellSuiteSixLocal () public returns (Shell shell_) {
-
-        // setupStablecoinsLocal();
-        // setupAssimilatorsSetOneLocal();
-
-        // shell_ = newShell();
-
-        // shell_.TEST_includeAssimilatorState(
-        //     dai, cdai, chai, pot,
-        //     usdc, cusdc,
-        //     usdt, ausdt,
-        //     susd, asusd
-        // );
-
-        // includeAssetsSetOne(shell_);
-        // includeAssimilatorsSetOne(shell_);
-        // setParamsSetThree(shell_);
-
-        // approveStablecoins(address(shell_));
-        // interApproveStablecoinsLocal(address(shell_));
-
-    }
-
-    function getShellSuiteSixLocalClone () public returns (Shell shell_) {
-
-        // shell_ = newShell();
-
-        // shell_.TEST_includeAssimilatorState(
-        //     dai, cdai, chai, pot,
-        //     usdc, cusdc,
-        //     usdt, ausdt,
-        //     susd, asusd
-        // );
-
-        // includeAssetsSetOne(shell_);
-        // includeAssimilatorsSetOne(shell_);
-        // setParamsSetThree(shell_);
-
-        // approveStablecoins(address(shell_));
-        // interApproveStablecoinsLocal(address(shell_));
-
-    }
-
-    function getShellSuiteSeven () public returns (Shell shell_) {
-
-        setupStablecoinsLocal();
-
-        setupAssimilatorsSetOneLocal();
-
-        shell_ = getShellFromFactory();
-        
-        setParamsSetFive(shell_);
-
-        approveStablecoins(address(shell_));
-
-        interApproveStablecoinsLocal(address(shell_));
-
     }
 
 }

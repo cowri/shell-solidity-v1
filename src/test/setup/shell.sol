@@ -8,7 +8,9 @@ import "../../interfaces/IERC20NoBool.sol";
 import "./storage.sol";
 
 contract ApproveFrom {
+
     function TEST_safeApprove(address _token, address _spender, uint256 _value) public;
+
 }
 
 contract ShellSetup is StorageSetup {
