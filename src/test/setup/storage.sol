@@ -11,17 +11,17 @@ import "../../interfaces/IPot.sol";
 contract StorageSetup {
 
     IERC20 dai;
-    IAToken adai;
-    ICToken cdai;
     IChai chai;
+    ICToken cdai;
+    IAToken adai;
 
     IERC20 usdc;
-    IAToken ausdc;
     ICToken cusdc;
+    IAToken ausdc;
 
     IERC20NoBool usdt;
-    IAToken ausdt;
     ICToken cusdt;
+    IAToken ausdt;
 
     IERC20 susd;
     IAToken asusd;
@@ -29,22 +29,34 @@ contract StorageSetup {
     IPot pot;
 
     address aaveLpCore;
+    
+    IERC20 pBTC;
+    IERC20 sBTC;
+    IERC20 tBTC;
+    IERC20 wBTC;
+    IERC20 renBTC;
 
     IAssimilator daiAssimilator;
+    IAssimilator chaiAssimilator;
     IAssimilator adaiAssimilator;
     IAssimilator cdaiAssimilator;
-    IAssimilator chaiAssimilator;
 
     IAssimilator usdcAssimilator;
     IAssimilator ausdcAssimilator;
     IAssimilator cusdcAssimilator;
 
     IAssimilator usdtAssimilator;
-    IAssimilator ausdtAssimilator;
     IAssimilator cusdtAssimilator;
+    IAssimilator ausdtAssimilator;
 
     IAssimilator susdAssimilator;
     IAssimilator asusdAssimilator;
+
+    IAssimilator renbtcAssimilator;
+    IAssimilator wbtcAssimilator;
+    IAssimilator tbtcAssimilator;
+    IAssimilator sbtcAssimilator;
+    IAssimilator pbtcAssimilator;
 
     uint256 epsilon;
     uint256 delta;

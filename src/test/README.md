@@ -38,6 +38,11 @@ The tests are divided into suites. Suites are composed asset sets and parameter 
     * Asset Set One
     * Param Set Five
     
+* Suite Eight - BTC on ETH:
+    * Assimilator Set Three
+    * Asset Set Five
+    * Param Set Five
+    
 ### Pool Parameter Sets
 
 *   Set One - standard testing with 2.5 bps base fee:
@@ -102,6 +107,13 @@ The tests are divided into suites. Suites are composed asset sets and parameter 
     * 33.3% dai
     * 33.3% usdc
     * 33.3% usdt
+    
+*  Set Five:
+    * Assimilator Set Three
+    * 40% wBTC
+    * 40% renBTC
+    * 10% tBTC
+    * 10% sBTC
 
 
 ### Assimilator Sets
@@ -117,3 +129,9 @@ The tests are divided into suites. Suites are composed asset sets and parameter 
     * usdc reserves held in cusdc
     * usdt reserves held in ausdt
     * susd reserves held in asusd
+    
+* Set Three:
+    * sBTC reserves held in sBTC
+    * tBTC reserves held in tBTC
+    * wBTC reserves held in wBTC
+    * renBTC reserves held in renBTC

@@ -75,70 +75,6 @@ contract ShellSetup is StorageSetup {
 
     }
 
-    // function includeAssimilatorsSetOne (Shell _shell) public {
-
-    //     _shell.includeAssimilator(address(chai), address(dai), address(dai), address(chaiAssimilator));
-
-    //     _shell.includeAssimilator(address(cdai), address(dai), address(dai), address(cdaiAssimilator));
-
-    //     _shell.includeAssimilator(address(cusdc), address(usdc), address(usdc), address(cusdcAssimilator));
-
-    //     _shell.includeAssimilator(address(ausdt), address(usdt), address(usdt), address(ausdtAssimilator));
-
-    //     _shell.includeAssimilator(address(asusd), address(susd), address(susd), address(asusdAssimilator));
-
-    // }
-
-    // function includeAssimilatorsSetTwo (Shell _shell) public {
-
-    //     _shell.includeAssimilator(address(chai), address(dai), address(cdai), address(chaiAssimilator));
-
-    // }
-
-    // function includeAssetsSetOne (Shell _shell) public {
-
-    //     _shell.includeAsset(address(dai), address(daiAssimilator), address(dai), address(daiAssimilator), .3e18);
-
-    //     _shell.includeAsset(address(usdc), address(usdcAssimilator), address(usdc), address(usdcAssimilator), .3e18);
-
-    //     _shell.includeAsset(address(usdt), address(usdtAssimilator), address(usdt), address(usdtAssimilator), .3e18);
-
-    //     _shell.includeAsset(address(susd), address(susdAssimilator), address(susd), address(susdAssimilator), .1e18);
-
-    // }
-
-    // function includeAssetsSetTwo (Shell _shell) public {
-
-    //     _shell.includeAsset(address(dai), address(daiAssimilator), address(cdai), address(cdaiAssimilator), .3e18);
-
-    //     _shell.includeAsset(address(usdc), address(usdcAssimilator), address(cusdc), address(cusdcAssimilator), .3e18);
-
-    //     _shell.includeAsset(address(usdt), address(usdtAssimilator), address(ausdt), address(ausdtAssimilator), .3e18);
-
-    //     _shell.includeAsset(address(susd), address(susdAssimilator), address(asusd), address(asusdAssimilator), .1e18);
-
-    // }
-
-    // function includeAssetsSetThree (Shell _shell) public {
-
-    //     _shell.includeAsset(address(dai), address(daiAssimilator), address(dai), address(daiAssimilator), 333333333333333333);
-
-    //     _shell.includeAsset(address(usdc), address(usdcAssimilator), address(usdc), address(usdcAssimilator), 333333333333333333);
-
-    //     _shell.includeAsset(address(usdt), address(usdtAssimilator), address(usdt), address(usdtAssimilator), 333333333333333333);
-
-    // }
-
-    // function includeAssetsSetFour (Shell _shell) public {
-
-    //     _shell.includeAsset(address(dai), address(daiAssimilator), address(cdai), address(cdaiAssimilator), 333333333333333333);
-
-    //     _shell.includeAsset(address(usdc), address(usdcAssimilator), address(cusdc), address(cusdcAssimilator), 333333333333333333);
-       
-    //     _shell.includeAsset(address(usdt), address(usdtAssimilator), address(ausdt), address(ausdtAssimilator), 333333333333333333);
-
-    // }
-
     function approveStablecoins (address _approveTo) public {
 
         approve(address(dai), _approveTo);
@@ -150,14 +86,18 @@ contract ShellSetup is StorageSetup {
         approve(address(ausdc), _approveTo);
         approve(address(cusdc), _approveTo);
 
-
         approveBad(address(usdt), _approveTo);
         approve(address(ausdt), _approveTo);
         approve(address(cusdt), _approveTo);
 
-
         approve(address(susd), _approveTo);
         approve(address(asusd), _approveTo);
+
+        approve(address(pBTC), _approveTo);
+        approve(address(renBTC), _approveTo);
+        approve(address(sBTC), _approveTo);
+        approve(address(tBTC), _approveTo);
+        approve(address(wBTC), _approveTo);
 
     }
 
@@ -174,8 +114,6 @@ contract ShellSetup is StorageSetup {
         targets[4] = address(usdt); spenders[4] = address(ausdt);
 
         for (uint i = 0; i < targets.length; i++) {
-
-            emit log_uint("i", i);
 
             ApproveFrom(_approveFrom).TEST_safeApprove(targets[i], spenders[i], uint256(0));
             ApproveFrom(_approveFrom).TEST_safeApprove(targets[i], spenders[i], uint256(-1));

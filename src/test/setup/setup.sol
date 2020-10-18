@@ -18,54 +18,14 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
         shell_ = getShellSuiteOneMainnetFromFactory();
 
-        // shell_ = getShellSuiteOneLocal();
-        // shell_ = getShellSuiteOneMainnet();
+    }
+
+    function getShellSuiteEight () public returns (Shell shell_) {
+
+        shell_ = getShellSuiteEightMainnet();
 
     }
 
-    function getShellSuiteTwo () public returns (Shell shell_) {
-
-        // shell_ = getShellSuiteTwoMainnet();
-
-    }
-
-    function getShellSuiteThree () public returns (Shell shell_) {
-
-
-    }
-
-    function getShellSuiteFive () public returns (Shell shell_) {
-
-
-    }
-
-    function getShellSuiteSix () public returns (Shell shell_) {
-
-
-    }
-
-    function getShellSuiteSixClone () public returns (Shell shell_) {
-
-
-    }
-
-
-    function newShell () public returns (Shell shell_) {
-        
-        address[] memory _assets = new address[](0);
-        uint[] memory _weights = new uint[](0);
-        address[] memory _derivatives = new address[](0);        
-        
-        shell_ = new Shell(
-            _assets,
-            _weights,
-            _derivatives
-        );
-
-    }
-
-    event log(bytes32);
-    
     function getShellSuiteOneMainnetFromFactory () public returns (Shell shell_) {
         
         setupStablecoinsMainnet();
@@ -160,21 +120,42 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
     }
 
-    function getShellSuiteOneMainnet () public returns (Shell shell_) {
+    function getShellSuiteEightMainnet () public returns (Shell shell_) {
 
-        // setupStablecoinsMainnet();
-        // setupAssimilatorsSetOneMainnet();
+        setupStablecoinsMainnet();
+            
+        setupAssimilatorsSetThreeMainnet();
+        
+        address[] memory _assets = new address[](15);
+        uint[] memory _weights = new uint[](3);
+        address[] memory _derivatives = new address[](0);
 
-        // shell_ = newShell();
+        _assets[0] = address(renBTC);
+        _assets[1] = address(renbtcAssimilator);
+        _assets[2] = address(renBTC);
+        _assets[3] = address(renbtcAssimilator);
+        _assets[4] = address(renBTC);
+        _weights[0] = .4e18;
 
-        // includeAssetsSetOne(shell_);
-        // includeAssimilatorsSetOne(shell_);
-        // setParamsSetOne(shell_);
+        _assets[5] = address(wBTC);
+        _assets[6] = address(wbtcAssimilator);
+        _assets[7] = address(wBTC);
+        _assets[8] = address(wbtcAssimilator);
+        _assets[9] = address(wBTC);
+        _weights[1] = .5e18;
 
-        // approveStablecoins(address(shell_));
-        // interApproveStablecoinsRPC(address(shell_));
+        _assets[10] = address(sBTC);
+        _assets[11] = address(sbtcAssimilator);
+        _assets[12] = address(sBTC);
+        _assets[13] = address(sbtcAssimilator);
+        _assets[14] = address(sBTC);
+        _weights[2] = .1e18;
+
+        shell_ = new Shell(_assets, _weights, _derivatives);
+
+        setParamsSetOne(shell_);
+
+        approveStablecoins(address(shell_));
 
     }
-
-
 }
