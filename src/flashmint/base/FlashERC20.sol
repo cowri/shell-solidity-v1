@@ -1,4 +1,4 @@
-pragma solidity 0.5.16;
+pragma solidity ^0.5.0;
 
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.5.0/contracts/token/ERC20/ERC20.sol";
@@ -12,12 +12,19 @@ contract FlashERC20 is ERC20 {
     using SafeERC20 for ERC20;
 
     // ERC20-Detailed
-    string public name = "Flash ERC20"; // e.g. Flash DAI
-    string public symbol = "fERC20"; // e.g.: fDAI
-    uint8  public decimals = 18;
+    string public name; // e.g. Flash DAI
+    string public symbol; // e.g.: fDAI
+    uint8  public decimals;
 
     // Set underlying to addres of the underlying asset.
     ERC20 public underlying = ERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F); // DAI address as an example
+
+    constructor(ERC20 public _underlying) {
+        underlying = _underlying;
+        name = string(abi.encodePacked("Flash ", _underlying.name()));
+        symbol = string(abi.encodePacked("f", _underlying.symbol()));
+        decimals = _underlying.decimals();
+    }
 
     // Events with parameter names that are consistent with the WETH9 contract.
     event Approval(address indexed src, address indexed guy, uint256 wad);
