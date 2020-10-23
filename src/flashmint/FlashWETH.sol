@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.3.0/contracts/token/ERC20/ERC20.sol";
-import "./IBorrower.sol";
+import "./base/ERC20.sol";
+import "./base/IBorrower.sol";
 
 // @title FlashWETH
 // @notice A simple ERC20 ETH-wrapper with flash-mint functionality.

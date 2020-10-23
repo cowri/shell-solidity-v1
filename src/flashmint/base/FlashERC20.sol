@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.5.0/contracts/token/ERC20/ERC20.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.5.0/contracts/token/ERC20/SafeERC20.sol";
+import "./ERC20.sol";
+import "./SafeERC20.sol";
 import "./IBorrower.sol";
 
 // @title FlashERC20
@@ -19,7 +19,7 @@ contract FlashERC20 is ERC20 {
     // Set underlying to addres of the underlying asset.
     ERC20 public underlying; // DAI address as an example
 
-    constructor(ERC20 _underlying) {
+    constructor(ERC20 _underlying) public {
         underlying = _underlying;
         name = string(abi.encodePacked("Flash ", _underlying.name()));
         symbol = string(abi.encodePacked("f", _underlying.symbol()));
