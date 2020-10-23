@@ -17,7 +17,7 @@ contract FlashERC20 is ERC20 {
     uint8  public decimals;
 
     // Set underlying to addres of the underlying asset.
-    ERC20 public underlying = ERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F); // DAI address as an example
+    ERC20 public underlying; // DAI address as an example
 
     constructor(ERC20 public _underlying) {
         underlying = _underlying;
