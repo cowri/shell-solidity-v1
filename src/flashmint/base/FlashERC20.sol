@@ -19,7 +19,7 @@ contract FlashERC20 is ERC20 {
     // Set underlying to addres of the underlying asset.
     ERC20 public underlying; // DAI address as an example
 
-    constructor(ERC20 public _underlying) {
+    constructor(ERC20 _underlying) {
         underlying = _underlying;
         name = string(abi.encodePacked("Flash ", _underlying.name()));
         symbol = string(abi.encodePacked("f", _underlying.symbol()));
