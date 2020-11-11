@@ -97,7 +97,10 @@ library ProportionalLiquidity {
 
             for (uint i = 0; i < _length; i++) {
 
-                deposits_[i] = Assimilators.viewRawAmount(shell.assets[i].addr, __deposit.mul(shell.weights[i]));
+                deposits_[i] = Assimilators.viewRawAmount(
+                    shell.assets[i].addr,
+                    __deposit.mul(shell.weights[i])
+                );
 
             }
 
@@ -107,7 +110,10 @@ library ProportionalLiquidity {
 
             for (uint i = 0; i < _length; i++) {
 
-                deposits_[i] = Assimilators.viewRawAmount(shell.assets[i].addr, _oBals[i].mul(_multiplier));
+                deposits_[i] = Assimilators.viewRawAmount(
+                    shell.assets[i].addr,
+                    _oBals[i].mul(_multiplier)
+                );
 
             }
 
@@ -147,7 +153,11 @@ library ProportionalLiquidity {
 
         for (uint i = 0; i < _length; i++) {
 
-            withdrawals_[i] = Assimilators.outputNumeraire(shell.assets[i].addr, msg.sender, _oBals[i].mul(_multiplier));
+            withdrawals_[i] = Assimilators.outputNumeraire(
+                shell.assets[i].addr,
+                msg.sender,
+                _oBals[i].mul(_multiplier)
+            );
 
         }
 

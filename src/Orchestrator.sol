@@ -43,15 +43,15 @@ library Orchestrator {
         uint256 _lambda
     ) internal {
 
-        require(_alpha < 1e18 && _alpha > 0, "Shell/parameter-invalid-alpha");
+        require(0 < _alpha && _alpha < 1e18, "Shell/parameter-invalid-alpha");
 
-        require(_beta <= _alpha && _beta >= 0, "Shell/parameter-invalid-beta");
+        require(0 <= _beta && _beta < _alpha, "Shell/parameter-invalid-beta");
 
         require(_feeAtHalt <= .5e18, "Shell/parameter-invalid-max");
 
-        require(_epsilon <= 1e16 && _epsilon >= 0, "Shell/parameter-invalid-epsilon");
+        require(0 <= _epsilon && _epsilon <= .01e18, "Shell/parameter-invalid-epsilon");
 
-        require(_lambda <= 1e18 && _lambda >= 0, "Shell/parameter-invalid-lambda");
+        require(0 <= _lambda && _lambda <= 1e18, "Shell/parameter-invalid-lambda");
 
         int128 _omega = getFee(shell);
 
