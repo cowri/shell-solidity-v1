@@ -75,6 +75,18 @@ contract ShellSetup is StorageSetup {
 
     }
 
+    function setParamsSetSix (Shell _shell) public {
+
+        uint256 _alpha = .8e18;
+        uint256 _beta = .1e18;
+        uint256 _max = .08e18;
+        uint256 _epsilon = 3.5e14;
+        uint256 _lambda = .9995e18;
+
+        _shell.setParams(_alpha, _beta, _max, _epsilon, _lambda);
+
+    }
+
     function approveStablecoins (address _approveTo) public {
 
         approve(address(dai), _approveTo);
@@ -99,9 +111,9 @@ contract ShellSetup is StorageSetup {
         approve(address(tBTC), _approveTo);
         approve(address(wBTC), _approveTo);
 
-    }
+        approve(address(ousd), _approveTo);
 
-    event log(bytes32);
+    }
 
     function interApproveStablecoinsLocal (address _approveFrom) public {
 

@@ -79,6 +79,13 @@ The tests are divided into suites. Suites are composed asset sets and parameter 
     * max = .05e18;
     * epsilon = 3.5e14;
     * lambda = .5e18;
+    
+* Set Six:
+    * alpha = .8e18;
+    * beta = .1e18;
+    * max = .08e18;
+    * epsilon = 3.5e14;
+    * lambda = .9995e18;
 
 ### Pool Asset Sets
 

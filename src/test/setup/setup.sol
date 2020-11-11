@@ -16,7 +16,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
     function getShellSuiteOne () public returns (Shell shell_) {
 
-        shell_ = getShellSuiteOneMainnetFromFactory();
+        shell_ = getShellSuiteOneMainnet();
 
     }
 
@@ -26,14 +26,12 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
 
     }
 
-    function getShellSuiteOneMainnetFromFactory () public returns (Shell shell_) {
+    function getShellSuiteOneMainnet () public returns (Shell shell_) {
         
         setupStablecoinsMainnet();
         
         setupAssimilatorsSetOneMainnet();
         
-        ShellFactory lf = new ShellFactory();
-
         address[] memory _assets = new address[](20);
         uint[] memory _assetWeights = new uint[](4);
         address[] memory _derivativeAssimilators = new address[](35);
@@ -108,7 +106,7 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
         _derivativeAssimilators[33] = address(asusdAssimilator);
         _derivativeAssimilators[34] = address(aaveLpCore);
 
-        shell_ = lf.newShell(
+        shell_ = new Shell(
             _assets,
             _assetWeights,
             _derivativeAssimilators
@@ -158,4 +156,44 @@ contract Setup is StablecoinSetup, AssimilatorSetup, ShellSetup {
         approveStablecoins(address(shell_));
 
     }
+
+    function getShellSuiteNineMainnet () public returns (Shell shell_) {
+
+        setupStablecoinsMainnet();
+            
+        setupAssimilatorsSetFourMainnet();
+        
+        address[] memory _assets = new address[](15);
+        uint[] memory _weights = new uint[](3);
+        address[] memory _derivatives = new address[](0);
+
+        _assets[0] = address(ousd);
+        _assets[1] = address(ousdAssimilator);
+        _assets[2] = address(ousd);
+        _assets[3] = address(ousdAssimilator);
+        _assets[4] = address(ousd);
+        _weights[0] = .5e18;
+
+        _assets[5] = address(usdc);
+        _assets[6] = address(usdcAssimilator);
+        _assets[7] = address(usdc);
+        _assets[8] = address(usdcAssimilator);
+        _assets[9] = address(usdc);
+        _weights[1] = .2e18;
+
+        _assets[10] = address(usdt);
+        _assets[11] = address(usdtAssimilator);
+        _assets[12] = address(usdt);
+        _assets[13] = address(usdtAssimilator);
+        _assets[14] = address(usdt);
+        _weights[2] = .3e18;
+
+        shell_ = new Shell(_assets, _weights, _derivatives);
+
+        setParamsSetOne(shell_);
+
+        approveStablecoins(address(shell_));
+
+    }
+
 }

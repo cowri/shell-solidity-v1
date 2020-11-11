@@ -35,6 +35,8 @@ contract StorageSetup {
     IERC20 tBTC;
     IERC20 wBTC;
     IERC20 renBTC;
+    
+    IERC20 ousd;
 
     IAssimilator daiAssimilator;
     IAssimilator chaiAssimilator;
@@ -57,6 +59,8 @@ contract StorageSetup {
     IAssimilator tbtcAssimilator;
     IAssimilator sbtcAssimilator;
     IAssimilator pbtcAssimilator;
+
+    IAssimilator ousdAssimilator;
 
     uint256 epsilon;
     uint256 delta;

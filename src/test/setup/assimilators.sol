@@ -15,6 +15,7 @@ import "../../assimilators/mainnet/usdtReserves/mainnetAUsdtToUsdtAssimilator.so
 import "../../assimilators/mainnet/usdtReserves/mainnetCUsdtToUsdtAssimilator.sol";
 import "../../assimilators/mainnet/susdReserves/mainnetSUsdToSUsdAssimilator.sol";
 import "../../assimilators/mainnet/susdReserves/mainnetASUsdToSUsdAssimilator.sol";
+import "../../assimilators/mainnet/ousdReserves/mainnetOUsdToOUsdAssimilator.sol";
 
 import "../../assimilators/mainnet/pbtcReserves/mainnetPBTCToPBTCAssimilator.sol";
 import "../../assimilators/mainnet/renbtcReserves/mainnetRenBTCToRenBTCAssimilator.sol";
@@ -51,6 +52,20 @@ contract AssimilatorSetup is StorageSetup {
         sbtcAssimilator = IAssimilator(address(new MainnetSBTCToSBTCAssimilator()));
         tbtcAssimilator = IAssimilator(address(new MainnetTBTCToTBTCAssimilator()));
         wbtcAssimilator = IAssimilator(address(new MainnetWBTCToWBTCAssimilator()));
+
+    }
+    
+    function setupAssimilatorsSetFourMainnet () public {
+        
+        usdcAssimilator = IAssimilator(address(new MainnetUsdcToUsdcAssimilator()));
+        ausdcAssimilator = IAssimilator(address(new MainnetAUsdcToUsdcAssimilator()));
+        cusdcAssimilator = IAssimilator(address(new MainnetCUsdcToUsdcAssimilator()));
+
+        usdtAssimilator = IAssimilator(address(new MainnetUsdtToUsdtAssimilator()));
+        ausdtAssimilator = IAssimilator(address(new MainnetAUsdtToUsdtAssimilator()));
+        cusdtAssimilator = IAssimilator(address(new MainnetCUsdtToUsdtAssimilator()));
+        
+        ousdAssimilator = IAssimilator(address(new MainnetOUsdToOUsdAssimilator()));
 
     }
 

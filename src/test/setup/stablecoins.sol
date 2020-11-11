@@ -43,6 +43,8 @@ contract StablecoinSetup is StorageSetup {
         sBTC = IERC20(0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6);
         tBTC = IERC20(0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa);
         wBTC = IERC20(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599);
+        
+        ousd = IERC20(0x2A8e1E676Ec238d8A992307B495b45B3fEAa5e86);
 
     }
 

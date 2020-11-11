@@ -19,29 +19,44 @@ contract DebugTest is Setup, DSMath, DSTest {
 
     Shell s;
 
-    event log_bytes(bytes32, bytes4);
-    event log_uints(bytes32, uint256[]);
-
     function setUp() public {
 
-        // s = getShellSuiteOne();
-        setupAssimilatorsSetOneMainnet();
+        s = getShellSuiteNineMainnet();
 
     }
 
     function testDebug () public {
+        
+        uint ousdbal = ousd.balanceOf(address(this));
+        uint usdcbal = usdc.balanceOf(address(this));
+        uint usdtbal = usdt.balanceOf(address(this));
+        
+        uint sminted = s.deposit(
+            address(ousd), 5e18,
+            address(usdc), 2e6,
+            address(usdt), 3e6
+        );
+        
+        uint ousdbalprime = ousd.balanceOf(address(this));
+        uint usdcbalprime = usdc.balanceOf(address(this));
+        uint usdtbalprime = usdt.balanceOf(address(this));
+        
+        assertTrue(ousdbal - ousdbalprime == 5e18);
+        assertTrue(usdcbal - usdcbalprime == 2e6);
+        assertTrue(usdtbal - usdtbalprime == 3e6);
+        
+        uint sburnt = s.withdraw(
+            address(ousd), 1e18
+        );
 
-        uint daiBal = daiAssimilator.viewNumeraireBalance(address(this)).mulu(1e18);
+        ousdbalprime = ousd.balanceOf(address(this));
 
-        emit log_named_uint("daibal", daiBal);
+        assertTrue(ousdbal - ousdbalprime == 4e18);
 
     }
     
     function testMath () public {
 
-        uint256 a = 1;
-
-        int128 a64 = a.fromUInt();
 
     }
 
