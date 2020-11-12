@@ -33,6 +33,11 @@ import "./ShellStorage.sol";
 
 import "./interfaces/IFreeFromUpTo.sol";
 
+contract IOUsd {
+    function rebaseOptIn () public;
+    function rebaseOptOut () public;
+}
+
 contract Shell is ShellStorage {
 
     event Approval(address indexed _owner, address indexed spender, uint256 value);
@@ -113,6 +118,7 @@ contract Shell is ShellStorage {
         uint[] memory _assetWeights,
         address[] memory _derivativeAssimilators
     ) public {
+    
         
         owner = msg.sender;
         emit OwnershipTransfered(address(0), msg.sender);
@@ -126,6 +132,18 @@ contract Shell is ShellStorage {
             _assetWeights,
             _derivativeAssimilators
         );
+
+    }
+    
+    function ousdOptIn () public {
+
+        IOUsd(0x2A8e1E676Ec238d8A992307B495b45B3fEAa5e86).rebaseOptIn();
+
+    }
+
+    function ousdOptOut () public {
+
+        IOUsd(0x2A8e1E676Ec238d8A992307B495b45B3fEAa5e86).rebaseOptOut();
 
     }
 

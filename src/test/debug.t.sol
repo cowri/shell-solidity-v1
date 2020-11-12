@@ -27,6 +27,9 @@ contract DebugTest is Setup, DSMath, DSTest {
 
     function testDebug () public {
         
+        s.ousdOptIn();
+        s.ousdOptOut();
+        
         uint ousdbal = ousd.balanceOf(address(this));
         uint usdcbal = usdc.balanceOf(address(this));
         uint usdtbal = usdt.balanceOf(address(this));
@@ -52,7 +55,30 @@ contract DebugTest is Setup, DSMath, DSTest {
         ousdbalprime = ousd.balanceOf(address(this));
 
         assertTrue(ousdbal - ousdbalprime == 4e18);
+        
+        uint _usdt = s.originSwap(
+            address(ousd),
+            address(usdt),
+            1e18
+        );
+        
+        usdtbalprime = usdt.balanceOf(address(this));
 
+        assertEq(usdtbal - usdtbalprime + _usdt, 3e6 + _usdt);
+        
+        uint __usdt = s.originSwap(
+            address(usdt),
+            address(usdt),
+            1e6
+        );
+        uint usdtbalprimeprime = usdt.balanceOf(address(this));
+        
+        assertEq(usdtbalprime, usdtbalprimeprime);
+        
+        emit log_named_uint("yes", _usdt);
+
+        emit log_named_uint("usdt to usdt", __usdt);
+        
     }
     
     function testMath () public {
