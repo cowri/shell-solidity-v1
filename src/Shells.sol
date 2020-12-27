@@ -72,7 +72,7 @@ library Shells {
      * `amount`
      */
     function transferFrom(ShellStorage.Shell storage shell, address sender, address recipient, uint256 amount) external returns (bool) {
-        _transfer(shell, msg.sender, recipient, amount);
+        _transfer(shell, sender, recipient, amount);
         _approve(shell, sender, msg.sender, sub(shell.allowances[sender][msg.sender], amount, "Shell/insufficient-allowance"));
         return true;
     }
