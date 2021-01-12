@@ -6,8 +6,8 @@ Shell Protocol is an automated market maker for assets of the same numeraire. It
 
 Shell Protocol is currently deployed to mainnet at the following addresses
 
-* [Shell Protocol Factory Contract](https://etherscan.io/address/0x7Ad175886d9fe7bAe494788292C4881f901EA982#code)
-* [Shell Protocol 30% DAI, USDC, USDT, 10% SUSD Pool](https://etherscan.io/address/0x2E703D658f8dd21709a7B458967aB4081F8D3d05#code)
+* [Shell Protocol 30% DAI, USDC, USDT, 10% SUSD Pool](https://etherscan.io/address/0x8f26D7bAB7a73309141A291525C965EcdEa7Bf42)
+* [Shell Protocol 50% WBTC, 40% RENBTC, 10% SBTC Pool](https://etherscan.io/address/0xC2D019b901f8D4fdb2B9a65b5d226Ad88c66EE8D)
 * Assimilator Contracts
   * [Dai to Dai Assimilator](https://etherscan.io/address/0x2f4184f73634775cd929c081d6e15ca8f3ff5fab#code)
   * [CDai to Dai Assimilator](https://etherscan.io/address/0xbeAAbb6897C4dAC29C93C32613Fc9cb5d6D457e5#code)
