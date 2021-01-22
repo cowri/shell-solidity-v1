@@ -48,8 +48,8 @@ interface IShell {
     function targetSwap (
         address _origin,
         address _target,
-        uint _targetAmount,
         uint _maxOriginAmount,
+        uint _targetAmount,
         uint _deadline
     ) external returns (
         uint originAmount_
@@ -58,8 +58,8 @@ interface IShell {
     function tansferByTarget (
         address _origin,
         address _target,
-        uint _targetAmount,
         uint _maxOriginAmount,
+        uint _targetAmount,
         address _recipient,
         uint _deadline
     ) external returns (
